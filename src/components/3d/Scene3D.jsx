@@ -177,13 +177,14 @@ export function Scene3D() {
 
   return (
     <div
-      className="fixed inset-0 -z-10"
+      className="fixed inset-0 z-0"
       onMouseMove={handleMouseMove}
     >
       <Canvas
         camera={{ position: [0, 0, 8], fov: 50 }}
         gl={{ antialias: true, alpha: true }}
         style={{ background: 'transparent' }}
+        frameloop="always"
       >
         <ambientLight intensity={0.6} />
         <directionalLight position={[5, 5, 5]} intensity={1.2} color="#ffffff" />
