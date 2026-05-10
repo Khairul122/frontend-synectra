@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { cn } from '../../utils/cn';
 
+// roles: undefined = semua role, ['admin'] = hanya admin, dll
 const NAV_ITEMS = [
   {
     label: 'Dashboard',
@@ -17,6 +18,7 @@ const NAV_ITEMS = [
   {
     label: 'Portfolio',
     path: '/portfolio',
+    roles: ['admin'],
     icon: (
       <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
         <rect x="2" y="3" width="20" height="14" rx="0" /><line x1="8" y1="21" x2="16" y2="21" /><line x1="12" y1="17" x2="12" y2="21" />
@@ -76,7 +78,7 @@ export function Sidebar({ user, onLogout }) {
 
       {/* Nav */}
       <nav className="flex-1 px-3 py-4 flex flex-col gap-1">
-        {NAV_ITEMS.map((item) => {
+        {NAV_ITEMS.filter(item => !item.roles || item.roles.includes(user?.role)).map((item) => {
           const active = location.pathname === item.path;
           return (
             <Link

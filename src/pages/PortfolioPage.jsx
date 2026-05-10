@@ -96,10 +96,12 @@ export default function PortfolioPage() {
   const isAdmin = user?.role === 'admin';
 
   useEffect(() => {
-    Promise.all([authService.getMe(), portfolioService.getAll()])
-      .then(([me, port]) => {
-        setUser(me.data);
-        setItems(port.data ?? []);
+    authService.getMe()
+      .then(me => {
+        const u = me.data;
+        if (u.role !== 'admin') { navigate('/dashboard'); return; }
+        setUser(u);
+        return portfolioService.getAll().then(port => setItems(port.data ?? []));
       })
       .catch(() => navigate('/login'))
       .finally(() => setIsLoading(false));
