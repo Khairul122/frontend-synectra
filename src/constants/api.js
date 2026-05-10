@@ -6,4 +6,5 @@ export const API_ENDPOINTS = {
   LOGOUT:      `${API_BASE_URL}/api/auth/logout`,
   ME:          `${API_BASE_URL}/api/auth/me`,
   GOOGLE:      `${API_BASE_URL}/api/auth/google`,
+  PORTFOLIO:   `${API_BASE_URL}/api/portfolio`,
 };
