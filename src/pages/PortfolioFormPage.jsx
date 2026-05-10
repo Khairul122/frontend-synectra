@@ -5,7 +5,10 @@ import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
 import { portfolioService } from '../services/portfolio.service';
 import { uploadService } from '../services/upload.service';
+import { Sidebar } from '../components/layout/Sidebar';
+import { Navbar } from '../components/layout/Navbar';
 import { AlertContainer } from '../components/ui/Alert';
+import { ConfirmModal } from '../components/ui/ConfirmModal';
 import { useAlert } from '../hooks/useAlert';
 
 const CATEGORIES = ['Web App', 'Mobile', 'Design', 'Backend'];
