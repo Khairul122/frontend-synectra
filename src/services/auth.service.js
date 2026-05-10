@@ -6,6 +6,11 @@ const client = axios.create({
 });
 
 export const authService = {
+  async register(email, fullName, password) {
+    const response = await client.post(API_ENDPOINTS.REGISTER, { email, fullName, password });
+    return response.data;
+  },
+
   async login(email, password) {
     const response = await client.post(API_ENDPOINTS.LOGIN, { email, password });
     return response.data;
