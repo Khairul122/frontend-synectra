@@ -5,72 +5,116 @@ import { cn } from '../../utils/cn';
 import { uploadService } from '../../services/upload.service';
 
 const CATEGORIES = ['Web App', 'Mobile', 'Design', 'Backend'];
-const EMPTY      = { title: '', description: '', image: '', category: '' };
+const EMPTY      = { title: '', description: '', images: [], category: '' };
 
-function ImageUploader({ value, onChange, error }) {
+function MultiImageUploader({ values, onChange, error }) {
   const [isDragging, setIsDragging]   = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
+  const [uploading, setUploading]     = useState([]);
   const [uploadError, setUploadError] = useState('');
   const inputRef = useRef(null);
 
-  const handleFile = useCallback(async (file) => {
-    if (!file) return;
-    if (!file.type.startsWith('image/')) {
-      setUploadError('File harus berupa gambar (JPG, PNG, WebP, GIF)');
-      return;
-    }
-    if (file.size > 5 * 1024 * 1024) {
-      setUploadError('Ukuran file maksimal 5 MB');
-      return;
-    }
+  const handleFiles = useCallback(async (files) => {
+    const list = Array.from(files).filter(f => f.type.startsWith('image/'));
+    if (!list.length) return;
+
+    const oversized = list.find(f => f.size > 5 * 1024 * 1024);
+    if (oversized) { setUploadError(`"${oversized.name}" melebihi 5 MB`); return; }
+
     setUploadError('');
-    setIsUploading(true);
+    const ids = list.map(() => crypto.randomUUID());
+    setUploading(ids);
+
     try {
-      const url = await uploadService.uploadImage(file);
-      onChange(url);
+      const urls = await Promise.all(list.map(f => uploadService.uploadImage(f)));
+      onChange([...values, ...urls]);
     } catch {
-      setUploadError('Gagal mengunggah gambar. Coba lagi.');
+      setUploadError('Gagal mengunggah. Coba lagi.');
     } finally {
-      setIsUploading(false);
+      setUploading([]);
     }
-  }, [onChange]);
+  }, [values, onChange]);
 
   const onDrop = useCallback((e) => {
     e.preventDefault();
     setIsDragging(false);
-    handleFile(e.dataTransfer.files[0]);
-  }, [handleFile]);
+    handleFiles(e.dataTransfer.files);
+  }, [handleFiles]);
 
-  const onDragOver = (e) => { e.preventDefault(); setIsDragging(true); };
-  const onDragLeave = () => setIsDragging(false);
+  const removeAt = (idx) => onChange(values.filter((_, i) => i !== idx));
+  const moveLeft  = (idx) => {
+    if (idx === 0) return;
+    const next = [...values];
+    [next[idx - 1], next[idx]] = [next[idx], next[idx - 1]];
+    onChange(next);
+  };
+  const moveRight = (idx) => {
+    if (idx === values.length - 1) return;
+    const next = [...values];
+    [next[idx], next[idx + 1]] = [next[idx + 1], next[idx]];
+    onChange(next);
+  };
 
-  const handleRemove = () => onChange('');
+  const isUploading = uploading.length > 0;
 
   return (
     <div className="flex flex-col gap-2">
-      <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wider">
-        Gambar
-      </label>
+      <div className="flex items-center justify-between">
+        <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wider">
+          Gambar
+        </label>
+        {values.length > 0 && (
+          <span className="font-mono text-[10px] text-neu-black/40">{values.length} gambar</span>
+        )}
+      </div>
 
-      {/* Preview */}
-      {value && (
-        <div className="relative border-2 border-neu-black">
-          <img src={value} alt="preview"
-            className="w-full h-40 object-cover"
-            onError={e => { e.target.style.display = 'none'; }} />
-          <button type="button" onClick={handleRemove}
-            className="absolute top-2 right-2 w-7 h-7 bg-neu-accent text-neu-white border-2 border-neu-black font-mono font-bold text-sm flex items-center justify-center hover:opacity-90 transition-opacity">
-            ×
-          </button>
+      {/* Grid preview gambar yang sudah diupload */}
+      {values.length > 0 && (
+        <div className="grid grid-cols-3 gap-2">
+          {values.map((url, idx) => (
+            <div key={url} className="relative border-2 border-neu-black group">
+              {idx === 0 && (
+                <span className="absolute top-1 left-1 z-10 px-1.5 py-0.5 bg-neu-primary border border-neu-black font-mono font-bold text-[9px] uppercase">
+                  Cover
+                </span>
+              )}
+              <img src={url} alt={`img-${idx}`}
+                className="w-full h-20 object-cover" />
+
+              {/* Overlay aksi */}
+              <div className="absolute inset-0 bg-neu-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
+                <button type="button" onClick={() => moveLeft(idx)} disabled={idx === 0}
+                  className="w-6 h-6 bg-neu-white border border-neu-black font-mono text-xs disabled:opacity-30 flex items-center justify-center hover:bg-neu-primary transition-colors">
+                  ←
+                </button>
+                <button type="button" onClick={() => removeAt(idx)}
+                  className="w-6 h-6 bg-neu-accent text-neu-white border border-neu-black font-mono text-xs flex items-center justify-center hover:opacity-90 transition-opacity">
+                  ×
+                </button>
+                <button type="button" onClick={() => moveRight(idx)} disabled={idx === values.length - 1}
+                  className="w-6 h-6 bg-neu-white border border-neu-black font-mono text-xs disabled:opacity-30 flex items-center justify-center hover:bg-neu-primary transition-colors">
+                  →
+                </button>
+              </div>
+            </div>
+          ))}
+
+          {/* Slot upload tambahan */}
+          {!isUploading && (
+            <button type="button" onClick={() => inputRef.current?.click()}
+              className="h-20 border-2 border-dashed border-neu-black/40 bg-neu-bg flex flex-col items-center justify-center gap-1 hover:border-neu-black hover:bg-neu-primary/10 transition-all duration-150">
+              <span className="font-mono text-lg text-neu-black/40">+</span>
+              <span className="font-mono text-[9px] text-neu-black/30 uppercase">Tambah</span>
+            </button>
+          )}
         </div>
       )}
 
-      {/* Drop zone — hanya tampil jika belum ada gambar */}
-      {!value && (
+      {/* Drop zone — tampil saat belum ada gambar */}
+      {values.length === 0 && (
         <div
           onDrop={onDrop}
-          onDragOver={onDragOver}
-          onDragLeave={onDragLeave}
+          onDragOver={e => { e.preventDefault(); setIsDragging(true); }}
+          onDragLeave={() => setIsDragging(false)}
           onClick={() => !isUploading && inputRef.current?.click()}
           className={cn(
             'w-full border-2 border-dashed border-neu-black bg-neu-bg',
@@ -78,13 +122,15 @@ function ImageUploader({ value, onChange, error }) {
             'transition-all duration-150',
             isDragging  && 'bg-neu-primary/20 border-solid',
             isUploading && 'opacity-60 cursor-not-allowed',
-            error && 'border-neu-accent',
+            error        && 'border-neu-accent',
           )}
         >
           {isUploading ? (
             <>
               <span className="animate-spin font-mono text-2xl">⟳</span>
-              <span className="font-display font-bold text-xs text-neu-black/60 uppercase">Mengunggah...</span>
+              <span className="font-display font-bold text-xs text-neu-black/60 uppercase">
+                Mengunggah {uploading.length} gambar...
+              </span>
             </>
           ) : (
             <>
@@ -94,25 +140,33 @@ function ImageUploader({ value, onChange, error }) {
               <p className="font-display font-bold text-xs text-neu-black/50 uppercase tracking-wider text-center px-4">
                 {isDragging ? 'Lepas gambar di sini' : 'Klik atau drag & drop gambar'}
               </p>
-              <p className="font-mono text-[10px] text-neu-black/30">JPG, PNG, WebP, GIF — maks. 5 MB</p>
+              <p className="font-mono text-[10px] text-neu-black/30">Bisa pilih lebih dari 1 — maks. 5 MB/gambar</p>
             </>
           )}
         </div>
       )}
 
-      {/* Ganti gambar button jika sudah ada */}
-      {value && !isUploading && (
-        <button type="button" onClick={() => inputRef.current?.click()}
-          className="self-start px-3 py-1.5 font-display font-bold text-[10px] uppercase tracking-wide border-2 border-neu-black bg-neu-white shadow-neu-sm hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-150">
-          Ganti Gambar
-        </button>
+      {/* Progress upload saat ada gambar sebelumnya */}
+      {values.length > 0 && isUploading && (
+        <div className="flex items-center gap-2 px-3 py-2 border-2 border-neu-black bg-neu-bg">
+          <span className="animate-spin font-mono text-sm">⟳</span>
+          <span className="font-display font-bold text-xs text-neu-black/60 uppercase">
+            Mengunggah {uploading.length} gambar...
+          </span>
+        </div>
       )}
 
-      <input ref={inputRef} type="file" accept="image/*" className="hidden"
-        onChange={e => handleFile(e.target.files[0])} />
+      <input ref={inputRef} type="file" accept="image/*" multiple className="hidden"
+        onChange={e => handleFiles(e.target.files)} />
 
       {(uploadError || error) && (
         <span className="font-body text-xs text-neu-accent font-semibold">{uploadError || error}</span>
+      )}
+
+      {values.length > 0 && (
+        <p className="font-mono text-[10px] text-neu-black/30">
+          Hover gambar untuk pindah urutan (←→) atau hapus (×). Gambar pertama jadi cover.
+        </p>
       )}
     </div>
   );
@@ -128,7 +182,12 @@ export function PortfolioModal({ isOpen, item, onSave, onClose, isSaving }) {
   useEffect(() => {
     if (!isOpen) return;
     setForm(item
-      ? { title: item.title ?? '', description: item.description ?? '', image: item.image ?? '', category: item.category ?? '' }
+      ? {
+          title:       item.title       ?? '',
+          description: item.description ?? '',
+          images:      item.images      ?? (item.image ? [item.image] : []),
+          category:    item.category    ?? '',
+        }
       : EMPTY,
     );
     setErrors({});
@@ -156,7 +215,8 @@ export function PortfolioModal({ isOpen, item, onSave, onClose, isSaving }) {
     onSave({
       title:       form.title,
       description: form.description || undefined,
-      image:       form.image       || undefined,
+      image:       form.images[0]   || undefined,
+      images:      form.images,
       category:    form.category    || undefined,
     });
   };
@@ -218,11 +278,11 @@ export function PortfolioModal({ isOpen, item, onSave, onClose, isSaving }) {
               placeholder="Atau ketik kategori lain..." className={cn(inputCls('category'), 'mt-1 text-xs')} />
           </div>
 
-          {/* Image Upload */}
-          <ImageUploader
-            value={form.image}
-            onChange={url => set('image', url)}
-            error={errors.image}
+          {/* Multi Image Upload */}
+          <MultiImageUploader
+            values={form.images}
+            onChange={urls => set('images', urls)}
+            error={errors.images}
           />
 
           {/* Description */}

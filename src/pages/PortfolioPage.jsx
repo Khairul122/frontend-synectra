@@ -8,7 +8,6 @@ import { Sidebar } from '../components/layout/Sidebar';
 import { Navbar } from '../components/layout/Navbar';
 import { AlertContainer } from '../components/ui/Alert';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
-import { PortfolioModal } from '../components/portfolio/PortfolioModal';
 import { useAlert } from '../hooks/useAlert';
 
 const CATEGORY_COLORS = {
@@ -21,16 +20,22 @@ const categoryColor = (cat) => CATEGORY_COLORS[cat] ?? 'bg-neu-black text-neu-wh
 
 function PortfolioCard({ item, isAdmin, onEdit, onDelete, delay }) {
   const ref = useRef(null);
+  const [imgIdx, setImgIdx] = useState(0);
+
+  const imgs = item.images?.length ? item.images : (item.image ? [item.image] : []);
+  const hasMultiple = imgs.length > 1;
+
   useEffect(() => {
     gsap.from(ref.current, { y: 30, opacity: 0, duration: 0.5, delay, ease: 'power2.out' });
   }, [delay]);
 
   return (
     <div ref={ref} className="bg-neu-white border-2 border-neu-black shadow-neu flex flex-col">
-      {/* Image */}
+      {/* Image / Carousel */}
       <div className="relative border-b-2 border-neu-black h-44 bg-neu-bg overflow-hidden">
-        {item.image ? (
-          <img src={item.image} alt={item.title} className="w-full h-full object-cover" onError={e => { e.target.style.display='none'; }} />
+        {imgs.length > 0 ? (
+          <img src={imgs[imgIdx]} alt={item.title} className="w-full h-full object-cover"
+            onError={e => { e.target.style.display = 'none'; }} />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <span className="font-display font-bold text-4xl text-neu-black/20">
@@ -38,9 +43,35 @@ function PortfolioCard({ item, isAdmin, onEdit, onDelete, delay }) {
             </span>
           </div>
         )}
+
+        {/* Navigasi carousel */}
+        {hasMultiple && (
+          <>
+            <button onClick={() => setImgIdx(i => (i - 1 + imgs.length) % imgs.length)}
+              className="absolute left-1 top-1/2 -translate-y-1/2 w-6 h-6 bg-neu-white/90 border-2 border-neu-black font-mono text-xs flex items-center justify-center hover:bg-neu-primary transition-colors">
+              ←
+            </button>
+            <button onClick={() => setImgIdx(i => (i + 1) % imgs.length)}
+              className="absolute right-1 top-1/2 -translate-y-1/2 w-6 h-6 bg-neu-white/90 border-2 border-neu-black font-mono text-xs flex items-center justify-center hover:bg-neu-primary transition-colors">
+              →
+            </button>
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+              {imgs.map((_, i) => (
+                <button key={i} onClick={() => setImgIdx(i)}
+                  className={cn('w-1.5 h-1.5 border border-neu-black transition-all', i === imgIdx ? 'bg-neu-primary' : 'bg-neu-white/70')} />
+              ))}
+            </div>
+          </>
+        )}
+
         {item.category && (
           <span className={cn('absolute top-2 left-2 px-2 py-0.5 border-2 border-neu-black font-mono font-bold text-xs uppercase', categoryColor(item.category))}>
             {item.category}
+          </span>
+        )}
+        {hasMultiple && (
+          <span className="absolute top-2 right-2 px-1.5 py-0.5 bg-neu-black/70 text-neu-white font-mono text-[10px]">
+            {imgIdx + 1}/{imgs.length}
           </span>
         )}
       </div>
@@ -83,10 +114,6 @@ export default function PortfolioPage() {
   const [showLogout, setShowLogout] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  const [modalOpen, setModalOpen]   = useState(false);
-  const [editItem, setEditItem]     = useState(null);
-  const [isSaving, setIsSaving]     = useState(false);
-
   const [deleteItem, setDeleteItem] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -109,26 +136,6 @@ export default function PortfolioPage() {
 
   const reload = useCallback(() =>
     portfolioService.getAll().then(r => setItems(r.data ?? [])), []);
-
-  const handleSave = async (payload) => {
-    setIsSaving(true);
-    try {
-      if (editItem) {
-        await portfolioService.update(editItem.id, payload);
-        alert.success('Portfolio berhasil diperbarui.');
-      } else {
-        await portfolioService.create(payload);
-        alert.success('Portfolio berhasil ditambahkan.');
-      }
-      setModalOpen(false);
-      setEditItem(null);
-      await reload();
-    } catch (err) {
-      alert.error(err?.response?.data?.message ?? 'Gagal menyimpan portfolio.');
-    } finally {
-      setIsSaving(false);
-    }
-  };
 
   const handleDelete = async () => {
     setIsDeleting(true);
@@ -179,8 +186,6 @@ export default function PortfolioPage() {
       <ConfirmModal isOpen={Boolean(deleteItem)} title="Hapus Portfolio"
         message={`Hapus "${deleteItem?.title}"? Tindakan ini tidak bisa dibatalkan.`}
         onConfirm={handleDelete} onCancel={() => setDeleteItem(null)} isLoading={isDeleting} />
-      <PortfolioModal isOpen={modalOpen} item={editItem}
-        onSave={handleSave} onClose={() => { setModalOpen(false); setEditItem(null); }} isSaving={isSaving} />
 
       <div className="flex min-h-screen bg-neu-bg">
         <Sidebar user={user} onLogout={() => setShowLogout(true)} />
@@ -204,7 +209,7 @@ export default function PortfolioPage() {
               )}
 
               {isAdmin && (
-                <button onClick={() => { setEditItem(null); setModalOpen(true); }}
+                <button onClick={() => navigate('/portfolio/new')}
                   className={cn('px-5 py-2.5 font-display font-bold text-xs uppercase tracking-wide', 'bg-neu-primary text-neu-black border-2 border-neu-black shadow-neu', 'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm', 'active:translate-x-1 active:translate-y-1 active:shadow-none whitespace-nowrap')}>
                   + Tambah Portfolio
                 </button>
@@ -225,7 +230,7 @@ export default function PortfolioPage() {
                   {items.length === 0 ? 'Belum ada portfolio.' : 'Tidak ada hasil pencarian.'}
                 </p>
                 {isAdmin && items.length === 0 && (
-                  <button onClick={() => { setEditItem(null); setModalOpen(true); }}
+                  <button onClick={() => navigate('/portfolio/new')}
                     className="mt-4 px-5 py-2.5 font-display font-bold text-xs uppercase bg-neu-primary border-2 border-neu-black shadow-neu hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm transition-all duration-150">
                     Tambah Portfolio Pertama
                   </button>
@@ -235,7 +240,7 @@ export default function PortfolioPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {filtered.map((item, i) => (
                   <PortfolioCard key={item.id} item={item} isAdmin={isAdmin}
-                    onEdit={it => { setEditItem(it); setModalOpen(true); }}
+                    onEdit={it => navigate(`/portfolio/${it.id}/edit`)}
                     onDelete={it => setDeleteItem(it)}
                     delay={i * 0.05} />
                 ))}
