@@ -248,18 +248,6 @@ export default function RegisterPage() {
             </button>
           </form>
 
-          {/* Role info */}
-          <div className="mt-5 flex items-center gap-2 px-3 py-2 border-2 border-neu-black bg-neu-bg shadow-neu-sm">
-            <span className="inline-flex items-center justify-center w-5 h-5 bg-neu-green text-neu-white font-mono text-xs font-bold flex-shrink-0">
-              ✓
-            </span>
-            <p className="font-body text-xs text-neu-black">
-              Akun yang didaftarkan akan mendapat role{' '}
-              <span className="font-display font-bold uppercase tracking-wide text-neu-green">Client</span>
-              {' '}secara otomatis.
-            </p>
-          </div>
-
           {/* Footer */}
           <p className="mt-4 text-center font-body text-sm text-neu-black/60">
             Sudah punya akun?{' '}
