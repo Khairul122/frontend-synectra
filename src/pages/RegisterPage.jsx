@@ -82,8 +82,8 @@ export default function RegisterPage() {
       <AlertContainer alerts={alert.alerts} onDismiss={alert.dismiss} />
       <Scene3D />
 
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div ref={cardRef} className="w-full max-w-md bg-neu-white border-2 border-neu-black shadow-neu-xl p-8">
+      <div className="min-h-screen flex items-center justify-center p-4 pointer-events-none relative z-10">
+        <div ref={cardRef} className="w-full max-w-md bg-neu-white border-2 border-neu-black shadow-neu-xl p-8 pointer-events-auto">
 
           {/* Header */}
           <div ref={titleRef} className="mb-8">
