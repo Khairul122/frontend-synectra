@@ -1,0 +1,44 @@
+@import "tailwindcss";
+@import "animate.css";
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap');
+
+@theme {
+  --color-neu-black:   #0D0D0D;
+  --color-neu-white:   #FAFAFA;
+  --color-neu-primary: #FFD000;
+  --color-neu-accent:  #FF5C5C;
+  --color-neu-blue:    #4D61FF;
+  --color-neu-green:   #00C48C;
+  --color-neu-purple:  #A855F7;
+  --color-neu-bg:      #F5F0E8;
+
+  --font-display: "Space Grotesk", sans-serif;
+  --font-body:    "DM Sans", sans-serif;
+  --font-mono:    "JetBrains Mono", monospace;
+
+  --shadow-neu-sm: 2px 2px 0px #0D0D0D;
+  --shadow-neu:    4px 4px 0px #0D0D0D;
+  --shadow-neu-md: 6px 6px 0px #0D0D0D;
+  --shadow-neu-lg: 8px 8px 0px #0D0D0D;
+  --shadow-neu-xl: 12px 12px 0px #0D0D0D;
+}
+
+:root {
+  --animate-duration: 0.4s;
+  --animate-delay: 0.1s;
+}
+
+html {
+  font-family: "DM Sans", sans-serif;
+  background-color: #F5F0E8;
+  color: #0D0D0D;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 700;
+}
+
+body {
+  margin: 0;
+}
