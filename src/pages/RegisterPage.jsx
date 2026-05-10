@@ -7,18 +7,17 @@ import { Scene3D } from '../components/3d/Scene3D';
 import { AlertContainer } from '../components/ui/Alert';
 import { useAlert } from '../hooks/useAlert';
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const navigate  = useNavigate();
   const alert     = useAlert();
   const cardRef   = useRef(null);
   const titleRef  = useRef(null);
   const formRef   = useRef(null);
 
-  const [email, setEmail]         = useState('');
-  const [password, setPassword]   = useState('');
+  const [form, setForm]           = useState({ email: '', fullName: '', password: '', confirm: '' });
   const [isLoading, setIsLoading] = useState(false);
   const [showPass, setShowPass]   = useState(false);
-  const [fieldError, setFieldError] = useState({ email: '', password: '' });
+  const [fieldError, setFieldError] = useState({});
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -34,13 +33,21 @@ export default function LoginPage() {
     gsap.fromTo(cardRef.current, { x: -10 }, { x: 0, duration: 0.5, ease: 'elastic.out(1, 0.3)' });
   };
 
+  const setField = (key, val) => {
+    setForm((p) => ({ ...p, [key]: val }));
+    setFieldError((p) => ({ ...p, [key]: '' }));
+  };
+
   const validate = () => {
-    const errs = { email: '', password: '' };
-    if (!email)              errs.email    = 'Email wajib diisi';
-    else if (!/\S+@\S+\.\S+/.test(email)) errs.email = 'Format email tidak valid';
-    if (!password)           errs.password = 'Password wajib diisi';
+    const errs = {};
+    if (!form.fullName.trim())                 errs.fullName = 'Nama lengkap wajib diisi';
+    if (!form.email)                           errs.email    = 'Email wajib diisi';
+    else if (!/\S+@\S+\.\S+/.test(form.email)) errs.email   = 'Format email tidak valid';
+    if (!form.password)                        errs.password = 'Password wajib diisi';
+    else if (form.password.length < 8)         errs.password = 'Password minimal 8 karakter';
+    if (form.confirm !== form.password)        errs.confirm  = 'Konfirmasi password tidak cocok';
     setFieldError(errs);
-    return !errs.email && !errs.password;
+    return Object.keys(errs).length === 0;
   };
 
   const handleSubmit = async (e) => {
@@ -49,17 +56,26 @@ export default function LoginPage() {
 
     setIsLoading(true);
     try {
-      await authService.login(email, password);
-      alert.success('Login berhasil! Mengalihkan...');
-      setTimeout(() => navigate('/dashboard'), 800);
+      await authService.register(form.email, form.fullName, form.password);
+      alert.success('Akun berhasil dibuat! Silakan masuk.');
+      setTimeout(() => navigate('/login'), 1200);
     } catch (err) {
-      const message = err?.response?.data?.message || 'Login gagal. Periksa kembali kredensial Anda.';
-      alert.error(message);
+      const message = err?.response?.data?.message || 'Registrasi gagal. Coba lagi.';
+      alert.error(Array.isArray(message) ? message.join(', ') : message);
       shakeCard();
     } finally {
       setIsLoading(false);
     }
   };
+
+  const inputClass = (key) => cn(
+    'w-full px-4 py-3 bg-neu-white',
+    'border-2 border-neu-black shadow-neu-sm',
+    'font-body text-neu-black placeholder:text-neu-black/30',
+    'outline-none focus:shadow-neu focus:-translate-x-0.5 focus:-translate-y-0.5',
+    'transition-all duration-150',
+    fieldError[key] && 'border-neu-accent shadow-[4px_4px_0px_#FF5C5C]',
+  );
 
   return (
     <>
@@ -71,20 +87,20 @@ export default function LoginPage() {
 
           {/* Header */}
           <div ref={titleRef} className="mb-8">
-            <div className="inline-block bg-neu-primary border-2 border-neu-black px-3 py-1 mb-4 shadow-neu-sm">
-              <span className="font-mono font-semibold text-xs text-neu-black uppercase tracking-widest">
+            <div className="inline-block bg-neu-blue border-2 border-neu-black px-3 py-1 mb-4 shadow-neu-sm">
+              <span className="font-mono font-semibold text-xs text-neu-white uppercase tracking-widest">
                 Synectra
               </span>
             </div>
             <h1 className="font-display font-bold text-4xl text-neu-black leading-tight">
-              Selamat<br />Datang
+              Buat<br />Akun Baru
             </h1>
             <p className="font-body text-sm text-neu-black/60 mt-2">
-              Masuk untuk mengakses platform penerimaan client.
+              Daftarkan diri Anda ke platform Synectra.
             </p>
           </div>
 
-          {/* Google OAuth — di atas form */}
+          {/* Google OAuth */}
           <button
             type="button"
             onClick={() => authService.loginWithGoogle()}
@@ -104,37 +120,48 @@ export default function LoginPage() {
               <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
               <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
             </svg>
-            Lanjutkan dengan Google
+            Daftar dengan Google
           </button>
 
           {/* Divider */}
           <div className="flex items-center gap-3 mb-6">
             <div className="flex-1 h-0.5 bg-neu-black" />
-            <span className="font-mono text-xs text-neu-black/50 uppercase">atau masuk manual</span>
+            <span className="font-mono text-xs text-neu-black/50 uppercase">atau daftar manual</span>
             <div className="flex-1 h-0.5 bg-neu-black" />
           </div>
 
           {/* Form */}
-          <form ref={formRef} onSubmit={handleSubmit} noValidate>
+          <form ref={formRef} onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
+            {/* Nama Lengkap */}
+            <div className="flex flex-col gap-1.5">
+              <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wider">
+                Nama Lengkap
+              </label>
+              <input
+                type="text"
+                value={form.fullName}
+                onChange={(e) => setField('fullName', e.target.value)}
+                placeholder="Nama lengkap Anda"
+                autoComplete="name"
+                className={inputClass('fullName')}
+              />
+              {fieldError.fullName && (
+                <span className="font-body font-semibold text-xs text-neu-accent">{fieldError.fullName}</span>
+              )}
+            </div>
+
             {/* Email */}
-            <div className="flex flex-col gap-1.5 mb-4">
+            <div className="flex flex-col gap-1.5">
               <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wider">
                 Email
               </label>
               <input
                 type="email"
-                value={email}
-                onChange={(e) => { setEmail(e.target.value); setFieldError((p) => ({ ...p, email: '' })); }}
+                value={form.email}
+                onChange={(e) => setField('email', e.target.value)}
                 placeholder="email@perusahaan.com"
                 autoComplete="email"
-                className={cn(
-                  'w-full px-4 py-3 bg-neu-white',
-                  'border-2 border-neu-black shadow-neu-sm',
-                  'font-body text-neu-black placeholder:text-neu-black/30',
-                  'outline-none focus:shadow-neu focus:-translate-x-0.5 focus:-translate-y-0.5',
-                  'transition-all duration-150',
-                  fieldError.email && 'border-neu-accent shadow-[4px_4px_0px_#FF5C5C]',
-                )}
+                className={inputClass('email')}
               />
               {fieldError.email && (
                 <span className="font-body font-semibold text-xs text-neu-accent">{fieldError.email}</span>
@@ -142,31 +169,24 @@ export default function LoginPage() {
             </div>
 
             {/* Password */}
-            <div className="flex flex-col gap-1.5 mb-6">
+            <div className="flex flex-col gap-1.5">
               <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wider">
                 Password
               </label>
               <div className="relative">
                 <input
                   type={showPass ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => { setPassword(e.target.value); setFieldError((p) => ({ ...p, password: '' })); }}
-                  placeholder="••••••••"
-                  autoComplete="current-password"
-                  className={cn(
-                    'w-full px-4 py-3 pr-12 bg-neu-white',
-                    'border-2 border-neu-black shadow-neu-sm',
-                    'font-body text-neu-black placeholder:text-neu-black/30',
-                    'outline-none focus:shadow-neu focus:-translate-x-0.5 focus:-translate-y-0.5',
-                    'transition-all duration-150',
-                    fieldError.password && 'border-neu-accent shadow-[4px_4px_0px_#FF5C5C]',
-                  )}
+                  value={form.password}
+                  onChange={(e) => setField('password', e.target.value)}
+                  placeholder="Min. 8 karakter"
+                  autoComplete="new-password"
+                  className={cn(inputClass('password'), 'pr-12')}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPass((p) => !p)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-neu-black/50 hover:text-neu-black transition-colors"
-                  aria-label={showPass ? 'Sembunyikan password' : 'Tampilkan password'}
+                  aria-label={showPass ? 'Sembunyikan' : 'Tampilkan'}
                 >
                   {showPass ? (
                     <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -187,13 +207,31 @@ export default function LoginPage() {
               )}
             </div>
 
+            {/* Konfirmasi Password */}
+            <div className="flex flex-col gap-1.5">
+              <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wider">
+                Konfirmasi Password
+              </label>
+              <input
+                type={showPass ? 'text' : 'password'}
+                value={form.confirm}
+                onChange={(e) => setField('confirm', e.target.value)}
+                placeholder="Ulangi password"
+                autoComplete="new-password"
+                className={inputClass('confirm')}
+              />
+              {fieldError.confirm && (
+                <span className="font-body font-semibold text-xs text-neu-accent">{fieldError.confirm}</span>
+              )}
+            </div>
+
             {/* Submit */}
             <button
               type="submit"
               disabled={isLoading}
               className={cn(
-                'w-full py-3 font-display font-bold text-sm uppercase tracking-wide',
-                'bg-neu-primary text-neu-black',
+                'w-full py-3 mt-2 font-display font-bold text-sm uppercase tracking-wide',
+                'bg-neu-blue text-neu-white',
                 'border-2 border-neu-black shadow-neu',
                 'transition-all duration-150',
                 'hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm',
@@ -204,20 +242,20 @@ export default function LoginPage() {
               {isLoading ? (
                 <span className="inline-flex items-center gap-2 justify-center">
                   <span className="animate-spin inline-block">⟳</span>
-                  Memproses...
+                  Mendaftarkan...
                 </span>
-              ) : 'Masuk'}
+              ) : 'Daftar Sekarang'}
             </button>
           </form>
 
           {/* Footer */}
           <p className="mt-6 text-center font-body text-sm text-neu-black/60">
-            Belum punya akun?{' '}
+            Sudah punya akun?{' '}
             <Link
-              to="/register"
+              to="/login"
               className="font-semibold text-neu-black underline hover:text-neu-blue transition-colors"
             >
-              Daftar sekarang
+              Masuk di sini
             </Link>
           </p>
         </div>
