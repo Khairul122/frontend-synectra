@@ -128,7 +128,14 @@ function BannerRow({ banner, index, onEdit, onDelete, onToggleActive, onPreview 
 
       {/* Gambar */}
       <td className="px-4 py-3 border-r-2 border-neu-black w-20">
-        <div className="w-14 h-10 border-2 border-neu-black overflow-hidden bg-neu-bg flex-shrink-0">
+        <div
+          onClick={() => banner.image && onPreview(banner)}
+          className={cn(
+            'w-14 h-10 border-2 border-neu-black overflow-hidden bg-neu-bg flex-shrink-0 transition-all duration-150',
+            banner.image && 'cursor-pointer hover:border-neu-primary hover:shadow-neu-sm hover:translate-x-[-1px] hover:translate-y-[-1px]',
+          )}
+          title={banner.image ? 'Klik untuk memperbesar' : undefined}
+        >
           {banner.image ? (
             <img
               src={banner.image}
@@ -227,8 +234,9 @@ export default function BannerPage() {
   const [banners,      setBanners]      = useState([]);
   const [isLoading,    setIsLoading]    = useState(true);
   const [search,       setSearch]       = useState('');
-  const [deleteTarget, setDeleteTarget] = useState(null);
-  const [isDeleting,   setIsDeleting]   = useState(false);
+  const [deleteTarget,  setDeleteTarget]  = useState(null);
+  const [isDeleting,    setIsDeleting]    = useState(false);
+  const [previewBanner, setPreviewBanner] = useState(null);
 
   const headerRef = useRef(null);
   const tableRef  = useRef(null);
@@ -300,6 +308,9 @@ export default function BannerPage() {
   return (
     <>
       <AlertContainer alerts={alert.alerts} onDismiss={alert.dismiss} />
+      {previewBanner && (
+        <ImagePreviewModal banner={previewBanner} onClose={() => setPreviewBanner(null)} />
+      )}
       <ConfirmModal
         isOpen={Boolean(deleteTarget)}
         title="Hapus Banner"
@@ -406,6 +417,7 @@ export default function BannerPage() {
                           onEdit={id => navigate(`/banners/${id}/edit`)}
                           onDelete={setDeleteTarget}
                           onToggleActive={handleToggleActive}
+                          onPreview={setPreviewBanner}
                         />
                       ))}
                     </tbody>
