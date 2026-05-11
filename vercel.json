@@ -1,8 +1,12 @@
 {
-  "routes": [
-    { "src": "/favicon.ico", "dest": "/favicon.svg", "headers": { "Cache-Control": "public, max-age=86400" } },
-    { "src": "/favicon.png", "dest": "/favicon.svg", "headers": { "Cache-Control": "public, max-age=86400" } },
-    { "handle": "filesystem" },
-    { "src": "/.*", "dest": "/index.html" }
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://backend-synectra.vercel.app/api/:path*"
+    },
+    {
+      "source": "/((?!api).*)",
+      "destination": "/index.html"
+    }
   ]
 }
