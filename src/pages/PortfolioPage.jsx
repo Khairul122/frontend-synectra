@@ -8,7 +8,10 @@ import { Sidebar } from '../components/layout/Sidebar';
 import { Navbar } from '../components/layout/Navbar';
 import { AlertContainer } from '../components/ui/Alert';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
+import { PortfolioDetailModal } from '../components/portfolio/PortfolioDetailModal';
 import { useAlert } from '../hooks/useAlert';
+
+const stripHtml = (html) => html?.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim() ?? '';
 
 const CATEGORY_COLORS = {
   'Web App':   'bg-neu-blue text-neu-white',
@@ -18,7 +21,7 @@ const CATEGORY_COLORS = {
 };
 const categoryColor = (cat) => CATEGORY_COLORS[cat] ?? 'bg-neu-black text-neu-white';
 
-function PortfolioCard({ item, isAdmin, onEdit, onDelete, delay }) {
+function PortfolioCard({ item, isAdmin, onEdit, onDelete, onDetail, delay }) {
   const ref = useRef(null);
   const [imgIdx, setImgIdx] = useState(0);
 
@@ -80,11 +83,21 @@ function PortfolioCard({ item, isAdmin, onEdit, onDelete, delay }) {
       <div className="p-4 flex-1 flex flex-col gap-2">
         <h3 className="font-display font-bold text-base text-neu-black leading-tight">{item.title}</h3>
         {item.description && (
-          <p className="font-body text-xs text-neu-black/60 line-clamp-3 flex-1">{item.description}</p>
+          <p className="font-body text-xs text-neu-black/60 line-clamp-3 flex-1">
+            {stripHtml(item.description)}
+          </p>
         )}
-        <p className="font-mono text-xs text-neu-black/40 mt-auto pt-2 border-t border-neu-black/10">
-          {new Date(item.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
-        </p>
+        <div className="mt-auto pt-2 border-t border-neu-black/10 flex items-center justify-between">
+          <p className="font-mono text-xs text-neu-black/40">
+            {new Date(item.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+          </p>
+          <button
+            onClick={() => onDetail(item)}
+            className="px-2.5 py-1 font-display font-bold text-[10px] uppercase tracking-wide border-2 border-neu-black bg-neu-white shadow-neu-sm hover:bg-neu-primary hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150"
+          >
+            Detail
+          </button>
+        </div>
       </div>
 
       {/* Admin actions */}
@@ -116,6 +129,7 @@ export default function PortfolioPage() {
 
   const [deleteItem, setDeleteItem] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [detailItem, setDetailItem] = useState(null);
 
   const [search, setSearch]         = useState('');
   const [filterCat, setFilterCat]   = useState('');
@@ -186,6 +200,9 @@ export default function PortfolioPage() {
       <ConfirmModal isOpen={Boolean(deleteItem)} title="Hapus Portfolio"
         message={`Hapus "${deleteItem?.title}"? Tindakan ini tidak bisa dibatalkan.`}
         onConfirm={handleDelete} onCancel={() => setDeleteItem(null)} isLoading={isDeleting} />
+      {detailItem && (
+        <PortfolioDetailModal item={detailItem} onClose={() => setDetailItem(null)} />
+      )}
 
       <div className="flex min-h-screen bg-neu-bg">
         <Sidebar user={user} onLogout={() => setShowLogout(true)} />
@@ -242,6 +259,7 @@ export default function PortfolioPage() {
                   <PortfolioCard key={item.id} item={item} isAdmin={isAdmin}
                     onEdit={it => navigate(`/portfolio/${it.id}/edit`)}
                     onDelete={it => setDeleteItem(it)}
+                    onDetail={it => setDetailItem(it)}
                     delay={i * 0.05} />
                 ))}
               </div>

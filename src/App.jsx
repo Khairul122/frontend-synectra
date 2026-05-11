@@ -4,6 +4,8 @@ import RegisterPage      from './pages/RegisterPage';
 import DashboardPage     from './pages/DashboardPage';
 import PortfolioPage     from './pages/PortfolioPage';
 import PortfolioFormPage from './pages/PortfolioFormPage';
+import BannerPage        from './pages/BannerPage';
+import BannerFormPage    from './pages/BannerFormPage';
 
 function App() {
   return (
@@ -15,6 +17,9 @@ function App() {
         <Route path="/portfolio"          element={<PortfolioPage />} />
         <Route path="/portfolio/new"      element={<PortfolioFormPage />} />
         <Route path="/portfolio/:id/edit" element={<PortfolioFormPage />} />
+        <Route path="/banners"            element={<BannerPage />} />
+        <Route path="/banners/new"        element={<BannerFormPage />} />
+        <Route path="/banners/:id/edit"   element={<BannerFormPage />} />
         <Route path="*"                   element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>
