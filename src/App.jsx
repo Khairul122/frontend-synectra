@@ -6,6 +6,8 @@ import PortfolioPage     from './pages/PortfolioPage';
 import PortfolioFormPage from './pages/PortfolioFormPage';
 import BannerPage        from './pages/BannerPage';
 import BannerFormPage    from './pages/BannerFormPage';
+import NotFoundPage      from './pages/NotFoundPage';
+import ServerErrorPage   from './pages/ServerErrorPage';
 
 function App() {
   return (
@@ -20,7 +22,8 @@ function App() {
         <Route path="/banners"            element={<BannerPage />} />
         <Route path="/banners/new"        element={<BannerFormPage />} />
         <Route path="/banners/:id/edit"   element={<BannerFormPage />} />
-        <Route path="*"                   element={<Navigate to="/login" replace />} />
+        <Route path="/500"                element={<ServerErrorPage />} />
+        <Route path="*"                   element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
   );
