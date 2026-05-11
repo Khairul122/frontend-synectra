@@ -9,9 +9,9 @@ export const tokenStorage = {
   clear: ()      => localStorage.removeItem(TOKEN_KEY),
 };
 
+// Client khusus auth — interceptor dipasang di apiClient.js untuk service lain
 const client = axios.create({ withCredentials: true });
 
-// Tambahkan Authorization header jika token ada di localStorage
 client.interceptors.request.use((config) => {
   const token = tokenStorage.get();
   if (token) config.headers['Authorization'] = `Bearer ${token}`;
