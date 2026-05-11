@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { createPortal } from 'react-dom';
 import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
@@ -12,8 +13,103 @@ import { useAlert } from '../hooks/useAlert';
 
 const stripHtml = (html) => html?.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim() ?? '';
 
+/* ─── Image Preview Modal ────────────────────────────────────────────────── */
+function ImagePreviewModal({ banner, onClose }) {
+  const backdropRef = useRef(null);
+  const cardRef     = useRef(null);
+
+  useEffect(() => {
+    gsap.fromTo(backdropRef.current,
+      { opacity: 0 },
+      { opacity: 1, duration: 0.2 },
+    );
+    gsap.fromTo(cardRef.current,
+      { y: -30, opacity: 0, scale: 0.95 },
+      { y: 0, opacity: 1, scale: 1, duration: 0.3, ease: 'power3.out' },
+    );
+
+    const handleKey = (e) => { if (e.key === 'Escape') handleClose(); };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, []);
+
+  const handleClose = () => {
+    gsap.to(cardRef.current,     { y: -20, opacity: 0, scale: 0.95, duration: 0.2, ease: 'power2.in' });
+    gsap.to(backdropRef.current, { opacity: 0, duration: 0.2, onComplete: onClose });
+  };
+
+  return createPortal(
+    <div
+      ref={backdropRef}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/70"
+      onClick={(e) => { if (e.target === e.currentTarget) handleClose(); }}
+    >
+      <div
+        ref={cardRef}
+        className="w-full max-w-2xl bg-neu-white border-2 border-neu-black shadow-neu-xl"
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-3 border-b-2 border-neu-black bg-neu-black">
+          <div className="flex items-center gap-2">
+            <svg className="w-4 h-4 text-neu-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <rect x="3" y="3" width="18" height="18" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" />
+            </svg>
+            <h3 className="font-display font-bold text-sm text-neu-white uppercase tracking-wide truncate">
+              {banner.title}
+            </h3>
+          </div>
+          <button
+            onClick={handleClose}
+            className="text-neu-white/60 hover:text-neu-white font-mono text-2xl leading-none transition-colors"
+            aria-label="Tutup"
+          >
+            ×
+          </button>
+        </div>
+
+        {/* Image */}
+        <div className="bg-neu-bg border-b-2 border-neu-black">
+          <img
+            src={banner.image}
+            alt={banner.title}
+            className="w-full max-h-[60vh] object-contain"
+          />
+        </div>
+
+        {/* Footer info */}
+        <div className="px-5 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className={cn(
+              'px-2 py-0.5 border-2 border-neu-black font-mono font-bold text-xs uppercase',
+              banner.isActive ? 'bg-neu-green text-neu-white' : 'bg-neu-black/10 text-neu-black/50',
+            )}>
+              {banner.isActive ? 'Aktif' : 'Nonaktif'}
+            </span>
+            <span className="font-mono text-xs text-neu-black/40">
+              {new Date(banner.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
+            </span>
+          </div>
+          <button
+            onClick={handleClose}
+            className={cn(
+              'px-4 py-2 bg-neu-white border-2 border-neu-black shadow-neu',
+              'font-display font-bold text-xs uppercase tracking-wide text-neu-black',
+              'transition-all duration-150',
+              'hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm',
+              'active:translate-x-1 active:translate-y-1 active:shadow-none',
+            )}
+          >
+            Tutup
+          </button>
+        </div>
+      </div>
+    </div>,
+    document.body,
+  );
+}
+
 /* ─── Table row ──────────────────────────────────────────────────────────── */
-function BannerRow({ banner, index, onEdit, onDelete, onToggleActive }) {
+function BannerRow({ banner, index, onEdit, onDelete, onToggleActive, onPreview }) {
   const ref = useRef(null);
 
   useEffect(() => {
