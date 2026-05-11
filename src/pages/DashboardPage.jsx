@@ -3,9 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
-import { Sidebar } from '../components/layout/Sidebar';
-import { Navbar } from '../components/layout/Navbar';
-import { AlertContainer } from '../components/ui/Alert';
+import { PageLayout } from '../components/layout/PageLayout';
 import { useAlert } from '../hooks/useAlert';
 
 const ROLE_CONFIG = {
@@ -100,17 +98,7 @@ export default function DashboardPage() {
   const isAdmin = user?.role === 'admin';
 
   return (
-    <>
-      <AlertContainer alerts={alert.alerts} onDismiss={alert.dismiss} />
-
-      <div className="flex min-h-screen bg-neu-bg">
-        <Sidebar user={user} />
-
-        {/* Main content */}
-        <div className="flex-1 ml-64 flex flex-col">
-          <Navbar title="Dashboard" user={user} />
-
-          <main className="flex-1 p-6 overflow-y-auto">
+    <PageLayout user={user} title="Dashboard" alert={alert}>
 
             {/* Hero greeting */}
             <div ref={heroRef} className={cn(
@@ -217,9 +205,6 @@ export default function DashboardPage() {
               )}
             </div>
 
-          </main>
-        </div>
-      </div>
-    </>
+    </PageLayout>
   );
 }

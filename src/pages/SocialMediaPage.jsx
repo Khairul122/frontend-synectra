@@ -5,9 +5,7 @@ import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
 import { socialMediaService } from '../services/socialMedia.service';
-import { Sidebar } from '../components/layout/Sidebar';
-import { Navbar } from '../components/layout/Navbar';
-import { AlertContainer } from '../components/ui/Alert';
+import { PageLayout } from '../components/layout/PageLayout';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
 import { useAlert } from '../hooks/useAlert';
 
@@ -231,8 +229,7 @@ export default function SocialMediaPage() {
   }
 
   return (
-    <>
-      <AlertContainer alerts={alert.alerts} onDismiss={alert.dismiss} />
+    <PageLayout user={user} title="Social Media Management" alert={alert}>
       {previewItem && <IconPreviewModal item={previewItem} onClose={() => setPreviewItem(null)} />}
       <ConfirmModal
         isOpen={Boolean(deleteTarget)}
@@ -243,80 +240,70 @@ export default function SocialMediaPage() {
         isLoading={isDeleting}
       />
 
-      <div className="flex min-h-screen bg-neu-bg">
-        <Sidebar user={user} />
-
-        <div className="flex-1 ml-64 flex flex-col">
-          <Navbar title="Social Media Management" user={user} />
-
-          <main className="flex-1 p-6 overflow-y-auto">
-            {/* Toolbar */}
-            <div ref={headerRef} className="flex flex-wrap items-center gap-3 mb-6">
-              <input type="text" value={search} onChange={e => setSearch(e.target.value)}
-                placeholder="Cari platform atau akun..."
-                className="flex-1 min-w-48 px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black placeholder:text-neu-black/30 outline-none focus:shadow-neu transition-all duration-150"
-              />
-              <span className="font-mono text-xs text-neu-black/50">
-                Menampilkan <strong className="text-neu-black">{filtered.length}</strong> dari <strong className="text-neu-black">{items.length}</strong> akun
-              </span>
-              <button onClick={() => navigate('/social-media/new')}
-                className={cn(
-                  'px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu',
-                  'font-display font-bold text-xs uppercase tracking-wide text-neu-black whitespace-nowrap',
-                  'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm active:translate-x-1 active:translate-y-1 active:shadow-none',
-                )}>
-                + Tambah Sosial Media
-              </button>
-            </div>
-
-            {/* Table */}
-            <div ref={tableRef} className="border-2 border-neu-black shadow-neu bg-neu-white overflow-hidden">
-              {filtered.length === 0 ? (
-                <div className="p-16 text-center">
-                  <p className="font-display font-bold text-xl text-neu-black/40">
-                    {items.length === 0 ? 'Belum ada sosial media.' : 'Tidak ada hasil pencarian.'}
-                  </p>
-                  {items.length === 0 && (
-                    <button onClick={() => navigate('/social-media/new')}
-                      className="mt-4 px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm transition-all duration-150">
-                      Tambah Pertama
-                    </button>
-                  )}
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full border-collapse">
-                    <thead>
-                      <tr className="bg-neu-black text-neu-white">
-                        <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase tracking-wide text-center w-10">No</th>
-                        <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase tracking-wide text-left w-20">Icon</th>
-                        <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase tracking-wide text-left w-36">Platform</th>
-                        <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase tracking-wide text-left w-40">Akun</th>
-                        <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase tracking-wide text-left">URL</th>
-                        <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase tracking-wide text-center w-28">Status</th>
-                        <th className="px-4 py-3 font-display font-bold text-xs uppercase tracking-wide text-left w-52">Aksi</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filtered.map((item, idx) => (
-                        <SocialMediaRow
-                          key={item.id}
-                          item={item}
-                          index={idx}
-                          onEdit={id => navigate(`/social-media/${id}/edit`)}
-                          onDelete={setDeleteTarget}
-                          onToggleActive={handleToggleActive}
-                          onPreview={setPreviewItem}
-                        />
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-          </main>
-        </div>
+      {/* Toolbar */}
+      <div ref={headerRef} className="flex flex-wrap items-center gap-3 mb-6">
+        <input type="text" value={search} onChange={e => setSearch(e.target.value)}
+          placeholder="Cari platform atau akun..."
+          className="flex-1 min-w-48 px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black placeholder:text-neu-black/30 outline-none focus:shadow-neu transition-all duration-150"
+        />
+        <span className="font-mono text-xs text-neu-black/50">
+          Menampilkan <strong className="text-neu-black">{filtered.length}</strong> dari <strong className="text-neu-black">{items.length}</strong> akun
+        </span>
+        <button onClick={() => navigate('/social-media/new')}
+          className={cn(
+            'px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu',
+            'font-display font-bold text-xs uppercase tracking-wide text-neu-black whitespace-nowrap',
+            'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm active:translate-x-1 active:translate-y-1 active:shadow-none',
+          )}>
+          + Tambah Sosial Media
+        </button>
       </div>
-    </>
+
+      {/* Table */}
+      <div ref={tableRef} className="border-2 border-neu-black shadow-neu bg-neu-white overflow-hidden">
+        {filtered.length === 0 ? (
+          <div className="p-16 text-center">
+            <p className="font-display font-bold text-xl text-neu-black/40">
+              {items.length === 0 ? 'Belum ada sosial media.' : 'Tidak ada hasil pencarian.'}
+            </p>
+            {items.length === 0 && (
+              <button onClick={() => navigate('/social-media/new')}
+                className="mt-4 px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm transition-all duration-150">
+                Tambah Pertama
+              </button>
+            )}
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="bg-neu-black text-neu-white">
+                  <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase tracking-wide text-center w-10">No</th>
+                  <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase tracking-wide text-left w-20">Icon</th>
+                  <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase tracking-wide text-left w-36">Platform</th>
+                  <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase tracking-wide text-left w-40">Akun</th>
+                  <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase tracking-wide text-left">URL</th>
+                  <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase tracking-wide text-center w-28">Status</th>
+                  <th className="px-4 py-3 font-display font-bold text-xs uppercase tracking-wide text-left w-52">Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((item, idx) => (
+                  <SocialMediaRow
+                    key={item.id}
+                    item={item}
+                    index={idx}
+                    onEdit={id => navigate(`/social-media/${id}/edit`)}
+                    onDelete={setDeleteTarget}
+                    onToggleActive={handleToggleActive}
+                    onPreview={setPreviewItem}
+                  />
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </PageLayout>
   );
 }

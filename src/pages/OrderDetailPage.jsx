@@ -7,9 +7,7 @@ import { authService } from '../services/auth.service';
 import { orderService } from '../services/order.service';
 import { paymentService } from '../services/payment.service';
 import { progressReportService } from '../services/progressReport.service';
-import { Sidebar } from '../components/layout/Sidebar';
-import { Navbar } from '../components/layout/Navbar';
-import { AlertContainer } from '../components/ui/Alert';
+import { PageLayout } from '../components/layout/PageLayout';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
 import { useAlert } from '../hooks/useAlert';
 import { SUPABASE_URL, SUPABASE_ANON, PROGRESS_ATTACH_BUCKET } from '../constants/api';
@@ -246,8 +244,7 @@ export default function OrderDetailPage() {
   const statusCfg = STATUS_CONFIG[order.status] ?? { label: order.status, bg: 'bg-neu-black/20', text: 'text-neu-black' };
 
   return (
-    <>
-      <AlertContainer alerts={alert.alerts} onDismiss={alert.dismiss} />
+    <PageLayout user={user} title="Detail Pesanan" alert={alert}>
       {showProgress && <ProgressModal orderId={id} onClose={() => setShowProgress(false)} onAdded={loadOrder} />}
       {rejectPaymentId && <RejectModal paymentId={rejectPaymentId} onClose={() => setRejectPaymentId(null)} onRejected={loadOrder} />}
       <ConfirmModal
@@ -259,169 +256,161 @@ export default function OrderDetailPage() {
         isLoading={isVerifying}
       />
 
-      <div className="flex min-h-screen bg-neu-bg">
-        <Sidebar user={user} />
-        <div className="flex-1 ml-64 flex flex-col">
-          <Navbar title="Detail Pesanan" user={user} />
-          <main className="flex-1 p-6 overflow-y-auto">
-            <div ref={pageRef} className="max-w-4xl mx-auto space-y-6">
+      <div ref={pageRef} className="max-w-4xl mx-auto space-y-6">
 
-              {/* Breadcrumb */}
-              <div className="flex items-center gap-2 font-mono text-xs text-neu-black/50">
-                <button type="button" onClick={() => navigate('/orders')} className="hover:text-neu-black">Orders</button>
-                <span>/</span>
-                <span className="text-neu-black truncate max-w-xs">{order.title}</span>
-              </div>
-
-              {/* ─── Section A: Info Order ─────────────────────────────────── */}
-              <div className="bg-neu-white border-2 border-neu-black shadow-neu p-6">
-                <div className="flex items-start justify-between gap-4 mb-5 flex-wrap">
-                  <div>
-                    <div className="flex items-center gap-3 mb-2">
-                      <StatusBadge status={order.status} config={STATUS_CONFIG} />
-                      {order.serviceCategory && (
-                        <span className="font-mono text-xs text-neu-black/50 uppercase">{order.serviceCategory.replace('_',' ')}</span>
-                      )}
-                    </div>
-                    <h2 className="font-display font-bold text-2xl text-neu-black">{order.title}</h2>
-                    <p className="font-body text-sm text-neu-black/60 mt-1">{order.clientName} · {order.clientEmail}</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <select onChange={e => handleStatusChange(e.target.value)} value={order.status}
-                      className="px-3 py-2 border-2 border-neu-black bg-neu-white font-display font-bold text-xs uppercase shadow-neu-sm outline-none cursor-pointer">
-                      {STATUS_TRANSITIONS.map(s => (
-                        <option key={s} value={s}>{STATUS_CONFIG[s]?.label ?? s}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 border-t-2 border-neu-black pt-4">
-                  <div>
-                    <p className="font-mono text-xs text-neu-black/40 uppercase mb-1">Total Harga</p>
-                    <p className="font-display font-bold text-lg text-neu-black">{fmt(order.totalPrice)}</p>
-                  </div>
-                  <div>
-                    <p className="font-mono text-xs text-neu-black/40 uppercase mb-1">Deadline</p>
-                    <p className="font-display font-bold text-sm text-neu-black">{fmtDate(order.deadline)}</p>
-                  </div>
-                  <div>
-                    <p className="font-mono text-xs text-neu-black/40 uppercase mb-1">Dibuat</p>
-                    <p className="font-mono text-xs text-neu-black">{fmtDateTime(order.createdAt)}</p>
-                  </div>
-                  <div>
-                    <p className="font-mono text-xs text-neu-black/40 uppercase mb-1">Progress Terakhir</p>
-                    {order.progressReports?.length > 0 ? (
-                      <div>
-                        <p className="font-display font-bold text-lg text-neu-blue">
-                          {order.progressReports[order.progressReports.length - 1].progressPercentage}%
-                        </p>
-                        <div className="h-2 border border-neu-black bg-neu-bg mt-1">
-                          <div className="h-full bg-neu-blue transition-all duration-300"
-                            style={{ width: `${order.progressReports[order.progressReports.length - 1].progressPercentage}%` }} />
-                        </div>
-                      </div>
-                    ) : <p className="font-mono text-xs text-neu-black/40">Belum ada</p>}
-                  </div>
-                </div>
-                {order.description && (
-                  <p className="font-body text-sm text-neu-black/60 mt-4 pt-4 border-t-2 border-neu-black">{order.description}</p>
-                )}
-              </div>
-
-              {/* ─── Section B: Payments ───────────────────────────────────── */}
-              <div className="bg-neu-white border-2 border-neu-black shadow-neu">
-                <div className="flex items-center justify-between px-6 py-4 border-b-2 border-neu-black">
-                  <h3 className="font-display font-bold text-base text-neu-black uppercase tracking-wide">
-                    Pembayaran ({order.payments?.length ?? 0})
-                  </h3>
-                </div>
-                {!order.payments?.length ? (
-                  <p className="px-6 py-8 font-body text-sm text-neu-black/40 text-center">Belum ada pembayaran.</p>
-                ) : (
-                  <div className="divide-y-2 divide-neu-black">
-                    {order.payments.map(p => (
-                      <div key={p.id} className="px-6 py-4 flex items-start gap-4">
-                        {/* Receipt thumbnail */}
-                        <a href={p.receiptImageUrl} target="_blank" rel="noopener noreferrer"
-                          className="flex-shrink-0 w-16 h-12 border-2 border-neu-black overflow-hidden bg-neu-bg">
-                          <img src={p.receiptImageUrl} alt="receipt" className="w-full h-full object-cover" />
-                        </a>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <StatusBadge status={p.status} config={PAYMENT_STATUS} />
-                            <span className="font-mono text-xs text-neu-black/50 uppercase">{p.paymentType}</span>
-                          </div>
-                          <p className="font-display font-bold text-base text-neu-black">{fmt(p.amount)}</p>
-                          <p className="font-mono text-xs text-neu-black/40">{fmtDateTime(p.createdAt)}</p>
-                          {p.notes && <p className="font-body text-xs text-neu-accent mt-1">Catatan: {p.notes}</p>}
-                          {p.verifiedAt && <p className="font-mono text-xs text-neu-green">Diverifikasi: {fmtDateTime(p.verifiedAt)}</p>}
-                        </div>
-                        {p.status === 'pending_verification' && (
-                          <div className="flex gap-2 flex-shrink-0">
-                            <button onClick={() => setVerifyTarget(p)}
-                              className="px-3 py-1.5 bg-neu-green border-2 border-neu-black font-display font-bold text-xs uppercase text-neu-white shadow-neu-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150">
-                              Verifikasi
-                            </button>
-                            <button onClick={() => setRejectPaymentId(p.id)}
-                              className="px-3 py-1.5 bg-neu-white border-2 border-neu-black font-display font-bold text-xs uppercase text-neu-accent shadow-neu-sm hover:bg-neu-accent hover:text-neu-white hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150">
-                              Tolak
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* ─── Section C: Progress Reports ───────────────────────────── */}
-              <div className="bg-neu-white border-2 border-neu-black shadow-neu">
-                <div className="flex items-center justify-between px-6 py-4 border-b-2 border-neu-black">
-                  <h3 className="font-display font-bold text-base text-neu-black uppercase tracking-wide">
-                    Progress ({order.progressReports?.length ?? 0})
-                  </h3>
-                  <button onClick={() => setShowProgress(true)}
-                    className={cn('px-4 py-2 bg-neu-blue border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-white',
-                      'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none')}>
-                    + Update Progress
-                  </button>
-                </div>
-                {!order.progressReports?.length ? (
-                  <p className="px-6 py-8 font-body text-sm text-neu-black/40 text-center">Belum ada update progress.</p>
-                ) : (
-                  <div className="divide-y-2 divide-neu-black">
-                    {[...order.progressReports].reverse().map(r => (
-                      <div key={r.id} className="px-6 py-4 flex items-start gap-4">
-                        {/* Percentage circle */}
-                        <div className="flex-shrink-0 w-14 h-14 border-2 border-neu-black bg-neu-bg flex flex-col items-center justify-center">
-                          <span className="font-display font-bold text-lg text-neu-blue leading-none">{r.progressPercentage}</span>
-                          <span className="font-mono text-[9px] text-neu-black/40">%</span>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-display font-bold text-sm text-neu-black">{r.title}</p>
-                          {r.description && <p className="font-body text-xs text-neu-black/60 mt-0.5">{r.description}</p>}
-                          <p className="font-mono text-xs text-neu-black/40 mt-1">{fmtDateTime(r.reportedAt)}</p>
-                          {/* Progress bar */}
-                          <div className="h-1.5 border border-neu-black bg-neu-bg mt-2">
-                            <div className="h-full bg-neu-blue transition-all duration-300" style={{ width: `${r.progressPercentage}%` }} />
-                          </div>
-                        </div>
-                        {r.attachmentUrl && (
-                          <a href={r.attachmentUrl} target="_blank" rel="noopener noreferrer"
-                            className="flex-shrink-0 w-16 h-12 border-2 border-neu-black overflow-hidden bg-neu-bg">
-                            <img src={r.attachmentUrl} alt="attachment" className="w-full h-full object-cover" />
-                          </a>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-            </div>
-          </main>
+        {/* Breadcrumb */}
+        <div className="flex items-center gap-2 font-mono text-xs text-neu-black/50">
+          <button type="button" onClick={() => navigate('/orders')} className="hover:text-neu-black">Orders</button>
+          <span>/</span>
+          <span className="text-neu-black truncate max-w-xs">{order.title}</span>
         </div>
+
+        {/* ─── Section A: Info Order ─────────────────────────────────── */}
+        <div className="bg-neu-white border-2 border-neu-black shadow-neu p-6">
+          <div className="flex items-start justify-between gap-4 mb-5 flex-wrap">
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <StatusBadge status={order.status} config={STATUS_CONFIG} />
+                {order.serviceCategory && (
+                  <span className="font-mono text-xs text-neu-black/50 uppercase">{order.serviceCategory.replace('_',' ')}</span>
+                )}
+              </div>
+              <h2 className="font-display font-bold text-2xl text-neu-black">{order.title}</h2>
+              <p className="font-body text-sm text-neu-black/60 mt-1">{order.clientName} · {order.clientEmail}</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <select onChange={e => handleStatusChange(e.target.value)} value={order.status}
+                className="px-3 py-2 border-2 border-neu-black bg-neu-white font-display font-bold text-xs uppercase shadow-neu-sm outline-none cursor-pointer">
+                {STATUS_TRANSITIONS.map(s => (
+                  <option key={s} value={s}>{STATUS_CONFIG[s]?.label ?? s}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 border-t-2 border-neu-black pt-4">
+            <div>
+              <p className="font-mono text-xs text-neu-black/40 uppercase mb-1">Total Harga</p>
+              <p className="font-display font-bold text-lg text-neu-black">{fmt(order.totalPrice)}</p>
+            </div>
+            <div>
+              <p className="font-mono text-xs text-neu-black/40 uppercase mb-1">Deadline</p>
+              <p className="font-display font-bold text-sm text-neu-black">{fmtDate(order.deadline)}</p>
+            </div>
+            <div>
+              <p className="font-mono text-xs text-neu-black/40 uppercase mb-1">Dibuat</p>
+              <p className="font-mono text-xs text-neu-black">{fmtDateTime(order.createdAt)}</p>
+            </div>
+            <div>
+              <p className="font-mono text-xs text-neu-black/40 uppercase mb-1">Progress Terakhir</p>
+              {order.progressReports?.length > 0 ? (
+                <div>
+                  <p className="font-display font-bold text-lg text-neu-blue">
+                    {order.progressReports[order.progressReports.length - 1].progressPercentage}%
+                  </p>
+                  <div className="h-2 border border-neu-black bg-neu-bg mt-1">
+                    <div className="h-full bg-neu-blue transition-all duration-300"
+                      style={{ width: `${order.progressReports[order.progressReports.length - 1].progressPercentage}%` }} />
+                  </div>
+                </div>
+              ) : <p className="font-mono text-xs text-neu-black/40">Belum ada</p>}
+            </div>
+          </div>
+          {order.description && (
+            <p className="font-body text-sm text-neu-black/60 mt-4 pt-4 border-t-2 border-neu-black">{order.description}</p>
+          )}
+        </div>
+
+        {/* ─── Section B: Payments ───────────────────────────────────── */}
+        <div className="bg-neu-white border-2 border-neu-black shadow-neu">
+          <div className="flex items-center justify-between px-6 py-4 border-b-2 border-neu-black">
+            <h3 className="font-display font-bold text-base text-neu-black uppercase tracking-wide">
+              Pembayaran ({order.payments?.length ?? 0})
+            </h3>
+          </div>
+          {!order.payments?.length ? (
+            <p className="px-6 py-8 font-body text-sm text-neu-black/40 text-center">Belum ada pembayaran.</p>
+          ) : (
+            <div className="divide-y-2 divide-neu-black">
+              {order.payments.map(p => (
+                <div key={p.id} className="px-6 py-4 flex items-start gap-4">
+                  {/* Receipt thumbnail */}
+                  <a href={p.receiptImageUrl} target="_blank" rel="noopener noreferrer"
+                    className="flex-shrink-0 w-16 h-12 border-2 border-neu-black overflow-hidden bg-neu-bg">
+                    <img src={p.receiptImageUrl} alt="receipt" className="w-full h-full object-cover" />
+                  </a>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <StatusBadge status={p.status} config={PAYMENT_STATUS} />
+                      <span className="font-mono text-xs text-neu-black/50 uppercase">{p.paymentType}</span>
+                    </div>
+                    <p className="font-display font-bold text-base text-neu-black">{fmt(p.amount)}</p>
+                    <p className="font-mono text-xs text-neu-black/40">{fmtDateTime(p.createdAt)}</p>
+                    {p.notes && <p className="font-body text-xs text-neu-accent mt-1">Catatan: {p.notes}</p>}
+                    {p.verifiedAt && <p className="font-mono text-xs text-neu-green">Diverifikasi: {fmtDateTime(p.verifiedAt)}</p>}
+                  </div>
+                  {p.status === 'pending_verification' && (
+                    <div className="flex gap-2 flex-shrink-0">
+                      <button onClick={() => setVerifyTarget(p)}
+                        className="px-3 py-1.5 bg-neu-green border-2 border-neu-black font-display font-bold text-xs uppercase text-neu-white shadow-neu-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150">
+                        Verifikasi
+                      </button>
+                      <button onClick={() => setRejectPaymentId(p.id)}
+                        className="px-3 py-1.5 bg-neu-white border-2 border-neu-black font-display font-bold text-xs uppercase text-neu-accent shadow-neu-sm hover:bg-neu-accent hover:text-neu-white hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150">
+                        Tolak
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* ─── Section C: Progress Reports ───────────────────────────── */}
+        <div className="bg-neu-white border-2 border-neu-black shadow-neu">
+          <div className="flex items-center justify-between px-6 py-4 border-b-2 border-neu-black">
+            <h3 className="font-display font-bold text-base text-neu-black uppercase tracking-wide">
+              Progress ({order.progressReports?.length ?? 0})
+            </h3>
+            <button onClick={() => setShowProgress(true)}
+              className={cn('px-4 py-2 bg-neu-blue border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-white',
+                'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none')}>
+              + Update Progress
+            </button>
+          </div>
+          {!order.progressReports?.length ? (
+            <p className="px-6 py-8 font-body text-sm text-neu-black/40 text-center">Belum ada update progress.</p>
+          ) : (
+            <div className="divide-y-2 divide-neu-black">
+              {[...order.progressReports].reverse().map(r => (
+                <div key={r.id} className="px-6 py-4 flex items-start gap-4">
+                  {/* Percentage circle */}
+                  <div className="flex-shrink-0 w-14 h-14 border-2 border-neu-black bg-neu-bg flex flex-col items-center justify-center">
+                    <span className="font-display font-bold text-lg text-neu-blue leading-none">{r.progressPercentage}</span>
+                    <span className="font-mono text-[9px] text-neu-black/40">%</span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-display font-bold text-sm text-neu-black">{r.title}</p>
+                    {r.description && <p className="font-body text-xs text-neu-black/60 mt-0.5">{r.description}</p>}
+                    <p className="font-mono text-xs text-neu-black/40 mt-1">{fmtDateTime(r.reportedAt)}</p>
+                    {/* Progress bar */}
+                    <div className="h-1.5 border border-neu-black bg-neu-bg mt-2">
+                      <div className="h-full bg-neu-blue transition-all duration-300" style={{ width: `${r.progressPercentage}%` }} />
+                    </div>
+                  </div>
+                  {r.attachmentUrl && (
+                    <a href={r.attachmentUrl} target="_blank" rel="noopener noreferrer"
+                      className="flex-shrink-0 w-16 h-12 border-2 border-neu-black overflow-hidden bg-neu-bg">
+                      <img src={r.attachmentUrl} alt="attachment" className="w-full h-full object-cover" />
+                    </a>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
       </div>
-    </>
+    </PageLayout>
   );
 }

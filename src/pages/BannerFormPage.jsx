@@ -5,9 +5,7 @@ import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
 import { bannerService } from '../services/banner.service';
-import { Sidebar } from '../components/layout/Sidebar';
-import { Navbar } from '../components/layout/Navbar';
-import { AlertContainer } from '../components/ui/Alert';
+import { PageLayout } from '../components/layout/PageLayout';
 import { RichTextEditor } from '../components/ui/RichTextEditor';
 import { useAlert } from '../hooks/useAlert';
 import { SUPABASE_URL, SUPABASE_ANON, BANNER_BUCKET } from '../constants/api';
@@ -229,119 +227,107 @@ export default function BannerFormPage() {
   }
 
   return (
-    <>
-      <AlertContainer alerts={alert.alerts} onDismiss={alert.dismiss} />
+    <PageLayout user={user} title={isEditMode ? 'Edit Banner' : 'Tambah Banner'} alert={alert}>
+      <div ref={formRef} className="max-w-2xl mx-auto">
 
-      <div className="flex min-h-screen bg-neu-bg">
-        <Sidebar user={user} />
-
-        <div className="flex-1 ml-64 flex flex-col">
-          <Navbar title={isEditMode ? 'Edit Banner' : 'Tambah Banner'} user={user} />
-
-          <main className="flex-1 p-6 overflow-y-auto">
-            <div ref={formRef} className="max-w-2xl mx-auto">
-
-              {/* Breadcrumb */}
-              <div className="flex items-center gap-2 mb-6 font-mono text-xs text-neu-black/50">
-                <button type="button" onClick={() => navigate('/banners')}
-                  className="hover:text-neu-black transition-colors">Banner</button>
-                <span>/</span>
-                <span className="text-neu-black">{isEditMode ? 'Edit' : 'Tambah Baru'}</span>
-              </div>
-
-              <form onSubmit={handleSubmit} className="space-y-6">
-
-                {/* Title */}
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-display font-bold text-sm text-neu-black uppercase tracking-wide">
-                    Judul Banner <span className="text-neu-accent">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={form.title}
-                    onChange={e => setField('title', e.target.value)}
-                    placeholder="Contoh: Banner Promo Lebaran 2025"
-                    className={cn(
-                      'w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm',
-                      'font-body text-neu-black placeholder:text-gray-400',
-                      'outline-none focus:shadow-neu focus:translate-x-[-2px] focus:translate-y-[-2px]',
-                      'transition-all duration-150',
-                      errors.title && 'border-neu-accent shadow-[4px_4px_0px_#FF5C5C]',
-                    )}
-                  />
-                  {errors.title && (
-                    <span className="text-neu-accent font-body font-semibold text-xs">{errors.title}</span>
-                  )}
-                </div>
-
-                {/* Description */}
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-display font-bold text-sm text-neu-black uppercase tracking-wide">
-                    Deskripsi
-                  </label>
-                  <RichTextEditor
-                    value={form.description}
-                    onChange={val => setField('description', val)}
-                    placeholder="Tulis deskripsi banner..."
-                  />
-                </div>
-
-                {/* Image */}
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-display font-bold text-sm text-neu-black uppercase tracking-wide">
-                    Gambar Banner
-                  </label>
-                  <ImageUploader
-                    value={form.image}
-                    onChange={url => setField('image', url)}
-                  />
-                </div>
-
-                {/* Is Active */}
-                <div className="bg-neu-white border-2 border-neu-black shadow-neu-sm p-4">
-                  <Toggle
-                    checked={form.isActive}
-                    onChange={val => setField('isActive', val)}
-                    label={form.isActive ? 'Banner Aktif (ditampilkan)' : 'Banner Nonaktif (disembunyikan)'}
-                  />
-                </div>
-
-                {/* Actions */}
-                <div className="flex items-center gap-3 pt-2">
-                  <button
-                    type="submit"
-                    disabled={isSaving}
-                    className={cn(
-                      'px-8 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu',
-                      'font-display font-bold text-sm uppercase tracking-wide text-neu-black',
-                      'transition-all duration-150',
-                      'hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm',
-                      'active:translate-x-1 active:translate-y-1 active:shadow-none',
-                      isSaving && 'opacity-60 cursor-not-allowed',
-                    )}
-                  >
-                    {isSaving ? 'Menyimpan...' : isEditMode ? 'Simpan Perubahan' : 'Buat Banner'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => navigate('/banners')}
-                    disabled={isSaving}
-                    className={cn(
-                      'px-6 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu',
-                      'font-display font-bold text-sm uppercase tracking-wide text-neu-black',
-                      'transition-all duration-150',
-                      'hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm',
-                      'active:translate-x-1 active:translate-y-1 active:shadow-none',
-                    )}
-                  >
-                    Batal
-                  </button>
-                </div>
-              </form>
-            </div>
-          </main>
+        {/* Breadcrumb */}
+        <div className="flex items-center gap-2 mb-6 font-mono text-xs text-neu-black/50">
+          <button type="button" onClick={() => navigate('/banners')}
+            className="hover:text-neu-black transition-colors">Banner</button>
+          <span>/</span>
+          <span className="text-neu-black">{isEditMode ? 'Edit' : 'Tambah Baru'}</span>
         </div>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+
+          {/* Title */}
+          <div className="flex flex-col gap-1.5">
+            <label className="font-display font-bold text-sm text-neu-black uppercase tracking-wide">
+              Judul Banner <span className="text-neu-accent">*</span>
+            </label>
+            <input
+              type="text"
+              value={form.title}
+              onChange={e => setField('title', e.target.value)}
+              placeholder="Contoh: Banner Promo Lebaran 2025"
+              className={cn(
+                'w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm',
+                'font-body text-neu-black placeholder:text-gray-400',
+                'outline-none focus:shadow-neu focus:translate-x-[-2px] focus:translate-y-[-2px]',
+                'transition-all duration-150',
+                errors.title && 'border-neu-accent shadow-[4px_4px_0px_#FF5C5C]',
+              )}
+            />
+            {errors.title && (
+              <span className="text-neu-accent font-body font-semibold text-xs">{errors.title}</span>
+            )}
+          </div>
+
+          {/* Description */}
+          <div className="flex flex-col gap-1.5">
+            <label className="font-display font-bold text-sm text-neu-black uppercase tracking-wide">
+              Deskripsi
+            </label>
+            <RichTextEditor
+              value={form.description}
+              onChange={val => setField('description', val)}
+              placeholder="Tulis deskripsi banner..."
+            />
+          </div>
+
+          {/* Image */}
+          <div className="flex flex-col gap-1.5">
+            <label className="font-display font-bold text-sm text-neu-black uppercase tracking-wide">
+              Gambar Banner
+            </label>
+            <ImageUploader
+              value={form.image}
+              onChange={url => setField('image', url)}
+            />
+          </div>
+
+          {/* Is Active */}
+          <div className="bg-neu-white border-2 border-neu-black shadow-neu-sm p-4">
+            <Toggle
+              checked={form.isActive}
+              onChange={val => setField('isActive', val)}
+              label={form.isActive ? 'Banner Aktif (ditampilkan)' : 'Banner Nonaktif (disembunyikan)'}
+            />
+          </div>
+
+          {/* Actions */}
+          <div className="flex items-center gap-3 pt-2">
+            <button
+              type="submit"
+              disabled={isSaving}
+              className={cn(
+                'px-8 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu',
+                'font-display font-bold text-sm uppercase tracking-wide text-neu-black',
+                'transition-all duration-150',
+                'hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm',
+                'active:translate-x-1 active:translate-y-1 active:shadow-none',
+                isSaving && 'opacity-60 cursor-not-allowed',
+              )}
+            >
+              {isSaving ? 'Menyimpan...' : isEditMode ? 'Simpan Perubahan' : 'Buat Banner'}
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate('/banners')}
+              disabled={isSaving}
+              className={cn(
+                'px-6 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu',
+                'font-display font-bold text-sm uppercase tracking-wide text-neu-black',
+                'transition-all duration-150',
+                'hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm',
+                'active:translate-x-1 active:translate-y-1 active:shadow-none',
+              )}
+            >
+              Batal
+            </button>
+          </div>
+        </form>
       </div>
-    </>
+    </PageLayout>
   );
 }

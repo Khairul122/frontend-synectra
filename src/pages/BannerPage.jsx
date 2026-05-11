@@ -5,9 +5,7 @@ import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
 import { bannerService } from '../services/banner.service';
-import { Sidebar } from '../components/layout/Sidebar';
-import { Navbar } from '../components/layout/Navbar';
-import { AlertContainer } from '../components/ui/Alert';
+import { PageLayout } from '../components/layout/PageLayout';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
 import { useAlert } from '../hooks/useAlert';
 
@@ -302,8 +300,7 @@ export default function BannerPage() {
   }
 
   return (
-    <>
-      <AlertContainer alerts={alert.alerts} onDismiss={alert.dismiss} />
+    <PageLayout user={user} title="Banner Management" alert={alert}>
       {previewBanner && (
         <ImagePreviewModal banner={previewBanner} onClose={() => setPreviewBanner(null)} />
       )}
@@ -316,115 +313,103 @@ export default function BannerPage() {
         isLoading={isDeleting}
       />
 
-      <div className="flex min-h-screen bg-neu-bg">
-        <Sidebar user={user} />
+      {/* Header toolbar */}
+      <div ref={headerRef} className="flex flex-wrap items-center gap-3 mb-6">
+        {/* Search */}
+        <input
+          type="text"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Cari banner..."
+          className={cn(
+            'flex-1 min-w-48 px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm',
+            'font-body text-sm text-neu-black placeholder:text-neu-black/30',
+            'outline-none focus:shadow-neu transition-all duration-150',
+          )}
+        />
 
-        <div className="flex-1 ml-64 flex flex-col">
-          <Navbar title="Banner Management" user={user} />
+        {/* Stats */}
+        <span className="font-mono text-xs text-neu-black/50">
+          Menampilkan <strong className="text-neu-black">{filtered.length}</strong> dari{' '}
+          <strong className="text-neu-black">{banners.length}</strong> banner
+        </span>
 
-          <main className="flex-1 p-6 overflow-y-auto">
+        {/* Tambah */}
+        <button
+          onClick={() => navigate('/banners/new')}
+          className={cn(
+            'px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu',
+            'font-display font-bold text-xs uppercase tracking-wide text-neu-black',
+            'transition-all duration-150 whitespace-nowrap',
+            'hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm',
+            'active:translate-x-1 active:translate-y-1 active:shadow-none',
+          )}
+        >
+          + Tambah Banner
+        </button>
+      </div>
 
-            {/* Header toolbar */}
-            <div ref={headerRef} className="flex flex-wrap items-center gap-3 mb-6">
-              {/* Search */}
-              <input
-                type="text"
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                placeholder="Cari banner..."
-                className={cn(
-                  'flex-1 min-w-48 px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm',
-                  'font-body text-sm text-neu-black placeholder:text-neu-black/30',
-                  'outline-none focus:shadow-neu transition-all duration-150',
-                )}
-              />
-
-              {/* Stats */}
-              <span className="font-mono text-xs text-neu-black/50">
-                Menampilkan <strong className="text-neu-black">{filtered.length}</strong> dari{' '}
-                <strong className="text-neu-black">{banners.length}</strong> banner
-              </span>
-
-              {/* Tambah */}
+      {/* Table */}
+      <div ref={tableRef} className="border-2 border-neu-black shadow-neu bg-neu-white overflow-hidden">
+        {filtered.length === 0 ? (
+          <div className="p-16 text-center border-t-2 border-neu-black">
+            <p className="font-display font-bold text-xl text-neu-black/40">
+              {banners.length === 0 ? 'Belum ada banner.' : 'Tidak ada hasil pencarian.'}
+            </p>
+            {banners.length === 0 && (
               <button
                 onClick={() => navigate('/banners/new')}
                 className={cn(
-                  'px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu',
-                  'font-display font-bold text-xs uppercase tracking-wide text-neu-black',
-                  'transition-all duration-150 whitespace-nowrap',
-                  'hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm',
-                  'active:translate-x-1 active:translate-y-1 active:shadow-none',
+                  'mt-4 px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu',
+                  'font-display font-bold text-xs uppercase hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm transition-all duration-150',
                 )}
               >
-                + Tambah Banner
+                Tambah Banner Pertama
               </button>
-            </div>
-
-            {/* Table */}
-            <div ref={tableRef} className="border-2 border-neu-black shadow-neu bg-neu-white overflow-hidden">
-              {filtered.length === 0 ? (
-                <div className="p-16 text-center border-t-2 border-neu-black">
-                  <p className="font-display font-bold text-xl text-neu-black/40">
-                    {banners.length === 0 ? 'Belum ada banner.' : 'Tidak ada hasil pencarian.'}
-                  </p>
-                  {banners.length === 0 && (
-                    <button
-                      onClick={() => navigate('/banners/new')}
-                      className={cn(
-                        'mt-4 px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu',
-                        'font-display font-bold text-xs uppercase hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm transition-all duration-150',
-                      )}
-                    >
-                      Tambah Banner Pertama
-                    </button>
-                  )}
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full border-collapse">
-                    <thead>
-                      <tr className="bg-neu-black text-neu-white">
-                        <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase tracking-wide text-center w-10">
-                          No
-                        </th>
-                        <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase tracking-wide text-left w-20">
-                          Gambar
-                        </th>
-                        <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase tracking-wide text-left">
-                          Judul
-                        </th>
-                        <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase tracking-wide text-center w-28">
-                          Status
-                        </th>
-                        <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase tracking-wide text-left w-36">
-                          Dibuat
-                        </th>
-                        <th className="px-4 py-3 font-display font-bold text-xs uppercase tracking-wide text-left w-48">
-                          Aksi
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filtered.map((banner, idx) => (
-                        <BannerRow
-                          key={banner.id}
-                          banner={banner}
-                          index={idx}
-                          onEdit={id => navigate(`/banners/${id}/edit`)}
-                          onDelete={setDeleteTarget}
-                          onToggleActive={handleToggleActive}
-                          onPreview={setPreviewBanner}
-                        />
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-
-          </main>
-        </div>
+            )}
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="bg-neu-black text-neu-white">
+                  <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase tracking-wide text-center w-10">
+                    No
+                  </th>
+                  <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase tracking-wide text-left w-20">
+                    Gambar
+                  </th>
+                  <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase tracking-wide text-left">
+                    Judul
+                  </th>
+                  <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase tracking-wide text-center w-28">
+                    Status
+                  </th>
+                  <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase tracking-wide text-left w-36">
+                    Dibuat
+                  </th>
+                  <th className="px-4 py-3 font-display font-bold text-xs uppercase tracking-wide text-left w-48">
+                    Aksi
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((banner, idx) => (
+                  <BannerRow
+                    key={banner.id}
+                    banner={banner}
+                    index={idx}
+                    onEdit={id => navigate(`/banners/${id}/edit`)}
+                    onDelete={setDeleteTarget}
+                    onToggleActive={handleToggleActive}
+                    onPreview={setPreviewBanner}
+                  />
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
-    </>
+    </PageLayout>
   );
 }

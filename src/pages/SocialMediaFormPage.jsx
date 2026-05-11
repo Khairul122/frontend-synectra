@@ -5,9 +5,7 @@ import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
 import { socialMediaService } from '../services/socialMedia.service';
-import { Sidebar } from '../components/layout/Sidebar';
-import { Navbar } from '../components/layout/Navbar';
-import { AlertContainer } from '../components/ui/Alert';
+import { PageLayout } from '../components/layout/PageLayout';
 import { useAlert } from '../hooks/useAlert';
 import { SUPABASE_URL, SUPABASE_ANON, SOCIAL_ICON_BUCKET } from '../constants/api';
 
@@ -219,83 +217,71 @@ export default function SocialMediaFormPage() {
   }
 
   return (
-    <>
-      <AlertContainer alerts={alert.alerts} onDismiss={alert.dismiss} />
+    <PageLayout user={user} title={isEditMode ? 'Edit Sosial Media' : 'Tambah Sosial Media'} alert={alert}>
+      <div ref={formRef} className="max-w-2xl mx-auto">
 
-      <div className="flex min-h-screen bg-neu-bg">
-        <Sidebar user={user} />
-
-        <div className="flex-1 ml-64 flex flex-col">
-          <Navbar title={isEditMode ? 'Edit Sosial Media' : 'Tambah Sosial Media'} user={user} />
-
-          <main className="flex-1 p-6 overflow-y-auto">
-            <div ref={formRef} className="max-w-2xl mx-auto">
-
-              {/* Breadcrumb */}
-              <div className="flex items-center gap-2 mb-6 font-mono text-xs text-neu-black/50">
-                <button type="button" onClick={() => navigate('/social-media')}
-                  className="hover:text-neu-black transition-colors">Social Media</button>
-                <span>/</span>
-                <span className="text-neu-black">{isEditMode ? 'Edit' : 'Tambah Baru'}</span>
-              </div>
-
-              <form onSubmit={handleSubmit} className="space-y-6">
-
-                <Field label={<>Nama Platform <span className="text-neu-accent">*</span></>} error={errors.platformName}>
-                  <input type="text" value={form.platformName}
-                    onChange={e => setField('platformName', e.target.value)}
-                    placeholder="Contoh: Instagram, Twitter, LinkedIn"
-                    className={inputCls(errors.platformName)} />
-                </Field>
-
-                <Field label={<>Nama Akun <span className="text-neu-accent">*</span></>} error={errors.accountName}>
-                  <input type="text" value={form.accountName}
-                    onChange={e => setField('accountName', e.target.value)}
-                    placeholder="Contoh: @synectra"
-                    className={inputCls(errors.accountName)} />
-                </Field>
-
-                <Field label={<>URL <span className="text-neu-accent">*</span></>} error={errors.url}>
-                  <input type="url" value={form.url}
-                    onChange={e => setField('url', e.target.value)}
-                    placeholder="Contoh: https://instagram.com/synectra"
-                    className={inputCls(errors.url)} />
-                </Field>
-
-                <Field label="Icon Platform">
-                  <IconUploader value={form.icon} onChange={val => setField('icon', val)} />
-                </Field>
-
-                <div className="bg-neu-white border-2 border-neu-black shadow-neu-sm p-4">
-                  <Toggle
-                    checked={form.isActive}
-                    onChange={val => setField('isActive', val)}
-                    label={form.isActive ? 'Akun Aktif (ditampilkan)' : 'Akun Nonaktif (disembunyikan)'}
-                  />
-                </div>
-
-                <div className="flex items-center gap-3 pt-2">
-                  <button type="submit" disabled={isSaving} className={cn(
-                    'px-8 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu',
-                    'font-display font-bold text-sm uppercase tracking-wide text-neu-black',
-                    'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm active:translate-x-1 active:translate-y-1 active:shadow-none',
-                    isSaving && 'opacity-60 cursor-not-allowed',
-                  )}>
-                    {isSaving ? 'Menyimpan...' : isEditMode ? 'Simpan Perubahan' : 'Buat Sosial Media'}
-                  </button>
-                  <button type="button" onClick={() => navigate('/social-media')} disabled={isSaving} className={cn(
-                    'px-6 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu',
-                    'font-display font-bold text-sm uppercase tracking-wide text-neu-black',
-                    'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm active:translate-x-1 active:translate-y-1 active:shadow-none',
-                  )}>
-                    Batal
-                  </button>
-                </div>
-              </form>
-            </div>
-          </main>
+        {/* Breadcrumb */}
+        <div className="flex items-center gap-2 mb-6 font-mono text-xs text-neu-black/50">
+          <button type="button" onClick={() => navigate('/social-media')}
+            className="hover:text-neu-black transition-colors">Social Media</button>
+          <span>/</span>
+          <span className="text-neu-black">{isEditMode ? 'Edit' : 'Tambah Baru'}</span>
         </div>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+
+          <Field label={<>Nama Platform <span className="text-neu-accent">*</span></>} error={errors.platformName}>
+            <input type="text" value={form.platformName}
+              onChange={e => setField('platformName', e.target.value)}
+              placeholder="Contoh: Instagram, Twitter, LinkedIn"
+              className={inputCls(errors.platformName)} />
+          </Field>
+
+          <Field label={<>Nama Akun <span className="text-neu-accent">*</span></>} error={errors.accountName}>
+            <input type="text" value={form.accountName}
+              onChange={e => setField('accountName', e.target.value)}
+              placeholder="Contoh: @synectra"
+              className={inputCls(errors.accountName)} />
+          </Field>
+
+          <Field label={<>URL <span className="text-neu-accent">*</span></>} error={errors.url}>
+            <input type="url" value={form.url}
+              onChange={e => setField('url', e.target.value)}
+              placeholder="Contoh: https://instagram.com/synectra"
+              className={inputCls(errors.url)} />
+          </Field>
+
+          <Field label="Icon Platform">
+            <IconUploader value={form.icon} onChange={val => setField('icon', val)} />
+          </Field>
+
+          <div className="bg-neu-white border-2 border-neu-black shadow-neu-sm p-4">
+            <Toggle
+              checked={form.isActive}
+              onChange={val => setField('isActive', val)}
+              label={form.isActive ? 'Akun Aktif (ditampilkan)' : 'Akun Nonaktif (disembunyikan)'}
+            />
+          </div>
+
+          <div className="flex items-center gap-3 pt-2">
+            <button type="submit" disabled={isSaving} className={cn(
+              'px-8 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu',
+              'font-display font-bold text-sm uppercase tracking-wide text-neu-black',
+              'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm active:translate-x-1 active:translate-y-1 active:shadow-none',
+              isSaving && 'opacity-60 cursor-not-allowed',
+            )}>
+              {isSaving ? 'Menyimpan...' : isEditMode ? 'Simpan Perubahan' : 'Buat Sosial Media'}
+            </button>
+            <button type="button" onClick={() => navigate('/social-media')} disabled={isSaving} className={cn(
+              'px-6 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu',
+              'font-display font-bold text-sm uppercase tracking-wide text-neu-black',
+              'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm active:translate-x-1 active:translate-y-1 active:shadow-none',
+            )}>
+              Batal
+            </button>
+          </div>
+        </form>
       </div>
-    </>
+    </PageLayout>
   );
 }

@@ -5,74 +5,13 @@ import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
 import { portfolioService } from '../services/portfolio.service';
 import { uploadService } from '../services/upload.service';
-import { Sidebar } from '../components/layout/Sidebar';
-import { AlertContainer } from '../components/ui/Alert';
+import { PageLayout } from '../components/layout/PageLayout';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
 import { RichTextEditor } from '../components/ui/RichTextEditor';
 import { useAlert } from '../hooks/useAlert';
 
 const CATEGORIES = ['Web App', 'Mobile', 'Design', 'Backend'];
 const EMPTY      = { title: '', description: '', images: [], category: '' };
-
-/* ─── Avatar Dropdown ───────────────────────────────────────────────────── */
-function AvatarDropdown({ user, onLogout }) {
-  const [open, setOpen] = useState(false);
-  const ref             = useRef(null);
-  const initial         = (user?.fullName ?? user?.email ?? '?').charAt(0).toUpperCase();
-
-  useEffect(() => {
-    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, []);
-
-  return (
-    <div ref={ref} className="relative">
-      <button
-        type="button"
-        onClick={() => setOpen(o => !o)}
-        className={cn(
-          'w-9 h-9 border-2 border-neu-black bg-neu-primary font-display font-bold text-sm text-neu-black',
-          'flex items-center justify-center shadow-neu-sm',
-          'hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-150',
-        )}
-      >
-        {user?.avatarUrl
-          ? <img src={user.avatarUrl} alt="avatar" className="w-full h-full object-cover" />
-          : initial}
-      </button>
-
-      {open && (
-        <div className="absolute right-0 top-full mt-2 w-52 bg-neu-white border-2 border-neu-black shadow-neu z-50">
-          {/* Info user */}
-          <div className="px-4 py-3 border-b-2 border-neu-black">
-            <p className="font-display font-bold text-sm text-neu-black truncate">
-              {user?.fullName ?? '—'}
-            </p>
-            <p className="font-mono text-[11px] text-neu-black/50 truncate mt-0.5">
-              {user?.email ?? '—'}
-            </p>
-            <span className="inline-block mt-2 px-2 py-0.5 bg-neu-accent text-neu-white border border-neu-black font-mono font-bold text-[10px] uppercase">
-              {user?.role ?? 'admin'}
-            </span>
-          </div>
-
-          {/* Logout */}
-          <button
-            type="button"
-            onClick={() => { setOpen(false); onLogout(); }}
-            className="w-full px-4 py-3 flex items-center gap-2 font-display font-bold text-xs uppercase text-neu-accent hover:bg-neu-accent hover:text-neu-white transition-colors duration-150"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-            </svg>
-            Keluar
-          </button>
-        </div>
-      )}
-    </div>
-  );
-}
 
 /* ─── Multi-image uploader ─────────────────────────────────────────────── */
 function MultiImageUploader({ values, onChange }) {
@@ -296,126 +235,108 @@ export default function PortfolioFormPage() {
   );
 
   return (
-    <>
-      <AlertContainer alerts={alert.alerts} onDismiss={alert.dismiss} />
-      <div className="flex min-h-screen bg-neu-bg">
-        <Sidebar user={user} />
+    <PageLayout user={user} title={isEdit ? 'Edit Portfolio' : 'Tambah Portfolio'} alert={alert}>
+      <div ref={contentRef} className="flex flex-col gap-6">
 
-        <div className="flex-1 ml-64 flex flex-col">
+        {/* Form — mengisi sisa area */}
+        <form onSubmit={handleSubmit}
+          className="bg-neu-white border-2 border-neu-black shadow-neu-lg flex flex-col">
 
-          {/* Topbar — hanya avatar dropdown, tanpa judul */}
-          <header className="h-16 bg-neu-white border-b-2 border-neu-black flex items-center justify-end px-6 shrink-0">
-            <AvatarDropdown user={user} onLogout={() => {}} />
-          </header>
+          {/* Isi form */}
+          <div className="p-6 flex flex-col gap-6">
 
-          <main ref={contentRef} className="flex-1 flex flex-col p-6 gap-6">
+            {/* Judul */}
+            <div className="flex flex-col gap-1.5">
+              <label className="font-display font-bold text-xs uppercase tracking-wider text-neu-black">
+                Judul <span className="text-neu-accent">*</span>
+              </label>
+              <input type="text" value={form.title}
+                onChange={e => set('title', e.target.value)}
+                placeholder="Nama proyek" className={inputCls('title')} autoFocus />
+              {errors.title && <span className="font-body text-xs text-neu-accent font-semibold">{errors.title}</span>}
+            </div>
 
-            {/* Judul halaman di section konten */}
-            <h2 className="font-display font-bold text-xl text-neu-black uppercase tracking-wide">
-              {isEdit ? 'Edit Portfolio' : 'Tambah Portfolio'}
-            </h2>
-
-            {/* Form — mengisi sisa area */}
-            <form onSubmit={handleSubmit}
-              className="flex-1 bg-neu-white border-2 border-neu-black shadow-neu-lg flex flex-col">
-
-              {/* Isi form */}
-              <div className="flex-1 p-6 flex flex-col gap-6 overflow-y-auto">
-
-                {/* Judul */}
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-display font-bold text-xs uppercase tracking-wider text-neu-black">
-                    Judul <span className="text-neu-accent">*</span>
-                  </label>
-                  <input type="text" value={form.title}
-                    onChange={e => set('title', e.target.value)}
-                    placeholder="Nama proyek" className={inputCls('title')} autoFocus />
-                  {errors.title && <span className="font-body text-xs text-neu-accent font-semibold">{errors.title}</span>}
-                </div>
-
-                {/* Kategori */}
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-display font-bold text-xs uppercase tracking-wider text-neu-black">Kategori</label>
-                  <div className="flex flex-wrap gap-2">
-                    {CATEGORIES.map(cat => (
-                      <button key={cat} type="button"
-                        onClick={() => set('category', form.category === cat ? '' : cat)}
-                        className={cn(
-                          'px-4 py-2 font-display font-bold text-xs uppercase tracking-wide border-2 border-neu-black transition-all duration-150',
-                          form.category === cat
-                            ? 'bg-neu-black text-neu-white translate-x-[2px] translate-y-[2px] shadow-none'
-                            : 'bg-neu-white text-neu-black shadow-neu-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none',
-                        )}>
-                        {cat}
-                      </button>
-                    ))}
-                  </div>
-                  <input type="text" value={form.category}
-                    onChange={e => set('category', e.target.value)}
-                    placeholder="Atau ketik kategori lain..."
-                    className={cn(inputCls('category'), 'text-xs')} />
-                </div>
-
-                {/* Gambar */}
-                <MultiImageUploader
-                  values={form.images}
-                  onChange={urls => set('images', urls)}
-                />
-
-                {/* Deskripsi */}
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-display font-bold text-xs uppercase tracking-wider text-neu-black">Deskripsi</label>
-                  <RichTextEditor
-                    value={form.description}
-                    onChange={v => set('description', v)}
-                    placeholder="Tulis deskripsi proyek..."
-                  />
-                </div>
+            {/* Kategori */}
+            <div className="flex flex-col gap-1.5">
+              <label className="font-display font-bold text-xs uppercase tracking-wider text-neu-black">Kategori</label>
+              <div className="flex flex-wrap gap-2">
+                {CATEGORIES.map(cat => (
+                  <button key={cat} type="button"
+                    onClick={() => set('category', form.category === cat ? '' : cat)}
+                    className={cn(
+                      'px-4 py-2 font-display font-bold text-xs uppercase tracking-wide border-2 border-neu-black transition-all duration-150',
+                      form.category === cat
+                        ? 'bg-neu-black text-neu-white translate-x-[2px] translate-y-[2px] shadow-none'
+                        : 'bg-neu-white text-neu-black shadow-neu-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none',
+                    )}>
+                    {cat}
+                  </button>
+                ))}
               </div>
+              <input type="text" value={form.category}
+                onChange={e => set('category', e.target.value)}
+                placeholder="Atau ketik kategori lain..."
+                className={cn(inputCls('category'), 'text-xs')} />
+            </div>
 
-              {/* Tombol aksi — kembali, batal, simpan sejajar di bawah */}
-              <div className="shrink-0 flex items-center gap-3 px-6 py-4 border-t-2 border-neu-black bg-neu-bg">
-                <button type="button" onClick={() => navigate('/portfolio')} disabled={isSaving}
-                  className={cn(
-                    'px-5 py-2.5 font-display font-bold text-xs uppercase tracking-wide',
-                    'bg-neu-white text-neu-black border-2 border-neu-black shadow-neu',
-                    'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm',
-                    'active:translate-x-1 active:translate-y-1 active:shadow-none',
-                    isSaving && 'opacity-40 cursor-not-allowed',
-                  )}>
-                  ← Kembali
-                </button>
+            {/* Gambar */}
+            <MultiImageUploader
+              values={form.images}
+              onChange={urls => set('images', urls)}
+            />
 
-                <div className="w-px h-5 bg-neu-black/20" />
+            {/* Deskripsi */}
+            <div className="flex flex-col gap-1.5">
+              <label className="font-display font-bold text-xs uppercase tracking-wider text-neu-black">Deskripsi</label>
+              <RichTextEditor
+                value={form.description}
+                onChange={v => set('description', v)}
+                placeholder="Tulis deskripsi proyek..."
+              />
+            </div>
+          </div>
 
-                <button type="button" onClick={() => navigate('/portfolio')} disabled={isSaving}
-                  className={cn(
-                    'px-5 py-2.5 font-display font-bold text-xs uppercase tracking-wide',
-                    'bg-neu-white text-neu-black border-2 border-neu-black shadow-neu',
-                    'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm',
-                    'active:translate-x-1 active:translate-y-1 active:shadow-none',
-                    isSaving && 'opacity-40 cursor-not-allowed',
-                  )}>
-                  Batal
-                </button>
+          {/* Tombol aksi — kembali, batal, simpan sejajar di bawah */}
+          <div className="shrink-0 flex items-center gap-3 px-6 py-4 border-t-2 border-neu-black bg-neu-bg">
+            <button type="button" onClick={() => navigate('/portfolio')} disabled={isSaving}
+              className={cn(
+                'px-5 py-2.5 font-display font-bold text-xs uppercase tracking-wide',
+                'bg-neu-white text-neu-black border-2 border-neu-black shadow-neu',
+                'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm',
+                'active:translate-x-1 active:translate-y-1 active:shadow-none',
+                isSaving && 'opacity-40 cursor-not-allowed',
+              )}>
+              ← Kembali
+            </button>
 
-                <button type="submit" disabled={isSaving}
-                  className={cn(
-                    'flex-1 py-2.5 font-display font-bold text-sm uppercase tracking-wide',
-                    'bg-neu-primary text-neu-black border-2 border-neu-black shadow-neu',
-                    'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm',
-                    'active:translate-x-1 active:translate-y-1 active:shadow-none',
-                    isSaving && 'opacity-60 cursor-not-allowed',
-                  )}>
-                  {isSaving
-                    ? <span className="inline-flex items-center gap-2 justify-center"><span className="animate-spin">⟳</span> Menyimpan...</span>
-                    : (isEdit ? 'Simpan Perubahan' : 'Tambah Portfolio')}
-                </button>
-              </div>
-            </form>
-          </main>
-        </div>
+            <div className="w-px h-5 bg-neu-black/20" />
+
+            <button type="button" onClick={() => navigate('/portfolio')} disabled={isSaving}
+              className={cn(
+                'px-5 py-2.5 font-display font-bold text-xs uppercase tracking-wide',
+                'bg-neu-white text-neu-black border-2 border-neu-black shadow-neu',
+                'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm',
+                'active:translate-x-1 active:translate-y-1 active:shadow-none',
+                isSaving && 'opacity-40 cursor-not-allowed',
+              )}>
+              Batal
+            </button>
+
+            <button type="submit" disabled={isSaving}
+              className={cn(
+                'flex-1 py-2.5 font-display font-bold text-sm uppercase tracking-wide',
+                'bg-neu-primary text-neu-black border-2 border-neu-black shadow-neu',
+                'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm',
+                'active:translate-x-1 active:translate-y-1 active:shadow-none',
+                isSaving && 'opacity-60 cursor-not-allowed',
+              )}>
+              {isSaving
+                ? <span className="inline-flex items-center gap-2 justify-center"><span className="animate-spin">⟳</span> Menyimpan...</span>
+                : (isEdit ? 'Simpan Perubahan' : 'Tambah Portfolio')}
+            </button>
+          </div>
+        </form>
       </div>
-    </>
+    </PageLayout>
   );
 }
