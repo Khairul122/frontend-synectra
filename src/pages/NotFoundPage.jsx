@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Lottie from 'lottie-react';
 import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
+import { LottiePlayer } from '../components/ui/LottiePlayer';
 import anim404 from '../assets/lottie/404.json';
 
 export default function NotFoundPage() {
@@ -120,10 +120,8 @@ export default function NotFoundPage() {
             <div className="absolute -top-3 -right-3 bg-neu-accent border-2 border-neu-black px-2 py-0.5">
               <span className="font-mono font-bold text-[10px] text-neu-white uppercase">not found</span>
             </div>
-            <Lottie
+            <LottiePlayer
               animationData={anim404}
-              loop
-              autoplay
               style={{ width: 280, height: 210 }}
             />
           </div>

@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Lottie from 'lottie-react';
 import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
+import { LottiePlayer } from '../components/ui/LottiePlayer';
 import anim500 from '../assets/lottie/500.json';
 
 export default function ServerErrorPage() {
@@ -142,10 +142,8 @@ export default function ServerErrorPage() {
             <div className="absolute -top-3 -right-3 bg-neu-primary border-2 border-neu-black px-2 py-0.5">
               <span className="font-mono font-bold text-[10px] text-neu-black uppercase">server error</span>
             </div>
-            <Lottie
+            <LottiePlayer
               animationData={anim500}
-              loop
-              autoplay
               style={{ width: 240, height: 240 }}
             />
           </div>
