@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Lottie from 'lottie-react';
 import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
+import anim500 from '../assets/lottie/500.json';
 
 export default function ServerErrorPage() {
   const navigate = useNavigate();
@@ -142,7 +143,7 @@ export default function ServerErrorPage() {
               <span className="font-mono font-bold text-[10px] text-neu-black uppercase">server error</span>
             </div>
             <Lottie
-              path="/lottie/500.json"
+              animationData={anim500}
               loop
               autoplay
               style={{ width: 240, height: 240 }}

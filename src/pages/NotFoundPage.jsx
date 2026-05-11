@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Lottie from 'lottie-react';
 import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
+import anim404 from '../assets/lottie/404.json';
 
 export default function NotFoundPage() {
   const navigate = useNavigate();
@@ -120,7 +121,7 @@ export default function NotFoundPage() {
               <span className="font-mono font-bold text-[10px] text-neu-white uppercase">not found</span>
             </div>
             <Lottie
-              path="/lottie/404.json"
+              animationData={anim404}
               loop
               autoplay
               style={{ width: 280, height: 210 }}
