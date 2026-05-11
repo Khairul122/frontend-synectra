@@ -6,9 +6,7 @@ import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
 import { orderService } from '../services/order.service';
 import { paymentService } from '../services/payment.service';
-import { Sidebar } from '../components/layout/Sidebar';
-import { Navbar } from '../components/layout/Navbar';
-import { AlertContainer } from '../components/ui/Alert';
+import { PageLayout } from '../components/layout/PageLayout';
 import { useAlert } from '../hooks/useAlert';
 import { SUPABASE_URL, SUPABASE_ANON, PAYMENT_RECEIPT_BUCKET } from '../constants/api';
 
@@ -159,133 +157,124 @@ export default function MyOrderDetailPage() {
     : 0;
 
   return (
-    <>
-      <AlertContainer alerts={alert.alerts} onDismiss={alert.dismiss} />
+    <PageLayout user={user} title="Detail Pesanan" alert={alert}>
       {showPayment && <UploadPaymentModal orderId={id} onClose={() => setShowPayment(false)} onUploaded={loadOrder} />}
 
-      <div className="flex min-h-screen bg-neu-bg">
-        <Sidebar user={user} />
-        <div className="flex-1 ml-64 flex flex-col">
-          <Navbar title="Detail Pesanan" user={user} />
-          <main className="flex-1 p-6 overflow-y-auto">
-            <div ref={pageRef} className="max-w-3xl mx-auto space-y-6">
+      <div ref={pageRef} className="max-w-3xl mx-auto space-y-6">
 
-              <div className="flex items-center gap-2 font-mono text-xs text-neu-black/50">
-                <button onClick={() => navigate('/my-orders')} className="hover:text-neu-black">Pesanan Saya</button>
-                <span>/</span>
-                <span className="text-neu-black truncate">{order.title}</span>
-              </div>
-
-              {/* Info */}
-              <div className="bg-neu-white border-2 border-neu-black shadow-neu p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <span className={cn('inline-block px-3 py-1 border-2 border-neu-black font-mono font-bold text-sm uppercase', statusCfg.bg, statusCfg.text)}>
-                    {statusCfg.label}
-                  </span>
-                  <button onClick={() => setShowPayment(true)}
-                    className="px-4 py-2 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase text-neu-black hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm transition-all duration-150">
-                    Upload Bukti Bayar
-                  </button>
-                </div>
-                <h2 className="font-display font-bold text-xl text-neu-black mb-2">{order.title}</h2>
-                {order.description && <p className="font-body text-sm text-neu-black/60 mb-4">{order.description}</p>}
-                <div className="grid grid-cols-2 gap-4 border-t-2 border-neu-black pt-4">
-                  <div>
-                    <p className="font-mono text-xs text-neu-black/40 uppercase">Total Harga</p>
-                    <p className="font-display font-bold text-lg">{fmt(order.totalPrice)}</p>
-                  </div>
-                  <div>
-                    <p className="font-mono text-xs text-neu-black/40 uppercase">Deadline</p>
-                    <p className="font-display font-bold text-sm">{fmtDateTime(order.deadline)}</p>
-                  </div>
-                </div>
-
-                {/* Overall progress */}
-                <div className="mt-4 pt-4 border-t-2 border-neu-black">
-                  <div className="flex justify-between mb-1">
-                    <span className="font-mono text-xs text-neu-black/50 uppercase">Progress Keseluruhan</span>
-                    <span className="font-mono text-sm font-bold text-neu-blue">{lastProgress}%</span>
-                  </div>
-                  <div className="h-4 border-2 border-neu-black bg-neu-bg overflow-hidden">
-                    <div className="h-full bg-neu-blue transition-all duration-500" style={{ width: `${lastProgress}%` }} />
-                  </div>
-                </div>
-              </div>
-
-              {/* Payments */}
-              <div className="bg-neu-white border-2 border-neu-black shadow-neu">
-                <div className="px-6 py-4 border-b-2 border-neu-black">
-                  <h3 className="font-display font-bold text-base uppercase">Riwayat Pembayaran</h3>
-                </div>
-                {!order.payments?.length ? (
-                  <p className="px-6 py-6 text-center font-body text-sm text-neu-black/40">Belum ada pembayaran.</p>
-                ) : (
-                  <div className="divide-y-2 divide-neu-black">
-                    {order.payments.map(p => {
-                      const pcfg = PAYMENT_STATUS[p.status] ?? { label: p.status, bg: 'bg-neu-black/20', text: 'text-neu-black' };
-                      return (
-                        <div key={p.id} className="px-6 py-4 flex items-center gap-4">
-                          <a href={p.receiptImageUrl} target="_blank" rel="noopener noreferrer"
-                            className="w-12 h-10 border-2 border-neu-black overflow-hidden bg-neu-bg flex-shrink-0">
-                            <img src={p.receiptImageUrl} alt="receipt" className="w-full h-full object-cover" />
-                          </a>
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-0.5">
-                              <span className={cn('px-2 py-0.5 border-2 border-neu-black font-mono font-bold text-xs uppercase', pcfg.bg, pcfg.text)}>
-                                {pcfg.label}
-                              </span>
-                              <span className="font-mono text-xs text-neu-black/50 uppercase">{p.paymentType}</span>
-                            </div>
-                            <p className="font-display font-bold text-sm">{fmt(p.amount)}</p>
-                            <p className="font-mono text-xs text-neu-black/40">{fmtDateTime(p.createdAt)}</p>
-                            {p.notes && <p className="font-body text-xs text-neu-accent mt-0.5">Catatan Admin: {p.notes}</p>}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-
-              {/* Progress Timeline */}
-              <div className="bg-neu-white border-2 border-neu-black shadow-neu">
-                <div className="px-6 py-4 border-b-2 border-neu-black">
-                  <h3 className="font-display font-bold text-base uppercase">Timeline Progress</h3>
-                </div>
-                {!order.progressReports?.length ? (
-                  <p className="px-6 py-6 text-center font-body text-sm text-neu-black/40">Belum ada update progress dari admin.</p>
-                ) : (
-                  <div className="divide-y-2 divide-neu-black">
-                    {[...order.progressReports].reverse().map(r => (
-                      <div key={r.id} className="px-6 py-4 flex gap-4">
-                        <div className="w-12 h-12 border-2 border-neu-black bg-neu-blue/10 flex flex-col items-center justify-center flex-shrink-0">
-                          <span className="font-display font-bold text-base text-neu-blue leading-none">{r.progressPercentage}</span>
-                          <span className="font-mono text-[9px] text-neu-blue/60">%</span>
-                        </div>
-                        <div className="flex-1">
-                          <p className="font-display font-bold text-sm text-neu-black">{r.title}</p>
-                          {r.description && <p className="font-body text-xs text-neu-black/60 mt-0.5">{r.description}</p>}
-                          <p className="font-mono text-xs text-neu-black/40 mt-1">{fmtDateTime(r.reportedAt)}</p>
-                          <div className="h-1.5 border border-neu-black bg-neu-bg mt-2">
-                            <div className="h-full bg-neu-blue" style={{ width: `${r.progressPercentage}%` }} />
-                          </div>
-                        </div>
-                        {r.attachmentUrl && (
-                          <a href={r.attachmentUrl} target="_blank" rel="noopener noreferrer"
-                            className="w-16 h-12 border-2 border-neu-black overflow-hidden bg-neu-bg flex-shrink-0">
-                            <img src={r.attachmentUrl} alt="screenshot" className="w-full h-full object-cover" />
-                          </a>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-            </div>
-          </main>
+        <div className="flex items-center gap-2 font-mono text-xs text-neu-black/50">
+          <button onClick={() => navigate('/my-orders')} className="hover:text-neu-black">Pesanan Saya</button>
+          <span>/</span>
+          <span className="text-neu-black truncate">{order.title}</span>
         </div>
+
+        {/* Info */}
+        <div className="bg-neu-white border-2 border-neu-black shadow-neu p-6">
+          <div className="flex items-center justify-between mb-4">
+            <span className={cn('inline-block px-3 py-1 border-2 border-neu-black font-mono font-bold text-sm uppercase', statusCfg.bg, statusCfg.text)}>
+              {statusCfg.label}
+            </span>
+            <button onClick={() => setShowPayment(true)}
+              className="px-4 py-2 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase text-neu-black hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm transition-all duration-150">
+              Upload Bukti Bayar
+            </button>
+          </div>
+          <h2 className="font-display font-bold text-xl text-neu-black mb-2">{order.title}</h2>
+          {order.description && <p className="font-body text-sm text-neu-black/60 mb-4">{order.description}</p>}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t-2 border-neu-black pt-4">
+            <div>
+              <p className="font-mono text-xs text-neu-black/40 uppercase">Total Harga</p>
+              <p className="font-display font-bold text-lg">{fmt(order.totalPrice)}</p>
+            </div>
+            <div>
+              <p className="font-mono text-xs text-neu-black/40 uppercase">Deadline</p>
+              <p className="font-display font-bold text-sm">{fmtDateTime(order.deadline)}</p>
+            </div>
+          </div>
+
+          {/* Overall progress */}
+          <div className="mt-4 pt-4 border-t-2 border-neu-black">
+            <div className="flex justify-between mb-1">
+              <span className="font-mono text-xs text-neu-black/50 uppercase">Progress Keseluruhan</span>
+              <span className="font-mono text-sm font-bold text-neu-blue">{lastProgress}%</span>
+            </div>
+            <div className="h-4 border-2 border-neu-black bg-neu-bg overflow-hidden">
+              <div className="h-full bg-neu-blue transition-all duration-500" style={{ width: `${lastProgress}%` }} />
+            </div>
+          </div>
+        </div>
+
+        {/* Payments */}
+        <div className="bg-neu-white border-2 border-neu-black shadow-neu">
+          <div className="px-6 py-4 border-b-2 border-neu-black">
+            <h3 className="font-display font-bold text-base uppercase">Riwayat Pembayaran</h3>
+          </div>
+          {!order.payments?.length ? (
+            <p className="px-6 py-6 text-center font-body text-sm text-neu-black/40">Belum ada pembayaran.</p>
+          ) : (
+            <div className="divide-y-2 divide-neu-black">
+              {order.payments.map(p => {
+                const pcfg = PAYMENT_STATUS[p.status] ?? { label: p.status, bg: 'bg-neu-black/20', text: 'text-neu-black' };
+                return (
+                  <div key={p.id} className="px-6 py-4 flex items-center gap-4">
+                    <a href={p.receiptImageUrl} target="_blank" rel="noopener noreferrer"
+                      className="w-12 h-10 border-2 border-neu-black overflow-hidden bg-neu-bg flex-shrink-0">
+                      <img src={p.receiptImageUrl} alt="receipt" className="w-full h-full object-cover" />
+                    </a>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <span className={cn('px-2 py-0.5 border-2 border-neu-black font-mono font-bold text-xs uppercase', pcfg.bg, pcfg.text)}>
+                          {pcfg.label}
+                        </span>
+                        <span className="font-mono text-xs text-neu-black/50 uppercase">{p.paymentType}</span>
+                      </div>
+                      <p className="font-display font-bold text-sm">{fmt(p.amount)}</p>
+                      <p className="font-mono text-xs text-neu-black/40">{fmtDateTime(p.createdAt)}</p>
+                      {p.notes && <p className="font-body text-xs text-neu-accent mt-0.5">Catatan Admin: {p.notes}</p>}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Progress Timeline */}
+        <div className="bg-neu-white border-2 border-neu-black shadow-neu">
+          <div className="px-6 py-4 border-b-2 border-neu-black">
+            <h3 className="font-display font-bold text-base uppercase">Timeline Progress</h3>
+          </div>
+          {!order.progressReports?.length ? (
+            <p className="px-6 py-6 text-center font-body text-sm text-neu-black/40">Belum ada update progress dari admin.</p>
+          ) : (
+            <div className="divide-y-2 divide-neu-black">
+              {[...order.progressReports].reverse().map(r => (
+                <div key={r.id} className="px-6 py-4 flex gap-4">
+                  <div className="w-12 h-12 border-2 border-neu-black bg-neu-blue/10 flex flex-col items-center justify-center flex-shrink-0">
+                    <span className="font-display font-bold text-base text-neu-blue leading-none">{r.progressPercentage}</span>
+                    <span className="font-mono text-[9px] text-neu-blue/60">%</span>
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-display font-bold text-sm text-neu-black">{r.title}</p>
+                    {r.description && <p className="font-body text-xs text-neu-black/60 mt-0.5">{r.description}</p>}
+                    <p className="font-mono text-xs text-neu-black/40 mt-1">{fmtDateTime(r.reportedAt)}</p>
+                    <div className="h-1.5 border border-neu-black bg-neu-bg mt-2">
+                      <div className="h-full bg-neu-blue" style={{ width: `${r.progressPercentage}%` }} />
+                    </div>
+                  </div>
+                  {r.attachmentUrl && (
+                    <a href={r.attachmentUrl} target="_blank" rel="noopener noreferrer"
+                      className="w-16 h-12 border-2 border-neu-black overflow-hidden bg-neu-bg flex-shrink-0">
+                      <img src={r.attachmentUrl} alt="screenshot" className="w-full h-full object-cover" />
+                    </a>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
       </div>
-    </>
+    </PageLayout>
   );
 }

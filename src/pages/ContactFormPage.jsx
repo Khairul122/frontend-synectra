@@ -5,15 +5,13 @@ import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
 import { contactService } from '../services/contact.service';
 import { PLATFORMS, getPlatform } from '../constants/platforms';
-import { Sidebar } from '../components/layout/Sidebar';
-import { Navbar } from '../components/layout/Navbar';
-import { AlertContainer } from '../components/ui/Alert';
+import { PageLayout } from '../components/layout/PageLayout';
 import { useAlert } from '../hooks/useAlert';
 
 /* ─── Icon Picker ────────────────────────────────────────────────────────── */
 function IconPicker({ value, onChange }) {
   return (
-    <div className="grid grid-cols-4 gap-2">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
       {PLATFORMS.map(({ key, label, Icon, color }) => {
         const selected = value === key;
         return (
@@ -188,132 +186,120 @@ export default function ContactFormPage() {
   const selectedPlatform = getPlatform(form.icon);
 
   return (
-    <>
-      <AlertContainer alerts={alert.alerts} onDismiss={alert.dismiss} />
+    <PageLayout user={user} title={isEditMode ? 'Edit Kontak' : 'Tambah Kontak'} alert={alert}>
+      <div ref={formRef} className="max-w-2xl mx-auto">
 
-      <div className="flex min-h-screen bg-neu-bg">
-        <Sidebar user={user} />
-
-        <div className="flex-1 ml-64 flex flex-col">
-          <Navbar title={isEditMode ? 'Edit Kontak' : 'Tambah Kontak'} user={user} />
-
-          <main className="flex-1 p-6 overflow-y-auto">
-            <div ref={formRef} className="max-w-2xl mx-auto">
-
-              {/* Breadcrumb */}
-              <div className="flex items-center gap-2 mb-6 font-mono text-xs text-neu-black/50">
-                <button type="button" onClick={() => navigate('/contacts')}
-                  className="hover:text-neu-black transition-colors">Contacts</button>
-                <span>/</span>
-                <span className="text-neu-black">{isEditMode ? 'Edit' : 'Tambah Baru'}</span>
-              </div>
-
-              <form onSubmit={handleSubmit} className="space-y-6">
-
-                {/* Icon Picker */}
-                <div className="flex flex-col gap-2">
-                  <label className="font-display font-bold text-sm text-neu-black uppercase tracking-wide">
-                    Pilih Platform Icon <span className="text-neu-accent">*</span>
-                  </label>
-                  {/* Preview terpilih */}
-                  <div className="flex items-center gap-3 p-3 bg-neu-white border-2 border-neu-black shadow-neu-sm mb-1">
-                    <div className="w-10 h-10 border-2 border-neu-black flex items-center justify-center"
-                      style={{ backgroundColor: selectedPlatform.color + '20' }}>
-                      <selectedPlatform.Icon style={{ color: selectedPlatform.color }} className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <p className="font-display font-bold text-sm text-neu-black">
-                        {selectedPlatform.label}
-                      </p>
-                      <p className="font-mono text-xs text-neu-black/40">icon: {form.icon}</p>
-                    </div>
-                  </div>
-                  <IconPicker value={form.icon} onChange={handleIconChange} />
-                </div>
-
-                {/* Nama */}
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-display font-bold text-sm text-neu-black uppercase tracking-wide">
-                    Nama <span className="text-neu-accent">*</span>
-                  </label>
-                  <input type="text" value={form.nama}
-                    onChange={e => setField('nama', e.target.value)}
-                    placeholder="Contoh: Customer Service, Admin, Hotline"
-                    className={inputCls(errors.nama)} />
-                  {errors.nama && <span className="text-neu-accent font-body font-semibold text-xs">{errors.nama}</span>}
-                </div>
-
-                {/* Platform name */}
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-display font-bold text-sm text-neu-black uppercase tracking-wide">
-                    Nama Platform <span className="text-neu-accent">*</span>
-                  </label>
-                  <input type="text" value={form.platform}
-                    onChange={e => setField('platform', e.target.value)}
-                    placeholder="Contoh: WhatsApp, Telepon CS, Email Support"
-                    className={inputCls(errors.platform)} />
-                  {errors.platform && <span className="text-neu-accent font-body font-semibold text-xs">{errors.platform}</span>}
-                </div>
-
-                {/* Contact Info */}
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-display font-bold text-sm text-neu-black uppercase tracking-wide">
-                    Info Kontak <span className="text-neu-accent">*</span>
-                  </label>
-                  <input type="text" value={form.contactInfo}
-                    onChange={e => setField('contactInfo', e.target.value)}
-                    placeholder="Contoh: +6281234567890, info@synectra.com, @synectra"
-                    className={inputCls(errors.contactInfo)} />
-                  {errors.contactInfo && <span className="text-neu-accent font-body font-semibold text-xs">{errors.contactInfo}</span>}
-                </div>
-
-                {/* Link URL */}
-                <div className="flex flex-col gap-1.5">
-                  <label className="font-display font-bold text-sm text-neu-black uppercase tracking-wide">
-                    Link URL <span className="text-neu-accent">*</span>
-                  </label>
-                  <input type="text" value={form.linkUrl}
-                    onChange={e => setField('linkUrl', e.target.value)}
-                    placeholder="Contoh: https://wa.me/6281234567890, tel:+6281234567890"
-                    className={inputCls(errors.linkUrl)} />
-                  {errors.linkUrl && <span className="text-neu-accent font-body font-semibold text-xs">{errors.linkUrl}</span>}
-                  <p className="font-mono text-xs text-neu-black/40">
-                    Tips: wa.me/628xx • tel:+628xx • mailto:email@domain.com • https://t.me/username
-                  </p>
-                </div>
-
-                {/* Is Active */}
-                <div className="bg-neu-white border-2 border-neu-black shadow-neu-sm p-4">
-                  <Toggle
-                    checked={form.isActive}
-                    onChange={val => setField('isActive', val)}
-                    label={form.isActive ? 'Kontak Aktif (ditampilkan)' : 'Kontak Nonaktif (disembunyikan)'}
-                  />
-                </div>
-
-                {/* Actions */}
-                <div className="flex items-center gap-3 pt-2">
-                  <button type="submit" disabled={isSaving} className={cn(
-                    'px-8 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu',
-                    'font-display font-bold text-sm uppercase tracking-wide text-neu-black',
-                    'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm active:translate-x-1 active:translate-y-1 active:shadow-none',
-                    isSaving && 'opacity-60 cursor-not-allowed',
-                  )}>
-                    {isSaving ? 'Menyimpan...' : isEditMode ? 'Simpan Perubahan' : 'Buat Kontak'}
-                  </button>
-                  <button type="button" onClick={() => navigate('/contacts')} disabled={isSaving} className={cn(
-                    'px-6 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu',
-                    'font-display font-bold text-sm uppercase tracking-wide text-neu-black',
-                    'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm active:translate-x-1 active:translate-y-1 active:shadow-none',
-                  )}>
-                    Batal
-                  </button>
-                </div>
-              </form>
-            </div>
-          </main>
+        {/* Breadcrumb */}
+        <div className="flex items-center gap-2 mb-6 font-mono text-xs text-neu-black/50">
+          <button type="button" onClick={() => navigate('/contacts')}
+            className="hover:text-neu-black transition-colors">Contacts</button>
+          <span>/</span>
+          <span className="text-neu-black">{isEditMode ? 'Edit' : 'Tambah Baru'}</span>
         </div>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+
+          {/* Icon Picker */}
+          <div className="flex flex-col gap-2">
+            <label className="font-display font-bold text-sm text-neu-black uppercase tracking-wide">
+              Pilih Platform Icon <span className="text-neu-accent">*</span>
+            </label>
+            {/* Preview terpilih */}
+            <div className="flex items-center gap-3 p-3 bg-neu-white border-2 border-neu-black shadow-neu-sm mb-1">
+              <div className="w-10 h-10 border-2 border-neu-black flex items-center justify-center"
+                style={{ backgroundColor: selectedPlatform.color + '20' }}>
+                <selectedPlatform.Icon style={{ color: selectedPlatform.color }} className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="font-display font-bold text-sm text-neu-black">
+                  {selectedPlatform.label}
+                </p>
+                <p className="font-mono text-xs text-neu-black/40">icon: {form.icon}</p>
+              </div>
+            </div>
+            <IconPicker value={form.icon} onChange={handleIconChange} />
+          </div>
+
+          {/* Nama */}
+          <div className="flex flex-col gap-1.5">
+            <label className="font-display font-bold text-sm text-neu-black uppercase tracking-wide">
+              Nama <span className="text-neu-accent">*</span>
+            </label>
+            <input type="text" value={form.nama}
+              onChange={e => setField('nama', e.target.value)}
+              placeholder="Contoh: Customer Service, Admin, Hotline"
+              className={inputCls(errors.nama)} />
+            {errors.nama && <span className="text-neu-accent font-body font-semibold text-xs">{errors.nama}</span>}
+          </div>
+
+          {/* Platform name */}
+          <div className="flex flex-col gap-1.5">
+            <label className="font-display font-bold text-sm text-neu-black uppercase tracking-wide">
+              Nama Platform <span className="text-neu-accent">*</span>
+            </label>
+            <input type="text" value={form.platform}
+              onChange={e => setField('platform', e.target.value)}
+              placeholder="Contoh: WhatsApp, Telepon CS, Email Support"
+              className={inputCls(errors.platform)} />
+            {errors.platform && <span className="text-neu-accent font-body font-semibold text-xs">{errors.platform}</span>}
+          </div>
+
+          {/* Contact Info */}
+          <div className="flex flex-col gap-1.5">
+            <label className="font-display font-bold text-sm text-neu-black uppercase tracking-wide">
+              Info Kontak <span className="text-neu-accent">*</span>
+            </label>
+            <input type="text" value={form.contactInfo}
+              onChange={e => setField('contactInfo', e.target.value)}
+              placeholder="Contoh: +6281234567890, info@synectra.com, @synectra"
+              className={inputCls(errors.contactInfo)} />
+            {errors.contactInfo && <span className="text-neu-accent font-body font-semibold text-xs">{errors.contactInfo}</span>}
+          </div>
+
+          {/* Link URL */}
+          <div className="flex flex-col gap-1.5">
+            <label className="font-display font-bold text-sm text-neu-black uppercase tracking-wide">
+              Link URL <span className="text-neu-accent">*</span>
+            </label>
+            <input type="text" value={form.linkUrl}
+              onChange={e => setField('linkUrl', e.target.value)}
+              placeholder="Contoh: https://wa.me/6281234567890, tel:+6281234567890"
+              className={inputCls(errors.linkUrl)} />
+            {errors.linkUrl && <span className="text-neu-accent font-body font-semibold text-xs">{errors.linkUrl}</span>}
+            <p className="font-mono text-xs text-neu-black/40">
+              Tips: wa.me/628xx • tel:+628xx • mailto:email@domain.com • https://t.me/username
+            </p>
+          </div>
+
+          {/* Is Active */}
+          <div className="bg-neu-white border-2 border-neu-black shadow-neu-sm p-4">
+            <Toggle
+              checked={form.isActive}
+              onChange={val => setField('isActive', val)}
+              label={form.isActive ? 'Kontak Aktif (ditampilkan)' : 'Kontak Nonaktif (disembunyikan)'}
+            />
+          </div>
+
+          {/* Actions */}
+          <div className="flex items-center gap-3 pt-2">
+            <button type="submit" disabled={isSaving} className={cn(
+              'px-8 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu',
+              'font-display font-bold text-sm uppercase tracking-wide text-neu-black',
+              'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm active:translate-x-1 active:translate-y-1 active:shadow-none',
+              isSaving && 'opacity-60 cursor-not-allowed',
+            )}>
+              {isSaving ? 'Menyimpan...' : isEditMode ? 'Simpan Perubahan' : 'Buat Kontak'}
+            </button>
+            <button type="button" onClick={() => navigate('/contacts')} disabled={isSaving} className={cn(
+              'px-6 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu',
+              'font-display font-bold text-sm uppercase tracking-wide text-neu-black',
+              'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm active:translate-x-1 active:translate-y-1 active:shadow-none',
+            )}>
+              Batal
+            </button>
+          </div>
+        </form>
       </div>
-    </>
+    </PageLayout>
   );
 }

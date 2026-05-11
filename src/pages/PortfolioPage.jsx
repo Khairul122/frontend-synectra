@@ -4,9 +4,7 @@ import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
 import { portfolioService } from '../services/portfolio.service';
-import { Sidebar } from '../components/layout/Sidebar';
-import { Navbar } from '../components/layout/Navbar';
-import { AlertContainer } from '../components/ui/Alert';
+import { PageLayout } from '../components/layout/PageLayout';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
 import { PortfolioDetailModal } from '../components/portfolio/PortfolioDetailModal';
 import { useAlert } from '../hooks/useAlert';
@@ -124,9 +122,6 @@ export default function PortfolioPage() {
   const [user, setUser]             = useState(null);
   const [items, setItems]           = useState([]);
   const [isLoading, setIsLoading]   = useState(true);
-  const [showLogout, setShowLogout] = useState(false);
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
-
   const [deleteItem, setDeleteItem] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [detailItem, setDetailItem] = useState(null);
@@ -179,8 +174,7 @@ export default function PortfolioPage() {
   );
 
   return (
-    <>
-      <AlertContainer alerts={alert.alerts} onDismiss={alert.dismiss} />
+    <PageLayout user={user} title="Portfolio" alert={alert}>
       <ConfirmModal isOpen={Boolean(deleteItem)} title="Hapus Portfolio"
         message={`Hapus "${deleteItem?.title}"? Tindakan ini tidak bisa dibatalkan.`}
         onConfirm={handleDelete} onCancel={() => setDeleteItem(null)} isLoading={isDeleting} />
@@ -188,69 +182,59 @@ export default function PortfolioPage() {
         <PortfolioDetailModal item={detailItem} onClose={() => setDetailItem(null)} />
       )}
 
-      <div className="flex min-h-screen bg-neu-bg">
-        <Sidebar user={user} />
+      {/* Toolbar */}
+      <div className="flex flex-wrap items-center gap-3 mb-6">
+        <input type="text" value={search} onChange={e => setSearch(e.target.value)}
+          placeholder="Cari portfolio..."
+          className="flex-1 min-w-48 px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black placeholder:text-neu-black/30 outline-none focus:shadow-neu transition-all duration-150" />
 
-        <div className="flex-1 ml-64 flex flex-col">
-          <Navbar title="Portfolio" user={user} />
+        {categories.length > 0 && (
+          <select value={filterCat} onChange={e => setFilterCat(e.target.value)}
+            className="px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-black outline-none focus:shadow-neu transition-all duration-150 cursor-pointer">
+            <option value="">Semua Kategori</option>
+            {categories.map(c => <option key={c} value={c}>{c}</option>)}
+          </select>
+        )}
 
-          <main className="flex-1 p-6">
-            {/* Toolbar */}
-            <div className="flex flex-wrap items-center gap-3 mb-6">
-              <input type="text" value={search} onChange={e => setSearch(e.target.value)}
-                placeholder="Cari portfolio..."
-                className="flex-1 min-w-48 px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black placeholder:text-neu-black/30 outline-none focus:shadow-neu transition-all duration-150" />
-
-              {categories.length > 0 && (
-                <select value={filterCat} onChange={e => setFilterCat(e.target.value)}
-                  className="px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-black outline-none focus:shadow-neu transition-all duration-150 cursor-pointer">
-                  <option value="">Semua Kategori</option>
-                  {categories.map(c => <option key={c} value={c}>{c}</option>)}
-                </select>
-              )}
-
-              {isAdmin && (
-                <button onClick={() => navigate('/portfolio/new')}
-                  className={cn('px-5 py-2.5 font-display font-bold text-xs uppercase tracking-wide', 'bg-neu-primary text-neu-black border-2 border-neu-black shadow-neu', 'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm', 'active:translate-x-1 active:translate-y-1 active:shadow-none whitespace-nowrap')}>
-                  + Tambah Portfolio
-                </button>
-              )}
-            </div>
-
-            {/* Stats bar */}
-            <div className="flex items-center gap-3 mb-5">
-              <span className="font-mono text-xs text-neu-black/50">
-                Menampilkan <strong className="text-neu-black">{filtered.length}</strong> dari <strong className="text-neu-black">{items.length}</strong> portfolio
-              </span>
-            </div>
-
-            {/* Grid */}
-            {filtered.length === 0 ? (
-              <div className="border-2 border-dashed border-neu-black/30 p-12 text-center">
-                <p className="font-display font-bold text-neu-black/40 text-lg">
-                  {items.length === 0 ? 'Belum ada portfolio.' : 'Tidak ada hasil pencarian.'}
-                </p>
-                {isAdmin && items.length === 0 && (
-                  <button onClick={() => navigate('/portfolio/new')}
-                    className="mt-4 px-5 py-2.5 font-display font-bold text-xs uppercase bg-neu-primary border-2 border-neu-black shadow-neu hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm transition-all duration-150">
-                    Tambah Portfolio Pertama
-                  </button>
-                )}
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {filtered.map((item, i) => (
-                  <PortfolioCard key={item.id} item={item} isAdmin={isAdmin}
-                    onEdit={it => navigate(`/portfolio/${it.id}/edit`)}
-                    onDelete={it => setDeleteItem(it)}
-                    onDetail={it => setDetailItem(it)}
-                    delay={i * 0.05} />
-                ))}
-              </div>
-            )}
-          </main>
-        </div>
+        {isAdmin && (
+          <button onClick={() => navigate('/portfolio/new')}
+            className={cn('px-5 py-2.5 font-display font-bold text-xs uppercase tracking-wide', 'bg-neu-primary text-neu-black border-2 border-neu-black shadow-neu', 'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm', 'active:translate-x-1 active:translate-y-1 active:shadow-none whitespace-nowrap')}>
+            + Tambah Portfolio
+          </button>
+        )}
       </div>
-    </>
+
+      {/* Stats bar */}
+      <div className="flex items-center gap-3 mb-5">
+        <span className="font-mono text-xs text-neu-black/50">
+          Menampilkan <strong className="text-neu-black">{filtered.length}</strong> dari <strong className="text-neu-black">{items.length}</strong> portfolio
+        </span>
+      </div>
+
+      {/* Grid */}
+      {filtered.length === 0 ? (
+        <div className="border-2 border-dashed border-neu-black/30 p-12 text-center">
+          <p className="font-display font-bold text-neu-black/40 text-lg">
+            {items.length === 0 ? 'Belum ada portfolio.' : 'Tidak ada hasil pencarian.'}
+          </p>
+          {isAdmin && items.length === 0 && (
+            <button onClick={() => navigate('/portfolio/new')}
+              className="mt-4 px-5 py-2.5 font-display font-bold text-xs uppercase bg-neu-primary border-2 border-neu-black shadow-neu hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm transition-all duration-150">
+              Tambah Portfolio Pertama
+            </button>
+          )}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {filtered.map((item, i) => (
+            <PortfolioCard key={item.id} item={item} isAdmin={isAdmin}
+              onEdit={it => navigate(`/portfolio/${it.id}/edit`)}
+              onDelete={it => setDeleteItem(it)}
+              onDetail={it => setDetailItem(it)}
+              delay={i * 0.05} />
+          ))}
+        </div>
+      )}
+    </PageLayout>
   );
 }

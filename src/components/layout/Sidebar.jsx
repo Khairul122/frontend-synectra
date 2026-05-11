@@ -17,6 +17,28 @@ const NAV_ITEMS = [
     ),
   },
   {
+    label: 'Orders',
+    path: '/orders',
+    roles: ['admin'],
+    icon: (
+      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
+        <rect x="9" y="3" width="6" height="4" /><line x1="9" y1="12" x2="15" y2="12" /><line x1="9" y1="16" x2="13" y2="16" />
+      </svg>
+    ),
+  },
+  {
+    label: 'My Orders',
+    path: '/my-orders',
+    roles: ['client', 'staff'],
+    icon: (
+      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
+        <rect x="9" y="3" width="6" height="4" /><line x1="9" y1="12" x2="15" y2="12" /><line x1="9" y1="16" x2="13" y2="16" />
+      </svg>
+    ),
+  },
+  {
     label: 'Portfolio',
     path: '/portfolio',
     roles: ['admin'],
@@ -58,28 +80,6 @@ const NAV_ITEMS = [
     ),
   },
   {
-    label: 'Orders',
-    path: '/orders',
-    roles: ['admin'],
-    icon: (
-      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
-        <rect x="9" y="3" width="6" height="4" /><line x1="9" y1="12" x2="15" y2="12" /><line x1="9" y1="16" x2="13" y2="16" />
-      </svg>
-    ),
-  },
-  {
-    label: 'My Orders',
-    path: '/my-orders',
-    roles: ['client', 'staff'],
-    icon: (
-      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
-        <rect x="9" y="3" width="6" height="4" /><line x1="9" y1="12" x2="15" y2="12" /><line x1="9" y1="16" x2="13" y2="16" />
-      </svg>
-    ),
-  },
-  {
     label: 'Contacts',
     path: '/contacts',
     roles: ['admin'],
@@ -97,7 +97,7 @@ const ROLE_CONFIG = {
   client: { label: 'Client',        bg: 'bg-neu-green',  text: 'text-neu-white' },
 };
 
-export function Sidebar({ user }) {
+export function Sidebar({ user, isOpen, onClose }) {
   const location   = useLocation();
   const navigate   = useNavigate();
   const sidebarRef = useRef(null);
@@ -106,8 +106,14 @@ export function Sidebar({ user }) {
   const [showConfirm,  setShowConfirm]  = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
+  // Desktop entrance animation — hanya sekali, hanya di desktop
   useEffect(() => {
-    gsap.from(sidebarRef.current, { x: -60, opacity: 0, duration: 0.5, ease: 'power3.out' });
+    const mq = window.matchMedia('(min-width: 1024px)');
+    if (mq.matches && sidebarRef.current) {
+      // Pastikan inline transform bersih sebelum animasi
+      gsap.set(sidebarRef.current, { clearProps: 'transform' });
+      gsap.from(sidebarRef.current, { opacity: 0, duration: 0.4, ease: 'power3.out' });
+    }
   }, []);
 
   const handleLogout = async () => {
@@ -123,6 +129,10 @@ export function Sidebar({ user }) {
     }
   };
 
+  const handleNavClick = () => {
+    if (onClose) onClose();
+  };
+
   return (
     <>
       <ConfirmModal
@@ -134,57 +144,64 @@ export function Sidebar({ user }) {
         isLoading={isLoggingOut}
       />
 
+      {/* Mobile overlay backdrop — CSS transition */}
+      <div
+        onClick={onClose}
+        className={cn(
+          'fixed inset-0 z-30 bg-neu-black/50 lg:hidden transition-opacity duration-300',
+          isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none',
+        )}
+      />
+
       <aside
         ref={sidebarRef}
-        className="fixed left-0 top-0 h-screen w-64 bg-neu-white border-r-2 border-neu-black flex flex-col z-40"
+        className={cn(
+          'fixed left-0 top-0 h-screen w-64 bg-neu-white border-r-2 border-neu-black flex flex-col z-40',
+          // CSS transition — tidak konflik dengan resize event
+          'transition-transform duration-300 ease-in-out',
+          // Desktop: selalu tampil
+          'lg:translate-x-0',
+          // Mobile: tampil hanya jika isOpen
+          isOpen ? 'translate-x-0' : '-translate-x-full',
+        )}
       >
         {/* Brand */}
-        <div className="px-5 py-5 border-b-2 border-neu-black">
-          <div className="inline-block bg-neu-primary border-2 border-neu-black px-3 py-1 shadow-neu-sm mb-3">
-            <span className="font-mono font-bold text-xs text-neu-black uppercase tracking-widest">
-              Synectra
-            </span>
+        <div className="px-5 py-5 border-b-2 border-neu-black flex items-center justify-between">
+          <div>
+            <div className="inline-block bg-neu-primary border-2 border-neu-black px-3 py-1 shadow-neu-sm mb-2">
+              <span className="font-mono font-bold text-xs text-neu-black uppercase tracking-widest">Synectra</span>
+            </div>
+            <h2 className="font-display font-bold text-xl text-neu-black leading-tight">Panel</h2>
           </div>
-          <h2 className="font-display font-bold text-xl text-neu-black leading-tight">
-            Panel
-          </h2>
+          {/* Close button — mobile only */}
+          <button onClick={onClose} className="lg:hidden w-8 h-8 flex items-center justify-center border-2 border-neu-black hover:bg-neu-bg transition-colors">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
         </div>
 
         {/* User info */}
         <div className="px-5 py-4 border-b-2 border-neu-black bg-neu-bg">
-          <p className="font-display font-bold text-sm text-neu-black truncate">
-            {user?.fullName ?? '—'}
-          </p>
-          <p className="font-body text-xs text-neu-black/50 truncate mb-2">
-            {user?.email ?? '—'}
-          </p>
-          <span className={cn(
-            'inline-block px-2 py-0.5 border-2 border-neu-black shadow-neu-sm',
-            'font-mono font-bold text-xs uppercase tracking-wide',
-            role.bg, role.text,
-          )}>
+          <p className="font-display font-bold text-sm text-neu-black truncate">{user?.fullName ?? '—'}</p>
+          <p className="font-body text-xs text-neu-black/50 truncate mb-2">{user?.email ?? '—'}</p>
+          <span className={cn('inline-block px-2 py-0.5 border-2 border-neu-black shadow-neu-sm font-mono font-bold text-xs uppercase tracking-wide', role.bg, role.text)}>
             {role.label}
           </span>
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 px-3 py-4 flex flex-col gap-1">
+        <nav className="flex-1 px-3 py-4 flex flex-col gap-1 overflow-y-auto">
           {NAV_ITEMS.filter(item => !item.roles || item.roles.includes(user?.role)).map((item) => {
-            const active = location.pathname === item.path ||
-              location.pathname.startsWith(item.path + '/');
+            const active = location.pathname === item.path || location.pathname.startsWith(item.path + '/');
             return (
-              <Link
-                key={item.path}
-                to={item.path}
+              <Link key={item.path} to={item.path} onClick={handleNavClick}
                 className={cn(
-                  'flex items-center gap-3 px-4 py-3',
-                  'font-display font-bold text-sm uppercase tracking-wide',
-                  'border-2 transition-all duration-150',
+                  'flex items-center gap-3 px-4 py-3 font-display font-bold text-sm uppercase tracking-wide border-2 transition-all duration-150',
                   active
                     ? 'bg-neu-primary border-neu-black shadow-neu text-neu-black'
                     : 'border-transparent text-neu-black/60 hover:bg-neu-bg hover:border-neu-black hover:text-neu-black',
-                )}
-              >
+                )}>
                 {item.icon}
                 {item.label}
               </Link>
@@ -194,23 +211,16 @@ export function Sidebar({ user }) {
 
         {/* Logout */}
         <div className="px-3 pb-5 pt-2 border-t-2 border-neu-black">
-          <button
-            onClick={() => setShowConfirm(true)}
-            disabled={isLoggingOut}
+          <button onClick={() => setShowConfirm(true)} disabled={isLoggingOut}
             className={cn(
-              'w-full flex items-center gap-3 px-4 py-3',
-              'font-display font-bold text-sm uppercase tracking-wide text-neu-black',
-              'border-2 border-neu-black shadow-neu bg-neu-white',
-              'transition-all duration-150',
-              'hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm',
-              'active:translate-x-1 active:translate-y-1 active:shadow-none',
+              'w-full flex items-center gap-3 px-4 py-3 font-display font-bold text-sm uppercase tracking-wide text-neu-black',
+              'border-2 border-neu-black shadow-neu bg-neu-white transition-all duration-150',
+              'hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm active:translate-x-1 active:translate-y-1 active:shadow-none',
               isLoggingOut && 'opacity-50 cursor-not-allowed',
-            )}
-          >
+            )}>
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-              <polyline points="16 17 21 12 16 7" />
-              <line x1="21" y1="12" x2="9" y2="12" />
+              <polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" />
             </svg>
             {isLoggingOut ? 'Keluar...' : 'Keluar'}
           </button>

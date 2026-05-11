@@ -4,9 +4,7 @@ import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
 import { orderService } from '../services/order.service';
-import { Sidebar } from '../components/layout/Sidebar';
-import { Navbar } from '../components/layout/Navbar';
-import { AlertContainer } from '../components/ui/Alert';
+import { PageLayout } from '../components/layout/PageLayout';
 import { useAlert } from '../hooks/useAlert';
 
 const STATUS_CONFIG = {
@@ -103,89 +101,79 @@ export default function OrderPage() {
   );
 
   return (
-    <>
-      <AlertContainer alerts={alert.alerts} onDismiss={alert.dismiss} />
-      <div className="flex min-h-screen bg-neu-bg">
-        <Sidebar user={user} />
-        <div className="flex-1 ml-64 flex flex-col">
-          <Navbar title="Order Management" user={user} />
-          <main className="flex-1 p-6 overflow-y-auto">
-
-            {/* Toolbar */}
-            <div ref={headerRef} className="flex flex-wrap items-center gap-3 mb-6">
-              <input type="text" value={search} onChange={e => setSearch(e.target.value)}
-                placeholder="Cari judul atau client..."
-                className="flex-1 min-w-48 px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm placeholder:text-neu-black/30 outline-none focus:shadow-neu transition-all duration-150" />
-              <select value={filter} onChange={e => setFilter(e.target.value)}
-                className="px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase outline-none focus:shadow-neu transition-all duration-150 cursor-pointer">
-                <option value="all">Semua Status</option>
-                {Object.entries(STATUS_CONFIG).map(([k, v]) => (
-                  <option key={k} value={k}>{v.label}</option>
-                ))}
-              </select>
-              <span className="font-mono text-xs text-neu-black/50">
-                <strong>{filtered.length}</strong> / <strong>{orders.length}</strong>
-              </span>
-              <button onClick={() => navigate('/orders/new')}
-                className={cn('px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase tracking-wide text-neu-black whitespace-nowrap',
-                  'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm active:translate-x-1 active:translate-y-1 active:shadow-none')}>
-                + Buat Pesanan
-              </button>
-            </div>
-
-            {/* Stats */}
-            <div className="flex gap-3 mb-5 flex-wrap">
-              {Object.entries(STATUS_CONFIG).map(([k, v]) => {
-                const count = orders.filter(o => o.status === k).length;
-                return count > 0 ? (
-                  <div key={k} className={cn('px-3 py-1.5 border-2 border-neu-black shadow-neu-sm flex items-center gap-2', v.bg)}>
-                    <span className={cn('font-mono font-bold text-lg leading-none', v.text)}>{count}</span>
-                    <span className={cn('font-mono text-xs uppercase', v.text)}>{v.label}</span>
-                  </div>
-                ) : null;
-              })}
-            </div>
-
-            {/* Table */}
-            <div ref={tableRef} className="border-2 border-neu-black shadow-neu bg-neu-white overflow-hidden">
-              {filtered.length === 0 ? (
-                <div className="p-16 text-center">
-                  <p className="font-display font-bold text-xl text-neu-black/40">
-                    {orders.length === 0 ? 'Belum ada pesanan.' : 'Tidak ada hasil.'}
-                  </p>
-                  {orders.length === 0 && (
-                    <button onClick={() => navigate('/orders/new')}
-                      className="mt-4 px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm transition-all duration-150">
-                      Buat Pesanan Pertama
-                    </button>
-                  )}
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full border-collapse">
-                    <thead>
-                      <tr className="bg-neu-black text-neu-white">
-                        <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase w-10 text-center">No</th>
-                        <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase text-left">Judul Pesanan</th>
-                        <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase text-left w-40">Client</th>
-                        <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase text-left w-36">Total</th>
-                        <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase text-left w-32">Deadline</th>
-                        <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase text-left w-32">Status</th>
-                        <th className="px-4 py-3 font-display font-bold text-xs uppercase text-left w-32">Dibuat</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filtered.map((order, idx) => (
-                        <OrderRow key={order.id} order={order} index={idx} onOpen={id => navigate(`/orders/${id}`)} />
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-          </main>
-        </div>
+    <PageLayout user={user} title="Order Management" alert={alert}>
+      {/* Toolbar */}
+      <div ref={headerRef} className="flex flex-wrap items-center gap-3 mb-6">
+        <input type="text" value={search} onChange={e => setSearch(e.target.value)}
+          placeholder="Cari judul atau client..."
+          className="flex-1 min-w-48 px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm placeholder:text-neu-black/30 outline-none focus:shadow-neu transition-all duration-150" />
+        <select value={filter} onChange={e => setFilter(e.target.value)}
+          className="px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase outline-none focus:shadow-neu transition-all duration-150 cursor-pointer">
+          <option value="all">Semua Status</option>
+          {Object.entries(STATUS_CONFIG).map(([k, v]) => (
+            <option key={k} value={k}>{v.label}</option>
+          ))}
+        </select>
+        <span className="font-mono text-xs text-neu-black/50">
+          <strong>{filtered.length}</strong> / <strong>{orders.length}</strong>
+        </span>
+        <button onClick={() => navigate('/orders/new')}
+          className={cn('px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase tracking-wide text-neu-black whitespace-nowrap',
+            'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm active:translate-x-1 active:translate-y-1 active:shadow-none')}>
+          + Buat Pesanan
+        </button>
       </div>
-    </>
+
+      {/* Stats */}
+      <div className="flex gap-3 mb-5 flex-wrap">
+        {Object.entries(STATUS_CONFIG).map(([k, v]) => {
+          const count = orders.filter(o => o.status === k).length;
+          return count > 0 ? (
+            <div key={k} className={cn('px-3 py-1.5 border-2 border-neu-black shadow-neu-sm flex items-center gap-2', v.bg)}>
+              <span className={cn('font-mono font-bold text-lg leading-none', v.text)}>{count}</span>
+              <span className={cn('font-mono text-xs uppercase', v.text)}>{v.label}</span>
+            </div>
+          ) : null;
+        })}
+      </div>
+
+      {/* Table */}
+      <div ref={tableRef} className="border-2 border-neu-black shadow-neu bg-neu-white overflow-hidden">
+        {filtered.length === 0 ? (
+          <div className="p-16 text-center">
+            <p className="font-display font-bold text-xl text-neu-black/40">
+              {orders.length === 0 ? 'Belum ada pesanan.' : 'Tidak ada hasil.'}
+            </p>
+            {orders.length === 0 && (
+              <button onClick={() => navigate('/orders/new')}
+                className="mt-4 px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm transition-all duration-150">
+                Buat Pesanan Pertama
+              </button>
+            )}
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="bg-neu-black text-neu-white">
+                  <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase w-10 text-center">No</th>
+                  <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase text-left">Judul Pesanan</th>
+                  <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase text-left w-40">Client</th>
+                  <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase text-left w-36">Total</th>
+                  <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase text-left w-32">Deadline</th>
+                  <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase text-left w-32">Status</th>
+                  <th className="px-4 py-3 font-display font-bold text-xs uppercase text-left w-32">Dibuat</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((order, idx) => (
+                  <OrderRow key={order.id} order={order} index={idx} onOpen={id => navigate(`/orders/${id}`)} />
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </PageLayout>
   );
 }
