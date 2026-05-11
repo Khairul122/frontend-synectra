@@ -206,8 +206,6 @@ export default function PortfolioFormPage() {
   const [user, setUser]                 = useState(null);
   const [isLoading, setIsLoading]       = useState(true);
   const [isSaving, setIsSaving]         = useState(false);
-  const [showLogout, setShowLogout]     = useState(false);
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [form, setForm]                 = useState(EMPTY);
   const [errors, setErrors]             = useState({});
 
@@ -284,18 +282,6 @@ export default function PortfolioFormPage() {
     }
   };
 
-  const handleLogout = async () => {
-    setIsLoggingOut(true);
-    try {
-      await authService.logout();
-      navigate('/login');
-    } catch {
-      alert.error('Gagal keluar.');
-      setIsLoggingOut(false);
-      setShowLogout(false);
-    }
-  };
-
   const inputCls = (k) => cn(
     'w-full px-4 py-3 bg-neu-white border-2 border-neu-black shadow-neu-sm',
     'font-body text-sm text-neu-black placeholder:text-neu-black/30',
@@ -312,18 +298,14 @@ export default function PortfolioFormPage() {
   return (
     <>
       <AlertContainer alerts={alert.alerts} onDismiss={alert.dismiss} />
-      <ConfirmModal isOpen={showLogout} title="Konfirmasi Keluar"
-        message="Apakah kamu yakin ingin keluar dari Synectra?"
-        onConfirm={handleLogout} onCancel={() => setShowLogout(false)} isLoading={isLoggingOut} />
-
       <div className="flex min-h-screen bg-neu-bg">
-        <Sidebar user={user} onLogout={() => setShowLogout(true)} />
+        <Sidebar user={user} />
 
         <div className="flex-1 ml-64 flex flex-col">
 
           {/* Topbar — hanya avatar dropdown, tanpa judul */}
           <header className="h-16 bg-neu-white border-b-2 border-neu-black flex items-center justify-end px-6 shrink-0">
-            <AvatarDropdown user={user} onLogout={() => setShowLogout(true)} />
+            <AvatarDropdown user={user} onLogout={() => {}} />
           </header>
 
           <main ref={contentRef} className="flex-1 flex flex-col p-6 gap-6">

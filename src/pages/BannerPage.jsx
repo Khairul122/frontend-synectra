@@ -263,10 +263,6 @@ export default function BannerPage() {
     }
   }, [isLoading]);
 
-  const handleLogout = async () => {
-    await authService.logout();
-    navigate('/login');
-  };
 
   const handleToggleActive = async (banner) => {
     try {
@@ -321,7 +317,7 @@ export default function BannerPage() {
       />
 
       <div className="flex min-h-screen bg-neu-bg">
-        <Sidebar user={user} onLogout={handleLogout} />
+        <Sidebar user={user} />
 
         <div className="flex-1 ml-64 flex flex-col">
           <Navbar title="Banner Management" user={user} />

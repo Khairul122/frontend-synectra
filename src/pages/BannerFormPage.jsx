@@ -219,10 +219,6 @@ export default function BannerFormPage() {
     }
   };
 
-  const handleLogout = async () => {
-    await authService.logout();
-    navigate('/login');
-  };
 
   if (isLoading) {
     return (
@@ -237,7 +233,7 @@ export default function BannerFormPage() {
       <AlertContainer alerts={alert.alerts} onDismiss={alert.dismiss} />
 
       <div className="flex min-h-screen bg-neu-bg">
-        <Sidebar user={user} onLogout={handleLogout} />
+        <Sidebar user={user} />
 
         <div className="flex-1 ml-64 flex flex-col">
           <Navbar title={isEditMode ? 'Edit Banner' : 'Tambah Banner'} user={user} />

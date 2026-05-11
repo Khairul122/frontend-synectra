@@ -6,7 +6,6 @@ import { authService } from '../services/auth.service';
 import { Sidebar } from '../components/layout/Sidebar';
 import { Navbar } from '../components/layout/Navbar';
 import { AlertContainer } from '../components/ui/Alert';
-import { ConfirmModal } from '../components/ui/ConfirmModal';
 import { useAlert } from '../hooks/useAlert';
 
 const ROLE_CONFIG = {
@@ -67,9 +66,6 @@ export default function DashboardPage() {
 
   const [user, setUser]             = useState(null);
   const [isLoading, setIsLoading]   = useState(true);
-  const [showLogout, setShowLogout] = useState(false);
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
-
   useEffect(() => {
     authService.getMe()
       .then((res) => {
@@ -90,19 +86,6 @@ export default function DashboardPage() {
     return () => ctx.revert();
   }, [user]);
 
-  const handleLogout = async () => {
-    setIsLoggingOut(true);
-    try {
-      await authService.logout();
-      alert.success('Berhasil keluar. Sampai jumpa!');
-      setTimeout(() => navigate('/login'), 1000);
-    } catch {
-      alert.error('Gagal keluar. Coba lagi.');
-      setIsLoggingOut(false);
-      setShowLogout(false);
-    }
-  };
-
   if (isLoading) {
     return (
       <div className="min-h-screen bg-neu-bg flex items-center justify-center">
@@ -119,17 +102,9 @@ export default function DashboardPage() {
   return (
     <>
       <AlertContainer alerts={alert.alerts} onDismiss={alert.dismiss} />
-      <ConfirmModal
-        isOpen={showLogout}
-        title="Konfirmasi Keluar"
-        message="Apakah kamu yakin ingin keluar dari Synectra? Sesi kamu akan diakhiri."
-        onConfirm={handleLogout}
-        onCancel={() => setShowLogout(false)}
-        isLoading={isLoggingOut}
-      />
 
       <div className="flex min-h-screen bg-neu-bg">
-        <Sidebar user={user} onLogout={() => setShowLogout(true)} />
+        <Sidebar user={user} />
 
         {/* Main content */}
         <div className="flex-1 ml-64 flex flex-col">

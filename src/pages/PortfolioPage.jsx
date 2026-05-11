@@ -165,19 +165,6 @@ export default function PortfolioPage() {
     }
   };
 
-  const handleLogout = async () => {
-    setIsLoggingOut(true);
-    try {
-      await authService.logout();
-      alert.success('Berhasil keluar. Sampai jumpa!');
-      setTimeout(() => navigate('/login'), 1000);
-    } catch {
-      alert.error('Gagal keluar. Coba lagi.');
-      setIsLoggingOut(false);
-      setShowLogout(false);
-    }
-  };
-
   const categories = [...new Set(items.map(i => i.category).filter(Boolean))];
   const filtered   = items.filter(i => {
     const matchSearch = !search || i.title.toLowerCase().includes(search.toLowerCase()) || (i.description ?? '').toLowerCase().includes(search.toLowerCase());
@@ -194,9 +181,6 @@ export default function PortfolioPage() {
   return (
     <>
       <AlertContainer alerts={alert.alerts} onDismiss={alert.dismiss} />
-      <ConfirmModal isOpen={showLogout} title="Konfirmasi Keluar"
-        message="Apakah kamu yakin ingin keluar dari Synectra?"
-        onConfirm={handleLogout} onCancel={() => setShowLogout(false)} isLoading={isLoggingOut} />
       <ConfirmModal isOpen={Boolean(deleteItem)} title="Hapus Portfolio"
         message={`Hapus "${deleteItem?.title}"? Tindakan ini tidak bisa dibatalkan.`}
         onConfirm={handleDelete} onCancel={() => setDeleteItem(null)} isLoading={isDeleting} />
@@ -205,7 +189,7 @@ export default function PortfolioPage() {
       )}
 
       <div className="flex min-h-screen bg-neu-bg">
-        <Sidebar user={user} onLogout={() => setShowLogout(true)} />
+        <Sidebar user={user} />
 
         <div className="flex-1 ml-64 flex flex-col">
           <Navbar title="Portfolio" user={user} />
