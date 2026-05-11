@@ -1,8 +1,21 @@
 import axios from 'axios';
 import { API_ENDPOINTS } from '../constants/api';
 
-const client = axios.create({
-  withCredentials: true, // kirim & terima httpOnly cookie JWT
+const TOKEN_KEY = 'synectra_token';
+
+export const tokenStorage = {
+  get: ()        => localStorage.getItem(TOKEN_KEY),
+  set: (token)   => localStorage.setItem(TOKEN_KEY, token),
+  clear: ()      => localStorage.removeItem(TOKEN_KEY),
+};
+
+const client = axios.create({ withCredentials: true });
+
+// Tambahkan Authorization header jika token ada di localStorage
+client.interceptors.request.use((config) => {
+  const token = tokenStorage.get();
+  if (token) config.headers['Authorization'] = `Bearer ${token}`;
+  return config;
 });
 
 export const authService = {
@@ -18,6 +31,7 @@ export const authService = {
 
   async logout() {
     const response = await client.post(API_ENDPOINTS.LOGOUT);
+    tokenStorage.clear();
     return response.data;
   },
 
