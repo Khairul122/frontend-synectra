@@ -24,6 +24,7 @@
 Berikut adalah daftar fitur dan komponen yang telah berhasil diimplementasikan (Update per tanggal ini):
 
 1. **Halaman & Akses (Pages)**
+   - Halaman Utama (`LandingPage.jsx`) dengan layout dinamis dan desain *modern neubrutalism*.
    - Halaman Login (`LoginPage.jsx`) untuk autentikasi pengguna.
    - Halaman Registrasi (`RegisterPage.jsx`) untuk pendaftaran akun baru.
    - Halaman Dashboard (`DashboardPage.jsx`) dengan role-based view untuk admin dan client.
@@ -32,6 +33,7 @@ Berikut adalah daftar fitur dan komponen yang telah berhasil diimplementasikan (
 
 2. **Komponen UI & Layout**
    - Struktur navigasi utama menggunakan `Navbar.jsx` dan `Sidebar.jsx`.
+   - Footer komprehensif (*Modern 2025 design*) yang memuat navigasi layanan, tautan perusahaan, dan informasi pembayaran.
    - Komponen UI reusable: `Alert.jsx` untuk notifikasi dinamis dan `ConfirmModal.jsx` untuk konfirmasi aksi.
    - Komponen fitur spesifik: `PortfolioModal.jsx` untuk interaksi penambahan atau pengeditan data portofolio.
    - Komponen form untuk customer portal dan order form management.

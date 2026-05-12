@@ -15,6 +15,18 @@ gsap.registerPlugin(ScrollTrigger);
 const Spline = lazy(() => import('@splinetool/react-spline'));
 const BASE = API_BASE_URL || '';
 
+/* ─── Pastikan URL kontak punya prefix yang benar ────────────────────── */
+function fixContactUrl(linkUrl, iconKey) {
+  if (!linkUrl) return '#';
+  // Sudah punya protocol → langsung pakai
+  if (/^(https?:\/\/|mailto:|tel:)/.test(linkUrl)) return linkUrl;
+  // Auto-detect berdasarkan icon/platform
+  if (iconKey === 'email') return `mailto:${linkUrl}`;
+  if (iconKey === 'phone') return `tel:${linkUrl.replace(/\s/g, '')}`;
+  // Fallback: tambahkan https://
+  return `https://${linkUrl}`;
+}
+
 /* ─── Lenis smooth scroll + GSAP ScrollTrigger sync ─────────────────── */
 function useLenis() {
   useEffect(() => {
@@ -282,12 +294,75 @@ export default function LandingPage() {
 
   useEffect(() => {
     if (isLoading) return;
+
+    // reveal-up: animasi masuk saat scroll down, keluar saat scroll up
     document.querySelectorAll('.reveal-up').forEach(el => {
-      gsap.from(el, { scrollTrigger: { trigger: el, start: 'top 87%' }, y: 40, opacity: 0, duration: 0.6, ease: 'power2.out' });
+      gsap.fromTo(el,
+        { y: 50, opacity: 0 },
+        {
+          y: 0, opacity: 1, duration: 0.7, ease: 'power2.out',
+          scrollTrigger: {
+            trigger: el,
+            start: 'top 88%',
+            end: 'top 30%',
+            toggleActions: 'play reverse play reverse',
+          },
+        },
+      );
     });
+
+    // Portfolio cards: stagger masuk + keluar
     document.querySelectorAll('.portfolio-card').forEach((card, i) => {
-      gsap.from(card, { scrollTrigger: { trigger: card, start: 'top 88%' }, y: 30, opacity: 0, duration: 0.5, delay: (i % 3) * 0.08, ease: 'power2.out' });
+      gsap.fromTo(card,
+        { y: 40, opacity: 0, scale: 0.97 },
+        {
+          y: 0, opacity: 1, scale: 1,
+          duration: 0.55, ease: 'power2.out',
+          delay: (i % 3) * 0.07,
+          scrollTrigger: {
+            trigger: card,
+            start: 'top 90%',
+            end: 'top 20%',
+            toggleActions: 'play reverse play reverse',
+          },
+        },
+      );
     });
+
+    // Section titles: slide dari kiri
+    document.querySelectorAll('.reveal-left').forEach(el => {
+      gsap.fromTo(el,
+        { x: -50, opacity: 0 },
+        {
+          x: 0, opacity: 1, duration: 0.7, ease: 'power3.out',
+          scrollTrigger: {
+            trigger: el,
+            start: 'top 88%',
+            end: 'top 30%',
+            toggleActions: 'play reverse play reverse',
+          },
+        },
+      );
+    });
+
+    // Stat cards: scale masuk
+    document.querySelectorAll('.reveal-scale').forEach((el, i) => {
+      gsap.fromTo(el,
+        { scale: 0.85, opacity: 0 },
+        {
+          scale: 1, opacity: 1,
+          duration: 0.5, ease: 'back.out(1.4)',
+          delay: i * 0.06,
+          scrollTrigger: {
+            trigger: el,
+            start: 'top 90%',
+            end: 'top 20%',
+            toggleActions: 'play reverse play reverse',
+          },
+        },
+      );
+    });
+
     return () => ScrollTrigger.getAll().forEach(t => t.kill());
   }, [isLoading]);
 
@@ -563,7 +638,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
           <div className="grid grid-cols-2 lg:grid-cols-4 divide-x-0 lg:divide-x-2 divide-neu-white/10">
             {stats.map((s, i) => (
-              <div key={s.label} className={cn('p-8 text-center', i > 0 && 'border-t-2 lg:border-t-0 border-neu-white/10')}>
+              <div key={s.label} className={cn('p-8 text-center reveal-scale', i > 0 && 'border-t-2 lg:border-t-0 border-neu-white/10')}>
                 <p className="font-display font-bold text-4xl lg:text-5xl text-neu-primary mb-2"><AnimatedCounter target={s.value} suffix={s.suffix} /></p>
                 <p className="font-body text-sm text-neu-white/60">{s.label}</p>
               </div>
@@ -575,7 +650,7 @@ export default function LandingPage() {
       {/* ── SERVICES ── */}
       <section className="border-b-2 border-neu-black py-20">
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
-          <div className="max-w-2xl mb-12 reveal-up">
+          <div className="max-w-2xl mb-12 reveal-left">
             <div className="flex items-center gap-3 mb-2"><div className="h-1 w-10 bg-neu-accent" /><span className="font-mono text-xs text-neu-black/50 uppercase tracking-widest">Apa yang Kami Tawarkan</span></div>
             <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-black">Layanan Lengkap untuk<br />Kebutuhan Digital Anda</h2>
           </div>
@@ -724,7 +799,7 @@ export default function LandingPage() {
       {/* ── WHY CHOOSE US ── */}
       <section className="border-b-2 border-neu-black bg-neu-bg py-20">
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
-          <div className="text-center mb-12 reveal-up">
+          <div className="text-center mb-12 reveal-left">
             <div className="flex items-center justify-center gap-3 mb-2"><div className="h-1 w-8 bg-neu-green" /><span className="font-mono text-xs text-neu-black/50 uppercase tracking-widest">Keunggulan Kami</span><div className="h-1 w-8 bg-neu-green" /></div>
             <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-black">Mengapa Memilih Synectra?</h2>
           </div>
@@ -839,8 +914,13 @@ export default function LandingPage() {
                   <div className="space-y-3">
                     {contacts.map(ct => {
                       const { Icon, color } = getPlatform(ct.icon);
+                      const href = fixContactUrl(ct.linkUrl, ct.icon);
+                      const isEmail = ct.icon === 'email' || href.startsWith('mailto:');
+                      const isPhone = ct.icon === 'phone' || href.startsWith('tel:');
                       return (
-                        <a key={ct.id} href={ct.linkUrl} target="_blank" rel="noopener noreferrer"
+                        <a key={ct.id} href={href}
+                          target={isEmail || isPhone ? '_self' : '_blank'}
+                          rel="noopener noreferrer"
                           className="flex items-center gap-4 p-4 bg-neu-white border-2 border-neu-black shadow-neu-sm hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-neu transition-all duration-150">
                           <div className="w-10 h-10 border-2 border-neu-black flex items-center justify-center flex-shrink-0" style={{ backgroundColor: color + '18' }}>
                             <Icon style={{ color }} className="w-5 h-5" />
