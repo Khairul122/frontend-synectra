@@ -5,6 +5,7 @@ Built with React, Vite, Tailwind CSS, GSAP, and Barba.js, featuring a modern Neu
 
 ## 🚀 Fitur yang Sudah Dibuat (Implemented Features)
 
+- **Landing Page**: Halaman utama dengan desain *modern neubrutalism* dan footer komprehensif.
 - **Authentication**: Halaman Login & Registrasi.
 - **Dashboard**: Role-based view untuk admin dan client.
 - **Portfolio Management**: Menampilkan dan mengelola data portofolio.
