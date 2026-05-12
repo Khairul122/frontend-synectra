@@ -5,6 +5,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Float, MeshDistortMaterial, Sphere, Torus, MeshWobbleMaterial, Icosahedron, Octahedron } from '@react-three/drei';
+import Lenis from 'lenis';
 import axios from 'axios';
 import { cn } from '../utils/cn';
 import { getPlatform } from '../constants/platforms';
@@ -13,6 +14,28 @@ import { API_BASE_URL } from '../constants/api';
 gsap.registerPlugin(ScrollTrigger);
 const Spline = lazy(() => import('@splinetool/react-spline'));
 const BASE = API_BASE_URL || '';
+
+/* ─── Lenis smooth scroll + GSAP ScrollTrigger sync ─────────────────── */
+function useLenis() {
+  useEffect(() => {
+    const lenis = new Lenis({
+      duration:  1.4,
+      easing:    (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: true,
+      syncTouch:   false,
+    });
+
+    // Sync Lenis dengan GSAP ScrollTrigger
+    lenis.on('scroll', ScrollTrigger.update);
+    gsap.ticker.add((time) => lenis.raf(time * 1000));
+    gsap.ticker.lagSmoothing(0);
+
+    return () => {
+      lenis.destroy();
+      gsap.ticker.remove((time) => lenis.raf(time * 1000));
+    };
+  }, []);
+}
 
 /* ─── Barba-style page transition ─────────────────────────────────────── */
 function usePageTransition() {
@@ -222,6 +245,7 @@ function PortfolioModal({ item, onClose, transitionTo }) {
    MAIN LANDING PAGE
 ══════════════════════════════════════════════════════════════════════ */
 export default function LandingPage() {
+  useLenis(); // smooth scroll aktif di seluruh landing page
   const { pageRef, transitionTo } = usePageTransition();
   const [portfolios,   setPortfolios]   = useState([]);
   const [banners,      setBanners]      = useState([]);
@@ -918,10 +942,6 @@ export default function LandingPage() {
                 </div>
               </div>
             )}
-          </div>
-          <div className="border-t border-neu-white/10 pt-6 flex items-center justify-between flex-wrap gap-3">
-            <p className="font-mono text-xs text-neu-white/30">© 2025 Synectra. All rights reserved. Built with ❤️ in Indonesia.</p>
-            <p className="font-mono text-xs text-neu-white/20">React · NestJS · Supabase · Three.js · Spline · Anime.js · Barba.js</p>
           </div>
         </div>
       </footer>

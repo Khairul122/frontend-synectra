@@ -8,6 +8,7 @@ import { authService } from '../services/auth.service';
 import { orderService } from '../services/order.service';
 import { paymentService } from '../services/payment.service';
 import { PageLayout } from '../components/layout/PageLayout';
+import { ConfirmModal } from '../components/ui/ConfirmModal';
 import { useAlert } from '../hooks/useAlert';
 import { SUPABASE_URL, SUPABASE_ANON, PAYMENT_RECEIPT_BUCKET } from '../constants/api';
 
@@ -346,6 +347,8 @@ export default function MyOrderDetailPage() {
   const [order,        setOrder]        = useState(null);
   const [isLoading,    setIsLoading]    = useState(true);
   const [showPayment,    setShowPayment]    = useState(false);
+  const [showComplete,   setShowComplete]   = useState(false);
+  const [isCompleting,   setIsCompleting]   = useState(false);
   const [previewImage,   setPreviewImage]   = useState(null);
   const [detailProgress, setDetailProgress] = useState(null);
 
@@ -354,6 +357,21 @@ export default function MyOrderDetailPage() {
   const loadOrder = async () => {
     const res = await orderService.getDetail(id);
     setOrder(res.data);
+  };
+
+  const handleComplete = async () => {
+    setIsCompleting(true);
+    try {
+      await orderService.completeOrder(id);
+      setOrder(prev => ({ ...prev, status: 'completed' }));
+      setShowComplete(false);
+      alert.success('Pesanan berhasil diselesaikan! Terima kasih telah menggunakan layanan Synectra.');
+    } catch (err) {
+      const msg = err?.response?.data?.message ?? 'Gagal menyelesaikan pesanan.';
+      alert.error(Array.isArray(msg) ? msg.join(', ') : msg);
+    } finally {
+      setIsCompleting(false);
+    }
   };
 
   useEffect(() => {
@@ -400,6 +418,16 @@ export default function MyOrderDetailPage() {
       )}
       {previewImage && <ImageModal src={previewImage.src} caption={previewImage.caption} onClose={() => setPreviewImage(null)} />}
       {showPayment && <UploadPaymentModal orderId={id} onClose={() => setShowPayment(false)} onUploaded={loadOrder} />}
+      <ConfirmModal
+        isOpen={showComplete}
+        title="Selesaikan Pesanan"
+        message={`Apakah kamu yakin ingin menyelesaikan pesanan "${order?.title}"? Pastikan kamu sudah menerima semua hasil pengerjaan sebelum menekan konfirmasi.`}
+        onConfirm={handleComplete}
+        onCancel={() => setShowComplete(false)}
+        isLoading={isCompleting}
+        confirmText="Ya, Selesaikan"
+        confirmColor="bg-neu-green text-neu-white"
+      />
 
       <div ref={pageRef} className="max-w-3xl mx-auto space-y-6">
 
@@ -415,12 +443,24 @@ export default function MyOrderDetailPage() {
             <span className={cn('inline-block px-3 py-1 border-2 border-neu-black font-mono font-bold text-sm uppercase', statusCfg.bg, statusCfg.text)}>
               {statusCfg.label}
             </span>
-            {!['completed', 'canceled'].includes(order.status) && (
-              <button onClick={() => setShowPayment(true)}
-                className="px-4 py-2 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase text-neu-black hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm transition-all duration-150">
-                Upload Bukti Bayar
-              </button>
-            )}
+            <div className="flex flex-wrap gap-2">
+              {!['completed', 'canceled'].includes(order.status) && (
+                <button onClick={() => setShowPayment(true)}
+                  className="px-4 py-2 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase text-neu-black hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm transition-all duration-150">
+                  Upload Bukti Bayar
+                </button>
+              )}
+              {['in_progress', 'testing', 'revision'].includes(order.status) && (
+                <button onClick={() => setShowComplete(true)}
+                  className={cn(
+                    'px-4 py-2 bg-neu-green border-2 border-neu-black shadow-neu',
+                    'font-display font-bold text-xs uppercase text-neu-white',
+                    'hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm transition-all duration-150',
+                  )}>
+                  ✓ Selesaikan Pesanan
+                </button>
+              )}
+            </div>
           </div>
           <h2 className="font-display font-bold text-xl text-neu-black mb-2">{order.title}</h2>
           {order.description && <p className="font-body text-sm text-neu-black/60 mb-4">{order.description}</p>}

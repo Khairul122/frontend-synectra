@@ -17,4 +17,7 @@ export const orderService = {
   updateDetails(id, payload) {
     return apiClient.patch(`${API_ENDPOINTS.ORDERS}/${id}/details`, payload).then(r => r.data);
   },
+  completeOrder(id) {
+    return apiClient.patch(`${API_ENDPOINTS.ORDERS}/${id}/complete`).then(r => r.data);
+  },
 };

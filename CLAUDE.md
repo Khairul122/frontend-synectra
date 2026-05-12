@@ -26,13 +26,15 @@ Berikut adalah daftar fitur dan komponen yang telah berhasil diimplementasikan (
 1. **Halaman & Akses (Pages)**
    - Halaman Login (`LoginPage.jsx`) untuk autentikasi pengguna.
    - Halaman Registrasi (`RegisterPage.jsx`) untuk pendaftaran akun baru.
-   - Halaman Dashboard (`DashboardPage.jsx`) sebagai antarmuka utama pengguna.
+   - Halaman Dashboard (`DashboardPage.jsx`) dengan role-based view untuk admin dan client.
    - Halaman Portfolio (`PortfolioPage.jsx`) untuk menampilkan dan mengelola data portofolio.
+   - Halaman Order Management (`MyOrderDetailPage.jsx`) untuk pelacakan status dan progres pesanan klien.
 
 2. **Komponen UI & Layout**
    - Struktur navigasi utama menggunakan `Navbar.jsx` dan `Sidebar.jsx`.
    - Komponen UI reusable: `Alert.jsx` untuk notifikasi dinamis dan `ConfirmModal.jsx` untuk konfirmasi aksi.
    - Komponen fitur spesifik: `PortfolioModal.jsx` untuk interaksi penambahan atau pengeditan data portofolio.
+   - Komponen form untuk customer portal dan order form management.
 
 3. **Integrasi Visual 3D**
    - Penambahan komponen `Scene3D.jsx` untuk integrasi visualisasi objek 3D interaktif yang memberikan pengalaman pengguna lebih premium dan modern.
@@ -40,7 +42,8 @@ Berikut adalah daftar fitur dan komponen yang telah berhasil diimplementasikan (
 4. **Service, API, & Utilities**
    - Integrasi `auth.service.js` untuk penanganan HTTP request terkait autentikasi ke backend.
    - Integrasi `portfolio.service.js` untuk komunikasi CRUD data portofolio dengan backend API.
-   - Konfigurasi endpoint di `constants/api.js`.
+   - Integrasi `order.service.js` untuk komunikasi sistem manajemen pesanan dengan backend API.
+   - Konfigurasi endpoint terpusat di `constants/api.js`.
    - Implementasi state management notifikasi menggunakan custom hook `useAlert.js`.
    - Utility class builder `cn.js` untuk styling Tailwind CSS.
 
