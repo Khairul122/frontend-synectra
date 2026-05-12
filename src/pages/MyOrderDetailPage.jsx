@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { createPortal } from 'react-dom';
-import { createClient } from '@supabase/supabase-js';
 import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
@@ -10,9 +9,8 @@ import { paymentService } from '../services/payment.service';
 import { PageLayout } from '../components/layout/PageLayout';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
 import { useAlert } from '../hooks/useAlert';
-import { SUPABASE_URL, SUPABASE_ANON, PAYMENT_RECEIPT_BUCKET } from '../constants/api';
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
+import { PAYMENT_RECEIPT_BUCKET } from '../constants/api';
+import supabase from '../lib/supabase';
 
 const STATUS_CONFIG = {
   pending:     { label: 'Pending',     bg: 'bg-neu-primary', text: 'text-neu-black' },

@@ -1,15 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { createClient } from '@supabase/supabase-js';
 import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
 import { bankAccountService } from '../services/bankAccount.service';
 import { PageLayout } from '../components/layout/PageLayout';
 import { useAlert } from '../hooks/useAlert';
-import { SUPABASE_URL, SUPABASE_ANON, BANK_LOGO_BUCKET } from '../constants/api';
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
+import { BANK_LOGO_BUCKET } from '../constants/api';
+import supabase from '../lib/supabase';
 
 async function uploadBankLogo(file) {
   const ext      = file.name.split('.').pop();
