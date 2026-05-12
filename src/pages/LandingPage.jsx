@@ -997,10 +997,6 @@ export default function LandingPage() {
             <p className="font-mono text-[11px] text-neu-white/25">
               © {new Date().getFullYear()} Synectra. All rights reserved.
             </p>
-            <span className="text-neu-white/15 hidden sm:block">·</span>
-            <p className="font-mono text-[11px] text-neu-white/20">
-              Built with React · NestJS · Supabase
-            </p>
           </div>
           <div className="flex items-center gap-4">
             {['Kebijakan Privasi','Syarat & Ketentuan'].map(t => (
