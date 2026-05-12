@@ -43,4 +43,14 @@ export const authService = {
   loginWithGoogle() {
     window.location.href = API_ENDPOINTS.GOOGLE;
   },
+
+  async updateProfile(payload) {
+    const response = await client.patch(API_ENDPOINTS.PROFILE, payload);
+    return response.data;
+  },
+
+  async changePassword(payload) {
+    const response = await client.patch(API_ENDPOINTS.CHANGE_PASSWORD, payload);
+    return response.data;
+  },
 };

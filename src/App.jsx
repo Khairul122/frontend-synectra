@@ -14,11 +14,14 @@ import SocialMediaPage      from './pages/SocialMediaPage';
 import SocialMediaFormPage  from './pages/SocialMediaFormPage';
 import ContactPage          from './pages/ContactPage';
 import ContactFormPage      from './pages/ContactFormPage';
+import ClientPage           from './pages/ClientPage';
+import ProfilePage          from './pages/ProfilePage';
 import OrderPage            from './pages/OrderPage';
 import OrderFormPage        from './pages/OrderFormPage';
 import OrderDetailPage      from './pages/OrderDetailPage';
 import MyOrderPage          from './pages/MyOrderPage';
 import MyOrderDetailPage    from './pages/MyOrderDetailPage';
+import MyOrderFormPage      from './pages/MyOrderFormPage';
 import NotFoundPage      from './pages/NotFoundPage';
 import ServerErrorPage   from './pages/ServerErrorPage';
 
@@ -65,10 +68,13 @@ function App() {
         <Route path="/contacts"                  element={<ContactPage />} />
         <Route path="/contacts/new"              element={<ContactFormPage />} />
         <Route path="/contacts/:id/edit"         element={<ContactFormPage />} />
+        <Route path="/profile"                   element={<ProfilePage />} />
+        <Route path="/clients"                   element={<ClientPage />} />
         <Route path="/orders"                    element={<OrderPage />} />
         <Route path="/orders/new"                element={<OrderFormPage />} />
         <Route path="/orders/:id"                element={<OrderDetailPage />} />
         <Route path="/my-orders"                 element={<MyOrderPage />} />
+        <Route path="/my-orders/new"             element={<MyOrderFormPage />} />
         <Route path="/my-orders/:id"             element={<MyOrderDetailPage />} />
         <Route path="/500"                element={<ServerErrorPage />} />
         <Route path="*"                   element={<NotFoundPage />} />

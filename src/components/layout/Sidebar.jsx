@@ -1,9 +1,7 @@
-import { useRef, useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useRef, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { cn } from '../../utils/cn';
-import { authService } from '../../services/auth.service';
-import { ConfirmModal } from '../ui/ConfirmModal';
 
 const NAV_ITEMS = [
   {
@@ -13,6 +11,19 @@ const NAV_ITEMS = [
       <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
         <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" />
         <rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" />
+      </svg>
+    ),
+  },
+  {
+    label: 'Clients',
+    path: '/clients',
+    roles: ['admin'],
+    icon: (
+      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
       </svg>
     ),
   },
@@ -64,7 +75,9 @@ const NAV_ITEMS = [
     roles: ['admin'],
     icon: (
       <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-        <rect x="2" y="5" width="20" height="16" /><polyline points="2 10 12 10 22 10" /><line x1="7" y1="15" x2="7" y2="15" strokeWidth="3" strokeLinecap="round" /><line x1="12" y1="15" x2="17" y2="15" />
+        <rect x="2" y="5" width="20" height="16" /><polyline points="2 10 12 10 22 10" />
+        <line x1="7" y1="15" x2="7" y2="15" strokeWidth="3" strokeLinecap="round" />
+        <line x1="12" y1="15" x2="17" y2="15" />
       </svg>
     ),
   },
@@ -75,7 +88,8 @@ const NAV_ITEMS = [
     icon: (
       <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
         <circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" />
-        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" /><line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
       </svg>
     ),
   },
@@ -91,60 +105,23 @@ const NAV_ITEMS = [
   },
 ];
 
-const ROLE_CONFIG = {
-  admin:  { label: 'Administrator', bg: 'bg-neu-accent', text: 'text-neu-white' },
-  staff:  { label: 'Staff',         bg: 'bg-neu-blue',   text: 'text-neu-white' },
-  client: { label: 'Client',        bg: 'bg-neu-green',  text: 'text-neu-white' },
-};
-
 export function Sidebar({ user, isOpen, onClose }) {
   const location   = useLocation();
-  const navigate   = useNavigate();
   const sidebarRef = useRef(null);
-  const role       = ROLE_CONFIG[user?.role] ?? ROLE_CONFIG.client;
 
-  const [showConfirm,  setShowConfirm]  = useState(false);
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
-
-  // Desktop entrance animation — hanya sekali, hanya di desktop
   useEffect(() => {
     const mq = window.matchMedia('(min-width: 1024px)');
     if (mq.matches && sidebarRef.current) {
-      // Pastikan inline transform bersih sebelum animasi
       gsap.set(sidebarRef.current, { clearProps: 'transform' });
       gsap.from(sidebarRef.current, { opacity: 0, duration: 0.4, ease: 'power3.out' });
     }
   }, []);
 
-  const handleLogout = async () => {
-    setIsLoggingOut(true);
-    try {
-      await authService.logout();
-      navigate('/login');
-    } catch {
-      navigate('/login');
-    } finally {
-      setIsLoggingOut(false);
-      setShowConfirm(false);
-    }
-  };
-
-  const handleNavClick = () => {
-    if (onClose) onClose();
-  };
+  const handleNavClick = () => { if (onClose) onClose(); };
 
   return (
     <>
-      <ConfirmModal
-        isOpen={showConfirm}
-        title="Konfirmasi Keluar"
-        message="Apakah kamu yakin ingin keluar dari Synectra? Sesi kamu akan diakhiri."
-        onConfirm={handleLogout}
-        onCancel={() => setShowConfirm(false)}
-        isLoading={isLoggingOut}
-      />
-
-      {/* Mobile overlay backdrop — CSS transition */}
+      {/* Mobile overlay */}
       <div
         onClick={onClose}
         className={cn(
@@ -157,11 +134,8 @@ export function Sidebar({ user, isOpen, onClose }) {
         ref={sidebarRef}
         className={cn(
           'fixed left-0 top-0 h-screen w-64 bg-neu-white border-r-2 border-neu-black flex flex-col z-40',
-          // CSS transition — tidak konflik dengan resize event
           'transition-transform duration-300 ease-in-out',
-          // Desktop: selalu tampil
           'lg:translate-x-0',
-          // Mobile: tampil hanya jika isOpen
           isOpen ? 'translate-x-0' : '-translate-x-full',
         )}
       >
@@ -173,21 +147,11 @@ export function Sidebar({ user, isOpen, onClose }) {
             </div>
             <h2 className="font-display font-bold text-xl text-neu-black leading-tight">Panel</h2>
           </div>
-          {/* Close button — mobile only */}
           <button onClick={onClose} className="lg:hidden w-8 h-8 flex items-center justify-center border-2 border-neu-black hover:bg-neu-bg transition-colors">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
               <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
             </svg>
           </button>
-        </div>
-
-        {/* User info */}
-        <div className="px-5 py-4 border-b-2 border-neu-black bg-neu-bg">
-          <p className="font-display font-bold text-sm text-neu-black truncate">{user?.fullName ?? '—'}</p>
-          <p className="font-body text-xs text-neu-black/50 truncate mb-2">{user?.email ?? '—'}</p>
-          <span className={cn('inline-block px-2 py-0.5 border-2 border-neu-black shadow-neu-sm font-mono font-bold text-xs uppercase tracking-wide', role.bg, role.text)}>
-            {role.label}
-          </span>
         </div>
 
         {/* Nav */}
@@ -208,23 +172,6 @@ export function Sidebar({ user, isOpen, onClose }) {
             );
           })}
         </nav>
-
-        {/* Logout */}
-        <div className="px-3 pb-5 pt-2 border-t-2 border-neu-black">
-          <button onClick={() => setShowConfirm(true)} disabled={isLoggingOut}
-            className={cn(
-              'w-full flex items-center gap-3 px-4 py-3 font-display font-bold text-sm uppercase tracking-wide text-neu-black',
-              'border-2 border-neu-black shadow-neu bg-neu-white transition-all duration-150',
-              'hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm active:translate-x-1 active:translate-y-1 active:shadow-none',
-              isLoggingOut && 'opacity-50 cursor-not-allowed',
-            )}>
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-              <polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" />
-            </svg>
-            {isLoggingOut ? 'Keluar...' : 'Keluar'}
-          </button>
-        </div>
       </aside>
     </>
   );

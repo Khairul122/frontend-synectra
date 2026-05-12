@@ -54,10 +54,32 @@ export default function MyOrderPage() {
 
   return (
     <PageLayout user={user} title="Pesanan Saya" alert={alert}>
+      {/* Header toolbar */}
+      <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
+        <div>
+          <h2 className="font-display font-bold text-xl text-neu-black">Pesanan Saya</h2>
+          <p className="font-mono text-xs text-neu-black/50 mt-0.5">{orders.length} pesanan terdaftar</p>
+        </div>
+        <button
+          onClick={() => navigate('/my-orders/new')}
+          className={cn(
+            'px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu',
+            'font-display font-bold text-xs uppercase tracking-wide text-neu-black whitespace-nowrap',
+            'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm active:translate-x-1 active:translate-y-1 active:shadow-none',
+          )}
+        >
+          + Buat Pesanan Baru
+        </button>
+      </div>
+
       {orders.length === 0 ? (
         <div className="border-2 border-dashed border-neu-black/30 p-16 text-center">
           <p className="font-display font-bold text-xl text-neu-black/40">Belum ada pesanan.</p>
-          <p className="font-body text-sm text-neu-black/30 mt-1">Hubungi admin untuk membuat pesanan baru.</p>
+          <p className="font-body text-sm text-neu-black/30 mt-1">Klik "Buat Pesanan Baru" untuk mulai.</p>
+          <button onClick={() => navigate('/my-orders/new')}
+            className="mt-4 px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm transition-all duration-150">
+            + Buat Pesanan Pertama
+          </button>
         </div>
       ) : (
         <div ref={headerRef} className="grid grid-cols-1 sm:grid-cols-2 gap-4">

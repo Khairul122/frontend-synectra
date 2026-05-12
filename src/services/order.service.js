@@ -14,4 +14,7 @@ export const orderService = {
   updateStatus(id, status) {
     return apiClient.patch(`${API_ENDPOINTS.ORDERS}/${id}/status`, { status }).then(r => r.data);
   },
+  updateDetails(id, payload) {
+    return apiClient.patch(`${API_ENDPOINTS.ORDERS}/${id}/details`, payload).then(r => r.data);
+  },
 };
