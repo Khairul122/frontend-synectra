@@ -274,6 +274,12 @@ export default function LandingPage() {
   const [activePortfolio, setActivePortfolio] = useState(null);
   const [menuOpen,     setMenuOpen]     = useState(false);
   const [splineError,  setSplineError]  = useState(false);
+  const [toast,        setToast]        = useState(null); // { msg, type }
+
+  const showToast = (msg, type = 'success') => {
+    setToast({ msg, type });
+    setTimeout(() => setToast(null), 3500);
+  };
   const [bannerAd,       setBannerAd]       = useState(null);  // banner popup iklan awal
   const [bannerExpanded, setBannerExpanded] = useState(false); // state split screen
   const [bannerModal,    setBannerModal]    = useState(null);  // modal dari section banners
@@ -402,6 +408,23 @@ export default function LandingPage() {
     <div ref={pageRef} className="min-h-screen bg-neu-bg overflow-x-hidden">
       {activePortfolio && (
         <PortfolioModal item={activePortfolio} onClose={() => setActivePortfolio(null)} transitionTo={transitionTo} />
+      )}
+
+      {/* ── Custom Toast Notification ── */}
+      {toast && createPortal(
+        <div className={cn(
+          'fixed bottom-6 right-6 z-[9999] flex items-start gap-3 px-4 py-3 border-2 border-neu-black shadow-neu max-w-sm',
+          toast.type === 'success' ? 'bg-neu-green text-neu-white' : 'bg-neu-accent text-neu-white',
+        )}>
+          <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+            {toast.type === 'success'
+              ? <polyline points="20 6 9 17 4 12" />
+              : <><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></>}
+          </svg>
+          <p className="font-display font-bold text-sm leading-snug">{toast.msg}</p>
+          <button onClick={() => setToast(null)} className="ml-auto text-neu-white/70 hover:text-neu-white font-mono text-lg leading-none flex-shrink-0">×</button>
+        </div>,
+        document.body
       )}
 
       {/* ── Banner Iklan Popup ── */}
@@ -933,7 +956,7 @@ export default function LandingPage() {
                               try {
                                 const emailAddr = href.replace('mailto:', '');
                                 navigator.clipboard.writeText(emailAddr);
-                                alert(`Email ${emailAddr} telah disalin ke clipboard!\n\n(Jika aplikasi email tidak otomatis terbuka, Anda dapat mem-paste email tersebut)`);
+                                showToast(`Email ${emailAddr} disalin ke clipboard!`);
                               } catch (err) {}
                             }
                           }}
