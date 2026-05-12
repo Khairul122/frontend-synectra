@@ -18,11 +18,17 @@ const BASE = API_BASE_URL || '';
 /* ─── Pastikan URL kontak punya prefix yang benar ────────────────────── */
 function fixContactUrl(linkUrl, iconKey) {
   if (!linkUrl) return '#';
+  const key = (iconKey || '').toLowerCase();
   // Sudah punya protocol → langsung pakai
-  if (/^(https?:\/\/|mailto:|tel:)/.test(linkUrl)) return linkUrl;
+  if (/^(https?:\/\/|mailto:|tel:)/i.test(linkUrl)) return linkUrl;
+  
+  // Cek apakah linkUrl adalah alamat email murni (misal: "budi@email.com")
+  if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(linkUrl)) return `mailto:${linkUrl}`;
+
   // Auto-detect berdasarkan icon/platform
-  if (iconKey === 'email') return `mailto:${linkUrl}`;
-  if (iconKey === 'phone') return `tel:${linkUrl.replace(/\s/g, '')}`;
+  if (key === 'email') return `mailto:${linkUrl}`;
+  if (key === 'phone' || key === 'whatsapp') return `tel:${linkUrl.replace(/\s/g, '')}`;
+  
   // Fallback: tambahkan https://
   return `https://${linkUrl}`;
 }
@@ -913,14 +919,24 @@ export default function LandingPage() {
                 {contacts.length > 0 && (
                   <div className="space-y-3">
                     {contacts.map(ct => {
-                      const { Icon, color } = getPlatform(ct.icon);
-                      const href = fixContactUrl(ct.linkUrl, ct.icon);
-                      const isEmail = ct.icon === 'email' || href.startsWith('mailto:');
-                      const isPhone = ct.icon === 'phone' || href.startsWith('tel:');
+                      const iconKey = (ct.icon || '').toLowerCase();
+                      const { Icon, color } = getPlatform(iconKey);
+                      const href = fixContactUrl(ct.linkUrl, iconKey);
+                      const isEmail = iconKey === 'email' || href.startsWith('mailto:');
+                      const isPhone = iconKey === 'phone' || href.startsWith('tel:');
                       return (
                         <a key={ct.id} href={href}
                           target={isEmail || isPhone ? '_self' : '_blank'}
                           rel="noopener noreferrer"
+                          onClick={(e) => {
+                            if (isEmail) {
+                              try {
+                                const emailAddr = href.replace('mailto:', '');
+                                navigator.clipboard.writeText(emailAddr);
+                                alert(`Email ${emailAddr} telah disalin ke clipboard!\n\n(Jika aplikasi email tidak otomatis terbuka, Anda dapat mem-paste email tersebut)`);
+                              } catch (err) {}
+                            }
+                          }}
                           className="flex items-center gap-4 p-4 bg-neu-white border-2 border-neu-black shadow-neu-sm hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-neu transition-all duration-150">
                           <div className="w-10 h-10 border-2 border-neu-black flex items-center justify-center flex-shrink-0" style={{ backgroundColor: color + '18' }}>
                             <Icon style={{ color }} className="w-5 h-5" />

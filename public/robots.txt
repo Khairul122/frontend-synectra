@@ -1,0 +1,25 @@
+User-agent: *
+Allow: /
+
+# Blokir halaman panel (butuh login)
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /orders
+Disallow: /orders/
+Disallow: /my-orders
+Disallow: /my-orders/
+Disallow: /clients
+Disallow: /banners
+Disallow: /portfolio
+Disallow: /bank-accounts
+Disallow: /social-media
+Disallow: /contacts
+Disallow: /500
+
+# Izinkan landing page dan auth
+Allow: /
+Allow: /login
+Allow: /register
+
+# Sitemap
+Sitemap: https://synectra-pi.vercel.app/sitemap.xml

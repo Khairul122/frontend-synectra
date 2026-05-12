@@ -1,7 +1,5 @@
-import { createClient } from '@supabase/supabase-js';
-import { SUPABASE_URL, SUPABASE_ANON, STORAGE_BUCKET } from '../constants/api';
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
+import { STORAGE_BUCKET } from '../constants/api';
+import supabase from '../lib/supabase';
 
 export const uploadService = {
   async uploadImage(file) {
