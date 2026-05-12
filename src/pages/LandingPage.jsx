@@ -901,47 +901,114 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── FOOTER ── */}
-      <footer className="bg-neu-black py-14">
-        <div className="max-w-7xl mx-auto px-4 lg:px-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-10">
-            <div className="md:col-span-2">
-              <div className="inline-block bg-neu-primary border-2 border-neu-primary px-3 py-1 mb-4"><span className="font-mono font-bold text-xs text-neu-black uppercase tracking-widest">Synectra</span></div>
-              <p className="font-body text-sm text-neu-white/60 leading-relaxed mb-4 max-w-xs">Platform jasa digital yang mengutamakan transparansi, kualitas, dan kepuasan client di Indonesia.</p>
+      {/* ══════════════════════════════════════════
+          FOOTER — Modern 2025
+      ══════════════════════════════════════════ */}
+      <footer className="bg-neu-black">
+
+        {/* Top strip */}
+        <div className="border-b border-neu-white/10">
+          <div className="max-w-7xl mx-auto px-4 lg:px-6 py-10 grid grid-cols-1 lg:grid-cols-5 gap-10">
+
+            {/* Brand col — 2/5 */}
+            <div className="lg:col-span-2">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="bg-neu-primary border-2 border-neu-primary px-3 py-1">
+                  <span className="font-mono font-bold text-sm text-neu-black uppercase tracking-widest">Synectra</span>
+                </div>
+              </div>
+              <p className="font-body text-sm text-neu-white/50 leading-relaxed mb-6 max-w-sm">
+                Platform jasa digital profesional yang mengutamakan transparansi, kualitas, dan kepuasan setiap client di Indonesia.
+              </p>
+              {/* Social icons */}
               {socialMedia.length > 0 && (
-                <div className="flex gap-2">
-                  {socialMedia.slice(0, 5).map(s => {
-                    const { Icon } = getPlatform(s.icon ?? s.platformName?.toLowerCase());
+                <div className="flex flex-wrap gap-2">
+                  {socialMedia.slice(0, 6).map(s => {
+                    const { Icon, color } = getPlatform(s.icon ?? s.platformName?.toLowerCase());
                     return (
-                      <a key={s.id} href={s.url} target="_blank" rel="noopener noreferrer" className="w-8 h-8 border border-neu-white/20 flex items-center justify-center hover:border-neu-primary hover:bg-neu-primary/10 transition-colors">
-                        <Icon style={{ color: '#ffffff60' }} className="w-4 h-4" />
+                      <a key={s.id} href={s.url} target="_blank" rel="noopener noreferrer"
+                        title={s.platformName}
+                        className="group w-9 h-9 border border-neu-white/15 flex items-center justify-center hover:border-neu-primary hover:bg-neu-primary transition-all duration-200">
+                        <Icon style={{ color: '#ffffff50' }} className="w-4 h-4 group-hover:!text-neu-black transition-colors duration-200" />
                       </a>
                     );
                   })}
                 </div>
               )}
             </div>
+
+            {/* Layanan */}
             <div>
-              <p className="font-display font-bold text-xs text-neu-white/50 uppercase tracking-widest mb-4">Navigasi</p>
-              <div className="flex flex-col gap-2">
-                {[['Masuk', '/login'], ['Daftar', '/register'], ['Buat Pesanan', '/my-orders/new']].map(([label, href]) => (
-                  <button key={href} onClick={() => transitionTo(href)} className="font-body text-sm text-neu-white/60 hover:text-neu-primary transition-colors text-left">{label}</button>
+              <p className="font-mono font-bold text-[10px] text-neu-white/30 uppercase tracking-widest mb-5">Layanan</p>
+              <ul className="flex flex-col gap-2.5">
+                {['Web Development','Mobile App','UI/UX Design','Backend & API','Data Science','Joki Tugas'].map(item => (
+                  <li key={item}>
+                    <button onClick={() => transitionTo('/register')}
+                      className="font-body text-sm text-neu-white/50 hover:text-neu-primary transition-colors text-left leading-none">
+                      {item}
+                    </button>
+                  </li>
                 ))}
+              </ul>
+            </div>
+
+            {/* Perusahaan */}
+            <div>
+              <p className="font-mono font-bold text-[10px] text-neu-white/30 uppercase tracking-widest mb-5">Perusahaan</p>
+              <ul className="flex flex-col gap-2.5">
+                {[['Beranda', '/'],['Portofolio', '/'],['Cara Kerja', '/'],['Harga', '/'],['Masuk', '/login'],['Daftar Gratis', '/register']].map(([label, href]) => (
+                  <li key={label}>
+                    <button onClick={() => transitionTo(href)}
+                      className="font-body text-sm text-neu-white/50 hover:text-neu-primary transition-colors text-left leading-none">
+                      {label}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Pembayaran */}
+            <div>
+              <p className="font-mono font-bold text-[10px] text-neu-white/30 uppercase tracking-widest mb-5">Rekening Pembayaran</p>
+              <div className="flex flex-col gap-4">
+                {bankAccounts.length > 0 ? bankAccounts.slice(0, 4).map(ba => (
+                  <div key={ba.id} className="flex items-center gap-3">
+                    {ba.bankLogo
+                      ? <img src={ba.bankLogo} alt={ba.bankName} className="w-9 h-6 object-contain flex-shrink-0" />
+                      : <div className="w-9 h-6 border border-neu-white/15 flex items-center justify-center flex-shrink-0"><span className="font-mono font-bold text-[9px] text-neu-white/40">{ba.bankName?.slice(0,3)}</span></div>
+                    }
+                    <div className="min-w-0">
+                      <p className="font-mono font-bold text-xs text-neu-white/80">{ba.bankName}</p>
+                      <p className="font-mono text-[10px] text-neu-white/35 truncate">{ba.accountNumber}</p>
+                      <p className="font-mono text-[9px] text-neu-white/25 truncate">{ba.accountHolder}</p>
+                    </div>
+                  </div>
+                )) : (
+                  <p className="font-mono text-xs text-neu-white/20">Belum dikonfigurasi.</p>
+                )}
               </div>
             </div>
-            {bankAccounts.length > 0 && (
-              <div>
-                <p className="font-display font-bold text-xs text-neu-white/50 uppercase tracking-widest mb-4">Info Pembayaran</p>
-                <div className="flex flex-col gap-3">
-                  {bankAccounts.slice(0, 3).map(ba => (
-                    <div key={ba.id} className="flex items-center gap-3">
-                      {ba.bankLogo ? <img src={ba.bankLogo} alt={ba.bankName} className="w-8 h-6 object-contain" /> : <div className="w-8 h-6 bg-neu-white/10 border border-neu-white/20 flex items-center justify-center"><span className="font-mono text-[9px] text-neu-white/60">{ba.bankName?.charAt(0)}</span></div>}
-                      <div><p className="font-mono font-bold text-xs text-neu-white">{ba.bankName}</p><p className="font-mono text-[10px] text-neu-white/40">{ba.accountNumber} · {ba.accountHolder}</p></div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+          </div>
+        </div>
+
+        {/* Bottom bar */}
+        <div className="max-w-7xl mx-auto px-4 lg:px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="flex items-center gap-4 flex-wrap">
+            <p className="font-mono text-[11px] text-neu-white/25">
+              © {new Date().getFullYear()} Synectra. All rights reserved.
+            </p>
+            <span className="text-neu-white/15 hidden sm:block">·</span>
+            <p className="font-mono text-[11px] text-neu-white/20">
+              Built with React · NestJS · Supabase
+            </p>
+          </div>
+          <div className="flex items-center gap-4">
+            {['Kebijakan Privasi','Syarat & Ketentuan'].map(t => (
+              <button key={t}
+                className="font-mono text-[11px] text-neu-white/25 hover:text-neu-white/60 transition-colors">
+                {t}
+              </button>
+            ))}
           </div>
         </div>
       </footer>
