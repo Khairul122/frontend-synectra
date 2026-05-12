@@ -1,6 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
 import { orderService } from '../services/order.service';
@@ -26,20 +25,15 @@ function StatusBadge({ status }) {
   );
 }
 
-/* ─── Stat Card ──────────────────────────────────────────────────────────── */
-function StatCard({ label, value, valueColor, barColor, delay, onClick }) {
-  const ref = useRef(null);
-  useEffect(() => {
-    gsap.from(ref.current, { y: 30, opacity: 0, duration: 0.5, delay, ease: 'power2.out' });
-  }, [delay]);
+/* ─── Stat Card — tanpa animasi ─────────────────────────────────────────── */
+function StatCard({ label, value, valueColor, barColor, onClick }) {
   return (
-    <div ref={ref}
+    <div
       onClick={onClick}
       className={cn(
         'bg-neu-white border-2 border-neu-black shadow-neu p-5 flex flex-col gap-2',
         onClick && 'cursor-pointer hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-neu-lg transition-all duration-150',
       )}>
-      {/* Thin accent bar on top */}
       {barColor && <div className="h-1 w-8" style={{ backgroundColor: barColor }} />}
       <p className="font-body text-xs text-neu-black/50 uppercase tracking-wide">{label}</p>
       <p className={cn('font-display font-bold text-3xl leading-none', valueColor ?? 'text-neu-black')}>{value}</p>
@@ -47,19 +41,8 @@ function StatCard({ label, value, valueColor, barColor, delay, onClick }) {
   );
 }
 
-/* ─── Admin Dashboard ────────────────────────────────────────────────────── */
+/* ─── Admin Dashboard — tanpa animasi ───────────────────────────────────── */
 function AdminDashboard({ user, orders, clients, navigate }) {
-  const heroRef = useRef(null);
-  const statsRef = useRef(null);
-  const tableRef = useRef(null);
-
-  useEffect(() => {
-    const tl = gsap.timeline({ defaults: { ease: 'power2.out' } });
-    tl.from(heroRef.current,  { y: 20, opacity: 0, duration: 0.5 })
-      .from(statsRef.current, { y: 20, opacity: 0, duration: 0.4 }, '-=0.2')
-      .from(tableRef.current, { y: 20, opacity: 0, duration: 0.4 }, '-=0.2');
-  }, []);
-
   const totalOrders   = orders.length;
   const totalClients  = clients.length;
   const pendingOrders = orders.filter(o => o.status === 'pending').length;
@@ -73,7 +56,7 @@ function AdminDashboard({ user, orders, clients, navigate }) {
   return (
     <>
       {/* Greeting */}
-      <div ref={heroRef} className="mb-6 p-6 bg-neu-white border-2 border-neu-black shadow-neu" style={{ borderLeftWidth: '6px', borderLeftColor: '#FF5C5C' }}>
+      <div className="mb-6 p-6 bg-neu-white border-2 border-neu-black shadow-neu" style={{ borderLeftWidth: '6px', borderLeftColor: '#FF5C5C' }}>
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
             <span className="inline-block px-3 py-1 border-2 border-neu-black mb-3 font-mono font-bold text-xs uppercase tracking-widest bg-neu-accent text-neu-white">
@@ -95,29 +78,26 @@ function AdminDashboard({ user, orders, clients, navigate }) {
       </div>
 
       {/* Stat Cards */}
-      <div ref={statsRef} className="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
-        <StatCard label="Total Pesanan"     value={totalOrders}   valueColor="text-neu-black"    barColor="#0D0D0D"  delay={0}    onClick={() => navigate('/orders')} />
-        <StatCard label="Total Client"      value={totalClients}  valueColor="text-neu-blue"     barColor="#4D61FF"  delay={0.05} onClick={() => navigate('/clients')} />
-        <StatCard label="Menunggu Aksi"     value={pendingOrders} valueColor="text-neu-primary"  barColor="#FFD000"  delay={0.1}  onClick={() => navigate('/orders')} />
-        <StatCard label="Sedang Dikerjakan" value={inProgress}    valueColor="text-neu-green"    barColor="#00C48C"  delay={0.15} onClick={() => navigate('/orders')} />
+      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+        <StatCard label="Total Pesanan"     value={totalOrders}   valueColor="text-neu-black"   barColor="#0D0D0D" onClick={() => navigate('/orders')} />
+        <StatCard label="Total Client"      value={totalClients}  valueColor="text-neu-blue"    barColor="#4D61FF" onClick={() => navigate('/clients')} />
+        <StatCard label="Menunggu Aksi"     value={pendingOrders} valueColor="text-neu-primary" barColor="#FFD000" onClick={() => navigate('/orders')} />
+        <StatCard label="Sedang Dikerjakan" value={inProgress}    valueColor="text-neu-green"   barColor="#00C48C" onClick={() => navigate('/orders')} />
       </div>
 
-      <div ref={tableRef} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Recent Orders */}
         <div className="lg:col-span-2 bg-neu-white border-2 border-neu-black shadow-neu overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b-2 border-neu-black">
             <h3 className="font-display font-bold text-sm uppercase tracking-wide">Pesanan Terbaru</h3>
-            <button onClick={() => navigate('/orders')}
-              className="font-mono text-xs text-neu-blue hover:underline">Lihat semua →</button>
+            <button onClick={() => navigate('/orders')} className="font-mono text-xs text-neu-blue hover:underline">Lihat semua →</button>
           </div>
           {recentOrders.length === 0 ? (
             <p className="px-5 py-8 text-center font-body text-sm text-neu-black/40">Belum ada pesanan.</p>
           ) : (
             <div className="divide-y-2 divide-neu-black">
               {recentOrders.map(o => (
-                <div key={o.id}
-                  onClick={() => navigate(`/orders/${o.id}`)}
+                <div key={o.id} onClick={() => navigate(`/orders/${o.id}`)}
                   className="px-5 py-3 flex items-center gap-3 hover:bg-neu-bg transition-colors cursor-pointer">
                   <div className="flex-1 min-w-0">
                     <p className="font-display font-bold text-sm text-neu-black truncate">{o.title}</p>
@@ -131,7 +111,7 @@ function AdminDashboard({ user, orders, clients, navigate }) {
           )}
         </div>
 
-        {/* Pesanan Perlu Aksi */}
+        {/* Perlu Aksi */}
         <div className="bg-neu-white border-2 border-neu-black shadow-neu overflow-hidden">
           <div className="px-5 py-4 border-b-2 border-neu-black">
             <h3 className="font-display font-bold text-sm uppercase tracking-wide">Perlu Aksi</h3>
@@ -145,8 +125,7 @@ function AdminDashboard({ user, orders, clients, navigate }) {
           ) : (
             <div className="divide-y-2 divide-neu-black">
               {needAction.map(o => (
-                <div key={o.id}
-                  onClick={() => navigate(`/orders/${o.id}`)}
+                <div key={o.id} onClick={() => navigate(`/orders/${o.id}`)}
                   className="px-5 py-3 hover:bg-neu-bg transition-colors cursor-pointer">
                   <p className="font-display font-bold text-sm text-neu-black truncate">{o.title}</p>
                   <p className="font-mono text-xs text-neu-black/40">{o.clientName ?? '—'}</p>
@@ -169,24 +148,12 @@ function AdminDashboard({ user, orders, clients, navigate }) {
   );
 }
 
-/* ─── Client Dashboard ───────────────────────────────────────────────────── */
+/* ─── Client Dashboard — tanpa animasi ──────────────────────────────────── */
 function ClientDashboard({ user, orders, navigate }) {
-  const heroRef  = useRef(null);
-  const statsRef = useRef(null);
-  const cardsRef = useRef(null);
-
-  useEffect(() => {
-    const tl = gsap.timeline({ defaults: { ease: 'power2.out' } });
-    tl.from(heroRef.current,  { y: 20, opacity: 0, duration: 0.5 })
-      .from(statsRef.current, { y: 20, opacity: 0, duration: 0.4 }, '-=0.2')
-      .from(cardsRef.current, { y: 20, opacity: 0, duration: 0.4 }, '-=0.2');
-  }, []);
-
   const totalOrders  = orders.length;
   const activeOrders = orders.filter(o => !['completed', 'canceled'].includes(o.status)).length;
 
-  // Progress terakhir dari semua order
-  const allReports = orders.flatMap(o => o.progressReports ?? []);
+  const allReports   = orders.flatMap(o => o.progressReports ?? []);
   const latestReport = allReports.length
     ? allReports.reduce((a, b) => new Date(a.reportedAt) > new Date(b.reportedAt) ? a : b)
     : null;
@@ -198,7 +165,7 @@ function ClientDashboard({ user, orders, navigate }) {
   return (
     <>
       {/* Greeting */}
-      <div ref={heroRef} className="mb-6 p-6 bg-neu-white border-2 border-neu-black shadow-neu" style={{ borderLeftWidth: '6px', borderLeftColor: '#00C48C' }}>
+      <div className="mb-6 p-6 bg-neu-white border-2 border-neu-black shadow-neu" style={{ borderLeftWidth: '6px', borderLeftColor: '#00C48C' }}>
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
             <span className="inline-block px-3 py-1 border-2 border-neu-black mb-3 font-mono font-bold text-xs uppercase tracking-widest bg-neu-green text-neu-white">
@@ -211,28 +178,22 @@ function ClientDashboard({ user, orders, navigate }) {
               Pantau status pesanan dan progress pengerjaan kamu di sini.
             </p>
           </div>
-          <div className="flex gap-2">
-            <button onClick={() => navigate('/my-orders/new')}
-              className={cn(
-                'px-4 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu',
-                'font-display font-bold text-xs uppercase tracking-wide text-neu-black',
-                'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm',
-              )}>
-              + Buat Pesanan
-            </button>
-          </div>
+          <button onClick={() => navigate('/my-orders/new')}
+            className="px-4 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase tracking-wide text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">
+            + Buat Pesanan
+          </button>
         </div>
       </div>
 
       {/* Stat Cards */}
-      <div ref={statsRef} className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-        <StatCard label="Total Pesanan"    value={totalOrders}    valueColor="text-neu-black"  barColor="#0D0D0D"  delay={0}    onClick={() => navigate('/my-orders')} />
-        <StatCard label="Pesanan Aktif"    value={activeOrders}   valueColor="text-neu-blue"   barColor="#4D61FF"  delay={0.05} onClick={() => navigate('/my-orders')} />
-        <StatCard label="Progress Terkini" value={`${latestProgress}%`} valueColor={latestProgress === 100 ? 'text-neu-green' : 'text-neu-blue'} barColor="#00C48C" delay={0.1} />
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+        <StatCard label="Total Pesanan"    value={totalOrders}          valueColor="text-neu-black"  barColor="#0D0D0D" onClick={() => navigate('/my-orders')} />
+        <StatCard label="Pesanan Aktif"    value={activeOrders}         valueColor="text-neu-blue"   barColor="#4D61FF" onClick={() => navigate('/my-orders')} />
+        <StatCard label="Progress Terkini" value={`${latestProgress}%`} valueColor={latestProgress === 100 ? 'text-neu-green' : 'text-neu-blue'} barColor="#00C48C" />
       </div>
 
       {/* Orders */}
-      <div ref={cardsRef}>
+      <div>
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-display font-bold text-sm text-neu-black uppercase tracking-wide">Pesanan Saya</h3>
           <button onClick={() => navigate('/my-orders')} className="font-mono text-xs text-neu-blue hover:underline">Lihat semua →</button>
@@ -254,9 +215,8 @@ function ClientDashboard({ user, orders, navigate }) {
                 ? o.progressReports[o.progressReports.length - 1].progressPercentage
                 : null;
               return (
-                <div key={o.id}
-                  onClick={() => navigate(`/my-orders/${o.id}`)}
-                  className="bg-neu-white border-2 border-neu-black shadow-neu hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-neu-lg transition-all duration-150 cursor-pointer p-5">
+                <div key={o.id} onClick={() => navigate(`/my-orders/${o.id}`)}
+                  className="bg-neu-white border-2 border-neu-black shadow-neu hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-neu-lg transition-all duration-150 cursor-pointer p-5">
                   <div className="flex items-center justify-between mb-2">
                     <span className={cn('inline-block px-2 py-0.5 border-2 border-neu-black font-mono font-bold text-xs uppercase', cfg.bg, cfg.text)}>
                       {cfg.label}
@@ -272,7 +232,7 @@ function ClientDashboard({ user, orders, navigate }) {
                         <span className="font-mono text-xs font-bold text-neu-blue">{lastPct}%</span>
                       </div>
                       <div className="h-2 border border-neu-black bg-neu-bg">
-                        <div className="h-full bg-neu-blue transition-all duration-300" style={{ width: `${lastPct}%` }} />
+                        <div className="h-full bg-neu-blue" style={{ width: `${lastPct}%` }} />
                       </div>
                     </div>
                   )}
@@ -301,7 +261,6 @@ export default function DashboardPage() {
       .then(async (res) => {
         const u = res.data;
         setUser(u);
-        // Fetch orders (admin: semua; client: milik sendiri — dihandle oleh backend)
         const [ordersRes, clientsRes] = await Promise.all([
           orderService.getAll().catch(() => ({ data: [] })),
           u.role === 'admin' ? clientService.getAll().catch(() => ({ data: [] })) : Promise.resolve({ data: [] }),
@@ -316,7 +275,7 @@ export default function DashboardPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-neu-bg flex items-center justify-center">
-        <p className="font-display font-bold text-neu-black animate-pulse text-lg">Memuat...</p>
+        <p className="font-display font-bold text-neu-black text-lg">Memuat...</p>
       </div>
     );
   }
