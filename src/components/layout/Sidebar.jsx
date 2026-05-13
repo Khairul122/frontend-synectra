@@ -1,11 +1,13 @@
 import { useRef, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { gsap } from 'gsap';
 import { cn } from '../../utils/cn';
+import { LanguageSwitcher } from '../ui/LanguageSwitcher';
 
 const NAV_ITEMS = [
   {
-    label: 'Dashboard',
+    tKey: 'sidebar.dashboard',
     path: '/dashboard',
     icon: (
       <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -15,7 +17,7 @@ const NAV_ITEMS = [
     ),
   },
   {
-    label: 'Clients',
+    tKey: 'sidebar.clients',
     path: '/clients',
     roles: ['admin'],
     icon: (
@@ -28,7 +30,7 @@ const NAV_ITEMS = [
     ),
   },
   {
-    label: 'Orders',
+    tKey: 'sidebar.orders',
     path: '/orders',
     roles: ['admin'],
     icon: (
@@ -39,7 +41,7 @@ const NAV_ITEMS = [
     ),
   },
   {
-    label: 'My Orders',
+    tKey: 'sidebar.myOrders',
     path: '/my-orders',
     roles: ['client', 'staff'],
     icon: (
@@ -50,7 +52,19 @@ const NAV_ITEMS = [
     ),
   },
   {
-    label: 'Portfolio',
+    tKey: 'sidebar.software',
+    path: '/my-software',
+    roles: ['client', 'staff'],
+    icon: (
+      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <rect x="2" y="3" width="20" height="14" /><polyline points="8 21 12 17 16 21" />
+        <line x1="7" y1="8" x2="7" y2="8" strokeWidth="3" strokeLinecap="round" />
+        <line x1="11" y1="8" x2="17" y2="8" /><line x1="11" y1="11" x2="17" y2="11" />
+      </svg>
+    ),
+  },
+  {
+    tKey: 'sidebar.portfolio',
     path: '/portfolio',
     roles: ['admin'],
     icon: (
@@ -60,7 +74,7 @@ const NAV_ITEMS = [
     ),
   },
   {
-    label: 'Banners',
+    tKey: 'sidebar.banners',
     path: '/banners',
     roles: ['admin'],
     icon: (
@@ -70,7 +84,7 @@ const NAV_ITEMS = [
     ),
   },
   {
-    label: 'Paket Layanan',
+    tKey: 'sidebar.servicePackages',
     path: '/service-packages',
     roles: ['admin'],
     icon: (
@@ -81,7 +95,32 @@ const NAV_ITEMS = [
     ),
   },
   {
-    label: 'Bank Accounts',
+    tKey: 'sidebar.softwarePurchases',
+    path: '/software-purchases',
+    roles: ['admin'],
+    icon: (
+      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
+        <rect x="9" y="3" width="6" height="4" />
+        <line x1="9" y1="12" x2="15" y2="12" /><line x1="9" y1="16" x2="11" y2="16" />
+        <circle cx="18" cy="18" r="3" /><path d="M18 16v2l1 1" />
+      </svg>
+    ),
+  },
+  {
+    tKey: 'sidebar.software',
+    path: '/software-products',
+    roles: ['admin'],
+    icon: (
+      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <rect x="2" y="3" width="20" height="14" /><polyline points="8 21 12 17 16 21" />
+        <line x1="7" y1="8" x2="7" y2="8" strokeWidth="3" strokeLinecap="round" />
+        <line x1="11" y1="8" x2="17" y2="8" /><line x1="11" y1="11" x2="17" y2="11" />
+      </svg>
+    ),
+  },
+  {
+    tKey: 'sidebar.bankAccounts',
     path: '/bank-accounts',
     roles: ['admin'],
     icon: (
@@ -93,7 +132,7 @@ const NAV_ITEMS = [
     ),
   },
   {
-    label: 'Social Media',
+    tKey: 'sidebar.socialMedia',
     path: '/social-media',
     roles: ['admin'],
     icon: (
@@ -105,7 +144,7 @@ const NAV_ITEMS = [
     ),
   },
   {
-    label: 'Contacts',
+    tKey: 'sidebar.contacts',
     path: '/contacts',
     roles: ['admin'],
     icon: (
@@ -119,6 +158,7 @@ const NAV_ITEMS = [
 export function Sidebar({ user, isOpen, onClose }) {
   const location   = useLocation();
   const sidebarRef = useRef(null);
+  const { t }      = useTranslation();
 
   useEffect(() => {
     const mq = window.matchMedia('(min-width: 1024px)');
@@ -156,7 +196,7 @@ export function Sidebar({ user, isOpen, onClose }) {
             <div className="inline-block bg-neu-primary border-2 border-neu-black px-3 py-1 shadow-neu-sm mb-2">
               <span className="font-mono font-bold text-xs text-neu-black uppercase tracking-widest">Synectra</span>
             </div>
-            <h2 className="font-display font-bold text-xl text-neu-black leading-tight">Panel</h2>
+            <h2 className="font-display font-bold text-xl text-neu-black leading-tight">{t('admin.panel')}</h2>
           </div>
           <button onClick={onClose} className="lg:hidden w-8 h-8 flex items-center justify-center border-2 border-neu-black hover:bg-neu-bg transition-colors">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -178,11 +218,17 @@ export function Sidebar({ user, isOpen, onClose }) {
                     : 'border-transparent text-neu-black/60 hover:bg-neu-bg hover:border-neu-black hover:text-neu-black',
                 )}>
                 {item.icon}
-                {item.label}
+                {t(item.tKey)}
               </Link>
             );
           })}
         </nav>
+
+        {/* Language switcher */}
+        <div className="px-5 py-4 border-t-2 border-neu-black flex items-center justify-between">
+          <span className="font-mono text-xs text-neu-black/40 uppercase tracking-wide">Language</span>
+          <LanguageSwitcher variant="light" />
+        </div>
       </aside>
     </>
   );
