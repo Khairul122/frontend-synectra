@@ -227,7 +227,7 @@ function PortfolioModal({ item, onClose, transitionTo }) {
         </div>
         {imgs.length > 0 && (
           <div className="relative border-b-2 border-neu-black bg-neu-bg">
-            <img src={imgs[imgIdx]} alt={item.title} className="w-full h-64 object-cover" />
+            <img src={imgs[imgIdx]} alt={item.title} className="w-full h-64 object-cover" loading="lazy" decoding="async" />
             {imgs.length > 1 && (
               <>
                 <button onClick={() => setImgIdx(i => (i - 1 + imgs.length) % imgs.length)}
@@ -543,7 +543,7 @@ export default function LandingPage() {
               </div>
               {bannerModal.image ? (
                 <div className="relative border-2 border-neu-black shadow-neu-xl overflow-hidden">
-                  <img src={bannerModal.image} alt={bannerModal.title} className="w-[90vw] max-w-xl h-[70vh] max-h-[500px] object-cover block" />
+                  <img src={bannerModal.image} alt={bannerModal.title} className="w-[90vw] max-w-xl h-[70vh] max-h-[500px] object-cover block" loading="lazy" decoding="async" />
                   <div className="absolute inset-0 bg-neu-black/0 group-hover:bg-neu-black/40 transition-all duration-300 flex items-end">
                     <div className="w-full px-5 py-4 bg-gradient-to-t from-neu-black/80 to-transparent translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
                       <p className="font-display font-bold text-lg text-neu-white">{bannerModal.title}</p>
@@ -563,7 +563,7 @@ export default function LandingPage() {
             <div className="w-full max-w-3xl border-2 border-neu-black shadow-neu-xl overflow-hidden flex flex-col sm:flex-row max-h-[85vh]">
               {bannerModal.image && (
                 <div className="sm:w-1/2 flex-shrink-0 border-b-2 sm:border-b-0 sm:border-r-2 border-neu-black">
-                  <img src={bannerModal.image} alt={bannerModal.title} className="w-full h-52 sm:h-full object-cover" />
+                  <img src={bannerModal.image} alt={bannerModal.title} className="w-full h-52 sm:h-full object-cover" loading="lazy" decoding="async" />
                 </div>
               )}
               <div className={cn('bg-neu-white flex flex-col overflow-y-auto', bannerModal.image ? 'sm:w-1/2' : 'w-full')}>
@@ -766,7 +766,7 @@ export default function LandingPage() {
                   className="flex-shrink-0 w-72 snap-start border-2 border-neu-black shadow-[4px_4px_0px_#0D0D0D] bg-neu-white overflow-hidden cursor-pointer group hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_#0D0D0D] transition-all duration-150">
                   {b.image && (
                     <div className="relative border-b-2 border-neu-black overflow-hidden">
-                      <img src={b.image} alt={b.title} className="w-full h-36 object-cover group-hover:scale-105 transition-transform duration-300" />
+                      <img src={b.image} alt={b.title} className="w-full h-36 object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" decoding="async" />
                       <div className="absolute inset-0 bg-neu-black/0 group-hover:bg-neu-black/20 transition-all duration-200 flex items-center justify-center">
                         <span className="opacity-0 group-hover:opacity-100 transition-opacity font-mono text-xs text-neu-white bg-neu-black/70 px-3 py-1.5">Klik untuk lihat →</span>
                       </div>
@@ -806,7 +806,7 @@ export default function LandingPage() {
                   <div key={item.id} className="portfolio-card border-2 border-neu-black shadow-neu bg-neu-white overflow-hidden group cursor-pointer" onClick={() => setActivePortfolio(item)}>
                     <div className="relative h-48 bg-neu-bg border-b-2 border-neu-black overflow-hidden">
                       {imgs[0]
-                        ? <img src={imgs[0]} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" />
+                        ? <img src={imgs[0]} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" loading="lazy" decoding="async" />
                         : <div className="w-full h-full flex items-center justify-center"><span className="font-display font-bold text-5xl text-neu-black/15">{item.title?.charAt(0)}</span></div>}
                       {item.category && <span className="absolute top-2 left-2 bg-neu-black text-neu-white font-mono font-bold text-[10px] uppercase px-2 py-0.5">{item.category.replace(/_/g,' ')}</span>}
                       <div className="absolute inset-0 bg-neu-black/0 group-hover:bg-neu-black/20 transition-all duration-300 flex items-center justify-center">

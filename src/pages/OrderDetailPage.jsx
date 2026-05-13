@@ -359,7 +359,7 @@ function ScreenshotUploader({ value, isUploading, onFile, onClear }) {
 
 /* ─── Progress Form Modal ────────────────────────────────────────────────── */
 function ProgressModal({ orderId, onClose, onAdded }) {
-  const [form, setForm] = useState({ title: '', description: '', progressPercentage: 0, attachmentUrl: '' });
+  const [form, setForm] = useState({ title: '', description: '', progressPercentage: 0, attachmentUrl: '', isLocked: false });
   const [isUploading, setIsUploading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const alert = useAlert();
@@ -424,6 +424,20 @@ function ProgressModal({ orderId, onClose, onAdded }) {
               onFile={handleFile}
               onClear={() => setForm(p => ({ ...p, attachmentUrl: '' }))}
             />
+          </div>
+          <div className="border-t-2 border-neu-black/10 pt-3">
+            <label className="flex items-center gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={form.isLocked}
+                onChange={e => setForm(p => ({ ...p, isLocked: e.target.checked }))}
+                className="w-4 h-4 border-2 border-neu-black accent-neu-primary"
+              />
+              <span className="font-mono text-sm font-bold text-neu-black uppercase">Kunci detail untuk client</span>
+            </label>
+            <p className="font-body text-xs text-neu-black/50 mt-1 ml-7">
+              Client hanya bisa lihat judul &amp; persentase. Detail terbuka otomatis saat pembayaran diverifikasi.
+            </p>
           </div>
         </div>
         <div className="px-5 pb-5 flex gap-3">
@@ -814,7 +828,14 @@ export default function OrderDetailPage() {
                     <span className="font-mono text-[9px] text-neu-black/40">%</span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-display font-bold text-sm text-neu-black">{r.title}</p>
+                    <div className="flex items-center gap-2 flex-wrap mb-0.5">
+                      <p className="font-display font-bold text-sm text-neu-black">{r.title}</p>
+                      {r.isLocked && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 border border-neu-black bg-neu-primary font-mono text-[10px] font-bold uppercase">
+                          🔒 Terkunci
+                        </span>
+                      )}
+                    </div>
                     {r.description && (
                       <p className="font-body text-xs text-neu-black/60 mt-0.5 line-clamp-2">{r.description}</p>
                     )}

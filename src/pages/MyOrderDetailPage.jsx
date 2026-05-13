@@ -533,38 +533,66 @@ export default function MyOrderDetailPage() {
             <div className="divide-y-2 divide-neu-black">
               {[...order.progressReports].reverse().map(r => (
                 <div key={r.id} className="px-6 py-4 flex gap-4">
-                  <div className="w-12 h-12 border-2 border-neu-black bg-neu-blue/10 flex flex-col items-center justify-center flex-shrink-0">
-                    <span className="font-display font-bold text-base text-neu-blue leading-none">{r.progressPercentage}</span>
-                    <span className="font-mono text-[9px] text-neu-blue/60">%</span>
+                  {/* Percentage circle */}
+                  <div className={cn(
+                    'w-12 h-12 border-2 border-neu-black flex flex-col items-center justify-center flex-shrink-0',
+                    r.isLocked ? 'bg-neu-black/5' : 'bg-neu-blue/10',
+                  )}>
+                    <span className={cn('font-display font-bold text-base leading-none', r.isLocked ? 'text-neu-black/40' : 'text-neu-blue')}>
+                      {r.progressPercentage}
+                    </span>
+                    <span className={cn('font-mono text-[9px]', r.isLocked ? 'text-neu-black/30' : 'text-neu-blue/60')}>%</span>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-display font-bold text-sm text-neu-black">{r.title}</p>
-                    {r.description && (
-                      <p className="font-body text-xs text-neu-black/60 mt-0.5 line-clamp-2">{r.description}</p>
-                    )}
-                    <p className="font-mono text-xs text-neu-black/40 mt-1">{fmtDateTime(r.reportedAt)}</p>
-                    <div className="h-1.5 border border-neu-black bg-neu-bg mt-2">
-                      <div className="h-full bg-neu-blue" style={{ width: `${r.progressPercentage}%` }} />
-                    </div>
-                  </div>
-                  <div className="flex flex-col items-end gap-2 flex-shrink-0">
-                    {r.attachmentUrl && (
-                      <div className="w-14 h-12 border-2 border-neu-black overflow-hidden bg-neu-bg">
-                        <img src={r.attachmentUrl} alt="screenshot" className="w-full h-full object-cover" />
+
+                  {r.isLocked ? (
+                    /* ── Locked card ── */
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <p className="font-display font-bold text-sm text-neu-black">{r.title}</p>
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 border border-neu-black bg-neu-primary font-mono text-[10px] font-bold uppercase">
+                          🔒 Terkunci
+                        </span>
                       </div>
-                    )}
-                    <button
-                      type="button"
-                      onClick={() => setDetailProgress(r)}
-                      className={cn(
-                        'px-3 py-1.5 bg-neu-blue border-2 border-neu-black shadow-neu-sm',
-                        'font-display font-bold text-xs uppercase tracking-wide text-neu-white whitespace-nowrap',
-                        'transition-all duration-150 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none',
-                      )}
-                    >
-                      Lihat Detail
-                    </button>
-                  </div>
+                      <p className="font-body text-xs text-neu-black/50 bg-neu-bg border border-neu-black/20 px-3 py-2">
+                        Detail progress terkunci. Lakukan pembayaran dan tunggu verifikasi admin untuk membuka akses.
+                      </p>
+                      <div className="h-1.5 border border-neu-black/20 bg-neu-bg mt-2">
+                        <div className="h-full bg-neu-black/20" style={{ width: `${r.progressPercentage}%` }} />
+                      </div>
+                    </div>
+                  ) : (
+                    /* ── Normal card ── */
+                    <>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-display font-bold text-sm text-neu-black">{r.title}</p>
+                        {r.description && (
+                          <p className="font-body text-xs text-neu-black/60 mt-0.5 line-clamp-2">{r.description}</p>
+                        )}
+                        <p className="font-mono text-xs text-neu-black/40 mt-1">{fmtDateTime(r.reportedAt)}</p>
+                        <div className="h-1.5 border border-neu-black bg-neu-bg mt-2">
+                          <div className="h-full bg-neu-blue" style={{ width: `${r.progressPercentage}%` }} />
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-end gap-2 flex-shrink-0">
+                        {r.attachmentUrl && (
+                          <div className="w-14 h-12 border-2 border-neu-black overflow-hidden bg-neu-bg">
+                            <img src={r.attachmentUrl} alt="screenshot" className="w-full h-full object-cover" />
+                          </div>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => setDetailProgress(r)}
+                          className={cn(
+                            'px-3 py-1.5 bg-neu-blue border-2 border-neu-black shadow-neu-sm',
+                            'font-display font-bold text-xs uppercase tracking-wide text-neu-white whitespace-nowrap',
+                            'transition-all duration-150 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none',
+                          )}
+                        >
+                          Lihat Detail
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
               ))}
             </div>
