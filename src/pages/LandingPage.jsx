@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, Suspense, lazy } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { gsap } from 'gsap';
@@ -12,7 +12,6 @@ import { getPlatform } from '../constants/platforms';
 import { API_BASE_URL } from '../constants/api';
 
 gsap.registerPlugin(ScrollTrigger);
-const Spline = lazy(() => import('@splinetool/react-spline'));
 const BASE = API_BASE_URL || '';
 
 /* ─── Pastikan URL kontak punya prefix yang benar ────────────────────── */
@@ -273,7 +272,6 @@ export default function LandingPage() {
   const [isLoading,    setIsLoading]    = useState(true);
   const [activePortfolio, setActivePortfolio] = useState(null);
   const [menuOpen,     setMenuOpen]     = useState(false);
-  const [splineError,  setSplineError]  = useState(false);
   const [toast,        setToast]        = useState(null); // { msg, type }
 
   const showToast = (msg, type = 'success') => {
@@ -723,32 +721,19 @@ export default function LandingPage() {
               </div>
             </div>
             <div className="h-80 lg:h-[420px] border-2 border-neu-white/20 relative overflow-hidden">
-              {!splineError ? (
-                <Suspense fallback={
-                  <div className="w-full h-full flex items-center justify-center bg-neu-black/50">
-                    <div className="text-center">
-                      <div className="w-12 h-12 border-2 border-neu-primary border-t-transparent animate-spin mx-auto mb-3" style={{ borderRadius: '50%' }} />
-                      <p className="font-mono text-xs text-neu-white/50">Loading 3D...</p>
-                    </div>
-                  </div>
-                }>
-                  <Spline scene="https://prod.spline.design/6Wq1Q7YGyM-iab9i/scene.splinecode" onError={() => setSplineError(true)} style={{ width: '100%', height: '100%' }} />
-                </Suspense>
-              ) : (
-                <Canvas camera={{ position: [0, 0, 4], fov: 60 }} style={{ background: '#0D0D0D' }}>
-                  <ambientLight intensity={0.5} />
-                  <pointLight position={[3, 3, 3]} intensity={2} color="#FFD000" />
-                  <Float speed={3} floatIntensity={2}>
-                    <mesh rotation={[0.5, 0.5, 0]}>
-                      <octahedronGeometry args={[1.2, 0]} />
-                      <meshStandardMaterial color="#4D61FF" wireframe />
-                    </mesh>
-                  </Float>
-                  <Float speed={2} floatIntensity={1}>
-                    <Torus args={[2, 0.05, 8, 64]}><meshBasicMaterial color="#FFD000" /></Torus>
-                  </Float>
-                </Canvas>
-              )}
+              <Canvas camera={{ position: [0, 0, 4], fov: 60 }} style={{ background: '#0D0D0D' }}>
+                <ambientLight intensity={0.5} />
+                <pointLight position={[3, 3, 3]} intensity={2} color="#FFD000" />
+                <Float speed={3} floatIntensity={2}>
+                  <mesh rotation={[0.5, 0.5, 0]}>
+                    <octahedronGeometry args={[1.2, 0]} />
+                    <meshStandardMaterial color="#4D61FF" wireframe />
+                  </mesh>
+                </Float>
+                <Float speed={2} floatIntensity={1}>
+                  <Torus args={[2, 0.05, 8, 64]}><meshBasicMaterial color="#FFD000" /></Torus>
+                </Float>
+              </Canvas>
             </div>
           </div>
         </div>
