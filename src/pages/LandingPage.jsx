@@ -831,41 +831,32 @@ export default function LandingPage() {
                 <div className="h-1 w-8 bg-neu-black" />
                 <h2 className="font-display font-bold text-2xl uppercase tracking-wide text-neu-black">Paket Layanan</h2>
               </div>
-              {/* Prev / Next hanya tampil jika > 5 paket */}
-              {packages.length > 5 && (
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => pkgSliderRef.current?.scrollBy({ left: -296, behavior: 'smooth' })}
-                    className="w-10 h-10 border-2 border-neu-black bg-neu-white shadow-neu-sm flex items-center justify-center font-bold text-neu-black hover:bg-neu-primary hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-neu transition-all duration-150"
-                    aria-label="Sebelumnya"
-                  >←</button>
-                  <button
-                    onClick={() => pkgSliderRef.current?.scrollBy({ left: 296, behavior: 'smooth' })}
-                    className="w-10 h-10 border-2 border-neu-black bg-neu-white shadow-neu-sm flex items-center justify-center font-bold text-neu-black hover:bg-neu-primary hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-neu transition-all duration-150"
-                    aria-label="Selanjutnya"
-                  >→</button>
-                </div>
-              )}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => pkgSliderRef.current?.scrollBy({ left: -296, behavior: 'smooth' })}
+                  className="w-10 h-10 border-2 border-neu-black bg-neu-white shadow-neu-sm flex items-center justify-center font-bold text-lg text-neu-black hover:bg-neu-primary hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-neu transition-all duration-150"
+                  aria-label="Sebelumnya"
+                >←</button>
+                <button
+                  onClick={() => pkgSliderRef.current?.scrollBy({ left: 296, behavior: 'smooth' })}
+                  className="w-10 h-10 border-2 border-neu-black bg-neu-white shadow-neu-sm flex items-center justify-center font-bold text-lg text-neu-black hover:bg-neu-primary hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-neu transition-all duration-150"
+                  aria-label="Selanjutnya"
+                >→</button>
+              </div>
             </div>
 
-            {/* Grid (≤5) atau Slider (>5) */}
-            {packages.length <= 5 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {packages.map(pkg => <PackageCard key={pkg.id} pkg={pkg} onOrder={() => transitionTo('/my-orders/new')} />)}
-              </div>
-            ) : (
-              <div
-                ref={pkgSliderRef}
-                className="flex gap-5 overflow-x-auto pb-3 snap-x snap-mandatory -mx-4 px-4 lg:mx-0 lg:px-0"
-                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-              >
-                {packages.map(pkg => (
-                  <div key={pkg.id} className="flex-shrink-0 w-72 snap-start">
-                    <PackageCard pkg={pkg} onOrder={() => transitionTo('/my-orders/new')} />
-                  </div>
-                ))}
-              </div>
-            )}
+            {/* Slider */}
+            <div
+              ref={pkgSliderRef}
+              className="flex gap-5 overflow-x-auto pb-3 snap-x snap-mandatory -mx-4 px-4 lg:mx-0 lg:px-0"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
+              {packages.map(pkg => (
+                <div key={pkg.id} className="flex-shrink-0 w-72 snap-start">
+                  <PackageCard pkg={pkg} onOrder={() => transitionTo('/my-orders/new')} />
+                </div>
+              ))}
+            </div>
           </div>
         </section>
       )}
