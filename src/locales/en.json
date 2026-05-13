@@ -37,7 +37,8 @@
     "noDescription": "No description.",
     "dragOrClick": "Click or drag image here",
     "imageFormats": "PNG, JPG, WEBP — max 5MB",
-    "required": "is required"
+    "required": "is required",
+    "notConfigured": "Not configured yet."
   },
   "nav": {
     "login": "Login",
@@ -66,62 +67,112 @@
   },
   "landing": {
     "hero": {
-      "badge": "Digital Services Platform",
-      "title": "Turn Your Digital Ideas\nInto Reality with Synectra",
-      "subtitle": "From websites and mobile apps to UI/UX design — we deliver with full transparency, quality, and on time.",
-      "cta": "Start a Project →",
-      "ctaSecondary": "View Portfolio",
-      "stat1": "Projects Done",
-      "stat2": "Happy Clients",
-      "stat3": "Expert Team",
-      "stat4": "Support"
+      "badge": "✦ Trusted Digital Services Platform",
+      "title1": "Bring Your",
+      "title2": "Digital Ideas",
+      "title3": "to Life",
+      "subtitle": "From modern websites and mobile apps to UI/UX design and academic tasks — we deliver with full transparency, competitive pricing, and guaranteed quality.",
+      "cta": "Start Now →",
+      "ctaSecondary": "View Our Work"
+    },
+    "stats": {
+      "projects": "Projects Done",
+      "clients": "Happy Clients",
+      "experience": "Years Experience",
+      "satisfaction": "Satisfaction Rate"
     },
     "services": {
-      "tag": "Our Services",
+      "tag": "What We Offer",
       "title": "Complete Services for\nYour Digital Needs",
-      "subtitle": "All your business digital needs, handled professionally."
+      "items": [
+        { "icon": "💻", "title": "Web Development", "desc": "Building professional, scalable, and modern websites for your business needs using the latest technologies." },
+        { "icon": "📱", "title": "Mobile App", "desc": "Responsive and high-performance Android & iOS apps to reach a wider audience." },
+        { "icon": "🎨", "title": "UI/UX Design", "desc": "Beautiful, intuitive interfaces that boost conversions. From wireframe to production-ready prototype." },
+        { "icon": "⚙️", "title": "Backend & API", "desc": "Solid, secure, and high-performance server architecture to support enterprise-scale applications." },
+        { "icon": "📊", "title": "Data Science", "desc": "Data analysis, machine learning, and visualization that turn raw data into smart business decisions." },
+        { "icon": "📝", "title": "Academic Assistance", "desc": "Professional help for academic tasks, thesis, dissertations, and campus projects. On time and quality." }
+      ]
+    },
+    "about": {
+      "tag": "Modern Digital Visualization",
+      "title": "We Build More\nThan Just Websites",
+      "subtitle": "Synectra doesn't just deliver code — we create memorable digital experiences. Every project is crafted with full attention to detail, performance, and industry-relevant aesthetics.",
+      "features": [
+        "Intuitive and modern interface design",
+        "High performance, responsive on all devices",
+        "Transparent progress updates throughout development",
+        "Clean, documented, production-ready source code"
+      ]
     },
     "packages": {
-      "title": "Service Packages"
+      "title": "Service Packages",
+      "duration": "Duration"
     },
     "portfolio": {
       "tag": "Portfolio",
-      "title": "Real Results,\nNot Empty Promises",
+      "title": "Our Best Work",
+      "subtitle": "Hundreds of projects completed to the highest quality standards.",
       "cta": "Order Now →",
       "noPortfolio": "Portfolio coming soon.",
       "viewDetail": "View Detail",
-      "detail": "View Detail →"
+      "viewDetailHover": "View Detail →",
+      "clickView": "Click to view →"
     },
     "why": {
-      "tag": "Why Synectra?",
-      "title": "More Than Just\na Digital Service Provider"
+      "tag": "Our Advantages",
+      "title": "Why Choose Synectra?",
+      "items": [
+        { "icon": "🔍", "title": "100% Transparent", "desc": "Track progress in real-time. No hidden fees — everything clearly documented." },
+        { "icon": "⚡", "title": "Fast Delivery", "desc": "Realistic deadlines and full commitment. Our team works efficiently without compromising quality." },
+        { "icon": "🛡️", "title": "Quality Guarantee", "desc": "Revisions until satisfied. We ensure the final result exceeds your expectations." },
+        { "icon": "💬", "title": "Active Communication", "desc": "Responsive and proactive. Progress updates sent regularly without you having to ask." },
+        { "icon": "💰", "title": "Affordable Pricing", "desc": "Premium quality at friendly prices. Flexible and secure down payment scheme." },
+        { "icon": "🏆", "title": "5+ Years Experience", "desc": "Experienced team that has handled 150+ projects across various scales and industries." }
+      ]
     },
     "howItWorks": {
-      "tag": "How It Works",
-      "title": "Simple Process,\nMaximum Results",
-      "step1Title": "Free Consultation",
-      "step1Desc": "Tell us your needs. We analyze and provide time & cost estimates at no charge.",
-      "step2Title": "Transparent Execution",
-      "step2Desc": "Track your project progress in real-time. No surprises at the end.",
-      "step3Title": "Revision & Delivery",
-      "step3Desc": "After completion, request revisions per your package. Source code and assets delivered instantly.",
-      "step4Title": "Post-Launch Support",
-      "step4Desc": "We don't disappear after the project ends. Support guarantee available for every package."
+      "tag": "Simple & Transparent Process",
+      "title": "How We Work",
+      "steps": [
+        { "no": "01", "title": "Consultation", "desc": "Tell us your needs. We discuss scope, technology, timeline, and cost estimates transparently." },
+        { "no": "02", "title": "Down Payment", "desc": "Deal! Pay a down payment to start the project. Secure, verified, and fully documented." },
+        { "no": "03", "title": "Development", "desc": "The team gets to work. Progress is reported regularly and can be tracked live in our app." },
+        { "no": "04", "title": "Handover", "desc": "Project complete, final revision, final payment, and full source code + documentation delivered." }
+      ]
     },
     "tech": {
       "label": "Technologies We Master"
     },
     "contact": {
       "tag": "Contact Us",
-      "title": "Ready to Start\na Project Together?",
-      "subtitle": "Consult your needs now. Our team is ready to help."
+      "title": "Have Questions?\nWe're Ready to Help.",
+      "subtitle": "Our team is online every day. Consult your needs now — free, no commitment.",
+      "social": "Follow Us on Social Media",
+      "emailCopied": "Email {{email}} copied to clipboard!"
+    },
+    "banner": {
+      "title": "Latest Announcements & Promos",
+      "promo": "Promo",
+      "clickDetail": "Click to view details →",
+      "learnMore": "Learn More",
+      "close": "Close",
+      "noDesc": "No description.",
+      "clickView": "Click to view →"
+    },
+    "cta": {
+      "title": "Start Your Project\nRight Now.",
+      "subtitle": "Bring your digital ideas to life with our professional team. Transparent, fast, and quality guaranteed.",
+      "primary": "Sign Up — It's Free",
+      "secondary": "Already Have an Account"
     },
     "footer": {
       "desc": "Trusted digital services platform for websites, mobile apps, UI/UX, and academic task assistance.",
       "services": "Services",
       "company": "Company",
-      "payment": "Payment",
+      "payment": "Payment Accounts",
       "rights": "All rights reserved.",
+      "privacy": "Privacy Policy",
+      "terms": "Terms & Conditions",
       "links": {
         "web": "Website Development",
         "mobile": "Mobile App",
@@ -135,20 +186,12 @@
         "register": "Get Started"
       }
     },
-    "cta": {
-      "title": "Ready to Build\nSomething Amazing?",
-      "subtitle": "Join dozens of clients who have trusted their digital projects to Synectra.",
-      "primary": "Start a Project Now →",
-      "secondary": "Free Consultation"
-    },
-    "banner": {
-      "title": "Latest Announcements & Promos"
-    },
     "order": "Order Now"
   },
   "admin": {
     "panel": "Panel",
     "dashboard": "Dashboard",
+    "enSection": "English Version (optional)",
     "banners": {
       "title": "Banner Management",
       "add": "Add Banner",
@@ -217,6 +260,9 @@
       "done": "✓ Done",
       "noCatalog": "No software available yet.",
       "noHistory": "No purchase history.",
+      "adminNote": "Note:",
+      "buySuccess": "Purchase \"{{name}}\" created! Please upload payment receipt.",
+      "buyFailed": "Failed to create purchase.",
       "cols": {
         "software": "Software",
         "price": "Price",
@@ -228,7 +274,368 @@
       "dragOrClick": "Click or drag transfer receipt photo",
       "formats": "PNG, JPG, WEBP",
       "send": "Send Receipt",
-      "sending": "Sending..."
+      "sending": "Sending...",
+      "uploading": "Uploading image...",
+      "failUpload": "Failed to upload receipt. Please try again.",
+      "failSend": "Failed to send payment receipt."
+    }
+  },
+  "dashboard": {
+    "adminBadge": "Administrator",
+    "adminGreeting": "Welcome, {{name}}!",
+    "adminSubtitle": "Here's a summary of today's Synectra system activity.",
+    "totalOrders": "Total Orders",
+    "totalClients": "Total Clients",
+    "needAction": "Needs Action",
+    "inProgress": "In Progress",
+    "recentOrders": "Recent Orders",
+    "viewAll": "View all →",
+    "noOrders": "No orders yet.",
+    "pendingOrders": "Needs Action",
+    "pendingSubtitle": "Pending status orders",
+    "noPending": "No pending orders.",
+    "allGood": "✓ All clear!",
+    "manageOrders": "Manage All Orders",
+    "clientBadge": "Client",
+    "clientGreeting": "Hello, {{name}}!",
+    "clientSubtitle": "Track your order status and project progress here.",
+    "createOrder": "+ New Order",
+    "activeOrders": "Active Orders",
+    "latestProgress": "Latest Progress",
+    "myOrders": "My Orders",
+    "noOrdersClient": "No orders yet.",
+    "createFirstOrder": "+ Create First Order",
+    "progress": "Progress"
+  },
+  "orders": {
+    "title": "Order Management",
+    "search": "Search by title or client...",
+    "allStatus": "All Status",
+    "createOrder": "+ New Order",
+    "noOrders": "No orders yet.",
+    "noResult": "No results.",
+    "createFirst": "Create First Order",
+    "cols": {
+      "title": "Order Title",
+      "client": "Client",
+      "total": "Total",
+      "deadline": "Deadline",
+      "status": "Status",
+      "createdAt": "Created"
+    }
+  },
+  "orderDetail": {
+    "breadcrumb": "Orders",
+    "progressDetail": "Progress Detail",
+    "progressPct": "Progress Percentage",
+    "progressTitle": "Update Title",
+    "description": "Description",
+    "noDesc": "No description.",
+    "screenshot": "Screenshot",
+    "zoomIn": "Click to enlarge",
+    "reportedAt": "Reported:",
+    "close": "Close",
+    "receiptTitle": "Transfer Receipt",
+    "note": "Note:",
+    "verifiedAt": "Verified:",
+    "paymentTypes": { "dp": "Down Payment (DP)", "termin_1": "Installment 1", "pelunasan": "Final Payment" },
+    "uploadProgress": "Update Progress",
+    "progressTitleLabel": "Update Title *",
+    "progressTitlePlaceholder": "e.g. Login feature completed",
+    "progressDesc": "Description",
+    "progressDescPlaceholder": "Progress details...",
+    "progressPctLabel": "Progress Percentage:",
+    "attachment": "Screenshot / Attachment",
+    "lockLabel": "Lock details from client",
+    "lockHelp": "Client can only see title & percentage. Details unlock automatically when payment is verified.",
+    "saveProgress": "Save Progress",
+    "rejectPayment": "Reject Payment",
+    "rejectReason": "Rejection Reason *",
+    "rejectPlaceholder": "e.g. Transfer amount does not match",
+    "verifyPayment": "Verify Payment",
+    "confirmVerify": "Confirm that payment of {{amount}} ({{type}}) has been received?",
+    "yesVerify": "Yes, Verify",
+    "clientNeed": "Client Requirements",
+    "totalPrice": "Total Price",
+    "notSet": "Not set yet",
+    "deadline": "Deadline",
+    "createdAt": "Created",
+    "noProgress": "None yet",
+    "setPriceTitle": "Set Price & Deadline",
+    "priceLabel": "Total Price (Rp)",
+    "pricePlaceholder": "e.g. 1500000",
+    "payments": "Payments ({{count}})",
+    "noPayments": "No payments yet.",
+    "progressCount": "Progress ({{count}})",
+    "addProgress": "+ Update Progress",
+    "noProgressUpdate": "No progress updates yet.",
+    "locked": "🔒 Locked",
+    "viewDetail": "View Detail",
+    "editPrice": "Edit Price",
+    "setPrice": "+ Set Price"
+  },
+  "orderForm": {
+    "title": "Create New Order",
+    "breadcrumb": "Orders",
+    "breadcrumbNew": "Create New",
+    "clientIdLabel": "Client ID *",
+    "clientIdPlaceholder": "Client UUID (from users table)",
+    "clientIdHelp": "Enter the UUID of the user with 'client' role",
+    "titleLabel": "Order Title *",
+    "titlePlaceholder": "e.g. Company Profile Website",
+    "categoryLabel": "Service Category",
+    "categoryDefault": "-- Select Category --",
+    "descLabel": "Description",
+    "descPlaceholder": "Client requirements details...",
+    "priceLabel": "Total Price (Rp)",
+    "pricePlaceholder": "1500000",
+    "deadlineLabel": "Deadline",
+    "submit": "Create Order",
+    "success": "Order created successfully!",
+    "failed": "Failed to create order.",
+    "validation": {
+      "clientRequired": "Client is required.",
+      "titleRequired": "Order title is required."
+    }
+  },
+  "clients": {
+    "title": "Client Management",
+    "search": "Search by name, company, or email...",
+    "editTitle": "Edit Client Data",
+    "nameLabel": "Name / Company",
+    "namePlaceholder": "Individual name or company",
+    "emailLabel": "Contact Email",
+    "emailPlaceholder": "email@example.com",
+    "resetTitle": "Reset Client Password",
+    "newPassPlaceholder": "New password (min 8 characters)",
+    "confirmPassPlaceholder": "Confirm new password",
+    "resetting": "Resetting...",
+    "resetBtn": "Reset Password",
+    "deleteConfirm": "Delete client \"{{name}}\"? Client data will be permanently removed.",
+    "noClients": "No clients registered yet.",
+    "cols": {
+      "username": "Username",
+      "company": "Name / Company",
+      "email": "Contact Email",
+      "registered": "Registered"
+    },
+    "success": {
+      "save": "Client data saved successfully.",
+      "delete": "Client deleted successfully.",
+      "reset": "Client password reset successfully."
+    },
+    "failed": {
+      "save": "Failed to save client data.",
+      "delete": "Failed to delete client."
+    },
+    "validation": {
+      "passwordMin": "Password must be at least 8 characters.",
+      "passwordMismatch": "Passwords do not match."
+    }
+  },
+  "portfolio": {
+    "title": "Portfolio Management",
+    "search": "Search portfolio...",
+    "allCategories": "All Categories",
+    "add": "+ Add Portfolio",
+    "addFirst": "Add First Portfolio",
+    "noPortfolio": "No portfolio yet.",
+    "deleteConfirm": "Delete \"{{name}}\"? This action cannot be undone.",
+    "success": { "delete": "Portfolio deleted successfully." },
+    "failed": { "delete": "Failed to delete portfolio." }
+  },
+  "portfolioForm": {
+    "titleNew": "Add Portfolio",
+    "titleEdit": "Edit Portfolio",
+    "breadcrumb": "Portfolio"
+  },
+  "bankAccounts": {
+    "title": "Bank Accounts",
+    "search": "Search by bank or account owner...",
+    "add": "Add Bank Account",
+    "addFirst": "Add First Account",
+    "noAccounts": "No bank accounts yet.",
+    "deleteConfirm": "Are you sure you want to delete bank account \"{{name}}\"? This action cannot be undone.",
+    "cols": { "logo": "Logo", "bank": "Bank", "number": "Account No.", "owner": "Account Owner" },
+    "success": {
+      "activated": "Bank account \"{{name}}\" activated.",
+      "deactivated": "Bank account \"{{name}}\" deactivated.",
+      "delete": "Bank account deleted successfully."
+    },
+    "failed": { "status": "Failed to update bank account status.", "delete": "Failed to delete bank account." }
+  },
+  "bankAccountForm": {
+    "titleNew": "Add Bank Account",
+    "titleEdit": "Edit Bank Account",
+    "breadcrumb": "Bank Accounts"
+  },
+  "socialMedia": {
+    "title": "Social Media Management",
+    "search": "Search by platform or account...",
+    "add": "Add Social Media",
+    "addFirst": "Add First Social Media",
+    "noData": "No social media yet.",
+    "deleteConfirm": "Delete \"{{name}}\"? This action cannot be undone.",
+    "success": { "activated": "activated.", "deactivated": "deactivated.", "delete": "deleted." },
+    "failed": { "status": "Failed to update status.", "delete": "Failed to delete." }
+  },
+  "socialMediaForm": {
+    "titleNew": "Add Social Media",
+    "titleEdit": "Edit Social Media",
+    "breadcrumb": "Social Media"
+  },
+  "contacts": {
+    "title": "Contact Management",
+    "search": "Search contacts...",
+    "add": "Add Contact",
+    "addFirst": "Add First Contact",
+    "noData": "No contacts yet.",
+    "deleteConfirm": "Delete \"{{name}}\"? This action cannot be undone.",
+    "success": { "activated": "activated.", "deactivated": "deactivated.", "delete": "deleted." },
+    "failed": { "status": "Failed to update status.", "delete": "Failed to delete." }
+  },
+  "contactForm": {
+    "titleNew": "Add Contact",
+    "titleEdit": "Edit Contact",
+    "breadcrumb": "Contacts"
+  },
+  "profile": {
+    "title": "My Profile",
+    "editSection": "Edit Profile",
+    "nameLabel": "Full Name *",
+    "namePlaceholder": "Full name",
+    "emailLabel": "Email *",
+    "emailPlaceholder": "email@example.com",
+    "saveProfile": "Save Profile",
+    "changePass": "Change Password",
+    "googleAccount": "Google Account",
+    "googleInfo": "This account was registered via Google OAuth and has no local password. Password is managed by Google.",
+    "currentPass": "Current Password",
+    "newPass": "New Password",
+    "confirmPass": "Confirm New Password",
+    "changePassBtn": "Change Password",
+    "success": { "profile": "Profile updated successfully.", "password": "Password updated successfully." },
+    "failed": { "profile": "Failed to update profile.", "password": "Failed to update password." },
+    "validation": {
+      "nameRequired": "Full name is required.",
+      "emailRequired": "Email is required.",
+      "currentPassRequired": "Current password is required.",
+      "newPassMin": "New password must be at least 8 characters.",
+      "passwordMismatch": "Passwords do not match."
+    }
+  },
+  "myOrders": {
+    "title": "My Orders",
+    "search": "Search orders...",
+    "create": "+ New Order",
+    "noOrders": "No orders yet.",
+    "createFirst": "Create First Order"
+  },
+  "myOrderDetail": {
+    "breadcrumb": "My Orders",
+    "uploadReceipt": "Upload Payment Receipt",
+    "completeOrder": "✓ Complete Order",
+    "paymentHistory": "Payment History",
+    "noPayments": "No payments yet.",
+    "progressTimeline": "Progress Timeline",
+    "noProgress": "No progress updates from admin yet.",
+    "locked": "🔒 Locked",
+    "lockedMsg": "Progress details are locked. Make a payment and wait for admin verification to unlock.",
+    "done": "✓ Done",
+    "adminNote": "Admin Note:",
+    "confirmComplete": "Are you sure you want to complete order \"{{title}}\"? Make sure you have received all deliverables before confirming.",
+    "yesComplete": "Yes, Complete",
+    "totalPrice": "Total Price",
+    "deadline": "Deadline",
+    "overallProgress": "Overall Progress"
+  },
+  "myOrderForm": {
+    "title": "Create New Order",
+    "breadcrumb": "My Orders",
+    "breadcrumbNew": "Create New",
+    "titleLabel": "Project Title *",
+    "titlePlaceholder": "e.g. Online store website",
+    "categoryLabel": "Service Category",
+    "categoryDefault": "-- Select Category --",
+    "categoryOptional": "-- Select Category (optional) --",
+    "descLabel": "Requirements Description",
+    "descPlaceholder": "Describe your requirements in detail...",
+    "descHelper": "The more detail you provide, the more accurate the price and time estimate from the admin.",
+    "howItWorks": "How orders work:",
+    "sending": "Submitting...",
+    "submit": "Submit Order",
+    "success": "Order created! Admin will contact you shortly.",
+    "failed": "Failed to create order.",
+    "contactTitle": "Contact Us",
+    "contactSubtitle": "Have questions? Our team is ready to help.",
+    "titleRequired": "Order title is required.",
+    "steps": [
+      "Fill in this form with your requirements",
+      "Admin will review and contact you to negotiate price & deadline",
+      "After agreement, upload DP receipt to start the project",
+      "Track project progress directly on this page"
+    ],
+    "categories": [
+      "Software Development",
+      "Mobile App",
+      "Web Design",
+      "UI/UX Design",
+      "Backend / API",
+      "Academic Assistance",
+      "Data Science / ML",
+      "Other"
+    ]
+  },
+  "login": {
+    "welcome": "Welcome\nBack",
+    "subtitle": "Sign in to access the client management platform.",
+    "withGoogle": "Continue with Google",
+    "orManual": "or sign in manually",
+    "emailLabel": "Email",
+    "emailPlaceholder": "email@company.com",
+    "passwordLabel": "Password",
+    "hidePassword": "Hide password",
+    "showPassword": "Show password",
+    "processing": "Processing...",
+    "submit": "Sign In",
+    "noAccount": "Don't have an account?",
+    "registerLink": "Sign up now",
+    "success": "Login successful! Redirecting...",
+    "failed": "Login failed. Please check your credentials.",
+    "validation": {
+      "emailRequired": "Email is required",
+      "emailInvalid": "Invalid email format",
+      "passwordRequired": "Password is required"
+    }
+  },
+  "register": {
+    "title": "Create\nNew Account",
+    "subtitle": "Register yourself on the Synectra platform.",
+    "withGoogle": "Sign up with Google",
+    "orManual": "or sign up manually",
+    "nameLabel": "Full Name",
+    "namePlaceholder": "Your full name",
+    "emailLabel": "Email",
+    "emailPlaceholder": "email@company.com",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Min. 8 characters",
+    "hide": "Hide",
+    "show": "Show",
+    "confirmLabel": "Confirm Password",
+    "confirmPlaceholder": "Re-enter password",
+    "registering": "Registering...",
+    "submit": "Sign Up Now",
+    "hasAccount": "Already have an account?",
+    "loginLink": "Sign in here",
+    "success": "Account created! Please sign in.",
+    "failed": "Registration failed. Please try again.",
+    "validation": {
+      "nameRequired": "Full name is required",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Invalid email format",
+      "passwordRequired": "Password is required",
+      "passwordMinLength": "Password must be at least 8 characters",
+      "passwordMismatch": "Passwords do not match"
     }
   },
   "status": {

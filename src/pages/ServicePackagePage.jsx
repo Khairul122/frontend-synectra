@@ -7,6 +7,7 @@ import { servicePackageService } from '../services/servicePackage.service';
 import { PageLayout } from '../components/layout/PageLayout';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
 import { useAlert } from '../hooks/useAlert';
+import { PageLoader } from '../components/ui/PageLoader';
 
 const fmt = (val) => `Rp ${Number(val).toLocaleString('id-ID')}`;
 
@@ -165,11 +166,7 @@ export default function ServicePackagePage() {
     (p.category || '').toLowerCase().includes(search.toLowerCase()),
   );
 
-  if (isLoading) return (
-    <div className="min-h-screen bg-neu-bg flex items-center justify-center">
-      <p className="font-display font-bold text-neu-black animate-pulse">Memuat...</p>
-    </div>
-  );
+  if (isLoading) return <PageLoader />;
 
   return (
     <PageLayout user={user} title="Paket Layanan" alert={alert}>

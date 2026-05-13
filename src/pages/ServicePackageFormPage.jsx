@@ -8,6 +8,7 @@ import { PageLayout } from '../components/layout/PageLayout';
 import { useAlert } from '../hooks/useAlert';
 import { PACKAGE_ICON_BUCKET } from '../constants/api';
 import supabase from '../lib/supabase';
+import { PageLoader } from '../components/ui/PageLoader';
 
 const CATEGORIES = ['Web', 'Mobile', 'UI/UX', 'Tugas', 'Lainnya'];
 
@@ -102,8 +103,8 @@ export default function ServicePackageFormPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving,  setIsSaving]  = useState(false);
   const [form, setForm] = useState({
-    name: '', description: '', price: '', duration: '',
-    features: '', badge: '', iconUrl: '', category: '',
+    name: '', nameEn: '', description: '', descriptionEn: '', price: '', duration: '', durationEn: '',
+    features: '', featuresEn: '', badge: '', badgeEn: '', iconUrl: '', category: '',
     sortOrder: '0', isActive: true,
   });
   const [errors, setErrors] = useState({});
@@ -119,16 +120,21 @@ export default function ServicePackageFormPage() {
           const res = await servicePackageService.getById(id);
           const p   = res.data;
           setForm({
-            name:        p.name        ?? '',
-            description: p.description ?? '',
-            price:       String(p.price ?? ''),
-            duration:    p.duration    ?? '',
-            features:    p.features    ?? '',
-            badge:       p.badge       ?? '',
-            iconUrl:     p.iconUrl     ?? '',
-            category:    p.category    ?? '',
-            sortOrder:   String(p.sortOrder ?? '0'),
-            isActive:    p.isActive    ?? true,
+            name:          p.name          ?? '',
+            nameEn:        p.nameEn        ?? '',
+            description:   p.description   ?? '',
+            descriptionEn: p.descriptionEn ?? '',
+            price:         String(p.price  ?? ''),
+            duration:      p.duration      ?? '',
+            durationEn:    p.durationEn    ?? '',
+            features:      p.features      ?? '',
+            featuresEn:    p.featuresEn    ?? '',
+            badge:         p.badge         ?? '',
+            badgeEn:       p.badgeEn       ?? '',
+            iconUrl:       p.iconUrl       ?? '',
+            category:      p.category      ?? '',
+            sortOrder:     String(p.sortOrder ?? '0'),
+            isActive:      p.isActive      ?? true,
           });
         }
       } catch { navigate('/login'); }
@@ -162,16 +168,21 @@ export default function ServicePackageFormPage() {
     setIsSaving(true);
     try {
       const payload = {
-        name:        form.name.trim(),
-        description: form.description.trim() || null,
-        price:       Number(form.price),
-        duration:    form.duration.trim()    || null,
-        features:    form.features.trim()    || null,
-        badge:       form.badge.trim()       || null,
-        iconUrl:     form.iconUrl            || null,
-        category:    form.category           || null,
-        sortOrder:   Number(form.sortOrder)  || 0,
-        isActive:    form.isActive,
+        name:          form.name.trim(),
+        nameEn:        form.nameEn.trim()        || null,
+        description:   form.description.trim()   || null,
+        descriptionEn: form.descriptionEn.trim() || null,
+        price:         Number(form.price),
+        duration:      form.duration.trim()      || null,
+        durationEn:    form.durationEn.trim()    || null,
+        features:      form.features.trim()      || null,
+        featuresEn:    form.featuresEn.trim()    || null,
+        badge:         form.badge.trim()         || null,
+        badgeEn:       form.badgeEn.trim()       || null,
+        iconUrl:       form.iconUrl              || null,
+        category:      form.category             || null,
+        sortOrder:     Number(form.sortOrder)    || 0,
+        isActive:      form.isActive,
       };
       if (isEditMode) {
         await servicePackageService.update(id, payload);
@@ -189,11 +200,7 @@ export default function ServicePackageFormPage() {
     }
   };
 
-  if (isLoading) return (
-    <div className="flex items-center justify-center min-h-screen bg-neu-bg">
-      <p className="font-display font-bold text-neu-black animate-pulse">Memuat...</p>
-    </div>
-  );
+  if (isLoading) return <PageLoader />;
 
   const inputClass = (err) => cn(
     'w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-neu-black placeholder:text-gray-400',
@@ -284,6 +291,42 @@ export default function ServicePackageFormPage() {
           <div className="flex flex-col gap-1.5">
             <label className="font-display font-bold text-sm text-neu-black uppercase tracking-wide">Icon / Gambar Paket</label>
             <ImageUploader value={form.iconUrl} onChange={url => setField('iconUrl', url)} />
+          </div>
+
+          {/* ── English Version ── */}
+          <div className="border-2 border-dashed border-neu-black/30 p-5 space-y-4">
+            <span className="font-mono text-xs text-neu-black/40 uppercase tracking-wide">🌐 Versi English (opsional)</span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wide">Nama Paket (EN)</label>
+                <input type="text" value={form.nameEn} onChange={e => setField('nameEn', e.target.value)}
+                  placeholder="e.g. Starter Package" className={inputClass(false)} />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wide">Durasi (EN)</label>
+                <input type="text" value={form.durationEn} onChange={e => setField('durationEn', e.target.value)}
+                  placeholder="e.g. 2 Weeks" className={inputClass(false)} />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wide">Badge (EN)</label>
+                <input type="text" value={form.badgeEn} onChange={e => setField('badgeEn', e.target.value)}
+                  placeholder="e.g. Most Popular" className={inputClass(false)} />
+              </div>
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wide">Fitur (EN) <span className="font-body normal-case text-neu-black/40 text-xs">(satu per baris)</span></label>
+              <textarea value={form.featuresEn} onChange={e => setField('featuresEn', e.target.value)}
+                rows={4} placeholder={"Responsive design\n2 revisions\nSource files included"}
+                className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu transition-all duration-150 resize-none" />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wide">Deskripsi (EN)</label>
+              <textarea value={form.descriptionEn} onChange={e => setField('descriptionEn', e.target.value)}
+                rows={2} placeholder="Description in English..."
+                className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu transition-all duration-150 resize-none" />
+            </div>
           </div>
 
           {/* Urutan & Status */}

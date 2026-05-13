@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
@@ -7,6 +8,7 @@ import { contactService } from '../services/contact.service';
 import { PLATFORMS, getPlatform } from '../constants/platforms';
 import { PageLayout } from '../components/layout/PageLayout';
 import { useAlert } from '../hooks/useAlert';
+import { PageLoader } from '../components/ui/PageLoader';
 
 /* ─── Icon Picker ────────────────────────────────────────────────────────── */
 function IconPicker({ value, onChange }) {
@@ -175,13 +177,7 @@ export default function ContactFormPage() {
     hasError && 'border-neu-accent shadow-[4px_4px_0px_#FF5C5C]',
   );
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-neu-bg">
-        <p className="font-display font-bold text-neu-black animate-pulse">Memuat...</p>
-      </div>
-    );
-  }
+  if (isLoading) return <PageLoader />;
 
   const selectedPlatform = getPlatform(form.icon);
 
@@ -288,7 +284,7 @@ export default function ContactFormPage() {
               'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm active:translate-x-1 active:translate-y-1 active:shadow-none',
               isSaving && 'opacity-60 cursor-not-allowed',
             )}>
-              {isSaving ? 'Menyimpan...' : isEditMode ? 'Simpan Perubahan' : 'Buat Kontak'}
+              {isSaving ? t('common.saving') : isEditMode ? 'Simpan Perubahan' : 'Buat Kontak'}
             </button>
             <button type="button" onClick={() => navigate('/contacts')} disabled={isSaving} className={cn(
               'px-6 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu',

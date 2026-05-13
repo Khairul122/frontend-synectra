@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
@@ -8,6 +9,7 @@ import { PageLayout } from '../components/layout/PageLayout';
 import { useAlert } from '../hooks/useAlert';
 import { BANK_LOGO_BUCKET } from '../constants/api';
 import supabase from '../lib/supabase';
+import { PageLoader } from '../components/ui/PageLoader';
 
 async function uploadBankLogo(file) {
   const ext      = file.name.split('.').pop();
@@ -193,13 +195,7 @@ export default function BankAccountFormPage() {
   };
 
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-neu-bg">
-        <p className="font-display font-bold text-neu-black animate-pulse">Memuat...</p>
-      </div>
-    );
-  }
+  if (isLoading) return <PageLoader />;
 
   return (
     <PageLayout user={user} title={isEditMode ? 'Edit Akun Bank' : 'Tambah Akun Bank'} alert={alert}>
@@ -299,7 +295,7 @@ export default function BankAccountFormPage() {
               'active:translate-x-1 active:translate-y-1 active:shadow-none',
               isSaving && 'opacity-60 cursor-not-allowed',
             )}>
-              {isSaving ? 'Menyimpan...' : isEditMode ? 'Simpan Perubahan' : 'Buat Akun Bank'}
+              {isSaving ? t('common.saving') : isEditMode ? 'Simpan Perubahan' : 'Buat Akun Bank'}
             </button>
             <button type="button" onClick={() => navigate('/bank-accounts')} disabled={isSaving} className={cn(
               'px-6 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu',

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
 import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
@@ -8,6 +9,7 @@ import { socialMediaService } from '../services/socialMedia.service';
 import { PageLayout } from '../components/layout/PageLayout';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
 import { useAlert } from '../hooks/useAlert';
+import { PageLoader } from '../components/ui/PageLoader';
 
 /* ─── Icon Preview Modal ─────────────────────────────────────────────────── */
 function IconPreviewModal({ item, onClose }) {
@@ -156,6 +158,7 @@ function SocialMediaRow({ item, index, onEdit, onDelete, onToggleActive, onPrevi
 /* ─── Main Page ──────────────────────────────────────────────────────────── */
 export default function SocialMediaPage() {
   const navigate = useNavigate();
+  const { t }    = useTranslation();
   const alert    = useAlert();
 
   const [user,         setUser]         = useState(null);
@@ -220,13 +223,7 @@ export default function SocialMediaPage() {
     i.accountName.toLowerCase().includes(search.toLowerCase()),
   );
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-neu-bg flex items-center justify-center">
-        <p className="font-display font-bold text-neu-black animate-pulse">Memuat...</p>
-      </div>
-    );
-  }
+  if (isLoading) return <PageLoader />;
 
   return (
     <PageLayout user={user} title="Social Media Management" alert={alert}>

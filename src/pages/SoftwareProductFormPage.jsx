@@ -8,6 +8,7 @@ import { PageLayout } from '../components/layout/PageLayout';
 import { useAlert } from '../hooks/useAlert';
 import { SOFTWARE_THUMBNAIL_BUCKET } from '../constants/api';
 import supabase from '../lib/supabase';
+import { PageLoader } from '../components/ui/PageLoader';
 
 const CATEGORIES = ['Web App', 'Mobile App', 'Desktop App', 'SaaS', 'Template', 'Script'];
 
@@ -90,8 +91,8 @@ export default function SoftwareProductFormPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving,  setIsSaving]  = useState(false);
   const [form, setForm] = useState({
-    name: '', description: '', category: '', price: '',
-    demoUrl: '', thumbnailUrl: '', techStack: '', features: '',
+    name: '', nameEn: '', description: '', descriptionEn: '', category: '', price: '',
+    demoUrl: '', thumbnailUrl: '', techStack: '', features: '', featuresEn: '',
     sortOrder: '0', isActive: true,
   });
   const [errors, setErrors] = useState({});
@@ -107,16 +108,19 @@ export default function SoftwareProductFormPage() {
           const res = await softwareProductService.getById(id);
           const p   = res.data;
           setForm({
-            name:         p.name         ?? '',
-            description:  p.description  ?? '',
-            category:     p.category     ?? '',
-            price:        String(p.price ?? ''),
-            demoUrl:      p.demoUrl      ?? '',
-            thumbnailUrl: p.thumbnailUrl ?? '',
-            techStack:    p.techStack    ?? '',
-            features:     p.features     ?? '',
-            sortOrder:    String(p.sortOrder ?? '0'),
-            isActive:     p.isActive     ?? true,
+            name:          p.name          ?? '',
+            nameEn:        p.nameEn        ?? '',
+            description:   p.description   ?? '',
+            descriptionEn: p.descriptionEn ?? '',
+            category:      p.category      ?? '',
+            price:         String(p.price  ?? ''),
+            demoUrl:       p.demoUrl       ?? '',
+            thumbnailUrl:  p.thumbnailUrl  ?? '',
+            techStack:     p.techStack     ?? '',
+            features:      p.features      ?? '',
+            featuresEn:    p.featuresEn    ?? '',
+            sortOrder:     String(p.sortOrder ?? '0'),
+            isActive:      p.isActive      ?? true,
           });
         }
       } catch { navigate('/login'); }
@@ -150,16 +154,19 @@ export default function SoftwareProductFormPage() {
     setIsSaving(true);
     try {
       const payload = {
-        name:         form.name.trim(),
-        description:  form.description.trim()  || null,
-        category:     form.category            || null,
-        price:        Number(form.price),
-        demoUrl:      form.demoUrl.trim()      || null,
-        thumbnailUrl: form.thumbnailUrl        || null,
-        techStack:    form.techStack.trim()    || null,
-        features:     form.features.trim()     || null,
-        sortOrder:    Number(form.sortOrder)   || 0,
-        isActive:     form.isActive,
+        name:          form.name.trim(),
+        nameEn:        form.nameEn.trim()        || null,
+        description:   form.description.trim()   || null,
+        descriptionEn: form.descriptionEn.trim() || null,
+        category:      form.category             || null,
+        price:         Number(form.price),
+        demoUrl:       form.demoUrl.trim()       || null,
+        thumbnailUrl:  form.thumbnailUrl         || null,
+        techStack:     form.techStack.trim()     || null,
+        features:      form.features.trim()      || null,
+        featuresEn:    form.featuresEn.trim()    || null,
+        sortOrder:     Number(form.sortOrder)    || 0,
+        isActive:      form.isActive,
       };
       if (isEditMode) {
         await softwareProductService.update(id, payload);
@@ -177,11 +184,7 @@ export default function SoftwareProductFormPage() {
     }
   };
 
-  if (isLoading) return (
-    <div className="flex items-center justify-center min-h-screen bg-neu-bg">
-      <p className="font-display font-bold text-neu-black animate-pulse">Memuat...</p>
-    </div>
-  );
+  if (isLoading) return <PageLoader />;
 
   const inputClass = (err) => cn(
     'w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-neu-black placeholder:text-gray-400',
@@ -274,6 +277,28 @@ export default function SoftwareProductFormPage() {
           <div className="flex flex-col gap-1.5">
             <label className="font-display font-bold text-sm text-neu-black uppercase tracking-wide">Thumbnail</label>
             <ImageUploader value={form.thumbnailUrl} onChange={url => setField('thumbnailUrl', url)} />
+          </div>
+
+          {/* ── English Version ── */}
+          <div className="border-2 border-dashed border-neu-black/30 p-5 space-y-4">
+            <span className="font-mono text-xs text-neu-black/40 uppercase tracking-wide">🌐 Versi English (opsional)</span>
+            <div className="flex flex-col gap-1.5">
+              <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wide">Nama Software (EN)</label>
+              <input type="text" value={form.nameEn} onChange={e => setField('nameEn', e.target.value)}
+                placeholder="e.g. POS Cashier System" className={inputClass(false)} />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wide">Deskripsi (EN)</label>
+              <textarea value={form.descriptionEn} onChange={e => setField('descriptionEn', e.target.value)}
+                rows={2} placeholder="Description in English..."
+                className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu transition-all duration-150 resize-none" />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wide">Fitur (EN) <span className="font-body normal-case text-neu-black/40 text-xs">(satu per baris)</span></label>
+              <textarea value={form.featuresEn} onChange={e => setField('featuresEn', e.target.value)}
+                rows={4} placeholder={"Multi cashier\nDaily reports\nInventory management"}
+                className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu transition-all duration-150 resize-none" />
+            </div>
           </div>
 
           {/* Urutan & Status */}

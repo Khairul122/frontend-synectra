@@ -9,6 +9,7 @@ import { RichTextEditor } from '../components/ui/RichTextEditor';
 import { useAlert } from '../hooks/useAlert';
 import { BANNER_BUCKET } from '../constants/api';
 import supabase from '../lib/supabase';
+import { PageLoader } from '../components/ui/PageLoader';
 
 async function uploadBannerImage(file) {
   const ext      = file.name.split('.').pop();
@@ -136,7 +137,7 @@ export default function BannerFormPage() {
   const [user,       setUser]       = useState(null);
   const [isLoading,  setIsLoading]  = useState(true);
   const [isSaving,   setIsSaving]   = useState(false);
-  const [form, setForm] = useState({ title: '', description: '', image: '', isActive: true });
+  const [form, setForm] = useState({ title: '', titleEn: '', description: '', descriptionEn: '', image: '', isActive: true });
   const [errors, setErrors] = useState({});
 
   const formRef = useRef(null);
@@ -152,10 +153,12 @@ export default function BannerFormPage() {
           const res = await bannerService.getById(id);
           const b   = res.data;
           setForm({
-            title:       b.title       ?? '',
-            description: b.description ?? '',
-            image:       b.image       ?? '',
-            isActive:    b.isActive    ?? true,
+            title:         b.title         ?? '',
+            titleEn:       b.titleEn       ?? '',
+            description:   b.description   ?? '',
+            descriptionEn: b.descriptionEn ?? '',
+            image:         b.image         ?? '',
+            isActive:      b.isActive      ?? true,
           });
         }
       } catch {
@@ -192,10 +195,12 @@ export default function BannerFormPage() {
     setIsSaving(true);
     try {
       const payload = {
-        title:       form.title.trim(),
-        description: form.description || null,
-        image:       form.image || null,
-        isActive:    form.isActive,
+        title:         form.title.trim(),
+        titleEn:       form.titleEn.trim()       || null,
+        description:   form.description          || null,
+        descriptionEn: form.descriptionEn        || null,
+        image:         form.image                || null,
+        isActive:      form.isActive,
       };
 
       if (isEditMode) {
@@ -216,13 +221,7 @@ export default function BannerFormPage() {
   };
 
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-neu-bg">
-        <p className="font-display font-bold text-neu-black animate-pulse">Memuat...</p>
-      </div>
-    );
-  }
+  if (isLoading) return <PageLoader />;
 
   return (
     <PageLayout user={user} title={isEditMode ? 'Edit Banner' : 'Tambah Banner'} alert={alert}>
@@ -282,6 +281,25 @@ export default function BannerFormPage() {
               value={form.image}
               onChange={url => setField('image', url)}
             />
+          </div>
+
+          {/* ── English Version ── */}
+          <div className="border-2 border-dashed border-neu-black/30 p-5 space-y-4">
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-xs text-neu-black/40 uppercase tracking-wide">🌐 Versi English (opsional)</span>
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wide">Title (English)</label>
+              <input type="text" value={form.titleEn} onChange={e => setField('titleEn', e.target.value)}
+                placeholder="e.g. Eid Sale Banner 2025"
+                className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu transition-all duration-150" />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wide">Description (English)</label>
+              <textarea value={form.descriptionEn} onChange={e => setField('descriptionEn', e.target.value)}
+                rows={3} placeholder="Banner description in English..."
+                className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu transition-all duration-150 resize-none" />
+            </div>
           </div>
 
           {/* Is Active */}

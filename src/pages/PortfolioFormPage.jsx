@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
@@ -9,6 +10,7 @@ import { PageLayout } from '../components/layout/PageLayout';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
 import { RichTextEditor } from '../components/ui/RichTextEditor';
 import { useAlert } from '../hooks/useAlert';
+import { PageLoader } from '../components/ui/PageLoader';
 
 const CATEGORIES = ['Web App', 'Mobile', 'Design', 'Backend'];
 const EMPTY      = { title: '', description: '', images: [], category: '' };
@@ -138,6 +140,7 @@ function MultiImageUploader({ values, onChange }) {
 /* ─── Form Page ─────────────────────────────────────────────────────────── */
 export default function PortfolioFormPage() {
   const navigate = useNavigate();
+  const { t }    = useTranslation();
   const { id }   = useParams();
   const isEdit   = Boolean(id);
   const alert    = useAlert();
@@ -228,11 +231,7 @@ export default function PortfolioFormPage() {
     errors[k] && 'border-neu-accent shadow-[4px_4px_0px_#FF5C5C]',
   );
 
-  if (isLoading) return (
-    <div className="min-h-screen bg-neu-bg flex items-center justify-center">
-      <p className="font-display font-bold text-neu-black animate-pulse">Memuat...</p>
-    </div>
-  );
+  if (isLoading) return <PageLoader />;
 
   return (
     <PageLayout user={user} title={isEdit ? 'Edit Portfolio' : 'Tambah Portfolio'} alert={alert}>

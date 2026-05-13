@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
 import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
@@ -12,6 +13,7 @@ import { ConfirmModal } from '../components/ui/ConfirmModal';
 import { useAlert } from '../hooks/useAlert';
 import { PROGRESS_ATTACH_BUCKET } from '../constants/api';
 import supabase from '../lib/supabase';
+import { PageLoader } from '../components/ui/PageLoader';
 
 const STATUS_CONFIG = {
   pending:     { label: 'Pending',     bg: 'bg-neu-primary',  text: 'text-neu-black' },
@@ -445,7 +447,7 @@ function ProgressModal({ orderId, onClose, onAdded }) {
             'flex-1 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black',
             'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm',
             (isSaving || !form.title.trim()) && 'opacity-50 cursor-not-allowed',
-          )}>{isSaving ? 'Menyimpan...' : 'Simpan Progress'}</button>
+          )}>{isSaving ? t('common.saving') : 'Simpan Progress'}</button>
           <button onClick={onClose} className="flex-1 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">Batal</button>
         </div>
       </div>
@@ -488,7 +490,7 @@ function RejectModal({ paymentId, onClose, onRejected }) {
             'flex-1 py-2.5 bg-neu-accent border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-white',
             'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm',
             (isSaving || !notes.trim()) && 'opacity-50 cursor-not-allowed',
-          )}>{isSaving ? 'Menyimpan...' : 'Tolak'}</button>
+          )}>{isSaving ? t('common.saving') : 'Tolak'}</button>
           <button onClick={onClose} className="flex-1 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">Batal</button>
         </div>
       </div>
@@ -499,6 +501,7 @@ function RejectModal({ paymentId, onClose, onRejected }) {
 /* ─── Main Detail Page ───────────────────────────────────────────────────── */
 export default function OrderDetailPage() {
   const navigate = useNavigate();
+  const { t }    = useTranslation();
   const { id }   = useParams();
   const alert    = useAlert();
 
@@ -591,11 +594,7 @@ export default function OrderDetailPage() {
   const fmtDate = (val) => val ? new Date(val).toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' }) : '—';
   const fmtDateTime = (val) => val ? new Date(val).toLocaleString('id-ID', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '—';
 
-  if (isLoading) return (
-    <div className="min-h-screen bg-neu-bg flex items-center justify-center">
-      <p className="font-display font-bold text-neu-black animate-pulse">Memuat...</p>
-    </div>
-  );
+  if (isLoading) return <PageLoader />;
 
   if (!order) return null;
 
@@ -741,7 +740,7 @@ export default function OrderDetailPage() {
                   'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm',
                   isSavingPrice && 'opacity-60 cursor-not-allowed',
                 )}>
-                {isSavingPrice ? 'Menyimpan...' : 'Simpan'}
+                {isSavingPrice ? t('common.saving') : 'Simpan'}
               </button>
               <button onClick={() => setShowPriceForm(false)}
                 className="px-6 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">

@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
 import { orderService } from '../services/order.service';
 import { PageLayout } from '../components/layout/PageLayout';
 import { useAlert } from '../hooks/useAlert';
+import { PageLoader } from '../components/ui/PageLoader';
 
 const STATUS_CONFIG = {
   pending:     { label: 'Pending',     bg: 'bg-neu-primary', text: 'text-neu-black' },
@@ -18,6 +20,7 @@ const STATUS_CONFIG = {
 
 export default function MyOrderPage() {
   const navigate = useNavigate();
+  const { t }    = useTranslation();
   const alert    = useAlert();
 
   const [user,      setUser]      = useState(null);
@@ -46,18 +49,14 @@ export default function MyOrderPage() {
   const fmt = (val) => val ? `Rp ${Number(val).toLocaleString('id-ID')}` : '—';
   const fmtDate = (val) => val ? new Date(val).toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' }) : '—';
 
-  if (isLoading) return (
-    <div className="min-h-screen bg-neu-bg flex items-center justify-center">
-      <p className="font-display font-bold text-neu-black animate-pulse">Memuat...</p>
-    </div>
-  );
+  if (isLoading) return <PageLoader />;
 
   return (
-    <PageLayout user={user} title="Pesanan Saya" alert={alert}>
+    <PageLayout user={user} title={t('myOrders.title')} alert={alert}>
       {/* Header toolbar */}
       <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
         <div>
-          <h2 className="font-display font-bold text-xl text-neu-black">Pesanan Saya</h2>
+          <h2 className="font-display font-bold text-xl text-neu-black">{t('myOrders.title')}</h2>
           <p className="font-mono text-xs text-neu-black/50 mt-0.5">{orders.length} pesanan terdaftar</p>
         </div>
         <button
@@ -68,17 +67,17 @@ export default function MyOrderPage() {
             'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm active:translate-x-1 active:translate-y-1 active:shadow-none',
           )}
         >
-          + Buat Pesanan Baru
+          {t('myOrders.create')}
         </button>
       </div>
 
       {orders.length === 0 ? (
         <div className="border-2 border-dashed border-neu-black/30 p-16 text-center">
-          <p className="font-display font-bold text-xl text-neu-black/40">Belum ada pesanan.</p>
+          <p className="font-display font-bold text-xl text-neu-black/40">{t('myOrders.noOrders')}</p>
           <p className="font-body text-sm text-neu-black/30 mt-1">Klik "Buat Pesanan Baru" untuk mulai.</p>
           <button onClick={() => navigate('/my-orders/new')}
             className="mt-4 px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm transition-all duration-150">
-            + Buat Pesanan Pertama
+            {t('myOrders.createFirst')}
           </button>
         </div>
       ) : (

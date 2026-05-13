@@ -1,42 +1,41 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
 import { orderService } from '../services/order.service';
 import { PageLayout } from '../components/layout/PageLayout';
 import { useAlert } from '../hooks/useAlert';
+import { PageLoader } from '../components/ui/PageLoader';
 
-const STATUS_CONFIG = {
-  pending:     { label: 'Pending',     bg: 'bg-neu-primary',    text: 'text-neu-black' },
-  in_progress: { label: 'In Progress', bg: 'bg-neu-blue',       text: 'text-neu-white' },
-  testing:     { label: 'Testing',     bg: 'bg-neu-purple',     text: 'text-neu-white' },
-  revision:    { label: 'Revisi',      bg: 'bg-[#F97316]',      text: 'text-neu-white' },
-  completed:   { label: 'Selesai',     bg: 'bg-neu-green',      text: 'text-neu-white' },
-  canceled:    { label: 'Dibatalkan',  bg: 'bg-neu-accent',     text: 'text-neu-white' },
+const STATUS_BG = {
+  pending:     { bg: 'bg-neu-primary',  text: 'text-neu-black' },
+  in_progress: { bg: 'bg-neu-blue',     text: 'text-neu-white' },
+  testing:     { bg: 'bg-neu-purple',   text: 'text-neu-white' },
+  revision:    { bg: 'bg-[#F97316]',    text: 'text-neu-white' },
+  completed:   { bg: 'bg-neu-green',    text: 'text-neu-white' },
+  canceled:    { bg: 'bg-neu-accent',   text: 'text-neu-white' },
 };
+const STATUS_KEYS = Object.keys(STATUS_BG);
 
 function StatusBadge({ status }) {
-  const cfg = STATUS_CONFIG[status] ?? { label: status, bg: 'bg-neu-black/20', text: 'text-neu-black' };
+  const { t } = useTranslation();
+  const cfg = STATUS_BG[status] ?? { bg: 'bg-neu-black/20', text: 'text-neu-black' };
   return (
     <span className={cn('inline-block px-2 py-0.5 border-2 border-neu-black font-mono font-bold text-xs uppercase', cfg.bg, cfg.text)}>
-      {cfg.label}
+      {t(`status.${status}`, { defaultValue: status })}
     </span>
   );
 }
 
 function OrderRow({ order, index, onOpen }) {
   const ref = useRef(null);
-  useEffect(() => {
-    gsap.from(ref.current, { x: -20, opacity: 0, duration: 0.4, delay: index * 0.04, ease: 'power2.out' });
-  }, [index]);
-
-  const fmt = (val) => val ? `Rp ${Number(val).toLocaleString('id-ID')}` : '—';
+  useEffect(() => { gsap.from(ref.current, { x: -20, opacity: 0, duration: 0.4, delay: index * 0.04, ease: 'power2.out' }); }, [index]);
+  const fmt     = (val) => val ? `Rp ${Number(val).toLocaleString('id-ID')}` : '—';
   const fmtDate = (val) => val ? new Date(val).toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' }) : '—';
-
   return (
-    <tr ref={ref} className="border-b-2 border-neu-black bg-neu-white hover:bg-neu-bg transition-colors duration-150 cursor-pointer"
-      onClick={() => onOpen(order.id)}>
+    <tr ref={ref} className="border-b-2 border-neu-black bg-neu-white hover:bg-neu-bg transition-colors duration-150 cursor-pointer" onClick={() => onOpen(order.id)}>
       <td className="px-4 py-3 border-r-2 border-neu-black font-mono text-xs text-neu-black/50 text-center w-10">{index + 1}</td>
       <td className="px-4 py-3 border-r-2 border-neu-black">
         <p className="font-display font-bold text-sm text-neu-black">{order.title}</p>
@@ -57,6 +56,7 @@ function OrderRow({ order, index, onOpen }) {
 export default function OrderPage() {
   const navigate = useNavigate();
   const alert    = useAlert();
+  const { t }    = useTranslation();
 
   const [user,      setUser]      = useState(null);
   const [orders,    setOrders]    = useState([]);
@@ -89,30 +89,22 @@ export default function OrderPage() {
 
   const filtered = orders.filter(o => {
     const matchStatus = filter === 'all' || o.status === filter;
-    const matchSearch = !search || o.title.toLowerCase().includes(search.toLowerCase()) ||
-      (o.clientName ?? '').toLowerCase().includes(search.toLowerCase());
+    const matchSearch = !search || o.title.toLowerCase().includes(search.toLowerCase()) || (o.clientName ?? '').toLowerCase().includes(search.toLowerCase());
     return matchStatus && matchSearch;
   });
 
-  if (isLoading) return (
-    <div className="min-h-screen bg-neu-bg flex items-center justify-center">
-      <p className="font-display font-bold text-neu-black animate-pulse">Memuat...</p>
-    </div>
-  );
+  if (isLoading) return <PageLoader />;
 
   return (
-    <PageLayout user={user} title="Order Management" alert={alert}>
-      {/* Toolbar */}
+    <PageLayout user={user} title={t('orders.title')} alert={alert}>
       <div ref={headerRef} className="flex flex-wrap items-center gap-3 mb-6">
         <input type="text" value={search} onChange={e => setSearch(e.target.value)}
-          placeholder="Cari judul atau client..."
+          placeholder={t('orders.search')}
           className="flex-1 min-w-48 px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm placeholder:text-neu-black/30 outline-none focus:shadow-neu transition-all duration-150" />
         <select value={filter} onChange={e => setFilter(e.target.value)}
           className="px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase outline-none focus:shadow-neu transition-all duration-150 cursor-pointer">
-          <option value="all">Semua Status</option>
-          {Object.entries(STATUS_CONFIG).map(([k, v]) => (
-            <option key={k} value={k}>{v.label}</option>
-          ))}
+          <option value="all">{t('orders.allStatus')}</option>
+          {STATUS_KEYS.map(k => <option key={k} value={k}>{t(`status.${k}`, { defaultValue: k })}</option>)}
         </select>
         <span className="font-mono text-xs text-neu-black/50">
           <strong>{filtered.length}</strong> / <strong>{orders.length}</strong>
@@ -120,34 +112,34 @@ export default function OrderPage() {
         <button onClick={() => navigate('/orders/new')}
           className={cn('px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase tracking-wide text-neu-black whitespace-nowrap',
             'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm active:translate-x-1 active:translate-y-1 active:shadow-none')}>
-          + Buat Pesanan
+          {t('orders.createOrder')}
         </button>
       </div>
 
-      {/* Stats */}
+      {/* Status chips */}
       <div className="flex gap-3 mb-5 flex-wrap">
-        {Object.entries(STATUS_CONFIG).map(([k, v]) => {
+        {STATUS_KEYS.map(k => {
           const count = orders.filter(o => o.status === k).length;
+          const cfg   = STATUS_BG[k];
           return count > 0 ? (
-            <div key={k} className={cn('px-3 py-1.5 border-2 border-neu-black shadow-neu-sm flex items-center gap-2', v.bg)}>
-              <span className={cn('font-mono font-bold text-lg leading-none', v.text)}>{count}</span>
-              <span className={cn('font-mono text-xs uppercase', v.text)}>{v.label}</span>
+            <div key={k} className={cn('px-3 py-1.5 border-2 border-neu-black shadow-neu-sm flex items-center gap-2', cfg.bg)}>
+              <span className={cn('font-mono font-bold text-lg leading-none', cfg.text)}>{count}</span>
+              <span className={cn('font-mono text-xs uppercase', cfg.text)}>{t(`status.${k}`, { defaultValue: k })}</span>
             </div>
           ) : null;
         })}
       </div>
 
-      {/* Table */}
       <div ref={tableRef} className="border-2 border-neu-black shadow-neu bg-neu-white overflow-hidden">
         {filtered.length === 0 ? (
           <div className="p-16 text-center">
             <p className="font-display font-bold text-xl text-neu-black/40">
-              {orders.length === 0 ? 'Belum ada pesanan.' : 'Tidak ada hasil.'}
+              {orders.length === 0 ? t('orders.noOrders') : t('orders.noResult')}
             </p>
             {orders.length === 0 && (
               <button onClick={() => navigate('/orders/new')}
                 className="mt-4 px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm transition-all duration-150">
-                Buat Pesanan Pertama
+                {t('orders.createFirst')}
               </button>
             )}
           </div>
@@ -157,12 +149,12 @@ export default function OrderPage() {
               <thead>
                 <tr className="bg-neu-black text-neu-white">
                   <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase w-10 text-center">No</th>
-                  <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase text-left">Judul Pesanan</th>
-                  <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase text-left w-40">Client</th>
-                  <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase text-left w-36">Total</th>
-                  <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase text-left w-32">Deadline</th>
-                  <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase text-left w-32">Status</th>
-                  <th className="px-4 py-3 font-display font-bold text-xs uppercase text-left w-32">Dibuat</th>
+                  <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase text-left">{t('orders.cols.title')}</th>
+                  <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase text-left w-40">{t('orders.cols.client')}</th>
+                  <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase text-left w-36">{t('orders.cols.total')}</th>
+                  <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase text-left w-32">{t('orders.cols.deadline')}</th>
+                  <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase text-left w-32">{t('orders.cols.status')}</th>
+                  <th className="px-4 py-3 font-display font-bold text-xs uppercase text-left w-32">{t('orders.cols.createdAt')}</th>
                 </tr>
               </thead>
               <tbody>

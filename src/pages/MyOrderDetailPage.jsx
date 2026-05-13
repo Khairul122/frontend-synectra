@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
 import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
@@ -11,19 +12,21 @@ import { ConfirmModal } from '../components/ui/ConfirmModal';
 import { useAlert } from '../hooks/useAlert';
 import { PAYMENT_RECEIPT_BUCKET } from '../constants/api';
 import supabase from '../lib/supabase';
+import { PageLoader } from '../components/ui/PageLoader';
 
-const STATUS_CONFIG = {
-  pending:     { label: 'Pending',     bg: 'bg-neu-primary', text: 'text-neu-black' },
-  in_progress: { label: 'In Progress', bg: 'bg-neu-blue',    text: 'text-neu-white' },
-  testing:     { label: 'Testing',     bg: 'bg-neu-purple',  text: 'text-neu-white' },
-  revision:    { label: 'Revisi',      bg: 'bg-[#F97316]',   text: 'text-neu-white' },
-  completed:   { label: 'Selesai',     bg: 'bg-neu-green',   text: 'text-neu-white' },
-  canceled:    { label: 'Dibatalkan',  bg: 'bg-neu-accent',  text: 'text-neu-white' },
+const STATUS_BG = {
+  pending:     { bg: 'bg-neu-primary', text: 'text-neu-black' },
+  in_progress: { bg: 'bg-neu-blue',    text: 'text-neu-white' },
+  testing:     { bg: 'bg-neu-purple',  text: 'text-neu-white' },
+  revision:    { bg: 'bg-[#F97316]',   text: 'text-neu-white' },
+  completed:   { bg: 'bg-neu-green',   text: 'text-neu-white' },
+  canceled:    { bg: 'bg-neu-accent',  text: 'text-neu-white' },
 };
-const PAYMENT_STATUS = {
-  pending_verification: { label: 'Menunggu Verifikasi', bg: 'bg-neu-primary', text: 'text-neu-black' },
-  verified: { label: 'Terverifikasi', bg: 'bg-neu-green', text: 'text-neu-white' },
-  rejected: { label: 'Ditolak', bg: 'bg-neu-accent', text: 'text-neu-white' },
+
+const PAYMENT_STATUS_BG = {
+  pending_verification: { bg: 'bg-neu-primary', text: 'text-neu-black' },
+  verified:             { bg: 'bg-neu-green',   text: 'text-neu-white' },
+  rejected:             { bg: 'bg-neu-accent',  text: 'text-neu-white' },
 };
 
 async function uploadReceipt(file) {
@@ -35,17 +38,14 @@ async function uploadReceipt(file) {
   return data.publicUrl;
 }
 
-/* ─── Progress Detail Modal ──────────────────────────────────────────────── */
 function ProgressDetailModal({ report, onClose, onViewImage }) {
+  const { t }       = useTranslation();
   const backdropRef = useRef(null);
   const cardRef     = useRef(null);
 
   useEffect(() => {
     gsap.fromTo(backdropRef.current, { opacity: 0 }, { opacity: 1, duration: 0.2 });
-    gsap.fromTo(cardRef.current,
-      { y: -30, opacity: 0, scale: 0.95 },
-      { y: 0, opacity: 1, scale: 1, duration: 0.3, ease: 'power3.out' },
-    );
+    gsap.fromTo(cardRef.current, { y: -30, opacity: 0, scale: 0.95 }, { y: 0, opacity: 1, scale: 1, duration: 0.3, ease: 'power3.out' });
     const handleKey = (e) => { if (e.key === 'Escape') handleClose(); };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
@@ -59,82 +59,58 @@ function ProgressDetailModal({ report, onClose, onViewImage }) {
   const fmtDT = (val) => val ? new Date(val).toLocaleString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—';
 
   return createPortal(
-    <div ref={backdropRef}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/70"
+    <div ref={backdropRef} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/70"
       onClick={(e) => { if (e.target === e.currentTarget) handleClose(); }}>
       <div ref={cardRef} className="w-full max-w-lg bg-neu-white border-2 border-neu-black shadow-neu-xl">
-
-        {/* Header */}
         <div className="flex items-center justify-between px-5 py-3 border-b-2 border-neu-black bg-neu-blue">
           <div className="flex items-center gap-2">
             <svg className="w-4 h-4 text-neu-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
             </svg>
-            <h3 className="font-display font-bold text-sm text-neu-white uppercase tracking-wide">Detail Progress</h3>
+            <h3 className="font-display font-bold text-sm text-neu-white uppercase tracking-wide">{t('orderDetail.progressDetail')}</h3>
           </div>
           <button onClick={handleClose} className="text-neu-white/60 hover:text-neu-white font-mono text-2xl leading-none">×</button>
         </div>
-
-        {/* Content */}
         <div className="px-5 py-5 space-y-4">
-
-          {/* Persentase */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <span className="font-mono text-xs text-neu-black/50 uppercase">Progress Pengerjaan</span>
+              <span className="font-mono text-xs text-neu-black/50 uppercase">{t('orderDetail.progressPct')}</span>
               <span className="font-display font-bold text-2xl text-neu-blue">{report.progressPercentage}%</span>
             </div>
             <div className="h-4 border-2 border-neu-black bg-neu-bg overflow-hidden">
               <div className="h-full bg-neu-blue transition-all duration-500" style={{ width: `${report.progressPercentage}%` }} />
             </div>
           </div>
-
-          {/* Judul */}
           <div>
-            <p className="font-mono text-xs text-neu-black/40 uppercase mb-1">Judul Update</p>
+            <p className="font-mono text-xs text-neu-black/40 uppercase mb-1">{t('orderDetail.progressTitle')}</p>
             <p className="font-display font-bold text-base text-neu-black">{report.title}</p>
           </div>
-
-          {/* Deskripsi */}
           {report.description ? (
             <div>
-              <p className="font-mono text-xs text-neu-black/40 uppercase mb-1">Deskripsi dari Admin</p>
+              <p className="font-mono text-xs text-neu-black/40 uppercase mb-1">{t('orderDetail.description')}</p>
               <div className="bg-neu-bg border-2 border-neu-black p-3">
                 <p className="font-body text-sm text-neu-black whitespace-pre-wrap leading-relaxed">{report.description}</p>
               </div>
             </div>
-          ) : (
-            <p className="font-body text-xs text-neu-black/40 italic">Tidak ada deskripsi tambahan.</p>
-          )}
-
-          {/* Screenshot */}
+          ) : <p className="font-body text-xs text-neu-black/40 italic">{t('common.noDescription')}</p>}
           {report.attachmentUrl && (
             <div>
-              <p className="font-mono text-xs text-neu-black/40 uppercase mb-2">Screenshot Pengerjaan</p>
-              <button type="button"
-                onClick={() => { handleClose(); setTimeout(() => onViewImage(report.attachmentUrl, report.title), 300); }}
+              <p className="font-mono text-xs text-neu-black/40 uppercase mb-2">{t('orderDetail.screenshot')}</p>
+              <button type="button" onClick={() => { handleClose(); setTimeout(() => onViewImage(report.attachmentUrl, report.title), 300); }}
                 className="relative w-full border-2 border-neu-black overflow-hidden group">
                 <img src={report.attachmentUrl} alt="screenshot" className="w-full max-h-48 object-cover" />
                 <div className="absolute inset-0 bg-neu-black/0 group-hover:bg-neu-black/30 transition-all duration-150 flex items-center justify-center">
-                  <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-150 font-display font-bold text-xs text-neu-white bg-neu-black/80 px-3 py-1.5 border border-neu-white/30">
-                    Klik untuk memperbesar
-                  </span>
+                  <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-150 font-display font-bold text-xs text-neu-white bg-neu-black/80 px-3 py-1.5 border border-neu-white/30">{t('orderDetail.zoomIn')}</span>
                 </div>
               </button>
             </div>
           )}
-
-          {/* Waktu */}
-          <p className="font-mono text-xs text-neu-black/40">Dilaporkan: {fmtDT(report.reportedAt)}</p>
+          <p className="font-mono text-xs text-neu-black/40">{t('orderDetail.reportedAt')} {fmtDT(report.reportedAt)}</p>
         </div>
-
-        {/* Footer */}
         <div className="px-5 pb-5">
-          <button onClick={handleClose} className={cn(
-            'w-full py-2.5 bg-neu-white border-2 border-neu-black shadow-neu',
-            'font-display font-bold text-sm uppercase tracking-wide text-neu-black',
-            'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm',
-          )}>Tutup</button>
+          <button onClick={handleClose} className="w-full py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase tracking-wide text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">
+            {t('common.close')}
+          </button>
         </div>
       </div>
     </div>,
@@ -142,17 +118,14 @@ function ProgressDetailModal({ report, onClose, onViewImage }) {
   );
 }
 
-/* ─── Generic Image Modal ────────────────────────────────────────────────── */
 function ImageModal({ src, caption, onClose }) {
+  const { t }       = useTranslation();
   const backdropRef = useRef(null);
   const cardRef     = useRef(null);
 
   useEffect(() => {
     gsap.fromTo(backdropRef.current, { opacity: 0 }, { opacity: 1, duration: 0.2 });
-    gsap.fromTo(cardRef.current,
-      { y: -30, opacity: 0, scale: 0.95 },
-      { y: 0, opacity: 1, scale: 1, duration: 0.3, ease: 'power3.out' },
-    );
+    gsap.fromTo(cardRef.current, { y: -30, opacity: 0, scale: 0.95 }, { y: 0, opacity: 1, scale: 1, duration: 0.3, ease: 'power3.out' });
     const handleKey = (e) => { if (e.key === 'Escape') handleClose(); };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
@@ -164,8 +137,7 @@ function ImageModal({ src, caption, onClose }) {
   };
 
   return createPortal(
-    <div ref={backdropRef}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/80"
+    <div ref={backdropRef} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/80"
       onClick={(e) => { if (e.target === e.currentTarget) handleClose(); }}>
       <div ref={cardRef} className="w-full max-w-2xl bg-neu-white border-2 border-neu-black shadow-neu-xl">
         <div className="flex items-center justify-between px-5 py-3 border-b-2 border-neu-black bg-neu-black">
@@ -176,10 +148,9 @@ function ImageModal({ src, caption, onClose }) {
           <img src={src} alt={caption} className="max-w-full max-h-[65vh] object-contain" />
         </div>
         <div className="px-5 py-3 flex justify-end">
-          <button onClick={handleClose} className={cn(
-            'px-5 py-2 bg-neu-black border-2 border-neu-black font-display font-bold text-xs uppercase text-neu-white',
-            'shadow-neu-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150',
-          )}>Tutup</button>
+          <button onClick={handleClose} className="px-5 py-2 bg-neu-black border-2 border-neu-black font-display font-bold text-xs uppercase text-neu-white shadow-neu-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150">
+            {t('common.close')}
+          </button>
         </div>
       </div>
     </div>,
@@ -187,68 +158,45 @@ function ImageModal({ src, caption, onClose }) {
   );
 }
 
-/* ─── Receipt Uploader ───────────────────────────────────────────────────── */
 function ReceiptUploader({ value, onChange, isUploading, onFile }) {
+  const { t }        = useTranslation();
   const [isDragging, setIsDragging] = useState(false);
   const inputRef = useRef(null);
 
-  const handleDrop = (e) => {
-    e.preventDefault();
-    setIsDragging(false);
-    const file = e.dataTransfer.files[0];
-    if (file) onFile(file);
-  };
-
   return (
     <div className="space-y-3">
-      <div
-        onClick={() => !isUploading && inputRef.current.click()}
+      <div onClick={() => !isUploading && inputRef.current.click()}
         onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
         onDragLeave={() => setIsDragging(false)}
-        onDrop={handleDrop}
-        className={cn(
-          'border-2 border-dashed border-neu-black p-6 text-center cursor-pointer transition-all duration-150',
-          isDragging ? 'bg-neu-primary/20 border-solid' : 'hover:bg-neu-bg',
-          isUploading && 'opacity-60 cursor-not-allowed',
-        )}
-      >
+        onDrop={(e) => { e.preventDefault(); setIsDragging(false); const f = e.dataTransfer.files[0]; if (f) onFile(f); }}
+        className={cn('border-2 border-dashed border-neu-black p-6 text-center cursor-pointer transition-all duration-150', isDragging ? 'bg-neu-primary/20 border-solid' : 'hover:bg-neu-bg', isUploading && 'opacity-60 cursor-not-allowed')}>
         <input ref={inputRef} type="file" accept="image/*" className="hidden"
           onChange={e => { if (e.target.files[0]) onFile(e.target.files[0]); }} />
-
         {isUploading ? (
           <div className="flex flex-col items-center gap-2">
             <svg className="w-8 h-8 text-neu-black/40 animate-spin" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <circle cx="12" cy="12" r="10" strokeDasharray="60" strokeDashoffset="20" />
             </svg>
-            <p className="font-display font-bold text-sm text-neu-black animate-pulse">Mengupload gambar...</p>
+            <p className="font-display font-bold text-sm text-neu-black animate-pulse">{t('client.uploadReceipt.uploading')}</p>
           </div>
         ) : (
           <>
             <svg className="w-10 h-10 mx-auto mb-3 text-neu-black/30" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
             </svg>
-            <p className="font-display font-bold text-sm text-neu-black">Klik atau drag foto bukti transfer ke sini</p>
-            <p className="font-body text-xs text-neu-black/40 mt-1">PNG, JPG, WEBP — maks 5MB</p>
+            <p className="font-display font-bold text-sm text-neu-black">{t('client.uploadReceipt.dragOrClick')}</p>
+            <p className="font-body text-xs text-neu-black/40 mt-1">{t('client.uploadReceipt.formats')}</p>
           </>
         )}
       </div>
-
       {value && !isUploading && (
         <div className="relative border-2 border-neu-black shadow-neu-sm overflow-hidden">
-          <img src={value} alt="Bukti transfer" className="w-full max-h-48 object-contain bg-neu-bg" />
+          <img src={value} alt={t('client.uploadReceipt.title')} className="w-full max-h-48 object-contain bg-neu-bg" />
           <button type="button" onClick={() => onChange('')}
-            className={cn(
-              'absolute top-2 right-2 w-8 h-8 flex items-center justify-center',
-              'bg-neu-accent border-2 border-neu-black text-neu-white font-bold text-xs',
-              'shadow-neu-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150',
-            )}>
-            ✕
-          </button>
+            className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center bg-neu-accent border-2 border-neu-black text-neu-white font-bold text-xs shadow-neu-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150">✕</button>
           <div className="absolute bottom-0 left-0 right-0 bg-neu-green/90 px-3 py-1.5 flex items-center gap-2">
-            <svg className="w-4 h-4 text-neu-white flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-              <polyline points="20 6 9 17 4 12" />
-            </svg>
-            <span className="font-mono font-bold text-xs text-neu-white">Foto berhasil diupload</span>
+            <svg className="w-4 h-4 text-neu-white flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" /></svg>
+            <span className="font-mono font-bold text-xs text-neu-white">{t('client.uploadReceipt.title')}</span>
           </div>
         </div>
       )}
@@ -256,24 +204,19 @@ function ReceiptUploader({ value, onChange, isUploading, onFile }) {
   );
 }
 
-/* ─── Upload Payment Modal ───────────────────────────────────────────────── */
 function UploadPaymentModal({ orderId, onClose, onUploaded }) {
-  const [form, setForm] = useState({ paymentType: 'dp', amount: '', receiptImageUrl: '' });
+  const { t }    = useTranslation();
+  const alert    = useAlert();
+  const [form, setForm]               = useState({ paymentType: 'dp', amount: '', receiptImageUrl: '' });
   const [isUploading, setIsUploading] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const alert = useAlert();
+  const [isSaving,    setIsSaving]    = useState(false);
 
   const handleFile = async (file) => {
-    if (!file.type.startsWith('image/')) {
-      alert.error('File harus berupa gambar (JPG, PNG, WEBP).');
-      return;
-    }
+    if (!file.type.startsWith('image/')) { alert.error(t('client.uploadReceipt.failUpload')); return; }
     setIsUploading(true);
     setForm(p => ({ ...p, receiptImageUrl: '' }));
-    try {
-      const url = await uploadReceipt(file);
-      setForm(p => ({ ...p, receiptImageUrl: url }));
-    } catch { alert.error('Gagal upload bukti. Coba lagi.'); }
+    try { const url = await uploadReceipt(file); setForm(p => ({ ...p, receiptImageUrl: url })); }
+    catch { alert.error(t('client.uploadReceipt.failUpload')); }
     finally { setIsUploading(false); }
   };
 
@@ -284,15 +227,16 @@ function UploadPaymentModal({ orderId, onClose, onUploaded }) {
       await paymentService.create({ orderId, paymentType: form.paymentType, amount: Number(form.amount), receiptImageUrl: form.receiptImageUrl });
       onUploaded();
       onClose();
-    } catch { alert.error('Gagal mengirim bukti pembayaran.'); }
+    } catch { alert.error(t('client.uploadReceipt.failSend')); }
     finally { setIsSaving(false); }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/60" onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/60"
+      onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
       <div className="w-full max-w-md bg-neu-white border-2 border-neu-black shadow-neu-xl">
         <div className="flex items-center justify-between px-5 py-3 border-b-2 border-neu-black bg-neu-primary">
-          <h3 className="font-display font-bold text-sm text-neu-black uppercase">Upload Bukti Pembayaran</h3>
+          <h3 className="font-display font-bold text-sm text-neu-black uppercase">{t('client.uploadReceipt.title')}</h3>
           <button onClick={onClose} className="text-neu-black/60 hover:text-neu-black font-mono text-2xl leading-none">×</button>
         </div>
         <div className="px-5 py-5 space-y-4">
@@ -306,30 +250,24 @@ function UploadPaymentModal({ orderId, onClose, onUploaded }) {
             </select>
           </div>
           <div className="flex flex-col gap-1.5">
-            <label className="font-display font-bold text-xs text-neu-black uppercase">Jumlah Transfer (Rp) *</label>
+            <label className="font-display font-bold text-xs text-neu-black uppercase">{t('common.price')} (Rp) *</label>
             <input type="number" value={form.amount} onChange={e => setForm(p => ({ ...p, amount: e.target.value }))}
               placeholder="750000"
               className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black outline-none focus:shadow-neu transition-all duration-150" />
           </div>
           <div className="flex flex-col gap-1.5">
-            <label className="font-display font-bold text-xs text-neu-black uppercase">
-              Foto Bukti Transfer * {!form.receiptImageUrl && !isUploading && <span className="text-neu-accent normal-case font-body font-normal">(wajib)</span>}
-            </label>
-            <ReceiptUploader
-              value={form.receiptImageUrl}
-              onChange={url => setForm(p => ({ ...p, receiptImageUrl: url }))}
-              isUploading={isUploading}
-              onFile={handleFile}
-            />
+            <label className="font-display font-bold text-xs text-neu-black uppercase">{t('client.uploadReceipt.title')} *</label>
+            <ReceiptUploader value={form.receiptImageUrl} onChange={url => setForm(p => ({ ...p, receiptImageUrl: url }))} isUploading={isUploading} onFile={handleFile} />
           </div>
         </div>
         <div className="px-5 pb-5 flex gap-3">
-          <button onClick={handleSubmit} disabled={isSaving || !form.amount || !form.receiptImageUrl} className={cn(
-            'flex-1 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black',
-            'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm',
-            (isSaving || !form.amount || !form.receiptImageUrl) && 'opacity-50 cursor-not-allowed',
-          )}>{isSaving ? 'Mengirim...' : 'Kirim Bukti'}</button>
-          <button onClick={onClose} className="flex-1 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">Batal</button>
+          <button onClick={handleSubmit} disabled={isSaving || !form.amount || !form.receiptImageUrl}
+            className={cn('flex-1 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm', (isSaving || !form.amount || !form.receiptImageUrl) && 'opacity-50 cursor-not-allowed')}>
+            {isSaving ? t('client.uploadReceipt.sending') : t('client.uploadReceipt.send')}
+          </button>
+          <button onClick={onClose} className="flex-1 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">
+            {t('common.cancel')}
+          </button>
         </div>
       </div>
     </div>
@@ -339,11 +277,12 @@ function UploadPaymentModal({ orderId, onClose, onUploaded }) {
 export default function MyOrderDetailPage() {
   const navigate = useNavigate();
   const { id }   = useParams();
+  const { t }    = useTranslation();
   const alert    = useAlert();
 
-  const [user,         setUser]         = useState(null);
-  const [order,        setOrder]        = useState(null);
-  const [isLoading,    setIsLoading]    = useState(true);
+  const [user,           setUser]           = useState(null);
+  const [order,          setOrder]          = useState(null);
+  const [isLoading,      setIsLoading]      = useState(true);
   const [showPayment,    setShowPayment]    = useState(false);
   const [showComplete,   setShowComplete]   = useState(false);
   const [isCompleting,   setIsCompleting]   = useState(false);
@@ -363,13 +302,11 @@ export default function MyOrderDetailPage() {
       await orderService.completeOrder(id);
       setOrder(prev => ({ ...prev, status: 'completed' }));
       setShowComplete(false);
-      alert.success('Pesanan berhasil diselesaikan! Terima kasih telah menggunakan layanan Synectra.');
+      alert.success('Pesanan berhasil diselesaikan!');
     } catch (err) {
       const msg = err?.response?.data?.message ?? 'Gagal menyelesaikan pesanan.';
       alert.error(Array.isArray(msg) ? msg.join(', ') : msg);
-    } finally {
-      setIsCompleting(false);
-    }
+    } finally { setIsCompleting(false); }
   };
 
   useEffect(() => {
@@ -385,52 +322,41 @@ export default function MyOrderDetailPage() {
   }, [id]);
 
   useEffect(() => {
-    if (!isLoading && pageRef.current) {
-      gsap.from(pageRef.current, { y: 20, opacity: 0, duration: 0.5, ease: 'power2.out' });
-    }
+    if (!isLoading && pageRef.current) gsap.from(pageRef.current, { y: 20, opacity: 0, duration: 0.5, ease: 'power2.out' });
   }, [isLoading]);
 
-  const fmt = (val) => val ? `Rp ${Number(val).toLocaleString('id-ID')}` : '—';
+  const fmt         = (val) => val ? `Rp ${Number(val).toLocaleString('id-ID')}` : '—';
   const fmtDateTime = (val) => val ? new Date(val).toLocaleString('id-ID', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '—';
 
-  if (isLoading) return (
-    <div className="min-h-screen bg-neu-bg flex items-center justify-center">
-      <p className="font-display font-bold text-neu-black animate-pulse">Memuat...</p>
-    </div>
-  );
+  if (isLoading) return <PageLoader />;
   if (!order) return null;
 
-  const statusCfg = STATUS_CONFIG[order.status] ?? { label: order.status, bg: 'bg-neu-black/20', text: 'text-neu-black' };
-  const lastProgress = order.progressReports?.length
-    ? order.progressReports[order.progressReports.length - 1].progressPercentage
-    : 0;
+  const statusCfg    = STATUS_BG[order.status] ?? { bg: 'bg-neu-black/20', text: 'text-neu-black' };
+  const lastProgress = order.progressReports?.length ? order.progressReports[order.progressReports.length - 1].progressPercentage : 0;
 
   return (
-    <PageLayout user={user} title="Detail Pesanan" alert={alert}>
+    <PageLayout user={user} title={t('myOrderDetail.breadcrumb')} alert={alert}>
       {detailProgress && (
-        <ProgressDetailModal
-          report={detailProgress}
-          onClose={() => setDetailProgress(null)}
-          onViewImage={(src, caption) => setPreviewImage({ src, caption })}
-        />
+        <ProgressDetailModal report={detailProgress} onClose={() => setDetailProgress(null)}
+          onViewImage={(src, caption) => setPreviewImage({ src, caption })} />
       )}
       {previewImage && <ImageModal src={previewImage.src} caption={previewImage.caption} onClose={() => setPreviewImage(null)} />}
       {showPayment && <UploadPaymentModal orderId={id} onClose={() => setShowPayment(false)} onUploaded={loadOrder} />}
       <ConfirmModal
         isOpen={showComplete}
-        title="Selesaikan Pesanan"
-        message={`Apakah kamu yakin ingin menyelesaikan pesanan "${order?.title}"? Pastikan kamu sudah menerima semua hasil pengerjaan sebelum menekan konfirmasi.`}
+        title={t('myOrderDetail.completeOrder')}
+        message={t('myOrderDetail.confirmComplete', { title: order?.title })}
         onConfirm={handleComplete}
         onCancel={() => setShowComplete(false)}
         isLoading={isCompleting}
-        confirmText="Ya, Selesaikan"
+        confirmText={t('myOrderDetail.yesComplete')}
         confirmColor="bg-neu-green text-neu-white"
       />
 
       <div ref={pageRef} className="max-w-3xl mx-auto space-y-6">
 
         <div className="flex items-center gap-2 font-mono text-xs text-neu-black/50">
-          <button onClick={() => navigate('/my-orders')} className="hover:text-neu-black">Pesanan Saya</button>
+          <button onClick={() => navigate('/my-orders')} className="hover:text-neu-black">{t('myOrderDetail.breadcrumb')}</button>
           <span>/</span>
           <span className="text-neu-black truncate">{order.title}</span>
         </div>
@@ -439,23 +365,19 @@ export default function MyOrderDetailPage() {
         <div className="bg-neu-white border-2 border-neu-black shadow-neu p-6">
           <div className="flex items-center justify-between mb-4">
             <span className={cn('inline-block px-3 py-1 border-2 border-neu-black font-mono font-bold text-sm uppercase', statusCfg.bg, statusCfg.text)}>
-              {statusCfg.label}
+              {t(`status.${order.status}`, { defaultValue: order.status })}
             </span>
             <div className="flex flex-wrap gap-2">
               {!['completed', 'canceled'].includes(order.status) && (
                 <button onClick={() => setShowPayment(true)}
                   className="px-4 py-2 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase text-neu-black hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm transition-all duration-150">
-                  Upload Bukti Bayar
+                  {t('myOrderDetail.uploadReceipt')}
                 </button>
               )}
               {['in_progress', 'testing', 'revision'].includes(order.status) && (
                 <button onClick={() => setShowComplete(true)}
-                  className={cn(
-                    'px-4 py-2 bg-neu-green border-2 border-neu-black shadow-neu',
-                    'font-display font-bold text-xs uppercase text-neu-white',
-                    'hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm transition-all duration-150',
-                  )}>
-                  ✓ Selesaikan Pesanan
+                  className="px-4 py-2 bg-neu-green border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase text-neu-white hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm transition-all duration-150">
+                  {t('myOrderDetail.completeOrder')}
                 </button>
               )}
             </div>
@@ -464,19 +386,17 @@ export default function MyOrderDetailPage() {
           {order.description && <p className="font-body text-sm text-neu-black/60 mb-4">{order.description}</p>}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t-2 border-neu-black pt-4">
             <div>
-              <p className="font-mono text-xs text-neu-black/40 uppercase">Total Harga</p>
+              <p className="font-mono text-xs text-neu-black/40 uppercase">{t('myOrderDetail.totalPrice')}</p>
               <p className="font-display font-bold text-lg">{fmt(order.totalPrice)}</p>
             </div>
             <div>
-              <p className="font-mono text-xs text-neu-black/40 uppercase">Deadline</p>
+              <p className="font-mono text-xs text-neu-black/40 uppercase">{t('myOrderDetail.deadline')}</p>
               <p className="font-display font-bold text-sm">{fmtDateTime(order.deadline)}</p>
             </div>
           </div>
-
-          {/* Overall progress */}
           <div className="mt-4 pt-4 border-t-2 border-neu-black">
             <div className="flex justify-between mb-1">
-              <span className="font-mono text-xs text-neu-black/50 uppercase">Progress Keseluruhan</span>
+              <span className="font-mono text-xs text-neu-black/50 uppercase">{t('myOrderDetail.overallProgress')}</span>
               <span className="font-mono text-sm font-bold text-neu-blue">{lastProgress}%</span>
             </div>
             <div className="h-4 border-2 border-neu-black bg-neu-bg overflow-hidden">
@@ -488,32 +408,31 @@ export default function MyOrderDetailPage() {
         {/* Payments */}
         <div className="bg-neu-white border-2 border-neu-black shadow-neu">
           <div className="px-6 py-4 border-b-2 border-neu-black">
-            <h3 className="font-display font-bold text-base uppercase">Riwayat Pembayaran</h3>
+            <h3 className="font-display font-bold text-base uppercase">{t('myOrderDetail.paymentHistory')}</h3>
           </div>
           {!order.payments?.length ? (
-            <p className="px-6 py-6 text-center font-body text-sm text-neu-black/40">Belum ada pembayaran.</p>
+            <p className="px-6 py-6 text-center font-body text-sm text-neu-black/40">{t('myOrderDetail.noPayments')}</p>
           ) : (
             <div className="divide-y-2 divide-neu-black">
               {order.payments.map(p => {
-                const pcfg = PAYMENT_STATUS[p.status] ?? { label: p.status, bg: 'bg-neu-black/20', text: 'text-neu-black' };
+                const pcfg = PAYMENT_STATUS_BG[p.status] ?? { bg: 'bg-neu-black/20', text: 'text-neu-black' };
                 return (
                   <div key={p.id} className="px-6 py-4 flex items-center gap-4">
                     <button type="button"
                       onClick={() => setPreviewImage({ src: p.receiptImageUrl, caption: `Bukti ${p.paymentType} — Rp ${Number(p.amount).toLocaleString('id-ID')}` })}
-                      title="Klik untuk memperbesar"
                       className="w-12 h-10 border-2 border-neu-black overflow-hidden bg-neu-bg flex-shrink-0 hover:border-neu-primary hover:shadow-neu-sm hover:translate-x-[-1px] hover:translate-y-[-1px] transition-all duration-150">
                       <img src={p.receiptImageUrl} alt="receipt" className="w-full h-full object-cover" />
                     </button>
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-0.5">
                         <span className={cn('px-2 py-0.5 border-2 border-neu-black font-mono font-bold text-xs uppercase', pcfg.bg, pcfg.text)}>
-                          {pcfg.label}
+                          {t(`status.${p.status}`, { defaultValue: p.status })}
                         </span>
                         <span className="font-mono text-xs text-neu-black/50 uppercase">{p.paymentType}</span>
                       </div>
                       <p className="font-display font-bold text-sm">{fmt(p.amount)}</p>
                       <p className="font-mono text-xs text-neu-black/40">{fmtDateTime(p.createdAt)}</p>
-                      {p.notes && <p className="font-body text-xs text-neu-accent mt-0.5">Catatan Admin: {p.notes}</p>}
+                      {p.notes && <p className="font-body text-xs text-neu-accent mt-0.5">{t('myOrderDetail.adminNote')} {p.notes}</p>}
                     </div>
                   </div>
                 );
@@ -522,52 +441,37 @@ export default function MyOrderDetailPage() {
           )}
         </div>
 
-        {/* Progress Timeline */}
+        {/* Progress */}
         <div className="bg-neu-white border-2 border-neu-black shadow-neu">
           <div className="px-6 py-4 border-b-2 border-neu-black">
-            <h3 className="font-display font-bold text-base uppercase">Timeline Progress</h3>
+            <h3 className="font-display font-bold text-base uppercase">{t('myOrderDetail.progressTimeline')}</h3>
           </div>
           {!order.progressReports?.length ? (
-            <p className="px-6 py-6 text-center font-body text-sm text-neu-black/40">Belum ada update progress dari admin.</p>
+            <p className="px-6 py-6 text-center font-body text-sm text-neu-black/40">{t('myOrderDetail.noProgress')}</p>
           ) : (
             <div className="divide-y-2 divide-neu-black">
               {[...order.progressReports].reverse().map(r => (
                 <div key={r.id} className="px-6 py-4 flex gap-4">
-                  {/* Percentage circle */}
-                  <div className={cn(
-                    'w-12 h-12 border-2 border-neu-black flex flex-col items-center justify-center flex-shrink-0',
-                    r.isLocked ? 'bg-neu-black/5' : 'bg-neu-blue/10',
-                  )}>
-                    <span className={cn('font-display font-bold text-base leading-none', r.isLocked ? 'text-neu-black/40' : 'text-neu-blue')}>
-                      {r.progressPercentage}
-                    </span>
+                  <div className={cn('w-12 h-12 border-2 border-neu-black flex flex-col items-center justify-center flex-shrink-0', r.isLocked ? 'bg-neu-black/5' : 'bg-neu-blue/10')}>
+                    <span className={cn('font-display font-bold text-base leading-none', r.isLocked ? 'text-neu-black/40' : 'text-neu-blue')}>{r.progressPercentage}</span>
                     <span className={cn('font-mono text-[9px]', r.isLocked ? 'text-neu-black/30' : 'text-neu-blue/60')}>%</span>
                   </div>
-
                   {r.isLocked ? (
-                    /* ── Locked card ── */
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <p className="font-display font-bold text-sm text-neu-black">{r.title}</p>
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 border border-neu-black bg-neu-primary font-mono text-[10px] font-bold uppercase">
-                          🔒 Terkunci
-                        </span>
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 border border-neu-black bg-neu-primary font-mono text-[10px] font-bold uppercase">{t('myOrderDetail.locked')}</span>
                       </div>
-                      <p className="font-body text-xs text-neu-black/50 bg-neu-bg border border-neu-black/20 px-3 py-2">
-                        Detail progress terkunci. Lakukan pembayaran dan tunggu verifikasi admin untuk membuka akses.
-                      </p>
+                      <p className="font-body text-xs text-neu-black/50 bg-neu-bg border border-neu-black/20 px-3 py-2">{t('myOrderDetail.lockedMsg')}</p>
                       <div className="h-1.5 border border-neu-black/20 bg-neu-bg mt-2">
                         <div className="h-full bg-neu-black/20" style={{ width: `${r.progressPercentage}%` }} />
                       </div>
                     </div>
                   ) : (
-                    /* ── Normal card ── */
                     <>
                       <div className="flex-1 min-w-0">
                         <p className="font-display font-bold text-sm text-neu-black">{r.title}</p>
-                        {r.description && (
-                          <p className="font-body text-xs text-neu-black/60 mt-0.5 line-clamp-2">{r.description}</p>
-                        )}
+                        {r.description && <p className="font-body text-xs text-neu-black/60 mt-0.5 line-clamp-2">{r.description}</p>}
                         <p className="font-mono text-xs text-neu-black/40 mt-1">{fmtDateTime(r.reportedAt)}</p>
                         <div className="h-1.5 border border-neu-black bg-neu-bg mt-2">
                           <div className="h-full bg-neu-blue" style={{ width: `${r.progressPercentage}%` }} />
@@ -579,16 +483,9 @@ export default function MyOrderDetailPage() {
                             <img src={r.attachmentUrl} alt="screenshot" className="w-full h-full object-cover" />
                           </div>
                         )}
-                        <button
-                          type="button"
-                          onClick={() => setDetailProgress(r)}
-                          className={cn(
-                            'px-3 py-1.5 bg-neu-blue border-2 border-neu-black shadow-neu-sm',
-                            'font-display font-bold text-xs uppercase tracking-wide text-neu-white whitespace-nowrap',
-                            'transition-all duration-150 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none',
-                          )}
-                        >
-                          Lihat Detail
+                        <button type="button" onClick={() => setDetailProgress(r)}
+                          className="px-3 py-1.5 bg-neu-blue border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase tracking-wide text-neu-white whitespace-nowrap transition-all duration-150 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none">
+                          {t('orderDetail.viewDetail')}
                         </button>
                       </div>
                     </>
