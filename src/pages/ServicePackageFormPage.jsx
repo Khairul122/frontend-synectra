@@ -1,0 +1,328 @@
+import { useEffect, useRef, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { gsap } from 'gsap';
+import { cn } from '../utils/cn';
+import { authService } from '../services/auth.service';
+import { servicePackageService } from '../services/servicePackage.service';
+import { PageLayout } from '../components/layout/PageLayout';
+import { useAlert } from '../hooks/useAlert';
+import { PACKAGE_ICON_BUCKET } from '../constants/api';
+import supabase from '../lib/supabase';
+
+const CATEGORIES = ['Web', 'Mobile', 'UI/UX', 'Tugas', 'Lainnya'];
+
+async function uploadIcon(file) {
+  const ext      = file.name.split('.').pop();
+  const filename = `${crypto.randomUUID()}.${ext}`;
+  const { error } = await supabase.storage
+    .from(PACKAGE_ICON_BUCKET)
+    .upload(filename, file, { cacheControl: '3600', upsert: false });
+  if (error) throw error;
+  const { data } = supabase.storage.from(PACKAGE_ICON_BUCKET).getPublicUrl(filename);
+  return data.publicUrl;
+}
+
+/* ─── Image uploader ─────────────────────────────────────────────────────── */
+function ImageUploader({ value, onChange }) {
+  const [isDragging,  setIsDragging]  = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const inputRef = useRef(null);
+
+  const processFile = async (file) => {
+    if (!file.type.startsWith('image/')) return;
+    setIsUploading(true);
+    try {
+      const url = await uploadIcon(file);
+      onChange(url);
+    } catch { /* parent handles error */ }
+    finally { setIsUploading(false); }
+  };
+
+  return (
+    <div className="space-y-3">
+      <div
+        onClick={() => !isUploading && inputRef.current.click()}
+        onDragOver={e => { e.preventDefault(); setIsDragging(true); }}
+        onDragLeave={() => setIsDragging(false)}
+        onDrop={e => { e.preventDefault(); setIsDragging(false); const f = e.dataTransfer.files[0]; if (f) processFile(f); }}
+        className={cn(
+          'border-2 border-dashed border-neu-black p-8 text-center cursor-pointer transition-all duration-150',
+          isDragging ? 'bg-neu-primary/20 border-solid' : 'hover:bg-neu-bg',
+          isUploading && 'opacity-60 cursor-not-allowed',
+        )}
+      >
+        <input ref={inputRef} type="file" accept="image/*" className="hidden"
+          onChange={e => { if (e.target.files[0]) processFile(e.target.files[0]); }} />
+        {isUploading ? (
+          <p className="font-display font-bold text-sm text-neu-black animate-pulse">Mengupload...</p>
+        ) : (
+          <>
+            <svg className="w-8 h-8 mx-auto mb-2 text-neu-black/40" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+            </svg>
+            <p className="font-display font-bold text-sm text-neu-black">Klik atau drag gambar ke sini</p>
+            <p className="font-body text-xs text-neu-black/40 mt-1">PNG, JPG, WEBP — opsional</p>
+          </>
+        )}
+      </div>
+      {value && (
+        <div className="relative w-24 h-24 border-2 border-neu-black shadow-neu-sm overflow-hidden">
+          <img src={value} alt="Icon preview" className="w-full h-full object-cover" />
+          <button type="button" onClick={() => onChange('')}
+            className="absolute top-1 right-1 w-6 h-6 flex items-center justify-center bg-neu-accent border-2 border-neu-black text-neu-white font-bold text-[10px] shadow-neu-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150">
+            ✕
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ─── Toggle ─────────────────────────────────────────────────────────────── */
+function Toggle({ checked, onChange, label }) {
+  return (
+    <label className="flex items-center gap-3 cursor-pointer select-none">
+      <div onClick={() => onChange(!checked)}
+        className={cn('w-12 h-6 border-2 border-neu-black relative transition-colors duration-150', checked ? 'bg-neu-green' : 'bg-neu-black/20')}>
+        <div className={cn('absolute top-0.5 w-4 h-4 border-2 border-neu-black bg-neu-white transition-all duration-150', checked ? 'left-[22px]' : 'left-0.5')} />
+      </div>
+      <span className="font-display font-bold text-sm text-neu-black">{label}</span>
+    </label>
+  );
+}
+
+/* ─── Main ───────────────────────────────────────────────────────────────── */
+export default function ServicePackageFormPage() {
+  const navigate   = useNavigate();
+  const { id }     = useParams();
+  const alert      = useAlert();
+  const isEditMode = Boolean(id);
+
+  const [user,      setUser]      = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving,  setIsSaving]  = useState(false);
+  const [form, setForm] = useState({
+    name: '', description: '', price: '', duration: '',
+    features: '', badge: '', iconUrl: '', category: '',
+    sortOrder: '0', isActive: true,
+  });
+  const [errors, setErrors] = useState({});
+  const formRef = useRef(null);
+
+  useEffect(() => {
+    const init = async () => {
+      try {
+        const me = await authService.getMe();
+        if (me.data.role !== 'admin') { navigate('/dashboard'); return; }
+        setUser(me.data);
+        if (isEditMode) {
+          const res = await servicePackageService.getById(id);
+          const p   = res.data;
+          setForm({
+            name:        p.name        ?? '',
+            description: p.description ?? '',
+            price:       String(p.price ?? ''),
+            duration:    p.duration    ?? '',
+            features:    p.features    ?? '',
+            badge:       p.badge       ?? '',
+            iconUrl:     p.iconUrl     ?? '',
+            category:    p.category    ?? '',
+            sortOrder:   String(p.sortOrder ?? '0'),
+            isActive:    p.isActive    ?? true,
+          });
+        }
+      } catch { navigate('/login'); }
+      finally { setIsLoading(false); }
+    };
+    init();
+  }, [id, isEditMode, navigate]);
+
+  useEffect(() => {
+    if (!isLoading && formRef.current)
+      gsap.from(formRef.current, { y: 30, opacity: 0, duration: 0.5, ease: 'power2.out' });
+  }, [isLoading]);
+
+  const setField = (key, value) => {
+    setForm(prev => ({ ...prev, [key]: value }));
+    if (errors[key]) setErrors(prev => ({ ...prev, [key]: '' }));
+  };
+
+  const validate = () => {
+    const e = {};
+    if (!form.name.trim())  e.name  = 'Nama paket wajib diisi.';
+    if (!form.price || isNaN(Number(form.price)) || Number(form.price) < 0)
+      e.price = 'Harga wajib diisi dan harus berupa angka positif.';
+    return e;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const errs = validate();
+    if (Object.keys(errs).length) { setErrors(errs); return; }
+    setIsSaving(true);
+    try {
+      const payload = {
+        name:        form.name.trim(),
+        description: form.description.trim() || null,
+        price:       Number(form.price),
+        duration:    form.duration.trim()    || null,
+        features:    form.features.trim()    || null,
+        badge:       form.badge.trim()       || null,
+        iconUrl:     form.iconUrl            || null,
+        category:    form.category           || null,
+        sortOrder:   Number(form.sortOrder)  || 0,
+        isActive:    form.isActive,
+      };
+      if (isEditMode) {
+        await servicePackageService.update(id, payload);
+        alert.success('Paket layanan berhasil diperbarui.');
+      } else {
+        await servicePackageService.create(payload);
+        alert.success('Paket layanan berhasil dibuat.');
+      }
+      setTimeout(() => navigate('/service-packages'), 800);
+    } catch (err) {
+      const msg = err?.response?.data?.message ?? 'Gagal menyimpan paket layanan.';
+      alert.error(Array.isArray(msg) ? msg.join(', ') : msg);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  if (isLoading) return (
+    <div className="flex items-center justify-center min-h-screen bg-neu-bg">
+      <p className="font-display font-bold text-neu-black animate-pulse">Memuat...</p>
+    </div>
+  );
+
+  const inputClass = (err) => cn(
+    'w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-neu-black placeholder:text-gray-400',
+    'outline-none focus:shadow-neu focus:translate-x-[-2px] focus:translate-y-[-2px] transition-all duration-150',
+    err && 'border-neu-accent shadow-[4px_4px_0px_#FF5C5C]',
+  );
+
+  return (
+    <PageLayout user={user} title={isEditMode ? 'Edit Paket Layanan' : 'Tambah Paket Layanan'} alert={alert}>
+      <div ref={formRef} className="max-w-2xl mx-auto">
+
+        {/* Breadcrumb */}
+        <div className="flex items-center gap-2 mb-6 font-mono text-xs text-neu-black/50">
+          <button type="button" onClick={() => navigate('/service-packages')} className="hover:text-neu-black transition-colors">
+            Paket Layanan
+          </button>
+          <span>/</span>
+          <span className="text-neu-black">{isEditMode ? 'Edit' : 'Tambah Baru'}</span>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+
+          {/* Nama Paket */}
+          <div className="flex flex-col gap-1.5">
+            <label className="font-display font-bold text-sm text-neu-black uppercase tracking-wide">
+              Nama Paket <span className="text-neu-accent">*</span>
+            </label>
+            <input type="text" value={form.name} onChange={e => setField('name', e.target.value)}
+              placeholder="Contoh: Paket Starter" className={inputClass(errors.name)} />
+            {errors.name && <span className="text-neu-accent font-body font-semibold text-xs">{errors.name}</span>}
+          </div>
+
+          {/* Kategori & Harga */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="font-display font-bold text-sm text-neu-black uppercase tracking-wide">Kategori</label>
+              <select value={form.category} onChange={e => setField('category', e.target.value)}
+                className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-neu-black outline-none cursor-pointer focus:shadow-neu transition-all duration-150">
+                <option value="">-- Pilih Kategori --</option>
+                {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="font-display font-bold text-sm text-neu-black uppercase tracking-wide">
+                Harga (Rp) <span className="text-neu-accent">*</span>
+              </label>
+              <input type="number" min="0" value={form.price} onChange={e => setField('price', e.target.value)}
+                placeholder="500000" className={inputClass(errors.price)} />
+              {errors.price && <span className="text-neu-accent font-body font-semibold text-xs">{errors.price}</span>}
+            </div>
+          </div>
+
+          {/* Durasi & Badge */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="font-display font-bold text-sm text-neu-black uppercase tracking-wide">Durasi</label>
+              <input type="text" value={form.duration} onChange={e => setField('duration', e.target.value)}
+                placeholder="Contoh: 2 Minggu" className={inputClass(false)} />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="font-display font-bold text-sm text-neu-black uppercase tracking-wide">Badge</label>
+              <input type="text" value={form.badge} onChange={e => setField('badge', e.target.value)}
+                placeholder="Contoh: Paling Populer" className={inputClass(false)} />
+            </div>
+          </div>
+
+          {/* Fitur-fitur */}
+          <div className="flex flex-col gap-1.5">
+            <label className="font-display font-bold text-sm text-neu-black uppercase tracking-wide">
+              Fitur-fitur
+              <span className="font-body font-normal normal-case text-neu-black/40 ml-2 text-xs">(satu fitur per baris)</span>
+            </label>
+            <textarea value={form.features} onChange={e => setField('features', e.target.value)}
+              rows={5}
+              placeholder={"Desain responsif\nRevisi 2x\nSumber file disertakan\nDukungan 30 hari"}
+              className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu transition-all duration-150 resize-none" />
+          </div>
+
+          {/* Deskripsi */}
+          <div className="flex flex-col gap-1.5">
+            <label className="font-display font-bold text-sm text-neu-black uppercase tracking-wide">Deskripsi</label>
+            <textarea value={form.description} onChange={e => setField('description', e.target.value)}
+              rows={3} placeholder="Deskripsi singkat paket layanan..."
+              className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu transition-all duration-150 resize-none" />
+          </div>
+
+          {/* Icon/Gambar */}
+          <div className="flex flex-col gap-1.5">
+            <label className="font-display font-bold text-sm text-neu-black uppercase tracking-wide">Icon / Gambar Paket</label>
+            <ImageUploader value={form.iconUrl} onChange={url => setField('iconUrl', url)} />
+          </div>
+
+          {/* Urutan & Status */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="font-display font-bold text-sm text-neu-black uppercase tracking-wide">Urutan Tampil</label>
+              <input type="number" min="0" value={form.sortOrder} onChange={e => setField('sortOrder', e.target.value)}
+                className={inputClass(false)} />
+              <span className="font-body text-xs text-neu-black/40">Angka lebih kecil tampil lebih awal</span>
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="font-display font-bold text-sm text-neu-black uppercase tracking-wide">Status</label>
+              <div className="bg-neu-white border-2 border-neu-black shadow-neu-sm p-4">
+                <Toggle
+                  checked={form.isActive}
+                  onChange={val => setField('isActive', val)}
+                  label={form.isActive ? 'Paket Aktif (ditampilkan)' : 'Paket Nonaktif (disembunyikan)'}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex items-center gap-3 pt-2">
+            <button type="submit" disabled={isSaving}
+              className={cn(
+                'px-8 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase tracking-wide text-neu-black transition-all duration-150',
+                'hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm active:translate-x-1 active:translate-y-1 active:shadow-none',
+                isSaving && 'opacity-60 cursor-not-allowed',
+              )}>
+              {isSaving ? 'Menyimpan...' : isEditMode ? 'Simpan Perubahan' : 'Buat Paket'}
+            </button>
+            <button type="button" onClick={() => navigate('/service-packages')} disabled={isSaving}
+              className="px-6 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase tracking-wide text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm active:translate-x-1 active:translate-y-1 active:shadow-none">
+              Batal
+            </button>
+          </div>
+        </form>
+      </div>
+    </PageLayout>
+  );
+}
