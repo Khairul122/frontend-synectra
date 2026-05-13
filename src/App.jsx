@@ -24,6 +24,8 @@ const OrderDetailPage    = lazy(() => import('./pages/OrderDetailPage'));
 const MyOrderPage        = lazy(() => import('./pages/MyOrderPage'));
 const MyOrderDetailPage  = lazy(() => import('./pages/MyOrderDetailPage'));
 const MyOrderFormPage    = lazy(() => import('./pages/MyOrderFormPage'));
+const ServicePackagePage     = lazy(() => import('./pages/ServicePackagePage'));
+const ServicePackageFormPage = lazy(() => import('./pages/ServicePackageFormPage'));
 const NotFoundPage       = lazy(() => import('./pages/NotFoundPage'));
 const ServerErrorPage    = lazy(() => import('./pages/ServerErrorPage'));
 
@@ -93,6 +95,9 @@ function App() {
         <Route path="/my-orders"                 element={<MyOrderPage />} />
         <Route path="/my-orders/new"             element={<MyOrderFormPage />} />
         <Route path="/my-orders/:id"             element={<MyOrderDetailPage />} />
+        <Route path="/service-packages"          element={<ServicePackagePage />} />
+        <Route path="/service-packages/new"      element={<ServicePackageFormPage />} />
+        <Route path="/service-packages/:id/edit" element={<ServicePackageFormPage />} />
         <Route path="/500"                element={<ServerErrorPage />} />
         <Route path="*"                   element={<NotFoundPage />} />
       </Routes>

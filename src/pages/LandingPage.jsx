@@ -258,6 +258,83 @@ function PortfolioModal({ item, onClose, transitionTo }) {
   );
 }
 
+/* ─── Package Card ──────────────────────────────────────────────────── */
+function PackageCard({ pkg, onOrder }) {
+  const featureList = pkg.features
+    ? pkg.features.split('\n').filter(f => f.trim()).slice(0, 5)
+    : [];
+  const fmt = (val) => `Rp ${Number(val).toLocaleString('id-ID')}`;
+
+  return (
+    <div className="relative border-2 border-neu-black shadow-neu bg-neu-white flex flex-col h-full">
+      {/* Badge */}
+      {pkg.badge && (
+        <span className="absolute -top-3 left-4 px-3 py-0.5 bg-neu-primary border-2 border-neu-black font-mono font-bold text-[10px] uppercase z-10">
+          {pkg.badge}
+        </span>
+      )}
+
+      {/* Header */}
+      <div className="border-b-2 border-neu-black p-5 bg-neu-black">
+        <div className="flex items-center gap-3 mb-3">
+          {pkg.iconUrl ? (
+            <div className="w-10 h-10 border-2 border-neu-white/30 overflow-hidden flex-shrink-0">
+              <img src={pkg.iconUrl} alt={pkg.name} className="w-full h-full object-cover" loading="lazy" decoding="async" />
+            </div>
+          ) : (
+            <div className="w-10 h-10 border-2 border-neu-white/30 bg-neu-white/10 flex items-center justify-center flex-shrink-0">
+              <svg className="w-5 h-5 text-neu-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+              </svg>
+            </div>
+          )}
+          <div>
+            <p className="font-display font-bold text-base text-neu-white leading-tight">{pkg.name}</p>
+            {pkg.category && (
+              <span className="font-mono text-[10px] text-neu-white/50 uppercase">{pkg.category}</span>
+            )}
+          </div>
+        </div>
+        <p className="font-display font-bold text-2xl text-neu-primary">{fmt(pkg.price)}</p>
+        {pkg.duration && (
+          <p className="font-mono text-xs text-neu-white/50 mt-1">Durasi: {pkg.duration}</p>
+        )}
+      </div>
+
+      {/* Features */}
+      <div className="p-5 flex-1">
+        {pkg.description && (
+          <p className="font-body text-xs text-neu-black/60 mb-4 leading-relaxed">{pkg.description}</p>
+        )}
+        {featureList.length > 0 && (
+          <ul className="space-y-2">
+            {featureList.map((f, i) => (
+              <li key={i} className="flex items-start gap-2">
+                <div className="w-4 h-4 border-2 border-neu-black bg-neu-primary flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <svg className="w-2.5 h-2.5 text-neu-black" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </div>
+                <span className="font-body text-sm text-neu-black">{f.trim()}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      {/* CTA */}
+      <div className="p-5 border-t-2 border-neu-black">
+        <button
+          onClick={onOrder}
+          className="w-full py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm active:translate-x-1 active:translate-y-1 active:shadow-none"
+        >
+          Pesan Sekarang
+        </button>
+      </div>
+    </div>
+  );
+}
+
 /* ══════════════════════════════════════════════════════════════════════
    MAIN LANDING PAGE
 ══════════════════════════════════════════════════════════════════════ */
@@ -265,6 +342,7 @@ export default function LandingPage() {
   useLenis(); // smooth scroll aktif di seluruh landing page
   const { pageRef, transitionTo } = usePageTransition();
   const [portfolios,   setPortfolios]   = useState([]);
+  const [packages,     setPackages]     = useState([]);
   const [banners,      setBanners]      = useState([]);
   const [contacts,     setContacts]     = useState([]);
   const [socialMedia,  setSocialMedia]  = useState([]);
@@ -282,7 +360,8 @@ export default function LandingPage() {
   const [bannerExpanded, setBannerExpanded] = useState(false); // state split screen
   const [bannerModal,    setBannerModal]    = useState(null);  // modal dari section banners
   const [bannerModalExp, setBannerModalExp] = useState(false); // expand split screen
-  const portfolioRef = useRef(null);
+  const portfolioRef  = useRef(null);
+  const pkgSliderRef  = useRef(null);
 
   useEffect(() => {
     Promise.all([
@@ -291,7 +370,8 @@ export default function LandingPage() {
       axios.get(`${BASE}/api/contacts`).catch(() => ({ data: { data: [] } })),
       axios.get(`${BASE}/api/social-media`).catch(() => ({ data: { data: [] } })),
       axios.get(`${BASE}/api/bank-accounts`).catch(() => ({ data: { data: [] } })),
-    ]).then(([p, b, c, s, ba]) => {
+      axios.get(`${BASE}/api/service-packages/public`).catch(() => ({ data: { data: [] } })),
+    ]).then(([p, b, c, s, ba, pkg]) => {
       setPortfolios(p.data?.data ?? []);
       const activeBanners = (b.data?.data ?? []).filter(x => x.isActive);
       setBanners(activeBanners);
@@ -299,6 +379,7 @@ export default function LandingPage() {
       setContacts((c.data?.data ?? []).filter(x => x.isActive));
       setSocialMedia((s.data?.data ?? []).filter(x => x.isActive));
       setBankAccounts((ba.data?.data ?? []).filter(x => x.isActive));
+      setPackages(pkg.data?.data ?? []);
     }).finally(() => setIsLoading(false));
   }, []);
 
@@ -738,6 +819,56 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* ── PAKET LAYANAN ── */}
+      {packages.length > 0 && (
+        <section id="paket" className="border-b-2 border-neu-black bg-neu-bg py-16">
+          <div className="max-w-7xl mx-auto px-4 lg:px-6">
+
+            {/* Section header */}
+            <div className="flex items-center justify-between mb-8 flex-wrap gap-3">
+              <div className="flex items-center gap-3">
+                <div className="h-1 w-8 bg-neu-black" />
+                <h2 className="font-display font-bold text-2xl uppercase tracking-wide text-neu-black">Paket Layanan</h2>
+              </div>
+              {/* Prev / Next hanya tampil jika > 5 paket */}
+              {packages.length > 5 && (
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => pkgSliderRef.current?.scrollBy({ left: -296, behavior: 'smooth' })}
+                    className="w-10 h-10 border-2 border-neu-black bg-neu-white shadow-neu-sm flex items-center justify-center font-bold text-neu-black hover:bg-neu-primary hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-neu transition-all duration-150"
+                    aria-label="Sebelumnya"
+                  >←</button>
+                  <button
+                    onClick={() => pkgSliderRef.current?.scrollBy({ left: 296, behavior: 'smooth' })}
+                    className="w-10 h-10 border-2 border-neu-black bg-neu-white shadow-neu-sm flex items-center justify-center font-bold text-neu-black hover:bg-neu-primary hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-neu transition-all duration-150"
+                    aria-label="Selanjutnya"
+                  >→</button>
+                </div>
+              )}
+            </div>
+
+            {/* Grid (≤5) atau Slider (>5) */}
+            {packages.length <= 5 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {packages.map(pkg => <PackageCard key={pkg.id} pkg={pkg} onOrder={() => transitionTo('/my-orders/new')} />)}
+              </div>
+            ) : (
+              <div
+                ref={pkgSliderRef}
+                className="flex gap-5 overflow-x-auto pb-3 snap-x snap-mandatory -mx-4 px-4 lg:mx-0 lg:px-0"
+                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+              >
+                {packages.map(pkg => (
+                  <div key={pkg.id} className="flex-shrink-0 w-72 snap-start">
+                    <PackageCard pkg={pkg} onOrder={() => transitionTo('/my-orders/new')} />
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+      )}
 
       {/* ── BANNERS ── */}
       {banners.length > 0 && (
