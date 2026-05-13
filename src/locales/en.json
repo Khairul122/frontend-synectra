@@ -1,0 +1,246 @@
+{
+  "common": {
+    "add": "Add",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "cancel": "Cancel",
+    "saving": "Saving...",
+    "loading": "Loading...",
+    "search": "Search...",
+    "active": "Active",
+    "inactive": "Inactive",
+    "activate": "Activate",
+    "deactivate": "Deactivate",
+    "confirm": "Confirm",
+    "close": "Close",
+    "yes": "Yes",
+    "no": "No",
+    "createdAt": "Created",
+    "actions": "Actions",
+    "status": "Status",
+    "showing": "Showing",
+    "from": "of",
+    "noData": "No data yet.",
+    "noResult": "No search results.",
+    "submit": "Submit",
+    "back": "Back",
+    "verifying": "Verifying...",
+    "verify": "Verify",
+    "reject": "Reject",
+    "uploading": "Uploading...",
+    "price": "Price",
+    "name": "Name",
+    "description": "Description",
+    "category": "Category",
+    "image": "Image",
+    "noDescription": "No description.",
+    "dragOrClick": "Click or drag image here",
+    "imageFormats": "PNG, JPG, WEBP — max 5MB",
+    "required": "is required"
+  },
+  "nav": {
+    "login": "Login",
+    "register": "Get Started",
+    "services": "Services",
+    "portfolio": "Portfolio",
+    "howItWorks": "How It Works",
+    "packages": "Packages",
+    "contact": "Contact"
+  },
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "clients": "Clients",
+    "orders": "Orders",
+    "myOrders": "My Orders",
+    "software": "Software",
+    "softwarePurchases": "Software Purchases",
+    "portfolio": "Portfolio",
+    "banners": "Banners",
+    "servicePackages": "Service Packages",
+    "bankAccounts": "Bank Accounts",
+    "socialMedia": "Social Media",
+    "contacts": "Contacts",
+    "profile": "Profile",
+    "users": "Users"
+  },
+  "landing": {
+    "hero": {
+      "badge": "Digital Services Platform",
+      "title": "Turn Your Digital Ideas\nInto Reality with Synectra",
+      "subtitle": "From websites and mobile apps to UI/UX design — we deliver with full transparency, quality, and on time.",
+      "cta": "Start a Project →",
+      "ctaSecondary": "View Portfolio",
+      "stat1": "Projects Done",
+      "stat2": "Happy Clients",
+      "stat3": "Expert Team",
+      "stat4": "Support"
+    },
+    "services": {
+      "tag": "Our Services",
+      "title": "Complete Services for\nYour Digital Needs",
+      "subtitle": "All your business digital needs, handled professionally."
+    },
+    "packages": {
+      "title": "Service Packages"
+    },
+    "portfolio": {
+      "tag": "Portfolio",
+      "title": "Real Results,\nNot Empty Promises",
+      "cta": "Order Now →",
+      "noPortfolio": "Portfolio coming soon.",
+      "viewDetail": "View Detail",
+      "detail": "View Detail →"
+    },
+    "why": {
+      "tag": "Why Synectra?",
+      "title": "More Than Just\na Digital Service Provider"
+    },
+    "howItWorks": {
+      "tag": "How It Works",
+      "title": "Simple Process,\nMaximum Results",
+      "step1Title": "Free Consultation",
+      "step1Desc": "Tell us your needs. We analyze and provide time & cost estimates at no charge.",
+      "step2Title": "Transparent Execution",
+      "step2Desc": "Track your project progress in real-time. No surprises at the end.",
+      "step3Title": "Revision & Delivery",
+      "step3Desc": "After completion, request revisions per your package. Source code and assets delivered instantly.",
+      "step4Title": "Post-Launch Support",
+      "step4Desc": "We don't disappear after the project ends. Support guarantee available for every package."
+    },
+    "tech": {
+      "label": "Technologies We Master"
+    },
+    "contact": {
+      "tag": "Contact Us",
+      "title": "Ready to Start\na Project Together?",
+      "subtitle": "Consult your needs now. Our team is ready to help."
+    },
+    "footer": {
+      "desc": "Trusted digital services platform for websites, mobile apps, UI/UX, and academic task assistance.",
+      "services": "Services",
+      "company": "Company",
+      "payment": "Payment",
+      "rights": "All rights reserved.",
+      "links": {
+        "web": "Website Development",
+        "mobile": "Mobile App",
+        "uiux": "UI/UX Design",
+        "task": "Academic Assistance",
+        "home": "Home",
+        "portfolio": "Portfolio",
+        "howItWorks": "How It Works",
+        "pricing": "Pricing",
+        "login": "Login",
+        "register": "Get Started"
+      }
+    },
+    "cta": {
+      "title": "Ready to Build\nSomething Amazing?",
+      "subtitle": "Join dozens of clients who have trusted their digital projects to Synectra.",
+      "primary": "Start a Project Now →",
+      "secondary": "Free Consultation"
+    },
+    "banner": {
+      "title": "Latest Announcements & Promos"
+    },
+    "order": "Order Now"
+  },
+  "admin": {
+    "panel": "Panel",
+    "dashboard": "Dashboard",
+    "banners": {
+      "title": "Banner Management",
+      "add": "Add Banner",
+      "addFirst": "Add First Banner",
+      "search": "Search banners...",
+      "deleteTitle": "Delete Banner",
+      "deleteMsg": "Are you sure you want to delete banner \"{{name}}\"? This action cannot be undone.",
+      "cols": {
+        "image": "Image",
+        "title": "Title",
+        "createdAt": "Created"
+      }
+    },
+    "packages": {
+      "title": "Service Packages",
+      "add": "Add Package",
+      "addFirst": "Add First Package",
+      "search": "Search packages...",
+      "deleteTitle": "Delete Service Package",
+      "deleteMsg": "Are you sure you want to delete package \"{{name}}\"? This action cannot be undone."
+    },
+    "software": {
+      "title": "Software Management",
+      "add": "Add Software",
+      "addFirst": "Add First Software",
+      "search": "Search software...",
+      "deleteTitle": "Delete Software",
+      "deleteMsg": "Are you sure you want to delete software \"{{name}}\"? This action cannot be undone."
+    },
+    "softwarePurchases": {
+      "title": "Software Purchases",
+      "verifyTitle": "Verify Purchase",
+      "verifyMsg": "Confirm that payment from {{client}} for \"{{software}}\" amounting to {{price}} has been received?",
+      "confirmVerify": "Yes, Verify",
+      "rejectTitle": "Reject Purchase",
+      "rejectReason": "Rejection Reason",
+      "cols": {
+        "software": "Software",
+        "client": "Client",
+        "total": "Total",
+        "receipt": "Receipt",
+        "date": "Date"
+      },
+      "filter": {
+        "all": "All",
+        "pending_payment": "Awaiting Payment",
+        "pending_verification": "Awaiting Verification",
+        "verified": "Verified",
+        "rejected": "Rejected"
+      },
+      "noData": "No purchase transactions yet."
+    }
+  },
+  "client": {
+    "mySoftware": {
+      "title": "Software",
+      "catalog": "Software Catalog",
+      "history": "Purchase History",
+      "buy": "Buy Now",
+      "buyAgain": "Buy Again",
+      "demo": "Demo",
+      "confirmTitle": "Confirm Purchase",
+      "confirmMsg": "Buy \"{{name}}\" for {{price}}? You will be asked to upload a transfer receipt after confirmation.",
+      "confirmBtn": "Yes, Buy Now",
+      "uploadReceipt": "Upload Receipt",
+      "done": "✓ Done",
+      "noCatalog": "No software available yet.",
+      "noHistory": "No purchase history.",
+      "cols": {
+        "software": "Software",
+        "price": "Price",
+        "date": "Date"
+      }
+    },
+    "uploadReceipt": {
+      "title": "Upload Payment Receipt",
+      "dragOrClick": "Click or drag transfer receipt photo",
+      "formats": "PNG, JPG, WEBP",
+      "send": "Send Receipt",
+      "sending": "Sending..."
+    }
+  },
+  "status": {
+    "pending_payment": "Awaiting Payment",
+    "pending_verification": "Awaiting Verification",
+    "verified": "Verified",
+    "rejected": "Rejected",
+    "pending": "Pending",
+    "in_progress": "In Progress",
+    "testing": "Testing",
+    "revision": "Revision",
+    "completed": "Completed",
+    "canceled": "Canceled"
+  }
+}

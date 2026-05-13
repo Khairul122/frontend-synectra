@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Canvas, useFrame } from '@react-three/fiber';
@@ -10,6 +11,7 @@ import axios from 'axios';
 import { cn } from '../utils/cn';
 import { getPlatform } from '../constants/platforms';
 import { API_BASE_URL } from '../constants/api';
+import { LanguageSwitcher } from '../components/ui/LanguageSwitcher';
 
 gsap.registerPlugin(ScrollTrigger);
 const BASE = API_BASE_URL || '';
@@ -245,7 +247,7 @@ function PortfolioModal({ item, onClose, transitionTo }) {
         <div className="px-5 py-4 flex gap-3 flex-wrap">
           <button onClick={() => { handleClose(); setTimeout(() => transitionTo('/register'), 350); }}
             className="flex-1 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">
-            Pesan Sekarang
+            {t('landing.order')}
           </button>
           <button onClick={handleClose}
             className="px-5 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">
@@ -260,6 +262,7 @@ function PortfolioModal({ item, onClose, transitionTo }) {
 
 /* ─── Package Card ──────────────────────────────────────────────────── */
 function PackageCard({ pkg, onOrder }) {
+  const { t } = useTranslation();
   const featureList = pkg.features
     ? pkg.features.split('\n').filter(f => f.trim()).slice(0, 5)
     : [];
@@ -328,7 +331,7 @@ function PackageCard({ pkg, onOrder }) {
           onClick={onOrder}
           className="w-full py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm active:translate-x-1 active:translate-y-1 active:shadow-none"
         >
-          Pesan Sekarang
+          {t('landing.order')}
         </button>
       </div>
     </div>
@@ -339,7 +342,8 @@ function PackageCard({ pkg, onOrder }) {
    MAIN LANDING PAGE
 ══════════════════════════════════════════════════════════════════════ */
 export default function LandingPage() {
-  useLenis(); // smooth scroll aktif di seluruh landing page
+  useLenis();
+  const { t } = useTranslation();
   const { pageRef, transitionTo } = usePageTransition();
   const [portfolios,   setPortfolios]   = useState([]);
   const [packages,     setPackages]     = useState([]);
@@ -675,23 +679,24 @@ export default function LandingPage() {
             </div>
             <div className="hidden md:flex items-center gap-6">
               {[
-                { label: 'Layanan',    id: 'layanan'   },
-                { label: 'Portofolio', id: 'portofolio'},
-                { label: 'Cara Kerja', id: 'cara-kerja'},
-                { label: 'Paket',      id: 'paket'     },
-                { label: 'Kontak',     id: 'kontak'    },
-              ].map(({ label, id }) => (
+                { tKey: 'nav.services',    id: 'layanan'   },
+                { tKey: 'nav.portfolio',   id: 'portofolio'},
+                { tKey: 'nav.howItWorks',  id: 'cara-kerja'},
+                { tKey: 'nav.packages',    id: 'paket'     },
+                { tKey: 'nav.contact',     id: 'kontak'    },
+              ].map(({ tKey, id }) => (
                 <button key={id}
                   onClick={() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
                   className="font-display font-bold text-xs text-neu-black/60 hover:text-neu-black uppercase tracking-wide transition-colors">
-                  {label}
+                  {t(tKey)}
                 </button>
               ))}
             </div>
           </div>
           <div className="hidden sm:flex items-center gap-3">
-            <button onClick={() => transitionTo('/login')} className="px-4 py-2 border-2 border-neu-black font-display font-bold text-xs uppercase text-neu-black hover:bg-neu-bg transition-colors">Masuk</button>
-            <button onClick={() => transitionTo('/register')} className="px-4 py-2 bg-neu-primary border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-black transition-all duration-150 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none">Daftar Gratis</button>
+            <LanguageSwitcher variant="light" />
+            <button onClick={() => transitionTo('/login')} className="px-4 py-2 border-2 border-neu-black font-display font-bold text-xs uppercase text-neu-black hover:bg-neu-bg transition-colors">{t('nav.login')}</button>
+            <button onClick={() => transitionTo('/register')} className="px-4 py-2 bg-neu-primary border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-black transition-all duration-150 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none">{t('nav.register')}</button>
           </div>
           <button onClick={() => setMenuOpen(o => !o)} className="sm:hidden w-9 h-9 border-2 border-neu-black flex items-center justify-center">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -702,21 +707,25 @@ export default function LandingPage() {
         {menuOpen && (
           <div className="sm:hidden border-t-2 border-neu-black bg-neu-white px-4 py-3 flex flex-col gap-1">
             {[
-              { label: 'Layanan',    id: 'layanan'   },
-              { label: 'Portofolio', id: 'portofolio'},
-              { label: 'Cara Kerja', id: 'cara-kerja'},
-              { label: 'Paket',      id: 'paket'     },
-              { label: 'Kontak',     id: 'kontak'    },
-            ].map(({ label, id }) => (
+              { tKey: 'nav.services',    id: 'layanan'   },
+              { tKey: 'nav.portfolio',   id: 'portofolio'},
+              { tKey: 'nav.howItWorks',  id: 'cara-kerja'},
+              { tKey: 'nav.packages',    id: 'paket'     },
+              { tKey: 'nav.contact',     id: 'kontak'    },
+            ].map(({ tKey, id }) => (
               <button key={id}
                 onClick={() => { document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); setMenuOpen(false); }}
                 className="font-display font-bold text-sm uppercase text-neu-black text-left py-1.5 border-b border-neu-black/10 last:border-0">
-                {label}
+                {t(tKey)}
               </button>
             ))}
             <div className="pt-2 flex flex-col gap-2">
-              <button onClick={() => { transitionTo('/login'); setMenuOpen(false); }} className="font-display font-bold text-sm uppercase text-neu-black text-left py-1.5">Masuk</button>
-              <button onClick={() => { transitionTo('/register'); setMenuOpen(false); }} className="px-4 py-2 bg-neu-primary border-2 border-neu-black font-display font-bold text-sm uppercase text-neu-black text-center">Daftar Gratis</button>
+              <button onClick={() => { transitionTo('/login'); setMenuOpen(false); }} className="font-display font-bold text-sm uppercase text-neu-black text-left py-1.5">{t('nav.login')}</button>
+              <button onClick={() => { transitionTo('/register'); setMenuOpen(false); }} className="px-4 py-2 bg-neu-primary border-2 border-neu-black font-display font-bold text-sm uppercase text-neu-black text-center">{t('nav.register')}</button>
+              <div className="flex items-center gap-2 py-1">
+                <span className="font-mono text-xs text-neu-black/40 uppercase">Lang</span>
+                <LanguageSwitcher variant="light" />
+              </div>
             </div>
           </div>
         )}
@@ -780,7 +789,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
           <div className="max-w-2xl mb-12 reveal-left">
             <div className="flex items-center gap-3 mb-2"><div className="h-1 w-10 bg-neu-accent" /><span className="font-mono text-xs text-neu-black/50 uppercase tracking-widest">Apa yang Kami Tawarkan</span></div>
-            <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-black">Layanan Lengkap untuk<br />Kebutuhan Digital Anda</h2>
+            <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-black">{t('landing.services.title').split('\n').map((line, i) => <span key={i}>{line}{i === 0 && <br />}</span>)}</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {services.map(svc => (
@@ -848,7 +857,7 @@ export default function LandingPage() {
             {/* Section header */}
             <div className="flex items-center gap-3 mb-8">
               <div className="h-1 w-8 bg-neu-black" />
-              <h2 className="font-display font-bold text-2xl uppercase tracking-wide text-neu-black">Paket Layanan</h2>
+              <h2 className="font-display font-bold text-2xl uppercase tracking-wide text-neu-black">{t('landing.packages.title')}</h2>
             </div>
 
             {/* Drag-to-scroll slider */}
@@ -896,7 +905,7 @@ export default function LandingPage() {
       {banners.length > 0 && (
         <section className="border-b-2 border-neu-black bg-neu-primary py-10">
           <div className="max-w-7xl mx-auto px-4 lg:px-6">
-            <div className="flex items-center gap-3 mb-5"><div className="h-1 w-8 bg-neu-black" /><h2 className="font-display font-bold text-lg uppercase tracking-wide text-neu-black">Pengumuman & Promo Terbaru</h2></div>
+            <div className="flex items-center gap-3 mb-5"><div className="h-1 w-8 bg-neu-black" /><h2 className="font-display font-bold text-lg uppercase tracking-wide text-neu-black">{t('landing.banner.title')}</h2></div>
             <div className="flex gap-4 overflow-x-auto pb-2 snap-x -mx-4 px-4 lg:mx-0 lg:px-0">
               {banners.map(b => (
                 <div key={b.id}
@@ -926,7 +935,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
           <div className="flex items-end justify-between mb-10 flex-wrap gap-4">
             <div className="reveal-up">
-              <div className="flex items-center gap-3 mb-2"><div className="h-1 w-10 bg-neu-blue" /><span className="font-mono text-xs text-neu-black/50 uppercase tracking-widest">Portofolio</span></div>
+              <div className="flex items-center gap-3 mb-2"><div className="h-1 w-10 bg-neu-blue" /><span className="font-mono text-xs text-neu-black/50 uppercase tracking-widest">{t('landing.portfolio.tag')}</span></div>
               <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-black">Karya Terbaik Kami</h2>
               <p className="font-body text-sm text-neu-black/60 mt-1 max-w-md">Ratusan proyek telah kami selesaikan dengan standar kualitas tertinggi.</p>
             </div>
@@ -935,7 +944,7 @@ export default function LandingPage() {
           {isLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">{[1,2,3].map(i => <div key={i} className="border-2 border-neu-black bg-neu-white h-64 animate-pulse" />)}</div>
           ) : portfolios.length === 0 ? (
-            <div className="border-2 border-dashed border-neu-black p-16 text-center"><p className="font-body text-neu-black/40">Portofolio segera hadir.</p></div>
+            <div className="border-2 border-dashed border-neu-black p-16 text-center"><p className="font-body text-neu-black/40">{t('landing.portfolio.noPortfolio')}</p></div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {portfolios.map(item => {
@@ -1019,7 +1028,7 @@ export default function LandingPage() {
       {/* ── TECH STACK ── */}
       <section className="border-b-2 border-neu-black bg-neu-bg py-12">
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
-          <p className="font-mono text-xs text-neu-black/40 uppercase tracking-widest text-center mb-6">Teknologi yang Kami Kuasai</p>
+          <p className="font-mono text-xs text-neu-black/40 uppercase tracking-widest text-center mb-6">{t('landing.tech.label')}</p>
           <div className="flex flex-wrap justify-center gap-3">
             {techStack.map(tech => (
               <div key={tech} className="px-4 py-2 bg-neu-white border-2 border-neu-black shadow-neu-sm font-mono font-bold text-xs text-neu-black uppercase hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-neu transition-all duration-150 cursor-default">{tech}</div>
@@ -1135,7 +1144,7 @@ export default function LandingPage() {
                 </div>
               </div>
               <p className="font-body text-sm text-neu-white/50 leading-relaxed mb-6 max-w-sm">
-                Platform jasa digital profesional yang mengutamakan transparansi, kualitas, dan kepuasan setiap client di Indonesia.
+                {t('landing.footer.desc')}
               </p>
               {/* Social icons */}
               {socialMedia.length > 0 && (
@@ -1156,7 +1165,7 @@ export default function LandingPage() {
 
             {/* Layanan */}
             <div>
-              <p className="font-mono font-bold text-[10px] text-neu-white/30 uppercase tracking-widest mb-5">Layanan</p>
+              <p className="font-mono font-bold text-[10px] text-neu-white/30 uppercase tracking-widest mb-5">{t('landing.footer.services')}</p>
               <ul className="flex flex-col gap-2.5">
                 {['Web Development','Mobile App','UI/UX Design','Backend & API','Data Science','Joki Tugas'].map(item => (
                   <li key={item}>
@@ -1171,9 +1180,16 @@ export default function LandingPage() {
 
             {/* Perusahaan */}
             <div>
-              <p className="font-mono font-bold text-[10px] text-neu-white/30 uppercase tracking-widest mb-5">Perusahaan</p>
+              <p className="font-mono font-bold text-[10px] text-neu-white/30 uppercase tracking-widest mb-5">{t('landing.footer.company')}</p>
               <ul className="flex flex-col gap-2.5">
-                {[['Beranda', '/'],['Portofolio', '/'],['Cara Kerja', '/'],['Harga', '/'],['Masuk', '/login'],['Daftar Gratis', '/register']].map(([label, href]) => (
+                {[
+                  [t('landing.footer.links.home'), '/'],
+                  [t('landing.footer.links.portfolio'), '/'],
+                  [t('landing.footer.links.howItWorks'), '/'],
+                  [t('landing.footer.links.pricing'), '/'],
+                  [t('nav.login'), '/login'],
+                  [t('nav.register'), '/register'],
+                ].map(([label, href]) => (
                   <li key={label}>
                     <button onClick={() => transitionTo(href)}
                       className="font-body text-sm text-neu-white/50 hover:text-neu-primary transition-colors text-left leading-none">
@@ -1186,7 +1202,7 @@ export default function LandingPage() {
 
             {/* Pembayaran */}
             <div>
-              <p className="font-mono font-bold text-[10px] text-neu-white/30 uppercase tracking-widest mb-5">Rekening Pembayaran</p>
+              <p className="font-mono font-bold text-[10px] text-neu-white/30 uppercase tracking-widest mb-5">{t('landing.footer.payment')}</p>
               <div className="flex flex-col gap-4">
                 {bankAccounts.length > 0 ? bankAccounts.slice(0, 4).map(ba => (
                   <div key={ba.id} className="flex items-center gap-3">

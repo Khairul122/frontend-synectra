@@ -1,0 +1,246 @@
+{
+  "common": {
+    "add": "Tambah",
+    "edit": "Edit",
+    "delete": "Hapus",
+    "save": "Simpan",
+    "cancel": "Batal",
+    "saving": "Menyimpan...",
+    "loading": "Memuat...",
+    "search": "Cari...",
+    "active": "Aktif",
+    "inactive": "Nonaktif",
+    "activate": "Aktifkan",
+    "deactivate": "Nonaktifkan",
+    "confirm": "Konfirmasi",
+    "close": "Tutup",
+    "yes": "Ya",
+    "no": "Tidak",
+    "createdAt": "Dibuat",
+    "actions": "Aksi",
+    "status": "Status",
+    "showing": "Menampilkan",
+    "from": "dari",
+    "noData": "Belum ada data.",
+    "noResult": "Tidak ada hasil pencarian.",
+    "submit": "Kirim",
+    "back": "Kembali",
+    "verifying": "Memverifikasi...",
+    "verify": "Verifikasi",
+    "reject": "Tolak",
+    "uploading": "Mengupload...",
+    "price": "Harga",
+    "name": "Nama",
+    "description": "Deskripsi",
+    "category": "Kategori",
+    "image": "Gambar",
+    "noDescription": "Tidak ada deskripsi.",
+    "dragOrClick": "Klik atau drag gambar ke sini",
+    "imageFormats": "PNG, JPG, WEBP — maks 5MB",
+    "required": "wajib diisi"
+  },
+  "nav": {
+    "login": "Masuk",
+    "register": "Daftar Gratis",
+    "services": "Layanan",
+    "portfolio": "Portofolio",
+    "howItWorks": "Cara Kerja",
+    "packages": "Paket",
+    "contact": "Kontak"
+  },
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "clients": "Clients",
+    "orders": "Orders",
+    "myOrders": "My Orders",
+    "software": "Software",
+    "softwarePurchases": "Pembelian Software",
+    "portfolio": "Portfolio",
+    "banners": "Banners",
+    "servicePackages": "Paket Layanan",
+    "bankAccounts": "Bank Accounts",
+    "socialMedia": "Social Media",
+    "contacts": "Contacts",
+    "profile": "Profile",
+    "users": "Users"
+  },
+  "landing": {
+    "hero": {
+      "badge": "Platform Jasa Digital",
+      "title": "Wujudkan Ide Digital\nKamu Bersama Synectra",
+      "subtitle": "Dari website, aplikasi mobile, hingga desain UI/UX — kami kerjakan dengan transparan, berkualitas, dan tepat waktu.",
+      "cta": "Mulai Proyek →",
+      "ctaSecondary": "Lihat Portofolio",
+      "stat1": "Proyek Selesai",
+      "stat2": "Client Puas",
+      "stat3": "Tim Expert",
+      "stat4": "Support"
+    },
+    "services": {
+      "tag": "Layanan Kami",
+      "title": "Layanan Lengkap untuk\nKebutuhan Digital Anda",
+      "subtitle": "Semua kebutuhan digital bisnis kamu, kami tangani dengan profesional."
+    },
+    "packages": {
+      "title": "Paket Layanan"
+    },
+    "portfolio": {
+      "tag": "Portofolio",
+      "title": "Hasil Kerja Nyata,\nBukan Janji Kosong",
+      "cta": "Pesan Layanan →",
+      "noPortfolio": "Portofolio segera hadir.",
+      "viewDetail": "Lihat Detail",
+      "detail": "Lihat Detail →"
+    },
+    "why": {
+      "tag": "Mengapa Synectra?",
+      "title": "Lebih dari Sekadar\nPenyedia Jasa Digital"
+    },
+    "howItWorks": {
+      "tag": "Cara Kerja",
+      "title": "Proses Sederhana,\nHasil Maksimal",
+      "step1Title": "Konsultasi Gratis",
+      "step1Desc": "Ceritakan kebutuhanmu. Kami analisis dan berikan estimasi waktu & biaya tanpa biaya apapun.",
+      "step2Title": "Pengerjaan Transparan",
+      "step2Desc": "Kamu bisa pantau progress pengerjaan secara real-time. Tidak ada kejutan di akhir.",
+      "step3Title": "Revisi & Delivery",
+      "step3Desc": "Setelah pengerjaan selesai, kamu bisa request revisi sesuai paket. Source code dan aset langsung dikirim.",
+      "step4Title": "Support Pasca Rilis",
+      "step4Desc": "Kami tidak menghilang setelah project selesai. Garansi support tersedia untuk setiap paket."
+    },
+    "tech": {
+      "label": "Teknologi yang Kami Kuasai"
+    },
+    "contact": {
+      "tag": "Hubungi Kami",
+      "title": "Siap Memulai\nProyek Bersama?",
+      "subtitle": "Konsultasikan kebutuhanmu sekarang. Tim kami siap membantu."
+    },
+    "footer": {
+      "desc": "Platform jasa digital terpercaya untuk website, mobile app, UI/UX, dan pengerjaan tugas akademik.",
+      "services": "Layanan",
+      "company": "Perusahaan",
+      "payment": "Pembayaran",
+      "rights": "Hak cipta dilindungi.",
+      "links": {
+        "web": "Pembuatan Website",
+        "mobile": "Aplikasi Mobile",
+        "uiux": "Desain UI/UX",
+        "task": "Joki Tugas",
+        "home": "Beranda",
+        "portfolio": "Portofolio",
+        "howItWorks": "Cara Kerja",
+        "pricing": "Harga",
+        "login": "Masuk",
+        "register": "Daftar Gratis"
+      }
+    },
+    "cta": {
+      "title": "Siap Membuat Sesuatu\nyang Luar Biasa?",
+      "subtitle": "Bergabung dengan puluhan client yang sudah mempercayakan proyek digital mereka kepada Synectra.",
+      "primary": "Mulai Proyek Sekarang →",
+      "secondary": "Konsultasi Gratis"
+    },
+    "banner": {
+      "title": "Pengumuman & Promo Terbaru"
+    },
+    "order": "Pesan Sekarang"
+  },
+  "admin": {
+    "panel": "Panel",
+    "dashboard": "Dashboard",
+    "banners": {
+      "title": "Banner Management",
+      "add": "Tambah Banner",
+      "addFirst": "Tambah Banner Pertama",
+      "search": "Cari banner...",
+      "deleteTitle": "Hapus Banner",
+      "deleteMsg": "Apakah kamu yakin ingin menghapus banner \"{{name}}\"? Tindakan ini tidak bisa dibatalkan.",
+      "cols": {
+        "image": "Gambar",
+        "title": "Judul",
+        "createdAt": "Dibuat"
+      }
+    },
+    "packages": {
+      "title": "Paket Layanan",
+      "add": "Tambah Paket",
+      "addFirst": "Tambah Paket Pertama",
+      "search": "Cari paket layanan...",
+      "deleteTitle": "Hapus Paket Layanan",
+      "deleteMsg": "Apakah kamu yakin ingin menghapus paket \"{{name}}\"? Tindakan ini tidak bisa dibatalkan."
+    },
+    "software": {
+      "title": "Manajemen Software",
+      "add": "Tambah Software",
+      "addFirst": "Tambah Software Pertama",
+      "search": "Cari software...",
+      "deleteTitle": "Hapus Software",
+      "deleteMsg": "Apakah kamu yakin ingin menghapus software \"{{name}}\"? Tindakan ini tidak bisa dibatalkan."
+    },
+    "softwarePurchases": {
+      "title": "Pembelian Software",
+      "verifyTitle": "Verifikasi Pembelian",
+      "verifyMsg": "Konfirmasi pembayaran dari {{client}} untuk \"{{software}}\" sebesar {{price}} sudah diterima?",
+      "confirmVerify": "Ya, Verifikasi",
+      "rejectTitle": "Tolak Pembelian",
+      "rejectReason": "Alasan Penolakan",
+      "cols": {
+        "software": "Software",
+        "client": "Client",
+        "total": "Total",
+        "receipt": "Bukti",
+        "date": "Tanggal"
+      },
+      "filter": {
+        "all": "Semua",
+        "pending_payment": "Belum Bayar",
+        "pending_verification": "Menunggu Verifikasi",
+        "verified": "Terverifikasi",
+        "rejected": "Ditolak"
+      },
+      "noData": "Belum ada transaksi pembelian."
+    }
+  },
+  "client": {
+    "mySoftware": {
+      "title": "Software",
+      "catalog": "Katalog Software",
+      "history": "Riwayat Pembelian",
+      "buy": "Beli Sekarang",
+      "buyAgain": "Beli Lagi",
+      "demo": "Demo",
+      "confirmTitle": "Konfirmasi Pembelian",
+      "confirmMsg": "Beli \"{{name}}\" seharga {{price}}? Kamu akan diminta upload bukti transfer setelah konfirmasi.",
+      "confirmBtn": "Ya, Beli Sekarang",
+      "uploadReceipt": "Upload Bukti",
+      "done": "✓ Selesai",
+      "noCatalog": "Belum ada software tersedia.",
+      "noHistory": "Belum ada riwayat pembelian.",
+      "cols": {
+        "software": "Software",
+        "price": "Harga",
+        "date": "Tanggal"
+      }
+    },
+    "uploadReceipt": {
+      "title": "Upload Bukti Pembayaran",
+      "dragOrClick": "Klik atau drag foto bukti transfer",
+      "formats": "PNG, JPG, WEBP",
+      "send": "Kirim Bukti",
+      "sending": "Mengirim..."
+    }
+  },
+  "status": {
+    "pending_payment": "Menunggu Pembayaran",
+    "pending_verification": "Menunggu Verifikasi",
+    "verified": "Terverifikasi",
+    "rejected": "Ditolak",
+    "pending": "Pending",
+    "in_progress": "In Progress",
+    "testing": "Testing",
+    "revision": "Revisi",
+    "completed": "Selesai",
+    "canceled": "Dibatalkan"
+  }
+}

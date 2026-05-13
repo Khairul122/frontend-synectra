@@ -19,6 +19,8 @@ export const API_ENDPOINTS = {
   PAYMENTS:          `${API_BASE_URL}/api/payments`,
   PROGRESS_REPORTS:  `${API_BASE_URL}/api/progress-reports`,
   SERVICE_PACKAGES:  `${API_BASE_URL}/api/service-packages`,
+  SOFTWARE_PRODUCTS:  `${API_BASE_URL}/api/software-products`,
+  SOFTWARE_PURCHASES: `${API_BASE_URL}/api/software-purchases`,
 };
 
 export const SUPABASE_URL  = 'https://ddgspjgrslhlphhaltkf.supabase.co';
@@ -29,4 +31,5 @@ export const BANK_LOGO_BUCKET    = 'bank-logos';
 export const SOCIAL_ICON_BUCKET      = 'social-icons';
 export const PAYMENT_RECEIPT_BUCKET  = 'payment-receipts';
 export const PROGRESS_ATTACH_BUCKET  = 'progress-attachments';
-export const PACKAGE_ICON_BUCKET     = 'package-icons';
+export const PACKAGE_ICON_BUCKET      = 'package-icons';
+export const SOFTWARE_THUMBNAIL_BUCKET = 'software-thumbnails';
