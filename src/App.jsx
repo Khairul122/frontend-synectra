@@ -1,30 +1,44 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
-import LandingPage       from './pages/LandingPage';
-import LoginPage         from './pages/LoginPage';
-import RegisterPage      from './pages/RegisterPage';
+import { useEffect, lazy, Suspense } from 'react';
 import { tokenStorage } from './services/auth.service';
-import DashboardPage     from './pages/DashboardPage';
-import PortfolioPage     from './pages/PortfolioPage';
-import PortfolioFormPage from './pages/PortfolioFormPage';
-import BannerPage           from './pages/BannerPage';
-import BannerFormPage       from './pages/BannerFormPage';
-import BankAccountPage      from './pages/BankAccountPage';
-import BankAccountFormPage  from './pages/BankAccountFormPage';
-import SocialMediaPage      from './pages/SocialMediaPage';
-import SocialMediaFormPage  from './pages/SocialMediaFormPage';
-import ContactPage          from './pages/ContactPage';
-import ContactFormPage      from './pages/ContactFormPage';
-import ClientPage           from './pages/ClientPage';
-import ProfilePage          from './pages/ProfilePage';
-import OrderPage            from './pages/OrderPage';
-import OrderFormPage        from './pages/OrderFormPage';
-import OrderDetailPage      from './pages/OrderDetailPage';
-import MyOrderPage          from './pages/MyOrderPage';
-import MyOrderDetailPage    from './pages/MyOrderDetailPage';
-import MyOrderFormPage      from './pages/MyOrderFormPage';
-import NotFoundPage      from './pages/NotFoundPage';
-import ServerErrorPage   from './pages/ServerErrorPage';
+
+const LandingPage        = lazy(() => import('./pages/LandingPage'));
+const LoginPage          = lazy(() => import('./pages/LoginPage'));
+const RegisterPage       = lazy(() => import('./pages/RegisterPage'));
+const DashboardPage      = lazy(() => import('./pages/DashboardPage'));
+const PortfolioPage      = lazy(() => import('./pages/PortfolioPage'));
+const PortfolioFormPage  = lazy(() => import('./pages/PortfolioFormPage'));
+const BannerPage         = lazy(() => import('./pages/BannerPage'));
+const BannerFormPage     = lazy(() => import('./pages/BannerFormPage'));
+const BankAccountPage    = lazy(() => import('./pages/BankAccountPage'));
+const BankAccountFormPage = lazy(() => import('./pages/BankAccountFormPage'));
+const SocialMediaPage    = lazy(() => import('./pages/SocialMediaPage'));
+const SocialMediaFormPage = lazy(() => import('./pages/SocialMediaFormPage'));
+const ContactPage        = lazy(() => import('./pages/ContactPage'));
+const ContactFormPage    = lazy(() => import('./pages/ContactFormPage'));
+const ClientPage         = lazy(() => import('./pages/ClientPage'));
+const ProfilePage        = lazy(() => import('./pages/ProfilePage'));
+const OrderPage          = lazy(() => import('./pages/OrderPage'));
+const OrderFormPage      = lazy(() => import('./pages/OrderFormPage'));
+const OrderDetailPage    = lazy(() => import('./pages/OrderDetailPage'));
+const MyOrderPage        = lazy(() => import('./pages/MyOrderPage'));
+const MyOrderDetailPage  = lazy(() => import('./pages/MyOrderDetailPage'));
+const MyOrderFormPage    = lazy(() => import('./pages/MyOrderFormPage'));
+const NotFoundPage       = lazy(() => import('./pages/NotFoundPage'));
+const ServerErrorPage    = lazy(() => import('./pages/ServerErrorPage'));
+
+function PageLoader() {
+  return (
+    <div className="min-h-screen bg-neu-bg flex items-center justify-center">
+      <div className="border-2 border-neu-black shadow-neu px-8 py-6 bg-neu-white">
+        <div className="flex items-center gap-3">
+          <div className="w-4 h-4 border-2 border-neu-black border-t-neu-primary animate-spin" />
+          <span className="font-mono text-sm font-bold text-neu-black uppercase tracking-widest">Loading...</span>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 // Tangkap ?_token= dari Google OAuth redirect dan simpan ke localStorage
 function OAuthTokenCapture() {
@@ -50,6 +64,7 @@ function App() {
   return (
     <BrowserRouter>
       <OAuthTokenCapture />
+      <Suspense fallback={<PageLoader />}>
       <Routes>
         <Route path="/"                   element={<LandingPage />} />
         <Route path="/login"              element={<LoginPage />} />
@@ -81,6 +96,7 @@ function App() {
         <Route path="/500"                element={<ServerErrorPage />} />
         <Route path="*"                   element={<NotFoundPage />} />
       </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 }
