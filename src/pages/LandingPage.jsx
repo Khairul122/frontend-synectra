@@ -362,6 +362,7 @@ export default function LandingPage() {
   const [bannerModalExp, setBannerModalExp] = useState(false); // expand split screen
   const portfolioRef  = useRef(null);
   const pkgSliderRef  = useRef(null);
+  const pkgDrag       = useRef({ active: false, startX: 0, scrollLeft: 0 });
 
   useEffect(() => {
     Promise.all([
@@ -477,11 +478,6 @@ export default function LandingPage() {
 
   const techStack = ['React', 'Next.js', 'Node.js', 'NestJS', 'Flutter', 'Laravel', 'Python', 'PostgreSQL', 'MongoDB', 'Docker', 'AWS', 'Figma'];
 
-  const pricing = [
-    { name: 'Starter',      price: 'Rp 500K', period: '/ proyek', color: 'bg-neu-white', features: ['Konsultasi 1 jam','Revisi 2x','Source code','Support 7 hari'], cta: 'Pilih Paket', highlight: false, shadow: 'shadow-neu' },
-    { name: 'Professional', price: 'Rp 2.5Jt', period: '/ proyek', color: 'bg-neu-primary', features: ['Konsultasi unlimited','Revisi 5x','Source code + dokumentasi','Support 30 hari','Progress tracking real-time'], cta: 'Paling Populer ★', highlight: true, shadow: 'shadow-[8px_8px_0px_#0D0D0D]' },
-    { name: 'Enterprise',   price: 'Custom',   period: '/ negosiasi', color: 'bg-neu-black', textColor: 'text-neu-white', features: ['Tim dedicated','Revisi unlimited','Deployment & maintenance','Support 90 hari','SLA guarantee'], cta: 'Hubungi Kami', highlight: false, shadow: 'shadow-[4px_4px_0px_#FFD000]' },
-  ];
 
   return (
     <div ref={pageRef} className="min-h-screen bg-neu-bg overflow-x-hidden">
@@ -678,9 +674,18 @@ export default function LandingPage() {
               <span className="font-mono font-bold text-xs text-neu-black uppercase tracking-widest">Synectra</span>
             </div>
             <div className="hidden md:flex items-center gap-6">
-              {['Layanan', 'Portofolio', 'Cara Kerja', 'Harga'].map(label => (
-                <button key={label} onClick={() => scrollTo(portfolioRef)}
-                  className="font-display font-bold text-xs text-neu-black/60 hover:text-neu-black uppercase tracking-wide transition-colors">{label}</button>
+              {[
+                { label: 'Layanan',    id: 'layanan'   },
+                { label: 'Portofolio', id: 'portofolio'},
+                { label: 'Cara Kerja', id: 'cara-kerja'},
+                { label: 'Paket',      id: 'paket'     },
+                { label: 'Kontak',     id: 'kontak'    },
+              ].map(({ label, id }) => (
+                <button key={id}
+                  onClick={() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                  className="font-display font-bold text-xs text-neu-black/60 hover:text-neu-black uppercase tracking-wide transition-colors">
+                  {label}
+                </button>
               ))}
             </div>
           </div>
@@ -695,9 +700,24 @@ export default function LandingPage() {
           </button>
         </div>
         {menuOpen && (
-          <div className="sm:hidden border-t-2 border-neu-black bg-neu-white px-4 py-3 flex flex-col gap-2">
-            <button onClick={() => { transitionTo('/login'); setMenuOpen(false); }} className="font-display font-bold text-sm uppercase text-neu-black text-left py-1.5">Masuk</button>
-            <button onClick={() => { transitionTo('/register'); setMenuOpen(false); }} className="px-4 py-2 bg-neu-primary border-2 border-neu-black font-display font-bold text-sm uppercase text-neu-black text-center">Daftar Gratis</button>
+          <div className="sm:hidden border-t-2 border-neu-black bg-neu-white px-4 py-3 flex flex-col gap-1">
+            {[
+              { label: 'Layanan',    id: 'layanan'   },
+              { label: 'Portofolio', id: 'portofolio'},
+              { label: 'Cara Kerja', id: 'cara-kerja'},
+              { label: 'Paket',      id: 'paket'     },
+              { label: 'Kontak',     id: 'kontak'    },
+            ].map(({ label, id }) => (
+              <button key={id}
+                onClick={() => { document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); setMenuOpen(false); }}
+                className="font-display font-bold text-sm uppercase text-neu-black text-left py-1.5 border-b border-neu-black/10 last:border-0">
+                {label}
+              </button>
+            ))}
+            <div className="pt-2 flex flex-col gap-2">
+              <button onClick={() => { transitionTo('/login'); setMenuOpen(false); }} className="font-display font-bold text-sm uppercase text-neu-black text-left py-1.5">Masuk</button>
+              <button onClick={() => { transitionTo('/register'); setMenuOpen(false); }} className="px-4 py-2 bg-neu-primary border-2 border-neu-black font-display font-bold text-sm uppercase text-neu-black text-center">Daftar Gratis</button>
+            </div>
           </div>
         )}
       </nav>
@@ -756,7 +776,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── SERVICES ── */}
-      <section className="border-b-2 border-neu-black py-20">
+      <section id="layanan" className="border-b-2 border-neu-black py-20">
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
           <div className="max-w-2xl mb-12 reveal-left">
             <div className="flex items-center gap-3 mb-2"><div className="h-1 w-10 bg-neu-accent" /><span className="font-mono text-xs text-neu-black/50 uppercase tracking-widest">Apa yang Kami Tawarkan</span></div>
@@ -826,30 +846,41 @@ export default function LandingPage() {
           <div className="max-w-7xl mx-auto px-4 lg:px-6">
 
             {/* Section header */}
-            <div className="flex items-center justify-between mb-8 flex-wrap gap-3">
-              <div className="flex items-center gap-3">
-                <div className="h-1 w-8 bg-neu-black" />
-                <h2 className="font-display font-bold text-2xl uppercase tracking-wide text-neu-black">Paket Layanan</h2>
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => pkgSliderRef.current?.scrollBy({ left: -296, behavior: 'smooth' })}
-                  className="w-10 h-10 border-2 border-neu-black bg-neu-white shadow-neu-sm flex items-center justify-center font-bold text-lg text-neu-black hover:bg-neu-primary hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-neu transition-all duration-150"
-                  aria-label="Sebelumnya"
-                >←</button>
-                <button
-                  onClick={() => pkgSliderRef.current?.scrollBy({ left: 296, behavior: 'smooth' })}
-                  className="w-10 h-10 border-2 border-neu-black bg-neu-white shadow-neu-sm flex items-center justify-center font-bold text-lg text-neu-black hover:bg-neu-primary hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-neu transition-all duration-150"
-                  aria-label="Selanjutnya"
-                >→</button>
-              </div>
+            <div className="flex items-center gap-3 mb-8">
+              <div className="h-1 w-8 bg-neu-black" />
+              <h2 className="font-display font-bold text-2xl uppercase tracking-wide text-neu-black">Paket Layanan</h2>
             </div>
 
-            {/* Slider */}
+            {/* Drag-to-scroll slider */}
             <div
               ref={pkgSliderRef}
-              className="flex gap-5 overflow-x-auto pb-3 snap-x snap-mandatory -mx-4 px-4 lg:mx-0 lg:px-0"
-              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+              className="flex gap-5 overflow-x-auto pt-5 pb-3 snap-x snap-mandatory -mx-4 px-4 lg:mx-0 lg:px-0 select-none"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', cursor: 'grab' }}
+              onMouseDown={e => {
+                const el = pkgSliderRef.current;
+                pkgDrag.current = { active: true, startX: e.pageX - el.offsetLeft, scrollLeft: el.scrollLeft };
+                el.style.cursor = 'grabbing';
+                el.style.scrollSnapType = 'none';
+              }}
+              onMouseMove={e => {
+                if (!pkgDrag.current.active) return;
+                const el = pkgSliderRef.current;
+                const x  = e.pageX - el.offsetLeft;
+                el.scrollLeft = pkgDrag.current.scrollLeft - (x - pkgDrag.current.startX);
+              }}
+              onMouseUp={() => {
+                pkgDrag.current.active = false;
+                const el = pkgSliderRef.current;
+                el.style.cursor = 'grab';
+                el.style.scrollSnapType = 'x mandatory';
+              }}
+              onMouseLeave={() => {
+                if (!pkgDrag.current.active) return;
+                pkgDrag.current.active = false;
+                const el = pkgSliderRef.current;
+                el.style.cursor = 'grab';
+                el.style.scrollSnapType = 'x mandatory';
+              }}
             >
               {packages.map(pkg => (
                 <div key={pkg.id} className="flex-shrink-0 w-72 snap-start">
@@ -891,7 +922,7 @@ export default function LandingPage() {
       )}
 
       {/* ── PORTFOLIO ── */}
-      <section ref={portfolioRef} className="border-b-2 border-neu-black py-20">
+      <section id="portofolio" ref={portfolioRef} className="border-b-2 border-neu-black py-20">
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
           <div className="flex items-end justify-between mb-10 flex-wrap gap-4">
             <div className="reveal-up">
@@ -959,7 +990,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── HOW IT WORKS ── */}
-      <section className="border-b-2 border-neu-black bg-neu-black py-20">
+      <section id="cara-kerja" className="border-b-2 border-neu-black bg-neu-black py-20">
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
           <div className="text-center mb-12 reveal-up">
             <span className="font-mono text-xs text-neu-white/40 uppercase tracking-widest">Proses Mudah & Transparan</span>
@@ -985,46 +1016,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── PRICING ── */}
-      <section className="border-b-2 border-neu-black py-20">
-        <div className="max-w-7xl mx-auto px-4 lg:px-6">
-          <div className="text-center mb-12 reveal-up">
-            <div className="flex items-center justify-center gap-3 mb-2"><div className="h-1 w-8 bg-neu-primary" /><span className="font-mono text-xs text-neu-black/50 uppercase tracking-widest">Harga Transparan</span><div className="h-1 w-8 bg-neu-primary" /></div>
-            <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-black">Pilih Paket yang Tepat</h2>
-            <p className="font-body text-sm text-neu-black/60 mt-2">Semua paket bisa dikustomisasi sesuai kebutuhanmu.</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
-            {pricing.map(pkg => (
-              <div key={pkg.name} className={cn('reveal-up border-2 border-neu-black p-6', pkg.color, pkg.shadow, pkg.highlight && '-translate-y-2')}>
-                {pkg.highlight && <div className="bg-neu-black text-neu-white font-mono font-bold text-[10px] uppercase px-3 py-1 inline-block mb-4">★ Terpopuler</div>}
-                <p className={cn('font-display font-bold text-xl mb-1', pkg.textColor ?? 'text-neu-black')}>{pkg.name}</p>
-                <div className="flex items-end gap-1 mb-4">
-                  <p className={cn('font-display font-bold text-4xl leading-none', pkg.textColor ?? 'text-neu-black')}>{pkg.price}</p>
-                  <p className={cn('font-mono text-xs mb-1', pkg.textColor ? 'text-neu-white/60' : 'text-neu-black/50')}>{pkg.period}</p>
-                </div>
-                <div className="border-t-2 border-current opacity-20 mb-4" />
-                <div className="space-y-2 mb-6">
-                  {pkg.features.map(f => (
-                    <div key={f} className="flex items-center gap-2">
-                      <div className="w-4 h-4 border border-current opacity-40 flex items-center justify-center flex-shrink-0">
-                        <svg className={cn('w-2.5 h-2.5', pkg.textColor ? 'text-neu-white' : 'text-neu-black')} fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" /></svg>
-                      </div>
-                      <p className={cn('font-body text-xs', pkg.textColor ? 'text-neu-white/80' : 'text-neu-black/70')}>{f}</p>
-                    </div>
-                  ))}
-                </div>
-                <button onClick={() => transitionTo('/register')}
-                  className={cn('w-full py-2.5 border-2 border-neu-black font-display font-bold text-sm uppercase transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none',
-                    pkg.highlight ? 'bg-neu-black text-neu-white shadow-[4px_4px_0px_rgba(255,208,0,0.8)]' : 'bg-neu-white text-neu-black shadow-neu-sm',
-                    pkg.textColor && !pkg.highlight ? 'bg-neu-white/10 text-neu-white border-neu-white/40' : '')}>
-                  {pkg.cta}
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ── TECH STACK ── */}
       <section className="border-b-2 border-neu-black bg-neu-bg py-12">
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
@@ -1039,7 +1030,7 @@ export default function LandingPage() {
 
       {/* ── CONTACT ── */}
       {(contacts.length > 0 || socialMedia.length > 0) && (
-        <section className="border-b-2 border-neu-black py-20">
+        <section id="kontak" className="border-b-2 border-neu-black py-20">
           <div className="max-w-7xl mx-auto px-4 lg:px-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
               <div className="reveal-up">
