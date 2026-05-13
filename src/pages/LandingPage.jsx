@@ -262,9 +262,11 @@ function PortfolioModal({ item, onClose, transitionTo }) {
 
 /* ─── Package Card ──────────────────────────────────────────────────── */
 function PackageCard({ pkg, onOrder }) {
-  const { t } = useTranslation();
-  const featureList = pkg.features
-    ? pkg.features.split('\n').filter(f => f.trim()).slice(0, 5)
+  const { t, i18n } = useTranslation();
+  const lang = (id, en) => i18n.language === 'en' && en ? en : id;
+  const activeFeaturesText = lang(pkg.features, pkg.featuresEn);
+  const featureList = activeFeaturesText
+    ? activeFeaturesText.split('\n').filter(f => f.trim()).slice(0, 5)
     : [];
   const fmt = (val) => `Rp ${Number(val).toLocaleString('id-ID')}`;
 
@@ -292,7 +294,7 @@ function PackageCard({ pkg, onOrder }) {
             </div>
           )}
           <div>
-            <p className="font-display font-bold text-base text-neu-white leading-tight">{pkg.name}</p>
+            <p className="font-display font-bold text-base text-neu-white leading-tight">{lang(pkg.name, pkg.nameEn)}</p>
             {pkg.category && (
               <span className="font-mono text-[10px] text-neu-white/50 uppercase">{pkg.category}</span>
             )}
@@ -300,14 +302,14 @@ function PackageCard({ pkg, onOrder }) {
         </div>
         <p className="font-display font-bold text-2xl text-neu-primary">{fmt(pkg.price)}</p>
         {pkg.duration && (
-          <p className="font-mono text-xs text-neu-white/50 mt-1">Durasi: {pkg.duration}</p>
+          <p className="font-mono text-xs text-neu-white/50 mt-1">{t('landing.packages.duration')}: {lang(pkg.duration, pkg.durationEn)}</p>
         )}
       </div>
 
       {/* Features */}
       <div className="p-5 flex-1">
         {pkg.description && (
-          <p className="font-body text-xs text-neu-black/60 mb-4 leading-relaxed">{pkg.description}</p>
+          <p className="font-body text-xs text-neu-black/60 mb-4 leading-relaxed">{lang(pkg.description, pkg.descriptionEn)}</p>
         )}
         {featureList.length > 0 && (
           <ul className="space-y-2">
@@ -343,8 +345,9 @@ function PackageCard({ pkg, onOrder }) {
 ══════════════════════════════════════════════════════════════════════ */
 export default function LandingPage() {
   useLenis();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { pageRef, transitionTo } = usePageTransition();
+  const lang = (id, en) => i18n.language === 'en' && en ? en : id;
   const [portfolios,   setPortfolios]   = useState([]);
   const [packages,     setPackages]     = useState([]);
   const [banners,      setBanners]      = useState([]);
@@ -464,20 +467,13 @@ export default function LandingPage() {
 
   const scrollTo = (ref) => ref.current?.scrollIntoView({ behavior: 'smooth' });
 
-  const services = [
-    { icon: '💻', title: 'Web Development', desc: 'Membangun website profesional, scalable, dan modern sesuai kebutuhan bisnis Anda dengan teknologi terkini.' },
-    { icon: '📱', title: 'Mobile App', desc: 'Aplikasi Android & iOS yang responsif, user-friendly, dan berperforma tinggi untuk menjangkau audiens lebih luas.' },
-    { icon: '🎨', title: 'UI/UX Design', desc: 'Desain antarmuka yang indah, intuitif, dan meningkatkan konversi. Dari wireframe hingga prototype siap produksi.' },
-    { icon: '⚙️', title: 'Backend & API', desc: 'Arsitektur server yang solid, aman, dan performa tinggi untuk mendukung aplikasi skala enterprise.' },
-    { icon: '📊', title: 'Data Science', desc: 'Analisis data, machine learning, dan visualisasi yang mengubah data mentah menjadi keputusan bisnis cerdas.' },
-    { icon: '📝', title: 'Joki Tugas', desc: 'Bantuan profesional untuk tugas akademik, skripsi, thesis, dan project kampus. Tepat waktu dan berkualitas.' },
-  ];
+  const services = t('landing.services.items', { returnObjects: true });
 
   const stats = [
-    { label: 'Proyek Selesai', value: 150, suffix: '+' },
-    { label: 'Client Puas',    value: 80,  suffix: '+' },
-    { label: 'Tahun Pengalaman', value: 5, suffix: '+' },
-    { label: 'Rating Kepuasan', value: 98, suffix: '%' },
+    { labelKey: 'landing.stats.projects',    value: 150, suffix: '+' },
+    { labelKey: 'landing.stats.clients',     value: 80,  suffix: '+' },
+    { labelKey: 'landing.stats.experience',  value: 5,   suffix: '+' },
+    { labelKey: 'landing.stats.satisfaction',value: 98,  suffix: '%' },
   ];
 
   const techStack = ['React', 'Next.js', 'Node.js', 'NestJS', 'Flutter', 'Laravel', 'Python', 'PostgreSQL', 'MongoDB', 'Docker', 'AWS', 'Figma'];
@@ -520,7 +516,7 @@ export default function LandingPage() {
                 ×
               </button>
               <div className="absolute top-3 left-3 z-10 bg-neu-accent border-2 border-neu-black px-2 py-0.5">
-                <span className="font-mono font-bold text-[10px] text-neu-white uppercase">Promo</span>
+                <span className="font-mono font-bold text-[10px] text-neu-white uppercase">{t('landing.banner.promo')}</span>
               </div>
 
               {bannerAd.image ? (
@@ -534,7 +530,7 @@ export default function LandingPage() {
                   <div className="absolute inset-0 bg-neu-black/0 group-hover:bg-neu-black/40 transition-all duration-300 flex items-end">
                     <div className="w-full px-5 py-4 bg-gradient-to-t from-neu-black/80 to-transparent translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
                       <p className="font-display font-bold text-lg text-neu-white">{bannerAd.title}</p>
-                      <p className="font-mono text-xs text-neu-white/70 mt-1">Klik untuk lihat detail →</p>
+                      <p className="font-mono text-xs text-neu-white/70 mt-1">{t('landing.banner.clickDetail')}</p>
                     </div>
                   </div>
                 </div>
@@ -542,7 +538,7 @@ export default function LandingPage() {
                 /* Jika tidak ada gambar — tampilkan card teks */
                 <div className="w-[90vw] max-w-sm border-2 border-neu-black shadow-neu-xl bg-neu-white p-8">
                   <p className="font-display font-bold text-2xl text-neu-black mb-2">{bannerAd.title}</p>
-                  <p className="font-mono text-xs text-neu-black/50 mt-2">Klik untuk lihat detail →</p>
+                  <p className="font-mono text-xs text-neu-black/50 mt-2">{t('landing.banner.clickDetail')}</p>
                 </div>
               )}
             </div>
@@ -569,7 +565,7 @@ export default function LandingPage() {
                 <div className="flex items-center justify-between px-5 py-4 border-b-2 border-neu-black bg-neu-black flex-shrink-0">
                   <div className="flex items-center gap-2">
                     <div className="bg-neu-accent border-2 border-neu-accent px-2 py-0.5">
-                      <span className="font-mono font-bold text-[10px] text-neu-white uppercase">Promo</span>
+                      <span className="font-mono font-bold text-[10px] text-neu-white uppercase">{t('landing.banner.promo')}</span>
                     </div>
                     <p className="font-display font-bold text-sm text-neu-white truncate">{bannerAd.title}</p>
                   </div>
@@ -586,7 +582,7 @@ export default function LandingPage() {
                       dangerouslySetInnerHTML={{ __html: bannerAd.description }}
                     />
                   ) : (
-                    <p className="font-body text-sm text-neu-black/40 italic">Tidak ada deskripsi.</p>
+                    <p className="font-body text-sm text-neu-black/40 italic">{t('landing.banner.noDesc')}</p>
                   )}
                 </div>
 
@@ -594,11 +590,11 @@ export default function LandingPage() {
                 <div className="px-5 py-4 border-t-2 border-neu-black flex gap-3 flex-shrink-0">
                   <button onClick={() => transitionTo('/register')}
                     className="flex-1 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none">
-                    Pelajari Lebih Lanjut
+                    {t('landing.banner.learnMore')}
                   </button>
                   <button onClick={() => { setBannerAd(null); setBannerExpanded(false); }}
                     className="px-4 py-2.5 bg-neu-white border-2 border-neu-black font-display font-bold text-xs uppercase text-neu-black/60 hover:text-neu-black transition-colors">
-                    Tutup
+                    {t('landing.banner.close')}
                   </button>
                 </div>
               </div>
@@ -618,7 +614,7 @@ export default function LandingPage() {
               <button onClick={(e) => { e.stopPropagation(); setBannerModal(null); setBannerModalExp(false); }}
                 className="absolute top-3 right-3 z-10 w-9 h-9 bg-neu-black text-neu-white border-2 border-neu-black flex items-center justify-center font-mono text-base hover:bg-neu-accent transition-colors">×</button>
               <div className="absolute top-3 left-3 z-10 bg-neu-accent border-2 border-neu-black px-2 py-0.5">
-                <span className="font-mono font-bold text-[10px] text-neu-white uppercase">Promo</span>
+                <span className="font-mono font-bold text-[10px] text-neu-white uppercase">{t('landing.banner.promo')}</span>
               </div>
               {bannerModal.image ? (
                 <div className="relative border-2 border-neu-black shadow-neu-xl overflow-hidden">
@@ -661,7 +657,7 @@ export default function LandingPage() {
                 </div>
                 <div className="px-5 py-4 border-t-2 border-neu-black flex gap-3 flex-shrink-0">
                   <button onClick={() => transitionTo('/register')} className="flex-1 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none">Pelajari Lebih Lanjut</button>
-                  <button onClick={() => { setBannerModal(null); setBannerModalExp(false); }} className="px-4 py-2.5 bg-neu-white border-2 border-neu-black font-display font-bold text-xs uppercase text-neu-black/60 hover:text-neu-black transition-colors">Tutup</button>
+                  <button onClick={() => { setBannerModal(null); setBannerModalExp(false); }} className="px-4 py-2.5 bg-neu-white border-2 border-neu-black font-display font-bold text-xs uppercase text-neu-black/60 hover:text-neu-black transition-colors">{t('landing.banner.close')}</button>
                 </div>
               </div>
             </div>
@@ -741,21 +737,21 @@ export default function LandingPage() {
 
         <div className="max-w-7xl mx-auto px-4 lg:px-6 w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center py-20">
           <div>
-            <div className="inline-block bg-neu-black text-neu-white px-4 py-1.5 font-mono font-bold text-xs uppercase tracking-widest mb-6">✦ Platform Jasa Digital Terpercaya</div>
+            <div className="inline-block bg-neu-black text-neu-white px-4 py-1.5 font-mono font-bold text-xs uppercase tracking-widest mb-6">{t('landing.hero.badge')}</div>
             <h1 className="font-display font-bold text-5xl sm:text-6xl lg:text-7xl text-neu-black leading-[0.9] mb-6">
-              <LetterReveal text="Wujudkan" className="block" />
+              <LetterReveal text={t('landing.hero.title1')} className="block" />
               <span className="block mt-1 relative">
-                <LetterReveal text="Ide Digital" className="relative z-10" delay={400} />
+                <LetterReveal text={t('landing.hero.title2')} className="relative z-10" delay={400} />
                 <span className="absolute bottom-2 left-0 h-5 w-full bg-neu-primary -z-0 block" />
               </span>
-              <LetterReveal text="Anda" className="block mt-1" delay={800} />
+              <LetterReveal text={t('landing.hero.title3')} className="block mt-1" delay={800} />
             </h1>
             <p className="font-body text-base lg:text-lg text-neu-black/60 mb-8 max-w-lg leading-relaxed">
-              Dari website modern, aplikasi mobile, desain UI/UX, hingga pengerjaan tugas akademik. Kami hadir dengan transparansi penuh, harga bersaing, dan kualitas terjamin.
+              {t('landing.hero.subtitle')}
             </p>
             <div className="flex flex-wrap gap-3">
-              <button onClick={() => transitionTo('/register')} className="px-8 py-3.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase tracking-wide text-neu-black transition-all duration-150 hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-neu-sm">Mulai Sekarang →</button>
-              <button onClick={() => scrollTo(portfolioRef)} className="px-8 py-3.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase tracking-wide text-neu-black transition-all duration-150 hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-neu-sm">Lihat Karya Kami</button>
+              <button onClick={() => transitionTo('/register')} className="px-8 py-3.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase tracking-wide text-neu-black transition-all duration-150 hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-neu-sm">{t('landing.hero.cta')}</button>
+              <button onClick={() => scrollTo(portfolioRef)} className="px-8 py-3.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase tracking-wide text-neu-black transition-all duration-150 hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-neu-sm">{t('landing.hero.ctaSecondary')}</button>
             </div>
           </div>
 
@@ -775,9 +771,9 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
           <div className="grid grid-cols-2 lg:grid-cols-4 divide-x-0 lg:divide-x-2 divide-neu-white/10">
             {stats.map((s, i) => (
-              <div key={s.label} className={cn('p-8 text-center reveal-scale', i > 0 && 'border-t-2 lg:border-t-0 border-neu-white/10')}>
+              <div key={s.labelKey} className={cn('p-8 text-center reveal-scale', i > 0 && 'border-t-2 lg:border-t-0 border-neu-white/10')}>
                 <p className="font-display font-bold text-4xl lg:text-5xl text-neu-primary mb-2"><AnimatedCounter target={s.value} suffix={s.suffix} /></p>
-                <p className="font-body text-sm text-neu-white/60">{s.label}</p>
+                <p className="font-body text-sm text-neu-white/60">{t(s.labelKey)}</p>
               </div>
             ))}
           </div>
@@ -788,7 +784,7 @@ export default function LandingPage() {
       <section id="layanan" className="border-b-2 border-neu-black py-20">
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
           <div className="max-w-2xl mb-12 reveal-left">
-            <div className="flex items-center gap-3 mb-2"><div className="h-1 w-10 bg-neu-accent" /><span className="font-mono text-xs text-neu-black/50 uppercase tracking-widest">Apa yang Kami Tawarkan</span></div>
+            <div className="flex items-center gap-3 mb-2"><div className="h-1 w-10 bg-neu-accent" /><span className="font-mono text-xs text-neu-black/50 uppercase tracking-widest">{t('landing.services.tag')}</span></div>
             <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-black">{t('landing.services.title').split('\n').map((line, i) => <span key={i}>{line}{i === 0 && <br />}</span>)}</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -809,18 +805,13 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="reveal-up">
-              <div className="flex items-center gap-3 mb-4"><div className="h-1 w-10 bg-neu-blue" /><span className="font-mono text-xs text-neu-white/50 uppercase tracking-widest">Visualisasi Digital Modern</span></div>
-              <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-white mb-4">Kami Membangun<br />Lebih dari Sekadar Website</h2>
+              <div className="flex items-center gap-3 mb-4"><div className="h-1 w-10 bg-neu-blue" /><span className="font-mono text-xs text-neu-white/50 uppercase tracking-widest">{t('landing.about.tag')}</span></div>
+              <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-white mb-4">{t('landing.about.title').split('\n').map((l,i)=><span key={i}>{l}{i===0&&<br/>}</span>)}</h2>
               <p className="font-body text-sm text-neu-white/60 leading-relaxed mb-6">
-                Synectra bukan hanya menyerahkan kode — kami menghadirkan pengalaman digital yang berkesan. Setiap proyek dikerjakan dengan perhatian penuh pada detail, performa, dan estetika yang relevan dengan industri Anda.
+                {t('landing.about.subtitle')}
               </p>
               <div className="flex flex-col gap-3">
-                {[
-                  'Desain antarmuka yang intuitif dan modern',
-                  'Performa tinggi, responsif di semua perangkat',
-                  'Update progress transparan selama pengerjaan',
-                  'Source code bersih, terdokumentasi, siap dikembangkan',
-                ].map(f => (
+                {(t('landing.about.features', { returnObjects: true })).map(f => (
                   <div key={f} className="flex items-center gap-3">
                     <div className="w-5 h-5 border-2 border-neu-primary bg-neu-primary flex items-center justify-center flex-shrink-0">
                       <svg className="w-3 h-3 text-neu-black" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" /></svg>
@@ -915,13 +906,13 @@ export default function LandingPage() {
                     <div className="relative border-b-2 border-neu-black overflow-hidden">
                       <img src={b.image} alt={b.title} className="w-full h-36 object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" decoding="async" />
                       <div className="absolute inset-0 bg-neu-black/0 group-hover:bg-neu-black/20 transition-all duration-200 flex items-center justify-center">
-                        <span className="opacity-0 group-hover:opacity-100 transition-opacity font-mono text-xs text-neu-white bg-neu-black/70 px-3 py-1.5">Klik untuk lihat →</span>
+                        <span className="opacity-0 group-hover:opacity-100 transition-opacity font-mono text-xs text-neu-white bg-neu-black/70 px-3 py-1.5">{t('landing.portfolio.clickView')}</span>
                       </div>
                     </div>
                   )}
                   <div className="p-4">
-                    <p className="font-display font-bold text-sm text-neu-black">{b.title}</p>
-                    {b.description && <p className="font-body text-xs text-neu-black/60 mt-1 line-clamp-2" dangerouslySetInnerHTML={{ __html: b.description.replace(/<[^>]*>/g,' ') }} />}
+                    <p className="font-display font-bold text-sm text-neu-black">{lang(b.title, b.titleEn)}</p>
+                    {b.description && <p className="font-body text-xs text-neu-black/60 mt-1 line-clamp-2" dangerouslySetInnerHTML={{ __html: lang(b.description, b.descriptionEn)?.replace(/<[^>]*>/g,' ') }} />}
                   </div>
                 </div>
               ))}
@@ -936,10 +927,10 @@ export default function LandingPage() {
           <div className="flex items-end justify-between mb-10 flex-wrap gap-4">
             <div className="reveal-up">
               <div className="flex items-center gap-3 mb-2"><div className="h-1 w-10 bg-neu-blue" /><span className="font-mono text-xs text-neu-black/50 uppercase tracking-widest">{t('landing.portfolio.tag')}</span></div>
-              <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-black">Karya Terbaik Kami</h2>
-              <p className="font-body text-sm text-neu-black/60 mt-1 max-w-md">Ratusan proyek telah kami selesaikan dengan standar kualitas tertinggi.</p>
+              <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-black">{t('landing.portfolio.title')}</h2>
+              <p className="font-body text-sm text-neu-black/60 mt-1 max-w-md">{t('landing.portfolio.subtitle')}</p>
             </div>
-            <button onClick={() => transitionTo('/register')} className="reveal-up px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-black hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-150">Pesan Layanan →</button>
+            <button onClick={() => transitionTo('/register')} className="reveal-up px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-black hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-150">{t('landing.portfolio.cta')}</button>
           </div>
           {isLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">{[1,2,3].map(i => <div key={i} className="border-2 border-neu-black bg-neu-white h-64 animate-pulse" />)}</div>
@@ -957,12 +948,12 @@ export default function LandingPage() {
                         : <div className="w-full h-full flex items-center justify-center"><span className="font-display font-bold text-5xl text-neu-black/15">{item.title?.charAt(0)}</span></div>}
                       {item.category && <span className="absolute top-2 left-2 bg-neu-black text-neu-white font-mono font-bold text-[10px] uppercase px-2 py-0.5">{item.category.replace(/_/g,' ')}</span>}
                       <div className="absolute inset-0 bg-neu-black/0 group-hover:bg-neu-black/20 transition-all duration-300 flex items-center justify-center">
-                        <span className="opacity-0 group-hover:opacity-100 transition-opacity font-display font-bold text-sm text-neu-white bg-neu-black/80 px-4 py-2 border border-neu-white/30">Lihat Detail →</span>
+                        <span className="opacity-0 group-hover:opacity-100 transition-opacity font-display font-bold text-sm text-neu-white bg-neu-black/80 px-4 py-2 border border-neu-white/30">{t('landing.portfolio.viewDetailHover')}</span>
                       </div>
                     </div>
                     <div className="p-4">
                       <h3 className="font-display font-bold text-base text-neu-black leading-tight mb-3">{item.title}</h3>
-                      <button className="w-full py-2 bg-neu-primary border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-black transition-all duration-150 group-hover:translate-x-[2px] group-hover:translate-y-[2px] group-hover:shadow-none">Lihat Detail</button>
+                      <button className="w-full py-2 bg-neu-primary border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-black transition-all duration-150 group-hover:translate-x-[2px] group-hover:translate-y-[2px] group-hover:shadow-none">{t('landing.portfolio.viewDetail')}</button>
                     </div>
                   </div>
                 );
@@ -976,18 +967,11 @@ export default function LandingPage() {
       <section className="border-b-2 border-neu-black bg-neu-bg py-20">
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
           <div className="text-center mb-12 reveal-left">
-            <div className="flex items-center justify-center gap-3 mb-2"><div className="h-1 w-8 bg-neu-green" /><span className="font-mono text-xs text-neu-black/50 uppercase tracking-widest">Keunggulan Kami</span><div className="h-1 w-8 bg-neu-green" /></div>
-            <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-black">Mengapa Memilih Synectra?</h2>
+            <div className="flex items-center justify-center gap-3 mb-2"><div className="h-1 w-8 bg-neu-green" /><span className="font-mono text-xs text-neu-black/50 uppercase tracking-widest">{t('landing.why.tag')}</span><div className="h-1 w-8 bg-neu-green" /></div>
+            <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-black">{t('landing.why.title')}</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              { icon: '🔍', title: 'Transparan 100%', desc: 'Pantau progress real-time. Tidak ada biaya tersembunyi — semua terdokumentasi dengan jelas.' },
-              { icon: '⚡', title: 'Pengerjaan Cepat', desc: 'Deadline realistis dan komitmen penuh. Tim kami bekerja efisien tanpa mengorbankan kualitas.' },
-              { icon: '🛡️', title: 'Garansi Kualitas', desc: 'Revisi hingga puas. Kami memastikan hasil akhir melampaui ekspektasi Anda.' },
-              { icon: '💬', title: 'Komunikasi Aktif', desc: 'Responsif dan proaktif. Update progress dikirim rutin tanpa perlu Anda tanya.' },
-              { icon: '💰', title: 'Harga Terjangkau', desc: 'Kualitas premium dengan harga bersahabat. Skema DP yang fleksibel dan aman.' },
-              { icon: '🏆', title: '5+ Tahun Pengalaman', desc: 'Tim berpengalaman yang telah menangani 150+ proyek berbagai skala dan industri.' },
-            ].map(w => (
+            {(t('landing.why.items', { returnObjects: true })).map(w => (
               <div key={w.title} className="reveal-up border-2 border-neu-black bg-neu-white shadow-neu p-6 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-neu-lg transition-all duration-150">
                 <span className="text-3xl">{w.icon}</span>
                 <h3 className="font-display font-bold text-base text-neu-black mt-3 mb-2">{w.title}</h3>
@@ -1002,16 +986,15 @@ export default function LandingPage() {
       <section id="cara-kerja" className="border-b-2 border-neu-black bg-neu-black py-20">
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
           <div className="text-center mb-12 reveal-up">
-            <span className="font-mono text-xs text-neu-white/40 uppercase tracking-widest">Proses Mudah & Transparan</span>
-            <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-white mt-1">Cara Kami Bekerja</h2>
+            <span className="font-mono text-xs text-neu-white/40 uppercase tracking-widest">{t('landing.howItWorks.tag')}</span>
+            <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-white mt-1">{t('landing.howItWorks.title')}</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[
-              { no: '01', title: 'Konsultasi', desc: 'Ceritakan kebutuhanmu. Kami diskusikan scope, teknologi, timeline, dan estimasi harga secara transparan.', color: 'bg-neu-primary', shadow: '4px 4px 0px #FFD000' },
-              { no: '02', title: 'Pembayaran DP', desc: 'Deal! Bayar DP sebagai tanda pengerjaan dimulai. Proses aman, terverifikasi, dan terdokumentasi.', color: 'bg-neu-blue', shadow: '4px 4px 0px #4D61FF' },
-              { no: '03', title: 'Pengerjaan', desc: 'Tim mulai bekerja. Progress dilaporkan rutin dan bisa dipantau live di aplikasi kami setiap saat.', color: 'bg-neu-green', shadow: '4px 4px 0px #00C48C' },
-              { no: '04', title: 'Serah Terima', desc: 'Proyek selesai, revisi final, pelunasan, dan source code + dokumentasi lengkap diserahkan.', color: 'bg-neu-accent', shadow: '4px 4px 0px #FF5C5C' },
-            ].map(step => (
+            {(t('landing.howItWorks.steps', { returnObjects: true })).map((step, si) => {
+              const colors = ['bg-neu-primary','bg-neu-blue','bg-neu-green','bg-neu-accent'];
+              const shadows = ['4px 4px 0px #FFD000','4px 4px 0px #4D61FF','4px 4px 0px #00C48C','4px 4px 0px #FF5C5C'];
+              return { ...step, color: colors[si], shadow: shadows[si] };
+            }).map(step => (
               <div key={step.no} className="reveal-up border-2 border-neu-white/20 bg-neu-white/5 p-6" style={{ boxShadow: step.shadow }}>
                 <div className={cn('w-12 h-12 border-2 border-neu-white/20 flex items-center justify-center mb-4', step.color)}>
                   <span className="font-display font-bold text-xl text-neu-black">{step.no.charAt(1)}</span>
@@ -1043,9 +1026,9 @@ export default function LandingPage() {
           <div className="max-w-7xl mx-auto px-4 lg:px-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
               <div className="reveal-up">
-                <div className="flex items-center gap-3 mb-2"><div className="h-1 w-10 bg-neu-green" /><span className="font-mono text-xs text-neu-black/50 uppercase tracking-widest">Hubungi Kami</span></div>
-                <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-black mb-3">Ada Pertanyaan?<br />Kami Siap Membantu.</h2>
-                <p className="font-body text-sm text-neu-black/60 mb-6 leading-relaxed">Tim kami online setiap hari. Konsultasikan kebutuhanmu sekarang — gratis, tanpa komitmen.</p>
+                <div className="flex items-center gap-3 mb-2"><div className="h-1 w-10 bg-neu-green" /><span className="font-mono text-xs text-neu-black/50 uppercase tracking-widest">{t('landing.contact.tag')}</span></div>
+                <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-black mb-3">{t('landing.contact.title').split('\n').map((l,i)=><span key={i}>{l}{i===0&&<br/>}</span>)}</h2>
+                <p className="font-body text-sm text-neu-black/60 mb-6 leading-relaxed">{t('landing.contact.subtitle')}</p>
                 {contacts.length > 0 && (
                   <div className="space-y-3">
                     {contacts.map(ct => {
@@ -1063,7 +1046,7 @@ export default function LandingPage() {
                               try {
                                 const emailAddr = href.replace('mailto:', '');
                                 navigator.clipboard.writeText(emailAddr);
-                                showToast(`Email ${emailAddr} disalin ke clipboard!`);
+                                showToast(t('landing.contact.emailCopied', { email: emailAddr }));
                               } catch (err) {}
                             }
                           }}
@@ -1081,7 +1064,7 @@ export default function LandingPage() {
               </div>
               {socialMedia.length > 0 && (
                 <div className="reveal-up">
-                  <p className="font-display font-bold text-sm text-neu-black uppercase mb-4">Ikuti Kami di Sosial Media</p>
+                  <p className="font-display font-bold text-sm text-neu-black uppercase mb-4">{t('landing.contact.social')}</p>
                   <div className="grid grid-cols-2 gap-3">
                     {socialMedia.map(s => {
                       const { Icon, color } = getPlatform(s.icon ?? s.platformName?.toLowerCase());
@@ -1116,11 +1099,11 @@ export default function LandingPage() {
             </div>
             {/* Text Side */}
             <div className="py-16 px-8 lg:px-12">
-              <h2 className="font-display font-bold text-4xl lg:text-5xl text-neu-black mb-4 reveal-up">Mulai Proyekmu<br />Sekarang Juga.</h2>
-              <p className="font-body text-base text-neu-black/70 mb-8 max-w-md reveal-up">Wujudkan ide digitalmu bersama tim profesional kami. Transparan, cepat, dan berkualitas.</p>
+              <h2 className="font-display font-bold text-4xl lg:text-5xl text-neu-black mb-4 reveal-up">{t('landing.cta.title').split('\n').map((l,i)=><span key={i}>{l}{i===0&&<br/>}</span>)}</h2>
+              <p className="font-body text-base text-neu-black/70 mb-8 max-w-md reveal-up">{t('landing.cta.subtitle')}</p>
               <div className="flex flex-col sm:flex-row gap-3 reveal-up">
-                <button onClick={() => transitionTo('/register')} className="px-8 py-4 bg-neu-black border-2 border-neu-black text-neu-white font-display font-bold text-sm uppercase shadow-[6px_6px_0px_#0D0D0D] hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none transition-all duration-150">Daftar Sekarang — Gratis</button>
-                <button onClick={() => transitionTo('/login')} className="px-8 py-4 bg-neu-white border-2 border-neu-black text-neu-black font-display font-bold text-sm uppercase shadow-[6px_6px_0px_#0D0D0D] hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none transition-all duration-150">Sudah Punya Akun</button>
+                <button onClick={() => transitionTo('/register')} className="px-8 py-4 bg-neu-black border-2 border-neu-black text-neu-white font-display font-bold text-sm uppercase shadow-[6px_6px_0px_#0D0D0D] hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none transition-all duration-150">{t('landing.cta.primary')}</button>
+                <button onClick={() => transitionTo('/login')} className="px-8 py-4 bg-neu-white border-2 border-neu-black text-neu-black font-display font-bold text-sm uppercase shadow-[6px_6px_0px_#0D0D0D] hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none transition-all duration-150">{t('landing.cta.secondary')}</button>
               </div>
             </div>
           </div>
@@ -1217,7 +1200,7 @@ export default function LandingPage() {
                     </div>
                   </div>
                 )) : (
-                  <p className="font-mono text-xs text-neu-white/20">Belum dikonfigurasi.</p>
+                  <p className="font-mono text-xs text-neu-white/20">{t('common.notConfigured')}</p>
                 )}
               </div>
             </div>
@@ -1228,14 +1211,14 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 lg:px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-4 flex-wrap">
             <p className="font-mono text-[11px] text-neu-white/25">
-              © {new Date().getFullYear()} Synectra. All rights reserved.
+              © {new Date().getFullYear()} Synectra. {t('landing.footer.rights')}
             </p>
           </div>
           <div className="flex items-center gap-4">
-            {['Kebijakan Privasi','Syarat & Ketentuan'].map(t => (
-              <button key={t}
+            {[t('landing.footer.privacy'), t('landing.footer.terms')].map(label => (
+              <button key={label}
                 className="font-mono text-[11px] text-neu-white/25 hover:text-neu-white/60 transition-colors">
-                {t}
+                {label}
               </button>
             ))}
           </div>

@@ -1,22 +1,25 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
 import { Scene3D } from '../components/3d/Scene3D';
 import { AlertContainer } from '../components/ui/Alert';
 import { useAlert } from '../hooks/useAlert';
+import { LanguageSwitcher } from '../components/ui/LanguageSwitcher';
 
 export default function RegisterPage() {
   const navigate  = useNavigate();
   const alert     = useAlert();
+  const { t }     = useTranslation();
   const cardRef   = useRef(null);
   const titleRef  = useRef(null);
   const formRef   = useRef(null);
 
-  const [form, setForm]           = useState({ email: '', fullName: '', password: '', confirm: '' });
-  const [isLoading, setIsLoading] = useState(false);
-  const [showPass, setShowPass]   = useState(false);
+  const [form, setForm]             = useState({ email: '', fullName: '', password: '', confirm: '' });
+  const [isLoading, setIsLoading]   = useState(false);
+  const [showPass, setShowPass]     = useState(false);
   const [fieldError, setFieldError] = useState({});
 
   useEffect(() => {
@@ -40,12 +43,12 @@ export default function RegisterPage() {
 
   const validate = () => {
     const errs = {};
-    if (!form.fullName.trim())                 errs.fullName = 'Nama lengkap wajib diisi';
-    if (!form.email)                           errs.email    = 'Email wajib diisi';
-    else if (!/\S+@\S+\.\S+/.test(form.email)) errs.email   = 'Format email tidak valid';
-    if (!form.password)                        errs.password = 'Password wajib diisi';
-    else if (form.password.length < 8)         errs.password = 'Password minimal 8 karakter';
-    if (form.confirm !== form.password)        errs.confirm  = 'Konfirmasi password tidak cocok';
+    if (!form.fullName.trim())                  errs.fullName = t('register.validation.nameRequired');
+    if (!form.email)                            errs.email    = t('register.validation.emailRequired');
+    else if (!/\S+@\S+\.\S+/.test(form.email)) errs.email    = t('register.validation.emailInvalid');
+    if (!form.password)                         errs.password = t('register.validation.passwordRequired');
+    else if (form.password.length < 8)          errs.password = t('register.validation.passwordMinLength');
+    if (form.confirm !== form.password)         errs.confirm  = t('register.validation.passwordMismatch');
     setFieldError(errs);
     return Object.keys(errs).length === 0;
   };
@@ -57,10 +60,10 @@ export default function RegisterPage() {
     setIsLoading(true);
     try {
       await authService.register(form.email, form.fullName, form.password);
-      alert.success('Akun berhasil dibuat! Silakan masuk.');
+      alert.success(t('register.success'));
       setTimeout(() => navigate('/login'), 1200);
     } catch (err) {
-      const message = err?.response?.data?.message || 'Registrasi gagal. Coba lagi.';
+      const message = err?.response?.data?.message || t('register.failed');
       alert.error(Array.isArray(message) ? message.join(', ') : message);
       shakeCard();
     } finally {
@@ -82,6 +85,11 @@ export default function RegisterPage() {
       <AlertContainer alerts={alert.alerts} onDismiss={alert.dismiss} />
       <Scene3D />
 
+      {/* Language switcher */}
+      <div className="absolute top-4 right-4 z-20">
+        <LanguageSwitcher variant="light" />
+      </div>
+
       <div className="min-h-screen flex items-center justify-center p-4 pointer-events-none relative z-10">
         <div ref={cardRef} className="w-full max-w-md bg-neu-white border-2 border-neu-black shadow-neu-xl p-8 pointer-events-auto">
 
@@ -93,10 +101,12 @@ export default function RegisterPage() {
               </span>
             </div>
             <h1 className="font-display font-bold text-4xl text-neu-black leading-tight">
-              Buat<br />Akun Baru
+              {t('register.title').split('\n').map((line, i) => (
+                <span key={i}>{line}{i === 0 && <br />}</span>
+              ))}
             </h1>
             <p className="font-body text-sm text-neu-black/60 mt-2">
-              Daftarkan diri Anda ke platform Synectra.
+              {t('register.subtitle')}
             </p>
           </div>
 
@@ -120,13 +130,13 @@ export default function RegisterPage() {
               <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
               <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
             </svg>
-            Daftar dengan Google
+            {t('register.withGoogle')}
           </button>
 
           {/* Divider */}
           <div className="flex items-center gap-3 mb-6">
             <div className="flex-1 h-0.5 bg-neu-black" />
-            <span className="font-mono text-xs text-neu-black/50 uppercase">atau daftar manual</span>
+            <span className="font-mono text-xs text-neu-black/50 uppercase">{t('register.orManual')}</span>
             <div className="flex-1 h-0.5 bg-neu-black" />
           </div>
 
@@ -135,13 +145,13 @@ export default function RegisterPage() {
             {/* Nama Lengkap */}
             <div className="flex flex-col gap-1.5">
               <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wider">
-                Nama Lengkap
+                {t('register.nameLabel')}
               </label>
               <input
                 type="text"
                 value={form.fullName}
                 onChange={(e) => setField('fullName', e.target.value)}
-                placeholder="Nama lengkap Anda"
+                placeholder={t('register.namePlaceholder')}
                 autoComplete="name"
                 className={inputClass('fullName')}
               />
@@ -153,13 +163,13 @@ export default function RegisterPage() {
             {/* Email */}
             <div className="flex flex-col gap-1.5">
               <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wider">
-                Email
+                {t('register.emailLabel')}
               </label>
               <input
                 type="email"
                 value={form.email}
                 onChange={(e) => setField('email', e.target.value)}
-                placeholder="email@perusahaan.com"
+                placeholder={t('register.emailPlaceholder')}
                 autoComplete="email"
                 className={inputClass('email')}
               />
@@ -171,14 +181,14 @@ export default function RegisterPage() {
             {/* Password */}
             <div className="flex flex-col gap-1.5">
               <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wider">
-                Password
+                {t('register.passwordLabel')}
               </label>
               <div className="relative">
                 <input
                   type={showPass ? 'text' : 'password'}
                   value={form.password}
                   onChange={(e) => setField('password', e.target.value)}
-                  placeholder="Min. 8 karakter"
+                  placeholder={t('register.passwordPlaceholder')}
                   autoComplete="new-password"
                   className={cn(inputClass('password'), 'pr-12')}
                 />
@@ -186,7 +196,7 @@ export default function RegisterPage() {
                   type="button"
                   onClick={() => setShowPass((p) => !p)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-neu-black/50 hover:text-neu-black transition-colors"
-                  aria-label={showPass ? 'Sembunyikan' : 'Tampilkan'}
+                  aria-label={showPass ? t('register.hide') : t('register.show')}
                 >
                   {showPass ? (
                     <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -210,13 +220,13 @@ export default function RegisterPage() {
             {/* Konfirmasi Password */}
             <div className="flex flex-col gap-1.5">
               <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wider">
-                Konfirmasi Password
+                {t('register.confirmLabel')}
               </label>
               <input
                 type={showPass ? 'text' : 'password'}
                 value={form.confirm}
                 onChange={(e) => setField('confirm', e.target.value)}
-                placeholder="Ulangi password"
+                placeholder={t('register.confirmPlaceholder')}
                 autoComplete="new-password"
                 className={inputClass('confirm')}
               />
@@ -242,20 +252,17 @@ export default function RegisterPage() {
               {isLoading ? (
                 <span className="inline-flex items-center gap-2 justify-center">
                   <span className="animate-spin inline-block">⟳</span>
-                  Mendaftarkan...
+                  {t('register.registering')}
                 </span>
-              ) : 'Daftar Sekarang'}
+              ) : t('register.submit')}
             </button>
           </form>
 
           {/* Footer */}
           <p className="mt-4 text-center font-body text-sm text-neu-black/60">
-            Sudah punya akun?{' '}
-            <Link
-              to="/login"
-              className="font-semibold text-neu-black underline hover:text-neu-blue transition-colors"
-            >
-              Masuk di sini
+            {t('register.hasAccount')}{' '}
+            <Link to="/login" className="font-semibold text-neu-black underline hover:text-neu-blue transition-colors">
+              {t('register.loginLink')}
             </Link>
           </p>
         </div>

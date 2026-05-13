@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
@@ -8,6 +9,7 @@ import { PageLayout } from '../components/layout/PageLayout';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
 import { PortfolioDetailModal } from '../components/portfolio/PortfolioDetailModal';
 import { useAlert } from '../hooks/useAlert';
+import { PageLoader } from '../components/ui/PageLoader';
 
 const stripHtml = (html) => html?.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim() ?? '';
 
@@ -117,6 +119,7 @@ function PortfolioCard({ item, isAdmin, onEdit, onDelete, onDetail, delay }) {
 
 export default function PortfolioPage() {
   const navigate = useNavigate();
+  const { t }    = useTranslation();
   const alert    = useAlert();
 
   const [user, setUser]             = useState(null);
@@ -167,11 +170,7 @@ export default function PortfolioPage() {
     return matchSearch && matchCat;
   });
 
-  if (isLoading) return (
-    <div className="min-h-screen bg-neu-bg flex items-center justify-center">
-      <p className="font-display font-bold text-neu-black animate-pulse">Memuat...</p>
-    </div>
-  );
+  if (isLoading) return <PageLoader />;
 
   return (
     <PageLayout user={user} title="Portfolio" alert={alert}>

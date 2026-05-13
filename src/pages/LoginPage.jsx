@@ -1,23 +1,26 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
 import { Scene3D } from '../components/3d/Scene3D';
 import { AlertContainer } from '../components/ui/Alert';
 import { useAlert } from '../hooks/useAlert';
+import { LanguageSwitcher } from '../components/ui/LanguageSwitcher';
 
 export default function LoginPage() {
   const navigate  = useNavigate();
   const alert     = useAlert();
+  const { t }     = useTranslation();
   const cardRef   = useRef(null);
   const titleRef  = useRef(null);
   const formRef   = useRef(null);
 
-  const [email, setEmail]         = useState('');
-  const [password, setPassword]   = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [showPass, setShowPass]   = useState(false);
+  const [email, setEmail]           = useState('');
+  const [password, setPassword]     = useState('');
+  const [isLoading, setIsLoading]   = useState(false);
+  const [showPass, setShowPass]     = useState(false);
   const [fieldError, setFieldError] = useState({ email: '', password: '' });
 
   useEffect(() => {
@@ -36,9 +39,9 @@ export default function LoginPage() {
 
   const validate = () => {
     const errs = { email: '', password: '' };
-    if (!email)              errs.email    = 'Email wajib diisi';
-    else if (!/\S+@\S+\.\S+/.test(email)) errs.email = 'Format email tidak valid';
-    if (!password)           errs.password = 'Password wajib diisi';
+    if (!email)                              errs.email    = t('login.validation.emailRequired');
+    else if (!/\S+@\S+\.\S+/.test(email))   errs.email    = t('login.validation.emailInvalid');
+    if (!password)                           errs.password = t('login.validation.passwordRequired');
     setFieldError(errs);
     return !errs.email && !errs.password;
   };
@@ -50,10 +53,10 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       await authService.login(email, password);
-      alert.success('Login berhasil! Mengalihkan...');
+      alert.success(t('login.success'));
       setTimeout(() => navigate('/dashboard'), 800);
     } catch (err) {
-      const message = err?.response?.data?.message || 'Login gagal. Periksa kembali kredensial Anda.';
+      const message = err?.response?.data?.message || t('login.failed');
       alert.error(message);
       shakeCard();
     } finally {
@@ -66,6 +69,11 @@ export default function LoginPage() {
       <AlertContainer alerts={alert.alerts} onDismiss={alert.dismiss} />
       <Scene3D />
 
+      {/* Language switcher */}
+      <div className="absolute top-4 right-4 z-20">
+        <LanguageSwitcher variant="light" />
+      </div>
+
       <div className="min-h-screen flex items-center justify-center p-4 pointer-events-none relative z-10">
         <div ref={cardRef} className="w-full max-w-md bg-neu-white border-2 border-neu-black shadow-neu-xl p-8 pointer-events-auto">
 
@@ -77,14 +85,16 @@ export default function LoginPage() {
               </span>
             </div>
             <h1 className="font-display font-bold text-4xl text-neu-black leading-tight">
-              Selamat<br />Datang
+              {t('login.welcome').split('\n').map((line, i) => (
+                <span key={i}>{line}{i === 0 && <br />}</span>
+              ))}
             </h1>
             <p className="font-body text-sm text-neu-black/60 mt-2">
-              Masuk untuk mengakses platform penerimaan client.
+              {t('login.subtitle')}
             </p>
           </div>
 
-          {/* Google OAuth — di atas form */}
+          {/* Google OAuth */}
           <button
             type="button"
             onClick={() => authService.loginWithGoogle()}
@@ -104,13 +114,13 @@ export default function LoginPage() {
               <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
               <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
             </svg>
-            Lanjutkan dengan Google
+            {t('login.withGoogle')}
           </button>
 
           {/* Divider */}
           <div className="flex items-center gap-3 mb-6">
             <div className="flex-1 h-0.5 bg-neu-black" />
-            <span className="font-mono text-xs text-neu-black/50 uppercase">atau masuk manual</span>
+            <span className="font-mono text-xs text-neu-black/50 uppercase">{t('login.orManual')}</span>
             <div className="flex-1 h-0.5 bg-neu-black" />
           </div>
 
@@ -119,13 +129,13 @@ export default function LoginPage() {
             {/* Email */}
             <div className="flex flex-col gap-1.5 mb-4">
               <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wider">
-                Email
+                {t('login.emailLabel')}
               </label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => { setEmail(e.target.value); setFieldError((p) => ({ ...p, email: '' })); }}
-                placeholder="email@perusahaan.com"
+                placeholder={t('login.emailPlaceholder')}
                 autoComplete="email"
                 className={cn(
                   'w-full px-4 py-3 bg-neu-white',
@@ -144,7 +154,7 @@ export default function LoginPage() {
             {/* Password */}
             <div className="flex flex-col gap-1.5 mb-6">
               <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wider">
-                Password
+                {t('login.passwordLabel')}
               </label>
               <div className="relative">
                 <input
@@ -166,7 +176,7 @@ export default function LoginPage() {
                   type="button"
                   onClick={() => setShowPass((p) => !p)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-neu-black/50 hover:text-neu-black transition-colors"
-                  aria-label={showPass ? 'Sembunyikan password' : 'Tampilkan password'}
+                  aria-label={showPass ? t('login.hidePassword') : t('login.showPassword')}
                 >
                   {showPass ? (
                     <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -204,20 +214,17 @@ export default function LoginPage() {
               {isLoading ? (
                 <span className="inline-flex items-center gap-2 justify-center">
                   <span className="animate-spin inline-block">⟳</span>
-                  Memproses...
+                  {t('login.processing')}
                 </span>
-              ) : 'Masuk'}
+              ) : t('login.submit')}
             </button>
           </form>
 
           {/* Footer */}
           <p className="mt-6 text-center font-body text-sm text-neu-black/60">
-            Belum punya akun?{' '}
-            <Link
-              to="/register"
-              className="font-semibold text-neu-black underline hover:text-neu-blue transition-colors"
-            >
-              Daftar sekarang
+            {t('login.noAccount')}{' '}
+            <Link to="/register" className="font-semibold text-neu-black underline hover:text-neu-blue transition-colors">
+              {t('login.registerLink')}
             </Link>
           </p>
         </div>

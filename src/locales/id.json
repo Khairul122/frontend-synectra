@@ -37,7 +37,8 @@
     "noDescription": "Tidak ada deskripsi.",
     "dragOrClick": "Klik atau drag gambar ke sini",
     "imageFormats": "PNG, JPG, WEBP — maks 5MB",
-    "required": "wajib diisi"
+    "required": "wajib diisi",
+    "notConfigured": "Belum dikonfigurasi."
   },
   "nav": {
     "login": "Masuk",
@@ -66,62 +67,112 @@
   },
   "landing": {
     "hero": {
-      "badge": "Platform Jasa Digital",
-      "title": "Wujudkan Ide Digital\nKamu Bersama Synectra",
-      "subtitle": "Dari website, aplikasi mobile, hingga desain UI/UX — kami kerjakan dengan transparan, berkualitas, dan tepat waktu.",
-      "cta": "Mulai Proyek →",
-      "ctaSecondary": "Lihat Portofolio",
-      "stat1": "Proyek Selesai",
-      "stat2": "Client Puas",
-      "stat3": "Tim Expert",
-      "stat4": "Support"
+      "badge": "✦ Platform Jasa Digital Terpercaya",
+      "title1": "Wujudkan",
+      "title2": "Ide Digital",
+      "title3": "Anda",
+      "subtitle": "Dari website modern, aplikasi mobile, desain UI/UX, hingga pengerjaan tugas akademik. Kami hadir dengan transparansi penuh, harga bersaing, dan kualitas terjamin.",
+      "cta": "Mulai Sekarang →",
+      "ctaSecondary": "Lihat Karya Kami"
+    },
+    "stats": {
+      "projects": "Proyek Selesai",
+      "clients": "Client Puas",
+      "experience": "Tahun Pengalaman",
+      "satisfaction": "Rating Kepuasan"
     },
     "services": {
-      "tag": "Layanan Kami",
+      "tag": "Apa yang Kami Tawarkan",
       "title": "Layanan Lengkap untuk\nKebutuhan Digital Anda",
-      "subtitle": "Semua kebutuhan digital bisnis kamu, kami tangani dengan profesional."
+      "items": [
+        { "icon": "💻", "title": "Web Development", "desc": "Membangun website profesional, scalable, dan modern sesuai kebutuhan bisnis Anda dengan teknologi terkini." },
+        { "icon": "📱", "title": "Mobile App", "desc": "Aplikasi Android & iOS yang responsif, user-friendly, dan berperforma tinggi untuk menjangkau audiens lebih luas." },
+        { "icon": "🎨", "title": "UI/UX Design", "desc": "Desain antarmuka yang indah, intuitif, dan meningkatkan konversi. Dari wireframe hingga prototype siap produksi." },
+        { "icon": "⚙️", "title": "Backend & API", "desc": "Arsitektur server yang solid, aman, dan performa tinggi untuk mendukung aplikasi skala enterprise." },
+        { "icon": "📊", "title": "Data Science", "desc": "Analisis data, machine learning, dan visualisasi yang mengubah data mentah menjadi keputusan bisnis cerdas." },
+        { "icon": "📝", "title": "Joki Tugas", "desc": "Bantuan profesional untuk tugas akademik, skripsi, thesis, dan project kampus. Tepat waktu dan berkualitas." }
+      ]
+    },
+    "about": {
+      "tag": "Visualisasi Digital Modern",
+      "title": "Kami Membangun\nLebih dari Sekadar Website",
+      "subtitle": "Synectra bukan hanya menyerahkan kode — kami menghadirkan pengalaman digital yang berkesan. Setiap proyek dikerjakan dengan perhatian penuh pada detail, performa, dan estetika yang relevan dengan industri Anda.",
+      "features": [
+        "Desain antarmuka yang intuitif dan modern",
+        "Performa tinggi, responsif di semua perangkat",
+        "Update progress transparan selama pengerjaan",
+        "Source code bersih, terdokumentasi, siap dikembangkan"
+      ]
     },
     "packages": {
-      "title": "Paket Layanan"
+      "title": "Paket Layanan",
+      "duration": "Durasi"
     },
     "portfolio": {
       "tag": "Portofolio",
-      "title": "Hasil Kerja Nyata,\nBukan Janji Kosong",
+      "title": "Karya Terbaik Kami",
+      "subtitle": "Ratusan proyek telah kami selesaikan dengan standar kualitas tertinggi.",
       "cta": "Pesan Layanan →",
       "noPortfolio": "Portofolio segera hadir.",
       "viewDetail": "Lihat Detail",
-      "detail": "Lihat Detail →"
+      "viewDetailHover": "Lihat Detail →",
+      "clickView": "Klik untuk lihat →"
     },
     "why": {
-      "tag": "Mengapa Synectra?",
-      "title": "Lebih dari Sekadar\nPenyedia Jasa Digital"
+      "tag": "Keunggulan Kami",
+      "title": "Mengapa Memilih Synectra?",
+      "items": [
+        { "icon": "🔍", "title": "Transparan 100%", "desc": "Pantau progress real-time. Tidak ada biaya tersembunyi — semua terdokumentasi dengan jelas." },
+        { "icon": "⚡", "title": "Pengerjaan Cepat", "desc": "Deadline realistis dan komitmen penuh. Tim kami bekerja efisien tanpa mengorbankan kualitas." },
+        { "icon": "🛡️", "title": "Garansi Kualitas", "desc": "Revisi hingga puas. Kami memastikan hasil akhir melampaui ekspektasi Anda." },
+        { "icon": "💬", "title": "Komunikasi Aktif", "desc": "Responsif dan proaktif. Update progress dikirim rutin tanpa perlu Anda tanya." },
+        { "icon": "💰", "title": "Harga Terjangkau", "desc": "Kualitas premium dengan harga bersahabat. Skema DP yang fleksibel dan aman." },
+        { "icon": "🏆", "title": "5+ Tahun Pengalaman", "desc": "Tim berpengalaman yang telah menangani 150+ proyek berbagai skala dan industri." }
+      ]
     },
     "howItWorks": {
-      "tag": "Cara Kerja",
-      "title": "Proses Sederhana,\nHasil Maksimal",
-      "step1Title": "Konsultasi Gratis",
-      "step1Desc": "Ceritakan kebutuhanmu. Kami analisis dan berikan estimasi waktu & biaya tanpa biaya apapun.",
-      "step2Title": "Pengerjaan Transparan",
-      "step2Desc": "Kamu bisa pantau progress pengerjaan secara real-time. Tidak ada kejutan di akhir.",
-      "step3Title": "Revisi & Delivery",
-      "step3Desc": "Setelah pengerjaan selesai, kamu bisa request revisi sesuai paket. Source code dan aset langsung dikirim.",
-      "step4Title": "Support Pasca Rilis",
-      "step4Desc": "Kami tidak menghilang setelah project selesai. Garansi support tersedia untuk setiap paket."
+      "tag": "Proses Mudah & Transparan",
+      "title": "Cara Kami Bekerja",
+      "steps": [
+        { "no": "01", "title": "Konsultasi", "desc": "Ceritakan kebutuhanmu. Kami diskusikan scope, teknologi, timeline, dan estimasi harga secara transparan." },
+        { "no": "02", "title": "Pembayaran DP", "desc": "Deal! Bayar DP sebagai tanda pengerjaan dimulai. Proses aman, terverifikasi, dan terdokumentasi." },
+        { "no": "03", "title": "Pengerjaan", "desc": "Tim mulai bekerja. Progress dilaporkan rutin dan bisa dipantau live di aplikasi kami setiap saat." },
+        { "no": "04", "title": "Serah Terima", "desc": "Proyek selesai, revisi final, pelunasan, dan source code + dokumentasi lengkap diserahkan." }
+      ]
     },
     "tech": {
       "label": "Teknologi yang Kami Kuasai"
     },
     "contact": {
       "tag": "Hubungi Kami",
-      "title": "Siap Memulai\nProyek Bersama?",
-      "subtitle": "Konsultasikan kebutuhanmu sekarang. Tim kami siap membantu."
+      "title": "Ada Pertanyaan?\nKami Siap Membantu.",
+      "subtitle": "Tim kami online setiap hari. Konsultasikan kebutuhanmu sekarang — gratis, tanpa komitmen.",
+      "social": "Ikuti Kami di Sosial Media",
+      "emailCopied": "Email {{email}} disalin ke clipboard!"
+    },
+    "banner": {
+      "title": "Pengumuman & Promo Terbaru",
+      "promo": "Promo",
+      "clickDetail": "Klik untuk lihat detail →",
+      "learnMore": "Pelajari Lebih Lanjut",
+      "close": "Tutup",
+      "noDesc": "Tidak ada deskripsi.",
+      "clickView": "Klik untuk lihat →"
+    },
+    "cta": {
+      "title": "Mulai Proyekmu\nSekarang Juga.",
+      "subtitle": "Wujudkan ide digitalmu bersama tim profesional kami. Transparan, cepat, dan berkualitas.",
+      "primary": "Daftar Sekarang — Gratis",
+      "secondary": "Sudah Punya Akun"
     },
     "footer": {
       "desc": "Platform jasa digital terpercaya untuk website, mobile app, UI/UX, dan pengerjaan tugas akademik.",
       "services": "Layanan",
       "company": "Perusahaan",
-      "payment": "Pembayaran",
-      "rights": "Hak cipta dilindungi.",
+      "payment": "Rekening Pembayaran",
+      "rights": "Semua hak dilindungi.",
+      "privacy": "Kebijakan Privasi",
+      "terms": "Syarat & Ketentuan",
       "links": {
         "web": "Pembuatan Website",
         "mobile": "Aplikasi Mobile",
@@ -135,20 +186,12 @@
         "register": "Daftar Gratis"
       }
     },
-    "cta": {
-      "title": "Siap Membuat Sesuatu\nyang Luar Biasa?",
-      "subtitle": "Bergabung dengan puluhan client yang sudah mempercayakan proyek digital mereka kepada Synectra.",
-      "primary": "Mulai Proyek Sekarang →",
-      "secondary": "Konsultasi Gratis"
-    },
-    "banner": {
-      "title": "Pengumuman & Promo Terbaru"
-    },
     "order": "Pesan Sekarang"
   },
   "admin": {
     "panel": "Panel",
     "dashboard": "Dashboard",
+    "enSection": "Versi English (opsional)",
     "banners": {
       "title": "Banner Management",
       "add": "Tambah Banner",
@@ -217,6 +260,9 @@
       "done": "✓ Selesai",
       "noCatalog": "Belum ada software tersedia.",
       "noHistory": "Belum ada riwayat pembelian.",
+      "adminNote": "Catatan:",
+      "buySuccess": "Pembelian \"{{name}}\" berhasil dibuat! Silakan upload bukti pembayaran.",
+      "buyFailed": "Gagal membuat pembelian.",
       "cols": {
         "software": "Software",
         "price": "Harga",
@@ -228,7 +274,368 @@
       "dragOrClick": "Klik atau drag foto bukti transfer",
       "formats": "PNG, JPG, WEBP",
       "send": "Kirim Bukti",
-      "sending": "Mengirim..."
+      "sending": "Mengirim...",
+      "uploading": "Mengupload gambar...",
+      "failUpload": "Gagal upload bukti. Coba lagi.",
+      "failSend": "Gagal mengirim bukti bayar."
+    }
+  },
+  "dashboard": {
+    "adminBadge": "Administrator",
+    "adminGreeting": "Selamat datang, {{name}}!",
+    "adminSubtitle": "Berikut ringkasan aktivitas sistem Synectra hari ini.",
+    "totalOrders": "Total Pesanan",
+    "totalClients": "Total Client",
+    "needAction": "Menunggu Aksi",
+    "inProgress": "Sedang Dikerjakan",
+    "recentOrders": "Pesanan Terbaru",
+    "viewAll": "Lihat semua →",
+    "noOrders": "Belum ada pesanan.",
+    "pendingOrders": "Perlu Aksi",
+    "pendingSubtitle": "Pesanan status Pending",
+    "noPending": "Tidak ada pesanan pending.",
+    "allGood": "✓ Semua beres!",
+    "manageOrders": "Kelola Semua Pesanan",
+    "clientBadge": "Client",
+    "clientGreeting": "Halo, {{name}}!",
+    "clientSubtitle": "Pantau status pesanan dan progress pengerjaan kamu di sini.",
+    "createOrder": "+ Buat Pesanan",
+    "activeOrders": "Pesanan Aktif",
+    "latestProgress": "Progress Terkini",
+    "myOrders": "Pesanan Saya",
+    "noOrdersClient": "Belum ada pesanan.",
+    "createFirstOrder": "+ Buat Pesanan Pertama",
+    "progress": "Progress"
+  },
+  "orders": {
+    "title": "Manajemen Pesanan",
+    "search": "Cari judul atau client...",
+    "allStatus": "Semua Status",
+    "createOrder": "+ Buat Pesanan",
+    "noOrders": "Belum ada pesanan.",
+    "noResult": "Tidak ada hasil.",
+    "createFirst": "Buat Pesanan Pertama",
+    "cols": {
+      "title": "Judul Pesanan",
+      "client": "Client",
+      "total": "Total",
+      "deadline": "Deadline",
+      "status": "Status",
+      "createdAt": "Dibuat"
+    }
+  },
+  "orderDetail": {
+    "breadcrumb": "Orders",
+    "progressDetail": "Detail Progress",
+    "progressPct": "Persentase Progress",
+    "progressTitle": "Judul Update",
+    "description": "Deskripsi",
+    "noDesc": "Tidak ada deskripsi.",
+    "screenshot": "Screenshot",
+    "zoomIn": "Klik untuk memperbesar",
+    "reportedAt": "Dilaporkan:",
+    "close": "Tutup",
+    "receiptTitle": "Bukti Transfer",
+    "note": "Catatan:",
+    "verifiedAt": "Diverifikasi:",
+    "paymentTypes": { "dp": "Down Payment (DP)", "termin_1": "Termin 1", "pelunasan": "Pelunasan" },
+    "uploadProgress": "Update Progress",
+    "progressTitleLabel": "Judul Update *",
+    "progressTitlePlaceholder": "Contoh: Selesai fitur Login",
+    "progressDesc": "Deskripsi",
+    "progressDescPlaceholder": "Detail progress...",
+    "progressPctLabel": "Persentase Progress:",
+    "attachment": "Screenshot / Lampiran",
+    "lockLabel": "Kunci detail untuk client",
+    "lockHelp": "Client hanya bisa lihat judul & persentase. Detail terbuka otomatis saat pembayaran diverifikasi.",
+    "saveProgress": "Simpan Progress",
+    "rejectPayment": "Tolak Pembayaran",
+    "rejectReason": "Alasan Penolakan *",
+    "rejectPlaceholder": "Contoh: Jumlah transfer tidak sesuai",
+    "verifyPayment": "Verifikasi Pembayaran",
+    "confirmVerify": "Konfirmasi pembayaran sebesar {{amount}} ({{type}}) sudah diterima?",
+    "yesVerify": "Ya, Verifikasi",
+    "clientNeed": "Kebutuhan dari Client",
+    "totalPrice": "Total Harga",
+    "notSet": "Belum ditetapkan",
+    "deadline": "Deadline",
+    "createdAt": "Dibuat",
+    "noProgress": "Belum ada",
+    "setPriceTitle": "Tetapkan Harga & Deadline",
+    "priceLabel": "Total Harga (Rp)",
+    "pricePlaceholder": "Contoh: 1500000",
+    "payments": "Pembayaran ({{count}})",
+    "noPayments": "Belum ada pembayaran.",
+    "progressCount": "Progress ({{count}})",
+    "addProgress": "+ Update Progress",
+    "noProgressUpdate": "Belum ada update progress.",
+    "locked": "🔒 Terkunci",
+    "viewDetail": "Lihat Detail",
+    "editPrice": "Edit Harga",
+    "setPrice": "+ Tetapkan Harga"
+  },
+  "orderForm": {
+    "title": "Buat Pesanan Baru",
+    "breadcrumb": "Orders",
+    "breadcrumbNew": "Buat Baru",
+    "clientIdLabel": "Client ID *",
+    "clientIdPlaceholder": "UUID client (dari tabel users)",
+    "clientIdHelp": "Isi dengan UUID user yang memiliki role 'client'",
+    "titleLabel": "Judul Pesanan *",
+    "titlePlaceholder": "Contoh: Pembuatan Web Company Profile",
+    "categoryLabel": "Kategori Layanan",
+    "categoryDefault": "-- Pilih Kategori --",
+    "descLabel": "Deskripsi",
+    "descPlaceholder": "Detail kebutuhan client...",
+    "priceLabel": "Total Harga (Rp)",
+    "pricePlaceholder": "1500000",
+    "deadlineLabel": "Deadline",
+    "submit": "Buat Pesanan",
+    "success": "Pesanan berhasil dibuat!",
+    "failed": "Gagal membuat pesanan.",
+    "validation": {
+      "clientRequired": "Client wajib dipilih.",
+      "titleRequired": "Judul pesanan wajib diisi."
+    }
+  },
+  "clients": {
+    "title": "Manajemen Client",
+    "search": "Cari nama, perusahaan, atau email...",
+    "editTitle": "Edit Data Client",
+    "nameLabel": "Nama / Perusahaan",
+    "namePlaceholder": "Nama individu atau perusahaan",
+    "emailLabel": "Email Kontak",
+    "emailPlaceholder": "email@example.com",
+    "resetTitle": "Reset Password Client",
+    "newPassPlaceholder": "Password baru (min 8 karakter)",
+    "confirmPassPlaceholder": "Konfirmasi password baru",
+    "resetting": "Mereset...",
+    "resetBtn": "Reset Password",
+    "deleteConfirm": "Hapus client \"{{name}}\"? Data client akan dihapus permanen.",
+    "noClients": "Belum ada client terdaftar.",
+    "cols": {
+      "username": "Nama Pengguna",
+      "company": "Nama / Perusahaan",
+      "email": "Email Kontak",
+      "registered": "Terdaftar"
+    },
+    "success": {
+      "save": "Data client berhasil disimpan.",
+      "delete": "Client berhasil dihapus.",
+      "reset": "Password client berhasil direset."
+    },
+    "failed": {
+      "save": "Gagal menyimpan data client.",
+      "delete": "Gagal menghapus client."
+    },
+    "validation": {
+      "passwordMin": "Password minimal 8 karakter.",
+      "passwordMismatch": "Konfirmasi password tidak cocok."
+    }
+  },
+  "portfolio": {
+    "title": "Manajemen Portfolio",
+    "search": "Cari portfolio...",
+    "allCategories": "Semua Kategori",
+    "add": "+ Tambah Portfolio",
+    "addFirst": "Tambah Portfolio Pertama",
+    "noPortfolio": "Belum ada portfolio.",
+    "deleteConfirm": "Hapus \"{{name}}\"? Tindakan ini tidak bisa dibatalkan.",
+    "success": { "delete": "Portfolio berhasil dihapus." },
+    "failed": { "delete": "Gagal menghapus portfolio." }
+  },
+  "portfolioForm": {
+    "titleNew": "Tambah Portfolio",
+    "titleEdit": "Edit Portfolio",
+    "breadcrumb": "Portfolio"
+  },
+  "bankAccounts": {
+    "title": "Rekening Bank",
+    "search": "Cari bank atau pemilik akun...",
+    "add": "Tambah Akun Bank",
+    "addFirst": "Tambah Akun Pertama",
+    "noAccounts": "Belum ada akun bank.",
+    "deleteConfirm": "Apakah kamu yakin ingin menghapus akun bank \"{{name}}\"? Tindakan ini tidak bisa dibatalkan.",
+    "cols": { "logo": "Logo", "bank": "Bank", "number": "No. Rekening", "owner": "Pemilik Akun" },
+    "success": {
+      "activated": "Akun bank \"{{name}}\" berhasil diaktifkan.",
+      "deactivated": "Akun bank \"{{name}}\" berhasil dinonaktifkan.",
+      "delete": "Akun bank berhasil dihapus."
+    },
+    "failed": { "status": "Gagal mengubah status akun bank.", "delete": "Gagal menghapus akun bank." }
+  },
+  "bankAccountForm": {
+    "titleNew": "Tambah Rekening Bank",
+    "titleEdit": "Edit Rekening Bank",
+    "breadcrumb": "Bank Accounts"
+  },
+  "socialMedia": {
+    "title": "Manajemen Social Media",
+    "search": "Cari platform atau akun...",
+    "add": "Tambah Social Media",
+    "addFirst": "Tambah Social Media Pertama",
+    "noData": "Belum ada social media.",
+    "deleteConfirm": "Hapus \"{{name}}\"? Tindakan ini tidak bisa dibatalkan.",
+    "success": { "activated": "berhasil diaktifkan.", "deactivated": "berhasil dinonaktifkan.", "delete": "berhasil dihapus." },
+    "failed": { "status": "Gagal mengubah status.", "delete": "Gagal menghapus." }
+  },
+  "socialMediaForm": {
+    "titleNew": "Tambah Social Media",
+    "titleEdit": "Edit Social Media",
+    "breadcrumb": "Social Media"
+  },
+  "contacts": {
+    "title": "Manajemen Kontak",
+    "search": "Cari kontak...",
+    "add": "Tambah Kontak",
+    "addFirst": "Tambah Kontak Pertama",
+    "noData": "Belum ada kontak.",
+    "deleteConfirm": "Hapus \"{{name}}\"? Tindakan ini tidak bisa dibatalkan.",
+    "success": { "activated": "berhasil diaktifkan.", "deactivated": "berhasil dinonaktifkan.", "delete": "berhasil dihapus." },
+    "failed": { "status": "Gagal mengubah status.", "delete": "Gagal menghapus." }
+  },
+  "contactForm": {
+    "titleNew": "Tambah Kontak",
+    "titleEdit": "Edit Kontak",
+    "breadcrumb": "Contacts"
+  },
+  "profile": {
+    "title": "Profil Saya",
+    "editSection": "Edit Profil",
+    "nameLabel": "Nama Lengkap *",
+    "namePlaceholder": "Nama lengkap",
+    "emailLabel": "Email *",
+    "emailPlaceholder": "email@example.com",
+    "saveProfile": "Simpan Profil",
+    "changePass": "Ganti Password",
+    "googleAccount": "Akun Google",
+    "googleInfo": "Akun ini terdaftar melalui Google OAuth dan tidak memiliki password lokal. Password dikelola oleh Google.",
+    "currentPass": "Password Saat Ini",
+    "newPass": "Password Baru",
+    "confirmPass": "Konfirmasi Password Baru",
+    "changePassBtn": "Ganti Password",
+    "success": { "profile": "Profil berhasil diperbarui.", "password": "Password berhasil diperbarui." },
+    "failed": { "profile": "Gagal memperbarui profil.", "password": "Gagal memperbarui password." },
+    "validation": {
+      "nameRequired": "Nama lengkap wajib diisi.",
+      "emailRequired": "Email wajib diisi.",
+      "currentPassRequired": "Password saat ini wajib diisi.",
+      "newPassMin": "Password baru minimal 8 karakter.",
+      "passwordMismatch": "Konfirmasi password tidak cocok."
+    }
+  },
+  "myOrders": {
+    "title": "Pesanan Saya",
+    "search": "Cari pesanan...",
+    "create": "+ Buat Pesanan Baru",
+    "noOrders": "Belum ada pesanan.",
+    "createFirst": "Buat Pesanan Pertama"
+  },
+  "myOrderDetail": {
+    "breadcrumb": "Pesanan Saya",
+    "uploadReceipt": "Upload Bukti Bayar",
+    "completeOrder": "✓ Selesaikan Pesanan",
+    "paymentHistory": "Riwayat Pembayaran",
+    "noPayments": "Belum ada pembayaran.",
+    "progressTimeline": "Timeline Progress",
+    "noProgress": "Belum ada update progress dari admin.",
+    "locked": "🔒 Terkunci",
+    "lockedMsg": "Detail progress terkunci. Lakukan pembayaran dan tunggu verifikasi admin untuk membuka akses.",
+    "done": "✓ Selesai",
+    "adminNote": "Catatan Admin:",
+    "confirmComplete": "Apakah kamu yakin ingin menyelesaikan pesanan \"{{title}}\"? Pastikan kamu sudah menerima semua hasil pengerjaan sebelum menekan konfirmasi.",
+    "yesComplete": "Ya, Selesaikan",
+    "totalPrice": "Total Harga",
+    "deadline": "Deadline",
+    "overallProgress": "Progress Keseluruhan"
+  },
+  "myOrderForm": {
+    "title": "Buat Pesanan Baru",
+    "breadcrumb": "Pesanan Saya",
+    "breadcrumbNew": "Buat Baru",
+    "titleLabel": "Judul / Nama Proyek *",
+    "titlePlaceholder": "Contoh: Pembuatan website toko online",
+    "categoryLabel": "Kategori Layanan",
+    "categoryDefault": "-- Pilih Kategori --",
+    "categoryOptional": "-- Pilih Kategori (opsional) --",
+    "descLabel": "Deskripsi Kebutuhan",
+    "descPlaceholder": "Ceritakan detail kebutuhanmu...",
+    "descHelper": "Semakin detail, semakin akurat estimasi harga dan waktu yang diberikan admin.",
+    "howItWorks": "Cara kerja pesanan:",
+    "sending": "Mengirim...",
+    "submit": "Kirim Pesanan",
+    "success": "Pesanan berhasil dibuat! Admin akan segera menghubungi kamu.",
+    "failed": "Gagal membuat pesanan.",
+    "contactTitle": "Hubungi Kami",
+    "contactSubtitle": "Ada pertanyaan? Tim kami siap membantu.",
+    "titleRequired": "Judul pesanan wajib diisi.",
+    "steps": [
+      "Kamu isi form ini dengan detail kebutuhanmu",
+      "Admin akan review dan menghubungi kamu untuk negosiasi harga & deadline",
+      "Setelah sepakat, kamu upload bukti DP untuk memulai pengerjaan",
+      "Pantau progress pengerjaan langsung di halaman ini"
+    ],
+    "categories": [
+      "Pengembangan Software",
+      "Aplikasi Mobile",
+      "Web Design",
+      "UI/UX Design",
+      "Backend / API",
+      "Joki Tugas / Project",
+      "Data Science / ML",
+      "Lainnya"
+    ]
+  },
+  "login": {
+    "welcome": "Selamat Datang",
+    "subtitle": "Masuk untuk mengakses platform penerimaan client.",
+    "withGoogle": "Lanjutkan dengan Google",
+    "orManual": "atau masuk manual",
+    "emailLabel": "Email",
+    "emailPlaceholder": "email@perusahaan.com",
+    "passwordLabel": "Password",
+    "hidePassword": "Sembunyikan password",
+    "showPassword": "Tampilkan password",
+    "processing": "Memproses...",
+    "submit": "Masuk",
+    "noAccount": "Belum punya akun?",
+    "registerLink": "Daftar sekarang",
+    "success": "Login berhasil! Mengalihkan...",
+    "failed": "Login gagal. Periksa kembali kredensial Anda.",
+    "validation": {
+      "emailRequired": "Email wajib diisi",
+      "emailInvalid": "Format email tidak valid",
+      "passwordRequired": "Password wajib diisi"
+    }
+  },
+  "register": {
+    "title": "Buat\nAkun Baru",
+    "subtitle": "Daftarkan diri Anda ke platform Synectra.",
+    "withGoogle": "Daftar dengan Google",
+    "orManual": "atau daftar manual",
+    "nameLabel": "Nama Lengkap",
+    "namePlaceholder": "Nama lengkap Anda",
+    "emailLabel": "Email",
+    "emailPlaceholder": "email@perusahaan.com",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Min. 8 karakter",
+    "hide": "Sembunyikan",
+    "show": "Tampilkan",
+    "confirmLabel": "Konfirmasi Password",
+    "confirmPlaceholder": "Ulangi password",
+    "registering": "Mendaftarkan...",
+    "submit": "Daftar Sekarang",
+    "hasAccount": "Sudah punya akun?",
+    "loginLink": "Masuk di sini",
+    "success": "Akun berhasil dibuat! Silakan masuk.",
+    "failed": "Registrasi gagal. Coba lagi.",
+    "validation": {
+      "nameRequired": "Nama lengkap wajib diisi",
+      "emailRequired": "Email wajib diisi",
+      "emailInvalid": "Format email tidak valid",
+      "passwordRequired": "Password wajib diisi",
+      "passwordMinLength": "Password minimal 8 karakter",
+      "passwordMismatch": "Konfirmasi password tidak cocok"
     }
   },
   "status": {

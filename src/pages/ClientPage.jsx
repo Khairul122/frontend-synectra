@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
 import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
@@ -9,6 +10,7 @@ import { userService } from '../services/user.service';
 import { PageLayout } from '../components/layout/PageLayout';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
 import { useAlert } from '../hooks/useAlert';
+import { PageLoader } from '../components/ui/PageLoader';
 
 /* ─── Edit Modal ─────────────────────────────────────────────────────────── */
 function EditClientModal({ client, onClose, onSaved }) {
@@ -124,7 +126,7 @@ function EditClientModal({ client, onClose, onSaved }) {
                 'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm',
                 isSaving && 'opacity-60 cursor-not-allowed',
               )}>
-              {isSaving ? 'Menyimpan...' : 'Simpan'}
+              {isSaving ? t('common.saving') : 'Simpan'}
             </button>
             <button onClick={handleClose}
               className="flex-1 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">
@@ -226,6 +228,7 @@ function ClientRow({ client, index, onEdit, onDelete }) {
 /* ─── Main Page ──────────────────────────────────────────────────────────── */
 export default function ClientPage() {
   const navigate = useNavigate();
+  const { t }    = useTranslation();
   const alert    = useAlert();
 
   const [user,         setUser]         = useState(null);
@@ -281,11 +284,7 @@ export default function ClientPage() {
     (c.email ?? '').toLowerCase().includes(search.toLowerCase()),
   );
 
-  if (isLoading) return (
-    <div className="min-h-screen bg-neu-bg flex items-center justify-center">
-      <p className="font-display font-bold text-neu-black animate-pulse">Memuat...</p>
-    </div>
-  );
+  if (isLoading) return <PageLoader />;
 
   return (
     <PageLayout user={user} title="Client Management" alert={alert}>
