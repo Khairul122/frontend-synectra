@@ -371,6 +371,8 @@ export default function LandingPage() {
   const portfolioRef  = useRef(null);
   const pkgSliderRef  = useRef(null);
   const pkgDrag       = useRef({ active: false, startX: 0, scrollLeft: 0 });
+  const swSliderRef   = useRef(null);
+  const swDrag        = useRef({ active: false, startX: 0, scrollLeft: 0 });
 
   useEffect(() => {
     Promise.all([
@@ -940,22 +942,38 @@ export default function LandingPage() {
               </button>
             </div>
 
-            {/* Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {softwareProducts.slice(0, 6).map(sw => {
+            {/* Drag-to-scroll slider — no scrollbar UI */}
+            <div
+              ref={swSliderRef}
+              className="flex gap-5 overflow-x-auto pt-5 pb-3 -mx-4 px-4 lg:mx-0 lg:px-0 select-none"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', cursor: 'grab' }}
+              onMouseDown={e => {
+                const el = swSliderRef.current;
+                swDrag.current = { active: true, startX: e.pageX - el.offsetLeft, scrollLeft: el.scrollLeft };
+                el.style.cursor = 'grabbing';
+              }}
+              onMouseMove={e => {
+                if (!swDrag.current.active) return;
+                const el = swSliderRef.current;
+                el.scrollLeft = swDrag.current.scrollLeft - (e.pageX - el.offsetLeft - swDrag.current.startX);
+              }}
+              onMouseUp={() => { swDrag.current.active = false; swSliderRef.current.style.cursor = 'grab'; }}
+              onMouseLeave={() => { if (swDrag.current.active) { swDrag.current.active = false; swSliderRef.current.style.cursor = 'grab'; } }}
+            >
+              {softwareProducts.map(sw => {
                 const isEn   = i18n.language === 'en';
                 const swName = (isEn && sw.nameEn)        ? sw.nameEn        : sw.name;
                 const swDesc = (isEn && sw.descriptionEn) ? sw.descriptionEn : sw.description;
                 const fmt    = (v) => `Rp ${Number(v).toLocaleString('id-ID')}`;
                 return (
-                  <div key={sw.id} className="software-card group flex flex-col bg-neu-white border-2 border-neu-black shadow-neu transition-all duration-200 hover:translate-x-[-3px] hover:translate-y-[-3px] hover:shadow-neu-lg cursor-default">
+                  <div key={sw.id} className="software-card flex-shrink-0 w-72 flex flex-col bg-neu-white border-2 border-neu-black shadow-neu transition-all duration-200 hover:translate-x-[-3px] hover:translate-y-[-3px] hover:shadow-neu-lg">
 
                     {/* Thumbnail */}
-                    <div className="relative border-b-2 border-neu-black h-44 bg-neu-bg overflow-hidden flex items-center justify-center">
+                    <div className="relative border-b-2 border-neu-black h-40 bg-neu-bg overflow-hidden flex items-center justify-center">
                       {sw.thumbnailUrl ? (
-                        <img src={sw.thumbnailUrl} alt={swName} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy" />
+                        <img src={sw.thumbnailUrl} alt={swName} className="w-full h-full object-cover pointer-events-none" loading="lazy" draggable="false" />
                       ) : (
-                        <svg className="w-14 h-14 text-neu-black/15" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                        <svg className="w-12 h-12 text-neu-black/15" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" draggable="false">
                           <rect x="2" y="3" width="20" height="14" /><line x1="8" y1="21" x2="16" y2="21" /><line x1="12" y1="17" x2="12" y2="21" />
                         </svg>
                       )}
@@ -968,12 +986,10 @@ export default function LandingPage() {
 
                     {/* Body */}
                     <div className="p-4 flex-1 flex flex-col gap-2">
-                      <p className="font-display font-bold text-base text-neu-black leading-tight">{swName}</p>
+                      <p className="font-display font-bold text-sm text-neu-black leading-tight">{swName}</p>
                       {swDesc && (
                         <p className="font-body text-xs text-neu-black/60 line-clamp-2 leading-relaxed">{swDesc}</p>
                       )}
-
-                      {/* Tech stack */}
                       {sw.techStack && (
                         <div className="flex flex-wrap gap-1 mt-auto pt-1">
                           {sw.techStack.split('\n').filter(s => s.trim()).slice(0, 3).map(s => (
@@ -985,16 +1001,19 @@ export default function LandingPage() {
 
                     {/* Footer */}
                     <div className="px-4 pb-4 border-t-2 border-neu-black pt-3 flex items-center justify-between gap-2">
-                      <span className="font-display font-bold text-lg text-neu-black">{fmt(sw.price)}</span>
-                      <div className="flex gap-2">
+                      <span className="font-display font-bold text-base text-neu-black whitespace-nowrap">{fmt(sw.price)}</span>
+                      <div className="flex gap-1.5">
                         {sw.demoUrl && (
                           <a href={sw.demoUrl} target="_blank" rel="noopener noreferrer"
-                            className="px-3 py-1.5 border-2 border-neu-black bg-neu-white font-display font-bold text-[10px] uppercase text-neu-black transition-all duration-150 hover:bg-neu-bg hover:translate-x-[1px] hover:translate-y-[1px]">
+                            onMouseDown={e => e.stopPropagation()}
+                            className="px-2.5 py-1.5 border-2 border-neu-black bg-neu-white font-display font-bold text-[10px] uppercase text-neu-black transition-all duration-150 hover:bg-neu-bg hover:translate-x-[1px] hover:translate-y-[1px]">
                             {t('landing.software.demo')}
                           </a>
                         )}
-                        <button onClick={() => transitionTo('/my-software')}
-                          className="px-3 py-1.5 bg-neu-primary border-2 border-neu-black shadow-neu-sm font-display font-bold text-[10px] uppercase text-neu-black transition-all duration-150 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none">
+                        <button
+                          onMouseDown={e => e.stopPropagation()}
+                          onClick={() => transitionTo('/my-software')}
+                          className="px-2.5 py-1.5 bg-neu-primary border-2 border-neu-black shadow-neu-sm font-display font-bold text-[10px] uppercase text-neu-black transition-all duration-150 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none">
                           {t('landing.software.buyNow')}
                         </button>
                       </div>
@@ -1002,17 +1021,6 @@ export default function LandingPage() {
                   </div>
                 );
               })}
-            </div>
-
-            {/* Mobile CTA */}
-            <div className="sm:hidden mt-6 flex justify-center">
-              <button onClick={() => transitionTo('/my-software')}
-                className="flex items-center gap-2 px-6 py-3 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">
-                {t('landing.software.viewAll')}
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </button>
             </div>
           </div>
         </section>
