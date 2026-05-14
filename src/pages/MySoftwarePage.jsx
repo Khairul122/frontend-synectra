@@ -289,7 +289,16 @@ export default function MySoftwarePage() {
                               </button>
                             )}
                             {p.paymentStatus === 'verified' && (
-                              <span className="font-mono text-xs text-neu-green font-bold">{t('client.mySoftware.done')}</span>
+                              <div className="flex flex-col gap-1.5">
+                                {p.softcopyUrl ? (
+                                  <a href={p.softcopyUrl} target="_blank" rel="noopener noreferrer"
+                                    className="px-3 py-1.5 bg-neu-green border-2 border-neu-black font-display font-bold text-xs uppercase text-neu-white shadow-neu-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150 whitespace-nowrap text-center">
+                                    ↓ Download
+                                  </a>
+                                ) : (
+                                  <span className="font-mono text-xs text-neu-green font-bold">{t('client.mySoftware.done')}</span>
+                                )}
+                              </div>
                             )}
                           </td>
                         </tr>
