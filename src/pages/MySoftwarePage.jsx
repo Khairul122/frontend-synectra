@@ -31,6 +31,104 @@ async function uploadReceipt(file) {
   return data.publicUrl;
 }
 
+function SoftwareDetailModal({ sw, isPurchased, onClose, onBuy }) {
+  const { t } = useTranslation();
+  const fmt   = (val) => `Rp ${Number(val).toLocaleString('id-ID')}`;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/75"
+      onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className="w-full max-w-lg bg-neu-white border-2 border-neu-black shadow-neu-xl flex flex-col max-h-[90vh]">
+
+        {/* Thumbnail header */}
+        <div className="relative border-b-2 border-neu-black bg-neu-bg h-52 flex items-center justify-center flex-shrink-0 overflow-hidden">
+          {sw.thumbnailUrl
+            ? <img src={sw.thumbnailUrl} alt={sw.name} className="w-full h-full object-cover" />
+            : <svg className="w-16 h-16 text-neu-black/15" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                <rect x="2" y="3" width="20" height="14" /><line x1="8" y1="21" x2="16" y2="21" /><line x1="12" y1="17" x2="12" y2="21" />
+              </svg>
+          }
+          {/* Overlay top bar */}
+          <div className="absolute inset-x-0 top-0 flex items-center justify-between px-4 py-3 bg-gradient-to-b from-neu-black/60 to-transparent">
+            {sw.category && (
+              <span className="font-mono text-[10px] text-neu-white uppercase tracking-widest border border-neu-white/40 px-2 py-0.5 bg-neu-black/30">
+                {sw.category}
+              </span>
+            )}
+            <button onClick={onClose}
+              className="ml-auto w-7 h-7 flex items-center justify-center bg-neu-white border-2 border-neu-black text-neu-black font-bold text-xs shadow-neu-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150">
+              ✕
+            </button>
+          </div>
+        </div>
+
+        {/* Scrollable content */}
+        <div className="overflow-y-auto flex-1 p-5 space-y-4">
+
+          {/* Name & price */}
+          <div className="flex items-start justify-between gap-3">
+            <h2 className="font-display font-bold text-xl text-neu-black leading-tight">{sw.name}</h2>
+            <p className="font-display font-bold text-xl text-neu-black whitespace-nowrap">{fmt(sw.price)}</p>
+          </div>
+
+          {/* Description */}
+          {sw.description && (
+            <p className="font-body text-sm text-neu-black/70 leading-relaxed">{sw.description}</p>
+          )}
+
+          {/* Tech stack */}
+          {sw.techStack && (
+            <div>
+              <p className="font-mono text-[10px] text-neu-black/40 uppercase tracking-widest mb-2">Tech Stack</p>
+              <div className="flex flex-wrap gap-1.5">
+                {sw.techStack.split('\n').filter(s => s.trim()).map(s => (
+                  <span key={s} className="font-mono text-[10px] bg-neu-black text-neu-white px-2.5 py-1 border border-neu-black">
+                    {s.trim()}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Features */}
+          {sw.features && (
+            <div>
+              <p className="font-mono text-[10px] text-neu-black/40 uppercase tracking-widest mb-2">Fitur</p>
+              <ul className="space-y-1.5">
+                {sw.features.split('\n').filter(f => f.trim()).map(f => (
+                  <li key={f} className="flex items-start gap-2">
+                    <span className="mt-0.5 w-4 h-4 flex-shrink-0 flex items-center justify-center bg-neu-primary border-2 border-neu-black">
+                      <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </span>
+                    <span className="font-body text-sm text-neu-black">{f.trim()}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+
+        {/* Footer actions */}
+        <div className="flex gap-2 px-5 py-4 border-t-2 border-neu-black flex-shrink-0">
+          {sw.demoUrl && (
+            <a href={sw.demoUrl} target="_blank" rel="noopener noreferrer"
+              className="flex-1 py-2.5 border-2 border-neu-black bg-neu-white font-display font-bold text-xs uppercase text-neu-black text-center shadow-neu transition-all duration-150 hover:bg-neu-bg hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">
+              {t('client.mySoftware.demo')}
+            </a>
+          )}
+          <button onClick={() => { onClose(); onBuy(sw); }}
+            className={cn('flex-1 py-2.5 border-2 border-neu-black font-display font-bold text-xs uppercase shadow-neu transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm',
+              isPurchased ? 'bg-neu-green text-neu-white' : 'bg-neu-primary text-neu-black')}>
+            {isPurchased ? t('client.mySoftware.buyAgain') : t('client.mySoftware.buy')}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function DownloadModal({ purchase, onClose }) {
   const [copied, setCopied] = useState(false);
 
@@ -193,6 +291,7 @@ export default function MySoftwarePage() {
   const [isBuying,       setIsBuying]       = useState(false);
   const [uploadTarget,   setUploadTarget]   = useState(null);
   const [downloadTarget, setDownloadTarget] = useState(null);
+  const [previewTarget,  setPreviewTarget]  = useState(null);
 
   const pageRef = useRef(null);
 
@@ -249,6 +348,15 @@ export default function MySoftwarePage() {
         confirmColor="bg-neu-primary text-neu-black"
       />
 
+      {previewTarget && (
+        <SoftwareDetailModal
+          sw={previewTarget}
+          isPurchased={purchasedIds.has(previewTarget.id)}
+          onClose={() => setPreviewTarget(null)}
+          onBuy={setBuyTarget}
+        />
+      )}
+
       {downloadTarget && (
         <DownloadModal purchase={downloadTarget} onClose={() => setDownloadTarget(null)} />
       )}
@@ -277,13 +385,19 @@ export default function MySoftwarePage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {software.map(sw => (
                 <div key={sw.id} className="border-2 border-neu-black shadow-neu bg-neu-white flex flex-col">
-                  <div className="border-b-2 border-neu-black bg-neu-bg h-40 overflow-hidden flex items-center justify-center">
+                  <div onClick={() => setPreviewTarget(sw)}
+                    className="relative border-b-2 border-neu-black bg-neu-bg h-40 overflow-hidden flex items-center justify-center cursor-pointer group">
                     {sw.thumbnailUrl
-                      ? <img src={sw.thumbnailUrl} alt={sw.name} className="w-full h-full object-cover" loading="lazy" />
-                      : <svg className="w-12 h-12 text-neu-black/15" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                      ? <img src={sw.thumbnailUrl} alt={sw.name} className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105" loading="lazy" />
+                      : <svg className="w-12 h-12 text-neu-black/15 transition-colors duration-150 group-hover:text-neu-black/30" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                           <rect x="2" y="3" width="20" height="14" /><line x1="8" y1="21" x2="16" y2="21" /><line x1="12" y1="17" x2="12" y2="21" />
                         </svg>
                     }
+                    <div className="absolute inset-0 bg-neu-black/0 group-hover:bg-neu-black/20 transition-colors duration-150 flex items-center justify-center">
+                      <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-150 bg-neu-white border-2 border-neu-black px-3 py-1.5 font-display font-bold text-[10px] uppercase shadow-neu-sm">
+                        Lihat Detail
+                      </span>
+                    </div>
                   </div>
                   <div className="p-4 flex-1">
                     <div className="flex items-start justify-between gap-2 mb-2">
