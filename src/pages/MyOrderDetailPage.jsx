@@ -10,7 +10,7 @@ import { paymentService } from '../services/payment.service';
 import { PageLayout } from '../components/layout/PageLayout';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
 import { useAlert } from '../hooks/useAlert';
-import { PAYMENT_RECEIPT_BUCKET } from '../constants/api';
+import { PAYMENT_RECEIPT_BUCKET, REVISION_IMAGE_BUCKET } from '../constants/api';
 import supabase from '../lib/supabase';
 import { PageLoader } from '../components/ui/PageLoader';
 
@@ -275,47 +275,167 @@ function UploadPaymentModal({ orderId, onClose, onUploaded }) {
 }
 
 function RevisionModal({ onClose, onSubmit }) {
-  const { t }     = useTranslation();
-  const [notes,    setNotes]    = useState('');
+  const { t }        = useTranslation();
+  const alert        = useAlert();
+  const [items, setItems]       = useState([{ id: crypto.randomUUID(), notes: '', images: [] }]);
+  const [uploadingIdx, setUploadingIdx] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
-  const alert = useAlert();
+
+  const addItem = () =>
+    setItems(prev => [...prev, { id: crypto.randomUUID(), notes: '', images: [] }]);
+
+  const removeItem = (idx) =>
+    setItems(prev => prev.filter((_, i) => i !== idx));
+
+  const updateNotes = (idx, val) =>
+    setItems(prev => prev.map((it, i) => i === idx ? { ...it, notes: val } : it));
+
+  const handleImageFiles = async (idx, files) => {
+    if (!files?.length) return;
+    setUploadingIdx(idx);
+    try {
+      const urls = await Promise.all(
+        Array.from(files).filter(f => f.type.startsWith('image/')).map(async (file) => {
+          const ext      = file.name.split('.').pop();
+          const filename = `${crypto.randomUUID()}.${ext}`;
+          const { error } = await supabase.storage
+            .from(REVISION_IMAGE_BUCKET)
+            .upload(filename, file, { cacheControl: '3600', upsert: false });
+          if (error) throw error;
+          return supabase.storage.from(REVISION_IMAGE_BUCKET).getPublicUrl(filename).data.publicUrl;
+        })
+      );
+      setItems(prev => prev.map((it, i) => i === idx ? { ...it, images: [...it.images, ...urls] } : it));
+    } catch { alert.error('Gagal upload gambar.'); }
+    finally { setUploadingIdx(null); }
+  };
+
+  const removeImage = (itemIdx, imgIdx) =>
+    setItems(prev => prev.map((it, i) =>
+      i === itemIdx ? { ...it, images: it.images.filter((_, j) => j !== imgIdx) } : it
+    ));
+
+  const canSubmit = items.every(it => it.notes.trim()) && uploadingIdx === null && !isSaving;
 
   const handleSubmit = async () => {
-    if (!notes.trim()) return;
+    if (!canSubmit) return;
     setIsSaving(true);
-    try { await onSubmit(notes.trim()); onClose(); }
-    catch { alert.error('Gagal mengirim permintaan revisi.'); }
+    try {
+      await onSubmit(items.map(it => ({ notes: it.notes.trim(), images: it.images })));
+      onClose();
+    } catch { alert.error('Gagal mengirim permintaan revisi.'); }
     finally { setIsSaving(false); }
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/70"
       onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
-      <div className="w-full max-w-md bg-neu-white border-2 border-neu-black shadow-neu-xl">
-        <div className="flex items-center justify-between px-5 py-4 border-b-2 border-neu-black bg-[#F97316]">
+      <div className="w-full max-w-lg bg-neu-white border-2 border-neu-black shadow-neu-xl flex flex-col max-h-[90vh]">
+
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b-2 border-neu-black bg-[#F97316] flex-shrink-0">
           <div className="flex items-center gap-2">
             <svg className="w-4 h-4 text-neu-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
             </svg>
-            <h3 className="font-display font-bold text-sm text-neu-white uppercase tracking-wide">{t('myOrderDetail.revisionModal.title')}</h3>
+            <h3 className="font-display font-bold text-sm text-neu-white uppercase tracking-wide">
+              {t('myOrderDetail.revisionModal.title')}
+            </h3>
           </div>
           <button onClick={onClose} className="text-neu-white/70 hover:text-neu-white font-mono text-2xl leading-none">×</button>
         </div>
-        <div className="px-5 py-5 space-y-3">
-          <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wide block">
-            {t('myOrderDetail.revisionModal.label')} <span className="text-neu-accent">*</span>
-          </label>
-          <textarea
-            value={notes} onChange={e => setNotes(e.target.value)} rows={5}
-            placeholder={t('myOrderDetail.revisionModal.placeholder')}
-            className="w-full px-4 py-3 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu transition-all duration-150 resize-none" />
+
+        {/* Scrollable items */}
+        <div className="overflow-y-auto flex-1 px-5 py-4 space-y-4">
+          {items.map((item, idx) => (
+            <div key={item.id} className="border-2 border-neu-black bg-neu-bg p-4 space-y-3">
+
+              {/* Item header */}
+              <div className="flex items-center justify-between">
+                <span className="font-display font-bold text-xs text-[#F97316] uppercase tracking-wide">
+                  {t('myOrderDetail.revisionModal.itemLabel', { n: idx + 1 })}
+                </span>
+                {items.length > 1 && (
+                  <button type="button" onClick={() => removeItem(idx)}
+                    className="w-6 h-6 flex items-center justify-center bg-neu-accent border-2 border-neu-black text-neu-white font-bold text-xs hover:translate-x-[1px] hover:translate-y-[1px] transition-all duration-150">
+                    ✕
+                  </button>
+                )}
+              </div>
+
+              {/* Notes */}
+              <div>
+                <label className="font-mono text-[10px] text-neu-black/50 uppercase tracking-widest block mb-1">
+                  {t('myOrderDetail.revisionModal.notesLabel')}
+                </label>
+                <textarea
+                  value={item.notes} onChange={e => updateNotes(idx, e.target.value)} rows={3}
+                  placeholder={t('myOrderDetail.revisionModal.notesPlaceholder')}
+                  className="w-full px-3 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu transition-all duration-150 resize-none" />
+              </div>
+
+              {/* Images */}
+              <div>
+                <label className="font-mono text-[10px] text-neu-black/50 uppercase tracking-widest block mb-1">
+                  {t('myOrderDetail.revisionModal.imagesLabel')}
+                </label>
+
+                {/* Uploaded thumbnails */}
+                {item.images.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {item.images.map((url, imgIdx) => (
+                      <div key={imgIdx} className="relative group">
+                        <img src={url} alt="" className="w-16 h-14 object-cover border-2 border-neu-black" />
+                        <button type="button" onClick={() => removeImage(idx, imgIdx)}
+                          className="absolute -top-1.5 -right-1.5 w-5 h-5 flex items-center justify-center bg-neu-accent border border-neu-black text-neu-white text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Upload zone */}
+                <label className={cn('flex items-center justify-center gap-2 border-2 border-dashed border-neu-black px-4 py-3 cursor-pointer transition-colors duration-150',
+                  uploadingIdx === idx ? 'opacity-60 cursor-not-allowed bg-neu-black/5' : 'hover:bg-neu-white')}>
+                  <input type="file" accept="image/*" multiple className="hidden"
+                    disabled={uploadingIdx !== null}
+                    onChange={e => { if (e.target.files) handleImageFiles(idx, e.target.files); e.target.value = ''; }} />
+                  {uploadingIdx === idx ? (
+                    <span className="font-display font-bold text-xs text-neu-black animate-pulse">
+                      {t('myOrderDetail.revisionModal.uploading')}
+                    </span>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4 text-neu-black/40" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                      </svg>
+                      <span className="font-display font-bold text-xs text-neu-black/50">
+                        {t('myOrderDetail.revisionModal.uploadImages')}
+                      </span>
+                    </>
+                  )}
+                </label>
+              </div>
+            </div>
+          ))}
+
+          {/* Add item button */}
+          <button type="button" onClick={addItem}
+            className="w-full py-2.5 border-2 border-dashed border-[#F97316] bg-[#F97316]/5 font-display font-bold text-xs uppercase text-[#F97316] transition-all duration-150 hover:bg-[#F97316]/10">
+            {t('myOrderDetail.revisionModal.addItem')}
+          </button>
         </div>
-        <div className="px-5 pb-5 flex gap-3">
-          <button onClick={handleSubmit} disabled={isSaving || !notes.trim()}
-            className={cn('flex-1 py-2.5 bg-[#F97316] border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-white transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm', (isSaving || !notes.trim()) && 'opacity-50 cursor-not-allowed')}>
+
+        {/* Footer */}
+        <div className="px-5 py-4 border-t-2 border-neu-black flex gap-3 flex-shrink-0">
+          <button onClick={handleSubmit} disabled={!canSubmit}
+            className={cn('flex-1 py-2.5 bg-[#F97316] border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-white transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm',
+              !canSubmit && 'opacity-50 cursor-not-allowed')}>
             {isSaving ? t('myOrderDetail.revisionModal.submitting') : t('myOrderDetail.revisionModal.submit')}
           </button>
-          <button onClick={onClose} className="flex-1 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">
+          <button onClick={onClose}
+            className="flex-1 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">
             {t('common.cancel')}
           </button>
         </div>
@@ -360,8 +480,8 @@ export default function MyOrderDetailPage() {
     } finally { setIsCompleting(false); }
   };
 
-  const handleRequestRevision = async (notes) => {
-    await orderService.requestRevision(id, notes);
+  const handleRequestRevision = async (items) => {
+    await orderService.requestRevision(id, items);
     await loadOrder();
     alert.success(t('myOrderDetail.requestRevision') + ' berhasil dikirim.');
   };
@@ -458,17 +578,33 @@ export default function MyOrderDetailPage() {
               <p className="font-display font-bold text-sm">{fmtDateTime(order.deadline)}</p>
             </div>
           </div>
-          {order.status === 'revision' && order.revisionNotes && (
-            <div className="mt-4 pt-4 border-t-2 border-neu-black">
-              <div className="flex items-start gap-3 p-3 border-2 border-[#F97316] bg-[#F97316]/10">
-                <svg className="w-4 h-4 text-[#F97316] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+          {order.status === 'revision' && order.revisionData?.length > 0 && (
+            <div className="mt-4 pt-4 border-t-2 border-neu-black space-y-2">
+              <p className="font-mono text-[10px] text-[#F97316] uppercase tracking-widest flex items-center gap-1.5">
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                 </svg>
-                <div>
-                  <p className="font-mono text-[10px] text-[#F97316] uppercase tracking-widest mb-1">{t('myOrderDetail.revisionNotes')}</p>
-                  <p className="font-body text-sm text-neu-black leading-relaxed">{order.revisionNotes}</p>
+                {t('myOrderDetail.revisionNotes')}
+              </p>
+              {order.revisionData.map((item, idx) => (
+                <div key={idx} className="border-2 border-[#F97316] bg-[#F97316]/8 p-3 space-y-2">
+                  <p className="font-mono text-[10px] text-[#F97316] font-bold uppercase">
+                    {t('myOrderDetail.revisionModal.itemLabel', { n: idx + 1 })}
+                  </p>
+                  <p className="font-body text-sm text-neu-black leading-relaxed">{item.notes}</p>
+                  {item.images?.length > 0 && (
+                    <div className="flex flex-wrap gap-2 pt-1">
+                      {item.images.map((url, imgIdx) => (
+                        <button key={imgIdx} type="button"
+                          onClick={() => setPreviewImage({ src: url, caption: `Revisi ${idx + 1} — Gambar ${imgIdx + 1}` })}
+                          className="w-16 h-14 border-2 border-neu-black overflow-hidden hover:border-[#F97316] hover:shadow-neu-sm hover:translate-x-[-1px] hover:translate-y-[-1px] transition-all duration-150">
+                          <img src={url} alt="" className="w-full h-full object-cover" />
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              </div>
+              ))}
             </div>
           )}
 

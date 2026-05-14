@@ -33,3 +33,4 @@ export const PAYMENT_RECEIPT_BUCKET  = 'payment-receipts';
 export const PROGRESS_ATTACH_BUCKET  = 'progress-attachments';
 export const PACKAGE_ICON_BUCKET      = 'package-icons';
 export const SOFTWARE_THUMBNAIL_BUCKET = 'software-thumbnails';
+export const REVISION_IMAGE_BUCKET     = 'revision-images';

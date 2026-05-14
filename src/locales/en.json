@@ -555,8 +555,13 @@
     "revisionNotes": "Client Revision Notes",
     "revisionModal": {
       "title": "Request Revision",
-      "label": "Describe what needs to be revised",
-      "placeholder": "e.g. The login page design needs to match the latest mockup, and the color scheme should be adjusted...",
+      "itemLabel": "Revision {{n}}",
+      "notesLabel": "Description *",
+      "notesPlaceholder": "e.g. The login page needs to match the latest mockup...",
+      "imagesLabel": "Supporting Images (optional)",
+      "uploadImages": "Click or drag images here",
+      "uploading": "Uploading...",
+      "addItem": "+ Add Revision Point",
       "submit": "Submit Revision Request",
       "submitting": "Submitting..."
     }

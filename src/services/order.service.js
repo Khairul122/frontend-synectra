@@ -20,7 +20,7 @@ export const orderService = {
   completeOrder(id) {
     return apiClient.patch(`${API_ENDPOINTS.ORDERS}/${id}/complete`).then(r => r.data);
   },
-  requestRevision(id, notes) {
-    return apiClient.patch(`${API_ENDPOINTS.ORDERS}/${id}/request-revision`, { notes }).then(r => r.data);
+  requestRevision(id, items) {
+    return apiClient.patch(`${API_ENDPOINTS.ORDERS}/${id}/request-revision`, { items }).then(r => r.data);
   },
 };
