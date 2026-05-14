@@ -498,6 +498,85 @@ function RejectModal({ paymentId, onClose, onRejected }) {
   );
 }
 
+/* ─── Revision Detail Modal ──────────────────────────────────────────────── */
+function RevisionDetailModal({ batch, batchIndex, onClose, onViewImage }) {
+  const backdropRef = useRef(null);
+  const cardRef     = useRef(null);
+
+  useEffect(() => {
+    gsap.fromTo(backdropRef.current, { opacity: 0 }, { opacity: 1, duration: 0.2 });
+    gsap.fromTo(cardRef.current, { y: -30, opacity: 0, scale: 0.95 }, { y: 0, opacity: 1, scale: 1, duration: 0.3, ease: 'power3.out' });
+    const onKey = (e) => { if (e.key === 'Escape') handleClose(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  const handleClose = () => {
+    gsap.to(cardRef.current,     { y: -20, opacity: 0, scale: 0.95, duration: 0.2, ease: 'power2.in' });
+    gsap.to(backdropRef.current, { opacity: 0, duration: 0.2, onComplete: onClose });
+  };
+
+  const fmtDT = (val) => new Date(val).toLocaleString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+  return createPortal(
+    <div ref={backdropRef} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/70"
+      onClick={e => { if (e.target === e.currentTarget) handleClose(); }}>
+      <div ref={cardRef} className="w-full max-w-lg bg-neu-white border-2 border-neu-black shadow-neu-xl flex flex-col max-h-[85vh]">
+
+        <div className="flex items-center justify-between px-5 py-4 border-b-2 border-neu-black bg-[#F97316] flex-shrink-0">
+          <div className="flex items-center gap-2">
+            <svg className="w-4 h-4 text-neu-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            <div>
+              <h3 className="font-display font-bold text-sm text-neu-white uppercase tracking-wide">
+                Revisi Client #{batchIndex + 1}
+              </h3>
+              <p className="font-mono text-[10px] text-neu-white/70 mt-0.5">{fmtDT(batch.createdAt)}</p>
+            </div>
+          </div>
+          <button onClick={handleClose} className="text-neu-white/70 hover:text-neu-white font-mono text-2xl leading-none">×</button>
+        </div>
+
+        <div className="overflow-y-auto flex-1 divide-y-2 divide-[#F97316]/30">
+          {batch.items.map((item, idx) => (
+            <div key={idx} className="px-5 py-4 space-y-2">
+              <p className="font-mono text-[10px] text-[#F97316] font-bold uppercase tracking-widest">
+                Poin Revisi {idx + 1}
+              </p>
+              <div className="bg-neu-bg border-2 border-neu-black/20 p-3">
+                <p className="font-body text-sm text-neu-black leading-relaxed whitespace-pre-wrap">{item.notes}</p>
+              </div>
+              {item.images?.length > 0 && (
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {item.images.map((url, imgIdx) => (
+                    <button key={imgIdx} type="button"
+                      onClick={() => { handleClose(); setTimeout(() => onViewImage(url, `Revisi #${batchIndex + 1} Poin ${idx + 1}`), 300); }}
+                      className="relative w-20 h-16 border-2 border-neu-black overflow-hidden group hover:border-[#F97316] hover:shadow-neu-sm hover:translate-x-[-1px] hover:translate-y-[-1px] transition-all duration-150">
+                      <img src={url} alt="" className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-neu-black/0 group-hover:bg-neu-black/25 transition-all duration-150 flex items-center justify-center">
+                        <span className="opacity-0 group-hover:opacity-100 font-mono text-[9px] text-neu-white bg-neu-black/70 px-1.5 py-0.5">Perbesar</span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <div className="px-5 py-4 border-t-2 border-neu-black flex-shrink-0">
+          <button onClick={handleClose}
+            className="w-full py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">
+            Tutup
+          </button>
+        </div>
+      </div>
+    </div>,
+    document.body,
+  );
+}
+
 /* ─── Main Detail Page ───────────────────────────────────────────────────── */
 export default function OrderDetailPage() {
   const navigate = useNavigate();
@@ -512,9 +591,10 @@ export default function OrderDetailPage() {
   const [rejectPaymentId, setRejectPaymentId] = useState(null);
   const [verifyTarget,    setVerifyTarget]    = useState(null);
   const [isVerifying,     setIsVerifying]     = useState(false);
-  const [previewReceipt,    setPreviewReceipt]    = useState(null);
-  const [previewAttachment, setPreviewAttachment] = useState(null);
-  const [detailProgress,    setDetailProgress]    = useState(null);
+  const [previewReceipt,       setPreviewReceipt]       = useState(null);
+  const [previewAttachment,    setPreviewAttachment]    = useState(null);
+  const [detailProgress,       setDetailProgress]       = useState(null);
+  const [revisionDetailTarget, setRevisionDetailTarget] = useState(null);
 
   // Penetapan harga & deadline
   const [showPriceForm, setShowPriceForm] = useState(false);
@@ -613,6 +693,14 @@ export default function OrderDetailPage() {
         <ImageModal src={previewAttachment.src} caption={previewAttachment.caption} onClose={() => setPreviewAttachment(null)} />
       )}
       {previewReceipt && <ReceiptPreviewModal payment={previewReceipt} onClose={() => setPreviewReceipt(null)} />}
+      {revisionDetailTarget && (
+        <RevisionDetailModal
+          batch={revisionDetailTarget.batch}
+          batchIndex={revisionDetailTarget.index}
+          onClose={() => setRevisionDetailTarget(null)}
+          onViewImage={(src, caption) => setPreviewAttachment({ src, caption })}
+        />
+      )}
       {showProgress && <ProgressModal orderId={id} onClose={() => setShowProgress(false)} onAdded={loadOrder} />}
       {rejectPaymentId && <RejectModal paymentId={rejectPaymentId} onClose={() => setRejectPaymentId(null)} onRejected={loadOrder} />}
       <ConfirmModal
@@ -866,6 +954,49 @@ export default function OrderDetailPage() {
             </div>
           )}
         </div>
+
+        {/* ─── Section D: Revisi Client ───────────────────────────── */}
+        {order.revisions?.length > 0 && (
+          <div className="bg-neu-white border-2 border-neu-black shadow-neu">
+            <div className="flex items-center gap-3 px-6 py-4 border-b-2 border-neu-black">
+              <svg className="w-4 h-4 text-[#F97316]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+              <h3 className="font-display font-bold text-base text-neu-black uppercase tracking-wide">
+                Revisi Client ({order.revisions.length})
+              </h3>
+            </div>
+            <div className="divide-y-2 divide-neu-black">
+              {order.revisions.map((batch, batchIdx) => (
+                <div key={batch.id} className="px-6 py-4 flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-4">
+                    <div className="flex-shrink-0 w-10 h-10 border-2 border-[#F97316] bg-[#F97316]/10 flex items-center justify-center">
+                      <span className="font-display font-bold text-base text-[#F97316] leading-none">#{batchIdx + 1}</span>
+                    </div>
+                    <div>
+                      <p className="font-display font-bold text-sm text-neu-black">
+                        {batch.items.length} poin revisi
+                      </p>
+                      <p className="font-mono text-xs text-neu-black/40 mt-0.5">
+                        {fmtDateTime(batch.createdAt)}
+                      </p>
+                      {/* Preview catatan pertama */}
+                      {batch.items[0]?.notes && (
+                        <p className="font-body text-xs text-neu-black/60 mt-0.5 line-clamp-1 max-w-xs">
+                          {batch.items[0].notes}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <button onClick={() => setRevisionDetailTarget({ batch, index: batchIdx })}
+                    className="px-3 py-1.5 bg-[#F97316] border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-white hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150 whitespace-nowrap flex-shrink-0">
+                    Lihat Detail
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
       </div>
     </PageLayout>
