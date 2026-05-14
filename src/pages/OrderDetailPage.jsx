@@ -869,6 +869,11 @@ export default function OrderDetailPage() {
                       <span className="font-mono text-xs text-neu-black/50 uppercase">{p.paymentType}</span>
                     </div>
                     <p className="font-display font-bold text-base text-neu-black">{fmt(p.amount)}</p>
+                    {p.paymentNumber && (
+                      <p className="font-mono text-xs text-neu-black/60 mt-0.5">
+                        No. Ref: <span className="font-bold text-neu-black">{p.paymentNumber}</span>
+                      </p>
+                    )}
                     <p className="font-mono text-xs text-neu-black/40">{fmtDateTime(p.createdAt)}</p>
                     {p.notes && <p className="font-body text-xs text-neu-accent mt-1">Catatan: {p.notes}</p>}
                     {p.verifiedAt && <p className="font-mono text-xs text-neu-green">Diverifikasi: {fmtDateTime(p.verifiedAt)}</p>}
