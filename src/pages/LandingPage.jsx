@@ -921,25 +921,14 @@ export default function LandingPage() {
           <div className="max-w-7xl mx-auto px-4 lg:px-6">
 
             {/* Header */}
-            <div className="flex items-center justify-between mb-10 reveal-left">
-              <div className="flex items-center gap-3">
-                <div className="h-1 w-8 bg-neu-primary" />
-                <div>
-                  <h2 className="font-display font-bold text-2xl uppercase tracking-wide text-neu-white">
-                    {t('landing.software.title')}
-                  </h2>
-                  <p className="font-body text-sm text-neu-white/50 mt-0.5">{t('landing.software.subtitle')}</p>
-                </div>
+            <div className="flex items-center gap-3 mb-10 reveal-left">
+              <div className="h-1 w-8 bg-neu-primary" />
+              <div>
+                <h2 className="font-display font-bold text-2xl uppercase tracking-wide text-neu-white">
+                  {t('landing.software.title')}
+                </h2>
+                <p className="font-body text-sm text-neu-white/50 mt-0.5">{t('landing.software.subtitle')}</p>
               </div>
-              <button
-                onClick={() => transitionTo('/my-software')}
-                className="hidden sm:flex items-center gap-2 px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm"
-              >
-                {t('landing.software.viewAll')}
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </button>
             </div>
 
             {/* Drag-to-scroll slider — no scrollbar UI */}
