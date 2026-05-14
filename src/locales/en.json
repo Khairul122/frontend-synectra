@@ -150,6 +150,13 @@
       "social": "Follow Us on Social Media",
       "emailCopied": "Email {{email}} copied to clipboard!"
     },
+    "software": {
+      "title": "Ready-to-Use Software",
+      "subtitle": "Complete source code, ready to deploy",
+      "viewAll": "View All →",
+      "buyNow": "Buy",
+      "demo": "Demo"
+    },
     "banner": {
       "title": "Latest Announcements & Promos",
       "promo": "Promo",
