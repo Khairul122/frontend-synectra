@@ -284,7 +284,7 @@ function UploadReceiptModal({ purchaseId, onClose, onUploaded }) {
 
 export default function MySoftwarePage() {
   const navigate = useNavigate();
-  const { t }    = useTranslation();
+  const { t, i18n } = useTranslation();
   const alert    = useAlert();
 
   const [user,          setUser]          = useState(null);
