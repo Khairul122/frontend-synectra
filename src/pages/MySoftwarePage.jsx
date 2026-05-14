@@ -32,8 +32,12 @@ async function uploadReceipt(file) {
 }
 
 function SoftwareDetailModal({ sw, isPurchased, onClose, onBuy }) {
-  const { t } = useTranslation();
-  const fmt   = (val) => `Rp ${Number(val).toLocaleString('id-ID')}`;
+  const { t, i18n } = useTranslation();
+  const fmt         = (val) => `Rp ${Number(val).toLocaleString('id-ID')}`;
+  const isEn        = i18n.language === 'en';
+  const displayName = (isEn && sw.nameEn)        ? sw.nameEn        : sw.name;
+  const displayDesc = (isEn && sw.descriptionEn) ? sw.descriptionEn : sw.description;
+  const displayFeat = (isEn && sw.featuresEn)    ? sw.featuresEn    : sw.features;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/75"
@@ -67,13 +71,13 @@ function SoftwareDetailModal({ sw, isPurchased, onClose, onBuy }) {
 
           {/* Name & price */}
           <div className="flex items-start justify-between gap-3">
-            <h2 className="font-display font-bold text-xl text-neu-black leading-tight">{sw.name}</h2>
+            <h2 className="font-display font-bold text-xl text-neu-black leading-tight">{displayName}</h2>
             <p className="font-display font-bold text-xl text-neu-black whitespace-nowrap">{fmt(sw.price)}</p>
           </div>
 
           {/* Description */}
-          {sw.description && (
-            <p className="font-body text-sm text-neu-black/70 leading-relaxed">{sw.description}</p>
+          {displayDesc && (
+            <p className="font-body text-sm text-neu-black/70 leading-relaxed">{displayDesc}</p>
           )}
 
           {/* Tech stack */}
@@ -91,11 +95,11 @@ function SoftwareDetailModal({ sw, isPurchased, onClose, onBuy }) {
           )}
 
           {/* Features */}
-          {sw.features && (
+          {displayFeat && (
             <div>
               <p className="font-mono text-[10px] text-neu-black/40 uppercase tracking-widest mb-2">{t('client.mySoftware.featuresLabel')}</p>
               <ul className="space-y-1.5">
-                {sw.features.split('\n').filter(f => f.trim()).map(f => (
+                {displayFeat.split('\n').filter(f => f.trim()).map(f => (
                   <li key={f} className="flex items-start gap-2">
                     <span className="mt-0.5 w-4 h-4 flex-shrink-0 flex items-center justify-center bg-neu-primary border-2 border-neu-black">
                       <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
