@@ -555,8 +555,13 @@
     "revisionNotes": "Catatan Revisi Client",
     "revisionModal": {
       "title": "Permintaan Revisi",
-      "label": "Jelaskan apa yang perlu direvisi",
-      "placeholder": "Contoh: Tampilan halaman login perlu disesuaikan dengan mockup terbaru, dan skema warna perlu diubah...",
+      "itemLabel": "Revisi {{n}}",
+      "notesLabel": "Keterangan *",
+      "notesPlaceholder": "Contoh: Tampilan halaman login perlu disesuaikan dengan mockup terbaru...",
+      "imagesLabel": "Gambar Pendukung (opsional)",
+      "uploadImages": "Klik atau drag gambar ke sini",
+      "uploading": "Mengupload...",
+      "addItem": "+ Tambah Poin Revisi",
       "submit": "Kirim Permintaan Revisi",
       "submitting": "Mengirim..."
     }
