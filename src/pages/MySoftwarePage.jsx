@@ -79,7 +79,7 @@ function SoftwareDetailModal({ sw, isPurchased, onClose, onBuy }) {
           {/* Tech stack */}
           {sw.techStack && (
             <div>
-              <p className="font-mono text-[10px] text-neu-black/40 uppercase tracking-widest mb-2">Tech Stack</p>
+              <p className="font-mono text-[10px] text-neu-black/40 uppercase tracking-widest mb-2">{t('client.mySoftware.techStack')}</p>
               <div className="flex flex-wrap gap-1.5">
                 {sw.techStack.split('\n').filter(s => s.trim()).map(s => (
                   <span key={s} className="font-mono text-[10px] bg-neu-black text-neu-white px-2.5 py-1 border border-neu-black">
@@ -93,7 +93,7 @@ function SoftwareDetailModal({ sw, isPurchased, onClose, onBuy }) {
           {/* Features */}
           {sw.features && (
             <div>
-              <p className="font-mono text-[10px] text-neu-black/40 uppercase tracking-widest mb-2">Fitur</p>
+              <p className="font-mono text-[10px] text-neu-black/40 uppercase tracking-widest mb-2">{t('client.mySoftware.featuresLabel')}</p>
               <ul className="space-y-1.5">
                 {sw.features.split('\n').filter(f => f.trim()).map(f => (
                   <li key={f} className="flex items-start gap-2">
@@ -395,7 +395,7 @@ export default function MySoftwarePage() {
                     }
                     <div className="absolute inset-0 bg-neu-black/0 group-hover:bg-neu-black/20 transition-colors duration-150 flex items-center justify-center">
                       <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-150 bg-neu-white border-2 border-neu-black px-3 py-1.5 font-display font-bold text-[10px] uppercase shadow-neu-sm">
-                        Lihat Detail
+                        {t('client.mySoftware.viewDetail')}
                       </span>
                     </div>
                   </div>
