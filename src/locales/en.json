@@ -56,6 +56,7 @@
     "myOrders": "My Orders",
     "software": "Software",
     "softwarePurchases": "Software Purchases",
+    "feedback": "Feedback & Rating",
     "portfolio": "Portfolio",
     "banners": "Banners",
     "servicePackages": "Service Packages",
@@ -156,6 +157,20 @@
       "viewAll": "View All →",
       "buyNow": "Buy",
       "demo": "Demo"
+    },
+    "feedback": {
+      "sectionTitle": "What They Say",
+      "avgRating": "average from {{count}} reviews",
+      "formTitle": "Leave Your Review",
+      "nameLabel": "Full Name *",
+      "emailLabel": "Email *",
+      "ratingLabel": "Rating *",
+      "messageLabel": "Comment (optional)",
+      "messagePlaceholder": "Share your experience with us...",
+      "submit": "Submit Review",
+      "submitting": "Submitting...",
+      "success": "Thank you for your review!",
+      "noReviews": "Be the first to review!"
     },
     "banner": {
       "title": "Latest Announcements & Promos",
