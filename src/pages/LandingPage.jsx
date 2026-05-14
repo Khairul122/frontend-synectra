@@ -991,9 +991,11 @@ export default function LandingPage() {
             <div className="hidden md:flex items-center gap-6">
               {[
                 { tKey: 'nav.services',    id: 'layanan'   },
+                { tKey: 'nav.packages',    id: 'paket'     },
+                { tKey: 'nav.software',    id: 'software'  },
                 { tKey: 'nav.portfolio',   id: 'portofolio'},
                 { tKey: 'nav.howItWorks',  id: 'cara-kerja'},
-                { tKey: 'nav.packages',    id: 'paket'     },
+                { tKey: 'nav.reviews',     id: 'ulasan'    },
                 { tKey: 'nav.contact',     id: 'kontak'    },
               ].map(({ tKey, id }) => (
                 <button key={id}
@@ -1019,9 +1021,11 @@ export default function LandingPage() {
           <div className="sm:hidden border-t-2 border-neu-black bg-neu-white px-4 py-3 flex flex-col gap-1">
             {[
               { tKey: 'nav.services',    id: 'layanan'   },
+              { tKey: 'nav.packages',    id: 'paket'     },
+              { tKey: 'nav.software',    id: 'software'  },
               { tKey: 'nav.portfolio',   id: 'portofolio'},
               { tKey: 'nav.howItWorks',  id: 'cara-kerja'},
-              { tKey: 'nav.packages',    id: 'paket'     },
+              { tKey: 'nav.reviews',     id: 'ulasan'    },
               { tKey: 'nav.contact',     id: 'kontak'    },
             ].map(({ tKey, id }) => (
               <button key={id}
