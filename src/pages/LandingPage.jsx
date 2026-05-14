@@ -348,9 +348,10 @@ export default function LandingPage() {
   const { t, i18n } = useTranslation();
   const { pageRef, transitionTo } = usePageTransition();
   const lang = (id, en) => i18n.language === 'en' && en ? en : id;
-  const [portfolios,   setPortfolios]   = useState([]);
-  const [packages,     setPackages]     = useState([]);
-  const [banners,      setBanners]      = useState([]);
+  const [portfolios,        setPortfolios]        = useState([]);
+  const [packages,          setPackages]          = useState([]);
+  const [softwareProducts,  setSoftwareProducts]  = useState([]);
+  const [banners,           setBanners]           = useState([]);
   const [contacts,     setContacts]     = useState([]);
   const [socialMedia,  setSocialMedia]  = useState([]);
   const [bankAccounts, setBankAccounts] = useState([]);
@@ -379,7 +380,8 @@ export default function LandingPage() {
       axios.get(`${BASE}/api/social-media`).catch(() => ({ data: { data: [] } })),
       axios.get(`${BASE}/api/bank-accounts`).catch(() => ({ data: { data: [] } })),
       axios.get(`${BASE}/api/service-packages/public`).catch(() => ({ data: { data: [] } })),
-    ]).then(([p, b, c, s, ba, pkg]) => {
+      axios.get(`${BASE}/api/software-products/public`).catch(() => ({ data: { data: [] } })),
+    ]).then(([p, b, c, s, ba, pkg, sw]) => {
       setPortfolios(p.data?.data ?? []);
       const activeBanners = (b.data?.data ?? []).filter(x => x.isActive);
       setBanners(activeBanners);
@@ -388,6 +390,7 @@ export default function LandingPage() {
       setSocialMedia((s.data?.data ?? []).filter(x => x.isActive));
       setBankAccounts((ba.data?.data ?? []).filter(x => x.isActive));
       setPackages(pkg.data?.data ?? []);
+      setSoftwareProducts(sw.data?.data ?? []);
     }).finally(() => setIsLoading(false));
   }, []);
 
@@ -418,6 +421,24 @@ export default function LandingPage() {
           y: 0, opacity: 1, scale: 1,
           duration: 0.55, ease: 'power2.out',
           delay: (i % 3) * 0.07,
+          scrollTrigger: {
+            trigger: card,
+            start: 'top 90%',
+            end: 'top 20%',
+            toggleActions: 'play reverse play reverse',
+          },
+        },
+      );
+    });
+
+    // Software cards: stagger masuk + keluar
+    document.querySelectorAll('.software-card').forEach((card, i) => {
+      gsap.fromTo(card,
+        { y: 40, opacity: 0, scale: 0.97 },
+        {
+          y: 0, opacity: 1, scale: 1,
+          duration: 0.55, ease: 'power2.out',
+          delay: (i % 3) * 0.06,
           scrollTrigger: {
             trigger: card,
             start: 'top 90%',
@@ -887,6 +908,111 @@ export default function LandingPage() {
                   <PackageCard pkg={pkg} onOrder={() => transitionTo('/my-orders/new')} />
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── SOFTWARE SIAP PAKAI ── */}
+      {softwareProducts.length > 0 && (
+        <section id="software" className="border-b-2 border-neu-black bg-neu-black py-16">
+          <div className="max-w-7xl mx-auto px-4 lg:px-6">
+
+            {/* Header */}
+            <div className="flex items-center justify-between mb-10 reveal-left">
+              <div className="flex items-center gap-3">
+                <div className="h-1 w-8 bg-neu-primary" />
+                <div>
+                  <h2 className="font-display font-bold text-2xl uppercase tracking-wide text-neu-white">
+                    {t('landing.software.title')}
+                  </h2>
+                  <p className="font-body text-sm text-neu-white/50 mt-0.5">{t('landing.software.subtitle')}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => transitionTo('/my-software')}
+                className="hidden sm:flex items-center gap-2 px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm"
+              >
+                {t('landing.software.viewAll')}
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {softwareProducts.slice(0, 6).map(sw => {
+                const isEn   = i18n.language === 'en';
+                const swName = (isEn && sw.nameEn)        ? sw.nameEn        : sw.name;
+                const swDesc = (isEn && sw.descriptionEn) ? sw.descriptionEn : sw.description;
+                const fmt    = (v) => `Rp ${Number(v).toLocaleString('id-ID')}`;
+                return (
+                  <div key={sw.id} className="software-card group flex flex-col bg-neu-white border-2 border-neu-black shadow-neu transition-all duration-200 hover:translate-x-[-3px] hover:translate-y-[-3px] hover:shadow-neu-lg cursor-default">
+
+                    {/* Thumbnail */}
+                    <div className="relative border-b-2 border-neu-black h-44 bg-neu-bg overflow-hidden flex items-center justify-center">
+                      {sw.thumbnailUrl ? (
+                        <img src={sw.thumbnailUrl} alt={swName} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy" />
+                      ) : (
+                        <svg className="w-14 h-14 text-neu-black/15" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                          <rect x="2" y="3" width="20" height="14" /><line x1="8" y1="21" x2="16" y2="21" /><line x1="12" y1="17" x2="12" y2="21" />
+                        </svg>
+                      )}
+                      {sw.category && (
+                        <span className="absolute top-2 right-2 font-mono text-[10px] font-bold uppercase px-2 py-0.5 bg-neu-primary border border-neu-black text-neu-black">
+                          {sw.category}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Body */}
+                    <div className="p-4 flex-1 flex flex-col gap-2">
+                      <p className="font-display font-bold text-base text-neu-black leading-tight">{swName}</p>
+                      {swDesc && (
+                        <p className="font-body text-xs text-neu-black/60 line-clamp-2 leading-relaxed">{swDesc}</p>
+                      )}
+
+                      {/* Tech stack */}
+                      {sw.techStack && (
+                        <div className="flex flex-wrap gap-1 mt-auto pt-1">
+                          {sw.techStack.split('\n').filter(s => s.trim()).slice(0, 3).map(s => (
+                            <span key={s} className="font-mono text-[10px] bg-neu-black text-neu-white px-2 py-0.5">{s.trim()}</span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Footer */}
+                    <div className="px-4 pb-4 border-t-2 border-neu-black pt-3 flex items-center justify-between gap-2">
+                      <span className="font-display font-bold text-lg text-neu-black">{fmt(sw.price)}</span>
+                      <div className="flex gap-2">
+                        {sw.demoUrl && (
+                          <a href={sw.demoUrl} target="_blank" rel="noopener noreferrer"
+                            className="px-3 py-1.5 border-2 border-neu-black bg-neu-white font-display font-bold text-[10px] uppercase text-neu-black transition-all duration-150 hover:bg-neu-bg hover:translate-x-[1px] hover:translate-y-[1px]">
+                            {t('landing.software.demo')}
+                          </a>
+                        )}
+                        <button onClick={() => transitionTo('/my-software')}
+                          className="px-3 py-1.5 bg-neu-primary border-2 border-neu-black shadow-neu-sm font-display font-bold text-[10px] uppercase text-neu-black transition-all duration-150 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none">
+                          {t('landing.software.buyNow')}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Mobile CTA */}
+            <div className="sm:hidden mt-6 flex justify-center">
+              <button onClick={() => transitionTo('/my-software')}
+                className="flex items-center gap-2 px-6 py-3 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">
+                {t('landing.software.viewAll')}
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </button>
             </div>
           </div>
         </section>

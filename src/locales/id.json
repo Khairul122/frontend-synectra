@@ -150,6 +150,13 @@
       "social": "Ikuti Kami di Sosial Media",
       "emailCopied": "Email {{email}} disalin ke clipboard!"
     },
+    "software": {
+      "title": "Software Siap Pakai",
+      "subtitle": "Source code lengkap, siap deploy",
+      "viewAll": "Lihat Semua →",
+      "buyNow": "Beli",
+      "demo": "Demo"
+    },
     "banner": {
       "title": "Pengumuman & Promo Terbaru",
       "promo": "Promo",
