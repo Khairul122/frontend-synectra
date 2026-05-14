@@ -260,6 +260,123 @@ function PortfolioModal({ item, onClose, transitionTo }) {
   );
 }
 
+/* ─── Software Detail Modal ─────────────────────────────────────────── */
+function SoftwareDetailModal({ sw, onClose, transitionTo }) {
+  const { t, i18n }  = useTranslation();
+  const backdropRef  = useRef(null);
+  const cardRef      = useRef(null);
+  const isEn         = i18n.language === 'en';
+  const swName       = (isEn && sw.nameEn)        ? sw.nameEn        : sw.name;
+  const swDesc       = (isEn && sw.descriptionEn) ? sw.descriptionEn : sw.description;
+  const swFeatures   = (isEn && sw.featuresEn)    ? sw.featuresEn    : sw.features;
+  const fmt          = (v) => `Rp ${Number(v).toLocaleString('id-ID')}`;
+
+  useEffect(() => {
+    gsap.fromTo(backdropRef.current, { opacity: 0 }, { opacity: 1, duration: 0.2 });
+    gsap.fromTo(cardRef.current, { y: -40, opacity: 0, scale: 0.95 }, { y: 0, opacity: 1, scale: 1, duration: 0.35, ease: 'power3.out' });
+    const handler = (e) => { if (e.key === 'Escape') handleClose(); };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, []);
+
+  const handleClose = () => {
+    gsap.to(cardRef.current,     { y: -20, opacity: 0, scale: 0.95, duration: 0.2, ease: 'power2.in' });
+    gsap.to(backdropRef.current, { opacity: 0, duration: 0.2, onComplete: onClose });
+  };
+
+  return createPortal(
+    <div ref={backdropRef} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/75 overflow-y-auto"
+      onClick={e => { if (e.target === e.currentTarget) handleClose(); }}>
+      <div ref={cardRef} className="w-full max-w-lg bg-neu-white border-2 border-neu-black shadow-neu-xl my-4 flex flex-col max-h-[90vh]">
+
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b-2 border-neu-black bg-neu-black flex-shrink-0">
+          <div>
+            <h3 className="font-display font-bold text-base text-neu-white leading-tight">{swName}</h3>
+            {sw.category && <span className="font-mono text-xs text-neu-white/50 uppercase">{sw.category}</span>}
+          </div>
+          <button onClick={handleClose} className="text-neu-white/60 hover:text-neu-white font-mono text-2xl leading-none ml-4 flex-shrink-0">×</button>
+        </div>
+
+        {/* Thumbnail */}
+        {sw.thumbnailUrl && (
+          <div className="border-b-2 border-neu-black bg-neu-bg flex-shrink-0">
+            <img src={sw.thumbnailUrl} alt={swName} className="w-full h-52 object-cover" loading="lazy" />
+          </div>
+        )}
+
+        {/* Scrollable body */}
+        <div className="overflow-y-auto flex-1 divide-y-2 divide-neu-black">
+
+          {/* Price */}
+          <div className="px-5 py-3 flex items-center justify-between">
+            <span className="font-mono text-xs text-neu-black/40 uppercase tracking-widest">Harga</span>
+            <span className="font-display font-bold text-xl text-neu-black">{fmt(sw.price)}</span>
+          </div>
+
+          {/* Description */}
+          {swDesc && (
+            <div className="px-5 py-4">
+              <p className="font-mono text-[10px] text-neu-black/40 uppercase tracking-widest mb-2">Deskripsi</p>
+              <p className="font-body text-sm text-neu-black/80 leading-relaxed">{swDesc}</p>
+            </div>
+          )}
+
+          {/* Features */}
+          {swFeatures && (
+            <div className="px-5 py-4">
+              <p className="font-mono text-[10px] text-neu-black/40 uppercase tracking-widest mb-3">Fitur</p>
+              <ul className="space-y-2">
+                {swFeatures.split('\n').filter(f => f.trim()).map((f, i) => (
+                  <li key={i} className="flex items-start gap-2.5">
+                    <span className="mt-0.5 w-4 h-4 flex-shrink-0 flex items-center justify-center bg-neu-primary border-2 border-neu-black">
+                      <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </span>
+                    <span className="font-body text-sm text-neu-black">{f.trim()}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Tech stack */}
+          {sw.techStack && (
+            <div className="px-5 py-4">
+              <p className="font-mono text-[10px] text-neu-black/40 uppercase tracking-widest mb-2">Tech Stack</p>
+              <div className="flex flex-wrap gap-1.5">
+                {sw.techStack.split('\n').filter(s => s.trim()).map(s => (
+                  <span key={s} className="font-mono text-[10px] bg-neu-black text-neu-white px-2.5 py-1 border border-neu-black">{s.trim()}</span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="px-5 py-4 border-t-2 border-neu-black flex gap-2 flex-shrink-0">
+          {sw.demoUrl && (
+            <a href={sw.demoUrl} target="_blank" rel="noopener noreferrer"
+              className="flex-1 py-2.5 border-2 border-neu-black bg-neu-white font-display font-bold text-xs uppercase text-neu-black text-center transition-all duration-150 hover:bg-neu-bg hover:translate-x-[2px] hover:translate-y-[2px]">
+              {t('landing.software.demo')}
+            </a>
+          )}
+          <button onClick={() => { handleClose(); setTimeout(() => transitionTo('/my-software'), 300); }}
+            className="flex-1 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">
+            {t('landing.software.buyNow')}
+          </button>
+          <button onClick={handleClose}
+            className="px-5 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">
+            Tutup
+          </button>
+        </div>
+      </div>
+    </div>,
+    document.body,
+  );
+}
+
 /* ─── Package Card ──────────────────────────────────────────────────── */
 function PackageCard({ pkg, onOrder }) {
   const { t, i18n } = useTranslation();
@@ -357,6 +474,7 @@ export default function LandingPage() {
   const [bankAccounts, setBankAccounts] = useState([]);
   const [isLoading,    setIsLoading]    = useState(true);
   const [activePortfolio, setActivePortfolio] = useState(null);
+  const [activeSoftware,  setActiveSoftware]  = useState(null);
   const [menuOpen,     setMenuOpen]     = useState(false);
   const [toast,        setToast]        = useState(null); // { msg, type }
 
@@ -506,6 +624,9 @@ export default function LandingPage() {
     <div ref={pageRef} className="min-h-screen bg-neu-bg overflow-x-hidden">
       {activePortfolio && (
         <PortfolioModal item={activePortfolio} onClose={() => setActivePortfolio(null)} transitionTo={transitionTo} />
+      )}
+      {activeSoftware && (
+        <SoftwareDetailModal sw={activeSoftware} onClose={() => setActiveSoftware(null)} transitionTo={transitionTo} />
       )}
 
       {/* ── Custom Toast Notification ── */}
@@ -955,7 +1076,7 @@ export default function LandingPage() {
                 const swDesc = (isEn && sw.descriptionEn) ? sw.descriptionEn : sw.description;
                 const fmt    = (v) => `Rp ${Number(v).toLocaleString('id-ID')}`;
                 return (
-                  <div key={sw.id} className="software-card flex-shrink-0 w-72 flex flex-col bg-neu-white border-2 border-neu-black shadow-neu transition-all duration-200 hover:translate-x-[-3px] hover:translate-y-[-3px] hover:shadow-neu-lg">
+                  <div key={sw.id} onClick={() => setActiveSoftware(sw)} className="software-card flex-shrink-0 w-72 flex flex-col bg-neu-white border-2 border-neu-black shadow-neu transition-all duration-200 hover:translate-x-[-3px] hover:translate-y-[-3px] hover:shadow-neu-lg cursor-pointer">
 
                     {/* Thumbnail */}
                     <div className="relative border-b-2 border-neu-black h-40 bg-neu-bg overflow-hidden flex items-center justify-center">
@@ -995,13 +1116,14 @@ export default function LandingPage() {
                         {sw.demoUrl && (
                           <a href={sw.demoUrl} target="_blank" rel="noopener noreferrer"
                             onMouseDown={e => e.stopPropagation()}
+                            onClick={e => e.stopPropagation()}
                             className="px-2.5 py-1.5 border-2 border-neu-black bg-neu-white font-display font-bold text-[10px] uppercase text-neu-black transition-all duration-150 hover:bg-neu-bg hover:translate-x-[1px] hover:translate-y-[1px]">
                             {t('landing.software.demo')}
                           </a>
                         )}
                         <button
                           onMouseDown={e => e.stopPropagation()}
-                          onClick={() => transitionTo('/my-software')}
+                          onClick={e => { e.stopPropagation(); transitionTo('/my-software'); }}
                           className="px-2.5 py-1.5 bg-neu-primary border-2 border-neu-black shadow-neu-sm font-display font-bold text-[10px] uppercase text-neu-black transition-all duration-150 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none">
                           {t('landing.software.buyNow')}
                         </button>
