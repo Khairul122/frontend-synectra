@@ -238,18 +238,26 @@ export default function SoftwarePurchasePage() {
                         {new Date(p.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
                       </td>
                       <td className="px-4 py-3">
-                        {p.paymentStatus === 'pending_verification' && (
-                          <div className="flex gap-2">
-                            <button onClick={() => setVerifyTarget(p)}
-                              className="px-2.5 py-1 bg-neu-green border-2 border-neu-black font-display font-bold text-[10px] uppercase text-neu-white shadow-neu-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150">
-                              Verifikasi
-                            </button>
-                            <button onClick={() => setRejectTarget(p)}
-                              className="px-2.5 py-1 bg-neu-white border-2 border-neu-black font-display font-bold text-[10px] uppercase text-neu-accent shadow-neu-sm hover:bg-neu-accent hover:text-neu-white hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150">
-                              Tolak
-                            </button>
-                          </div>
-                        )}
+                        <div className="flex flex-col gap-1.5">
+                          {p.paymentStatus === 'pending_verification' && (
+                            <div className="flex gap-2">
+                              <button onClick={() => setVerifyTarget(p)}
+                                className="px-2.5 py-1 bg-neu-green border-2 border-neu-black font-display font-bold text-[10px] uppercase text-neu-white shadow-neu-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150">
+                                Verifikasi
+                              </button>
+                              <button onClick={() => setRejectTarget(p)}
+                                className="px-2.5 py-1 bg-neu-white border-2 border-neu-black font-display font-bold text-[10px] uppercase text-neu-accent shadow-neu-sm hover:bg-neu-accent hover:text-neu-white hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150">
+                                Tolak
+                              </button>
+                            </div>
+                          )}
+                          {p.softcopyUrl && (
+                            <a href={p.softcopyUrl} target="_blank" rel="noopener noreferrer"
+                              className="px-2.5 py-1 bg-neu-blue border-2 border-neu-black font-display font-bold text-[10px] uppercase text-neu-white shadow-neu-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150 text-center">
+                              ↓ Softcopy
+                            </a>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   );
