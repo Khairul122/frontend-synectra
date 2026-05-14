@@ -92,7 +92,7 @@ export default function SoftwareProductFormPage() {
   const [isSaving,  setIsSaving]  = useState(false);
   const [form, setForm] = useState({
     name: '', nameEn: '', description: '', descriptionEn: '', category: '', price: '',
-    demoUrl: '', thumbnailUrl: '', techStack: '', features: '', featuresEn: '',
+    demoUrl: '', softcopyUrl: '', thumbnailUrl: '', techStack: '', features: '', featuresEn: '',
     sortOrder: '0', isActive: true,
   });
   const [errors, setErrors] = useState({});
@@ -115,6 +115,7 @@ export default function SoftwareProductFormPage() {
             category:      p.category      ?? '',
             price:         String(p.price  ?? ''),
             demoUrl:       p.demoUrl       ?? '',
+            softcopyUrl:   p.softcopyUrl   ?? '',
             thumbnailUrl:  p.thumbnailUrl  ?? '',
             techStack:     p.techStack     ?? '',
             features:      p.features      ?? '',
@@ -161,6 +162,7 @@ export default function SoftwareProductFormPage() {
         category:      form.category             || null,
         price:         Number(form.price),
         demoUrl:       form.demoUrl.trim()       || null,
+        softcopyUrl:   form.softcopyUrl.trim()   || null,
         thumbnailUrl:  form.thumbnailUrl         || null,
         techStack:     form.techStack.trim()     || null,
         features:      form.features.trim()      || null,
@@ -236,11 +238,21 @@ export default function SoftwareProductFormPage() {
             </div>
           </div>
 
-          {/* Demo URL */}
-          <div className="flex flex-col gap-1.5">
-            <label className="font-display font-bold text-sm text-neu-black uppercase tracking-wide">Link Demo</label>
-            <input type="url" value={form.demoUrl} onChange={e => setField('demoUrl', e.target.value)}
-              placeholder="https://demo.example.com" className={inputClass(false)} />
+          {/* Demo URL & Softcopy URL */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="font-display font-bold text-sm text-neu-black uppercase tracking-wide">Link Demo</label>
+              <input type="url" value={form.demoUrl} onChange={e => setField('demoUrl', e.target.value)}
+                placeholder="https://demo.example.com" className={inputClass(false)} />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="font-display font-bold text-sm text-neu-black uppercase tracking-wide">
+                Link Softcopy
+                <span className="font-body font-normal normal-case text-neu-black/40 ml-2 text-xs">dikirim setelah verifikasi</span>
+              </label>
+              <input type="url" value={form.softcopyUrl} onChange={e => setField('softcopyUrl', e.target.value)}
+                placeholder="https://drive.google.com/..." className={inputClass(false)} />
+            </div>
           </div>
 
           {/* Deskripsi */}
