@@ -115,7 +115,7 @@ export default function SoftwarePurchasePage() {
         const u = res.data;
         if (u.role !== 'admin') { navigate('/dashboard'); return; }
         setUser(u);
-        return loadData();
+        return loadData().catch(() => alert.error('Gagal memuat data pembelian.'));
       })
       .catch(() => navigate('/login'))
       .finally(() => setIsLoading(false));
