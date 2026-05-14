@@ -550,7 +550,16 @@
     "yesComplete": "Yes, Complete",
     "totalPrice": "Total Price",
     "deadline": "Deadline",
-    "overallProgress": "Overall Progress"
+    "overallProgress": "Overall Progress",
+    "requestRevision": "Request Revision",
+    "revisionNotes": "Client Revision Notes",
+    "revisionModal": {
+      "title": "Request Revision",
+      "label": "Describe what needs to be revised",
+      "placeholder": "e.g. The login page design needs to match the latest mockup, and the color scheme should be adjusted...",
+      "submit": "Submit Revision Request",
+      "submitting": "Submitting..."
+    }
   },
   "myOrderForm": {
     "title": "Create New Order",

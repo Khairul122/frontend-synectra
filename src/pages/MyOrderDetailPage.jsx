@@ -274,6 +274,56 @@ function UploadPaymentModal({ orderId, onClose, onUploaded }) {
   );
 }
 
+function RevisionModal({ onClose, onSubmit }) {
+  const { t }     = useTranslation();
+  const [notes,    setNotes]    = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const alert = useAlert();
+
+  const handleSubmit = async () => {
+    if (!notes.trim()) return;
+    setIsSaving(true);
+    try { await onSubmit(notes.trim()); onClose(); }
+    catch { alert.error('Gagal mengirim permintaan revisi.'); }
+    finally { setIsSaving(false); }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/70"
+      onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className="w-full max-w-md bg-neu-white border-2 border-neu-black shadow-neu-xl">
+        <div className="flex items-center justify-between px-5 py-4 border-b-2 border-neu-black bg-[#F97316]">
+          <div className="flex items-center gap-2">
+            <svg className="w-4 h-4 text-neu-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            <h3 className="font-display font-bold text-sm text-neu-white uppercase tracking-wide">{t('myOrderDetail.revisionModal.title')}</h3>
+          </div>
+          <button onClick={onClose} className="text-neu-white/70 hover:text-neu-white font-mono text-2xl leading-none">×</button>
+        </div>
+        <div className="px-5 py-5 space-y-3">
+          <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wide block">
+            {t('myOrderDetail.revisionModal.label')} <span className="text-neu-accent">*</span>
+          </label>
+          <textarea
+            value={notes} onChange={e => setNotes(e.target.value)} rows={5}
+            placeholder={t('myOrderDetail.revisionModal.placeholder')}
+            className="w-full px-4 py-3 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu transition-all duration-150 resize-none" />
+        </div>
+        <div className="px-5 pb-5 flex gap-3">
+          <button onClick={handleSubmit} disabled={isSaving || !notes.trim()}
+            className={cn('flex-1 py-2.5 bg-[#F97316] border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-white transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm', (isSaving || !notes.trim()) && 'opacity-50 cursor-not-allowed')}>
+            {isSaving ? t('myOrderDetail.revisionModal.submitting') : t('myOrderDetail.revisionModal.submit')}
+          </button>
+          <button onClick={onClose} className="flex-1 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">
+            {t('common.cancel')}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function MyOrderDetailPage() {
   const navigate = useNavigate();
   const { id }   = useParams();
@@ -286,6 +336,7 @@ export default function MyOrderDetailPage() {
   const [showPayment,    setShowPayment]    = useState(false);
   const [showComplete,   setShowComplete]   = useState(false);
   const [isCompleting,   setIsCompleting]   = useState(false);
+  const [showRevision,   setShowRevision]   = useState(false);
   const [previewImage,   setPreviewImage]   = useState(null);
   const [detailProgress, setDetailProgress] = useState(null);
 
@@ -307,6 +358,12 @@ export default function MyOrderDetailPage() {
       const msg = err?.response?.data?.message ?? 'Gagal menyelesaikan pesanan.';
       alert.error(Array.isArray(msg) ? msg.join(', ') : msg);
     } finally { setIsCompleting(false); }
+  };
+
+  const handleRequestRevision = async (notes) => {
+    await orderService.requestRevision(id, notes);
+    await loadOrder();
+    alert.success(t('myOrderDetail.requestRevision') + ' berhasil dikirim.');
   };
 
   useEffect(() => {
@@ -341,6 +398,7 @@ export default function MyOrderDetailPage() {
           onViewImage={(src, caption) => setPreviewImage({ src, caption })} />
       )}
       {previewImage && <ImageModal src={previewImage.src} caption={previewImage.caption} onClose={() => setPreviewImage(null)} />}
+      {showRevision && <RevisionModal onClose={() => setShowRevision(false)} onSubmit={handleRequestRevision} />}
       {showPayment && <UploadPaymentModal orderId={id} onClose={() => setShowPayment(false)} onUploaded={loadOrder} />}
       <ConfirmModal
         isOpen={showComplete}
@@ -374,6 +432,12 @@ export default function MyOrderDetailPage() {
                   {t('myOrderDetail.uploadReceipt')}
                 </button>
               )}
+              {order.status === 'testing' && (
+                <button onClick={() => setShowRevision(true)}
+                  className="px-4 py-2 bg-[#F97316] border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase text-neu-white hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm transition-all duration-150">
+                  {t('myOrderDetail.requestRevision')}
+                </button>
+              )}
               {['in_progress', 'testing', 'revision'].includes(order.status) && (
                 <button onClick={() => setShowComplete(true)}
                   className="px-4 py-2 bg-neu-green border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase text-neu-white hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm transition-all duration-150">
@@ -394,6 +458,20 @@ export default function MyOrderDetailPage() {
               <p className="font-display font-bold text-sm">{fmtDateTime(order.deadline)}</p>
             </div>
           </div>
+          {order.status === 'revision' && order.revisionNotes && (
+            <div className="mt-4 pt-4 border-t-2 border-neu-black">
+              <div className="flex items-start gap-3 p-3 border-2 border-[#F97316] bg-[#F97316]/10">
+                <svg className="w-4 h-4 text-[#F97316] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+                <div>
+                  <p className="font-mono text-[10px] text-[#F97316] uppercase tracking-widest mb-1">{t('myOrderDetail.revisionNotes')}</p>
+                  <p className="font-body text-sm text-neu-black leading-relaxed">{order.revisionNotes}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="mt-4 pt-4 border-t-2 border-neu-black">
             <div className="flex justify-between mb-1">
               <span className="font-mono text-xs text-neu-black/50 uppercase">{t('myOrderDetail.overallProgress')}</span>

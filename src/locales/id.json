@@ -550,7 +550,16 @@
     "yesComplete": "Ya, Selesaikan",
     "totalPrice": "Total Harga",
     "deadline": "Deadline",
-    "overallProgress": "Progress Keseluruhan"
+    "overallProgress": "Progress Keseluruhan",
+    "requestRevision": "Minta Revisi",
+    "revisionNotes": "Catatan Revisi Client",
+    "revisionModal": {
+      "title": "Permintaan Revisi",
+      "label": "Jelaskan apa yang perlu direvisi",
+      "placeholder": "Contoh: Tampilan halaman login perlu disesuaikan dengan mockup terbaru, dan skema warna perlu diubah...",
+      "submit": "Kirim Permintaan Revisi",
+      "submitting": "Mengirim..."
+    }
   },
   "myOrderForm": {
     "title": "Buat Pesanan Baru",
