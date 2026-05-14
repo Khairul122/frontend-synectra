@@ -207,7 +207,7 @@ function ReceiptUploader({ value, onChange, isUploading, onFile }) {
 function UploadPaymentModal({ orderId, onClose, onUploaded }) {
   const { t }    = useTranslation();
   const alert    = useAlert();
-  const [form, setForm]               = useState({ paymentType: 'dp', amount: '', receiptImageUrl: '' });
+  const [form, setForm]               = useState({ paymentType: 'dp', amount: '', receiptImageUrl: '', paymentNumber: '' });
   const [isUploading, setIsUploading] = useState(false);
   const [isSaving,    setIsSaving]    = useState(false);
 
@@ -224,7 +224,7 @@ function UploadPaymentModal({ orderId, onClose, onUploaded }) {
     if (!form.amount || !form.receiptImageUrl) return;
     setIsSaving(true);
     try {
-      await paymentService.create({ orderId, paymentType: form.paymentType, amount: Number(form.amount), receiptImageUrl: form.receiptImageUrl });
+      await paymentService.create({ orderId, paymentType: form.paymentType, amount: Number(form.amount), receiptImageUrl: form.receiptImageUrl, paymentNumber: form.paymentNumber || undefined });
       onUploaded();
       onClose();
     } catch { alert.error(t('client.uploadReceipt.failSend')); }
@@ -254,6 +254,15 @@ function UploadPaymentModal({ orderId, onClose, onUploaded }) {
             <input type="number" value={form.amount} onChange={e => setForm(p => ({ ...p, amount: e.target.value }))}
               placeholder="750000"
               className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black outline-none focus:shadow-neu transition-all duration-150" />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="font-display font-bold text-xs text-neu-black uppercase">
+              {t('myOrderDetail.paymentNumber') || 'No. Referensi Transfer'}
+              <span className="font-body font-normal normal-case text-neu-black/40 ml-1 text-xs">(opsional)</span>
+            </label>
+            <input type="text" value={form.paymentNumber} onChange={e => setForm(p => ({ ...p, paymentNumber: e.target.value }))}
+              placeholder="Contoh: TRF-20240514-001 atau 8 digit terakhir"
+              className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu transition-all duration-150" />
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="font-display font-bold text-xs text-neu-black uppercase">{t('client.uploadReceipt.title')} *</label>
@@ -706,6 +715,11 @@ export default function MyOrderDetailPage() {
                         <span className="font-mono text-xs text-neu-black/50 uppercase">{p.paymentType}</span>
                       </div>
                       <p className="font-display font-bold text-sm">{fmt(p.amount)}</p>
+                      {p.paymentNumber && (
+                        <p className="font-mono text-xs text-neu-black/60 mt-0.5">
+                          No. Ref: <span className="font-bold text-neu-black">{p.paymentNumber}</span>
+                        </p>
+                      )}
                       <p className="font-mono text-xs text-neu-black/40">{fmtDateTime(p.createdAt)}</p>
                       {p.notes && <p className="font-body text-xs text-neu-accent mt-0.5">{t('myOrderDetail.adminNote')} {p.notes}</p>}
                     </div>
