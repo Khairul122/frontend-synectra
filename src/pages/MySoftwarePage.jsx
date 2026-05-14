@@ -31,6 +31,82 @@ async function uploadReceipt(file) {
   return data.publicUrl;
 }
 
+function DownloadModal({ purchase, onClose }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(purchase.softcopyUrl).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/70"
+      onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className="w-full max-w-sm bg-neu-white border-2 border-neu-black shadow-neu-xl">
+
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b-2 border-neu-black bg-neu-green">
+          <div className="flex items-center gap-2">
+            <svg className="w-5 h-5 text-neu-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <h3 className="font-display font-bold text-sm text-neu-white uppercase tracking-wide">Softcopy Tersedia</h3>
+          </div>
+          <button onClick={onClose} className="text-neu-white/70 hover:text-neu-white font-mono text-2xl leading-none">×</button>
+        </div>
+
+        {/* Body */}
+        <div className="px-5 py-6 space-y-5">
+          {/* Software name */}
+          <div className="border-2 border-neu-black bg-neu-bg px-4 py-3 shadow-neu-sm">
+            <p className="font-mono text-[10px] text-neu-black/40 uppercase tracking-widest mb-1">Software</p>
+            <p className="font-display font-bold text-base text-neu-black leading-tight">{purchase.softwareName}</p>
+          </div>
+
+          {/* Download button utama */}
+          <a href={purchase.softcopyUrl} target="_blank" rel="noopener noreferrer"
+            className="flex items-center justify-center gap-3 w-full py-4 bg-neu-green border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-white tracking-wide transition-all duration-150 hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none active:translate-x-1 active:translate-y-1 active:shadow-none">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            Download Softcopy
+          </a>
+
+          {/* Copy link */}
+          <button onClick={handleCopy}
+            className={cn('flex items-center justify-center gap-2 w-full py-2.5 border-2 border-neu-black font-display font-bold text-xs uppercase tracking-wide transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none',
+              copied ? 'bg-neu-primary text-neu-black shadow-neu-sm' : 'bg-neu-white text-neu-black shadow-neu')}>
+            {copied ? (
+              <>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+                Link Tersalin!
+              </>
+            ) : (
+              <>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+                </svg>
+                Salin Link
+              </>
+            )}
+          </button>
+        </div>
+
+        {/* Footer hint */}
+        <div className="px-5 pb-5">
+          <p className="font-body text-xs text-neu-black/40 text-center">
+            Link ini eksklusif untuk pembelian Anda. Jangan disebarkan.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function UploadReceiptModal({ purchaseId, onClose, onUploaded }) {
   const { t }     = useTranslation();
   const alert     = useAlert();
@@ -113,9 +189,10 @@ export default function MySoftwarePage() {
   const [software,      setSoftware]      = useState([]);
   const [purchases,     setPurchases]     = useState([]);
   const [isLoading,     setIsLoading]     = useState(true);
-  const [buyTarget,     setBuyTarget]     = useState(null);
-  const [isBuying,      setIsBuying]      = useState(false);
-  const [uploadTarget,  setUploadTarget]  = useState(null);
+  const [buyTarget,      setBuyTarget]      = useState(null);
+  const [isBuying,       setIsBuying]       = useState(false);
+  const [uploadTarget,   setUploadTarget]   = useState(null);
+  const [downloadTarget, setDownloadTarget] = useState(null);
 
   const pageRef = useRef(null);
 
@@ -171,6 +248,10 @@ export default function MySoftwarePage() {
         confirmText={t('client.mySoftware.confirmBtn')}
         confirmColor="bg-neu-primary text-neu-black"
       />
+
+      {downloadTarget && (
+        <DownloadModal purchase={downloadTarget} onClose={() => setDownloadTarget(null)} />
+      )}
 
       {uploadTarget && (
         <UploadReceiptModal
@@ -289,16 +370,17 @@ export default function MySoftwarePage() {
                               </button>
                             )}
                             {p.paymentStatus === 'verified' && (
-                              <div className="flex flex-col gap-1.5">
-                                {p.softcopyUrl ? (
-                                  <a href={p.softcopyUrl} target="_blank" rel="noopener noreferrer"
-                                    className="px-3 py-1.5 bg-neu-green border-2 border-neu-black font-display font-bold text-xs uppercase text-neu-white shadow-neu-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150 whitespace-nowrap text-center">
-                                    ↓ Download
-                                  </a>
-                                ) : (
-                                  <span className="font-mono text-xs text-neu-green font-bold">{t('client.mySoftware.done')}</span>
-                                )}
-                              </div>
+                              p.softcopyUrl ? (
+                                <button onClick={() => setDownloadTarget(p)}
+                                  className="flex items-center gap-1.5 px-3 py-1.5 bg-neu-green border-2 border-neu-black font-display font-bold text-xs uppercase text-neu-white shadow-neu-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150 whitespace-nowrap">
+                                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                  </svg>
+                                  Softcopy
+                                </button>
+                              ) : (
+                                <span className="font-mono text-xs text-neu-green font-bold">{t('client.mySoftware.done')}</span>
+                              )
                             )}
                           </td>
                         </tr>
