@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
@@ -12,10 +13,13 @@ import { PageLoader } from '../components/ui/PageLoader';
 const fmt = (val) => `Rp ${Number(val).toLocaleString('id-ID')}`;
 
 function SoftwareRow({ product, index, onEdit, onDelete, onToggleActive }) {
+  const { i18n } = useTranslation();
   const ref = useRef(null);
   useEffect(() => {
     gsap.from(ref.current, { x: -20, opacity: 0, duration: 0.4, delay: index * 0.04, ease: 'power2.out' });
   }, [index]);
+  const isEn       = i18n.language === 'en';
+  const displayName = (isEn && product.nameEn) ? product.nameEn : product.name;
 
   return (
     <tr ref={ref} className="border-b-2 border-neu-black bg-neu-white hover:bg-neu-bg transition-colors duration-150">
@@ -38,7 +42,7 @@ function SoftwareRow({ product, index, onEdit, onDelete, onToggleActive }) {
 
       {/* Nama & Kategori */}
       <td className="px-4 py-3 border-r-2 border-neu-black">
-        <p className="font-display font-bold text-sm text-neu-black">{product.name}</p>
+        <p className="font-display font-bold text-sm text-neu-black">{displayName}</p>
         {product.category && (
           <span className="font-mono text-[10px] text-neu-black/40 uppercase">{product.category}</span>
         )}
@@ -54,7 +58,7 @@ function SoftwareRow({ product, index, onEdit, onDelete, onToggleActive }) {
         {product.demoUrl ? (
           <a href={product.demoUrl} target="_blank" rel="noopener noreferrer"
             className="font-mono text-xs text-neu-blue underline hover:no-underline truncate block max-w-[120px]">
-            Lihat Demo
+            {isEn ? 'View Demo' : 'Lihat Demo'}
           </a>
         ) : (
           <span className="font-mono text-xs text-neu-black/30">—</span>
@@ -67,7 +71,7 @@ function SoftwareRow({ product, index, onEdit, onDelete, onToggleActive }) {
           'inline-block px-2 py-0.5 border-2 border-neu-black font-mono font-bold text-xs uppercase',
           product.isActive ? 'bg-neu-green text-neu-white' : 'bg-neu-black/10 text-neu-black/50',
         )}>
-          {product.isActive ? 'Aktif' : 'Nonaktif'}
+          {product.isActive ? (isEn ? 'Active' : 'Aktif') : (isEn ? 'Inactive' : 'Nonaktif')}
         </span>
       </td>
 
@@ -79,7 +83,7 @@ function SoftwareRow({ product, index, onEdit, onDelete, onToggleActive }) {
               'px-2.5 py-1 border-2 border-neu-black font-display font-bold text-[10px] uppercase transition-all duration-150 shadow-neu-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none',
               product.isActive ? 'bg-neu-black/10 text-neu-black' : 'bg-neu-green text-neu-white',
             )}>
-            {product.isActive ? 'Nonaktifkan' : 'Aktifkan'}
+            {product.isActive ? (isEn ? 'Deactivate' : 'Nonaktifkan') : (isEn ? 'Activate' : 'Aktifkan')}
           </button>
           <button onClick={() => onEdit(product.id)}
             className="px-2.5 py-1 border-2 border-neu-black bg-neu-primary font-display font-bold text-[10px] uppercase text-neu-black shadow-neu-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150">
@@ -87,7 +91,7 @@ function SoftwareRow({ product, index, onEdit, onDelete, onToggleActive }) {
           </button>
           <button onClick={() => onDelete(product)}
             className="px-2.5 py-1 border-2 border-neu-black bg-neu-white font-display font-bold text-[10px] uppercase text-neu-accent shadow-neu-sm hover:bg-neu-accent hover:text-neu-white hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150">
-            Hapus
+            {isEn ? 'Delete' : 'Hapus'}
           </button>
         </div>
       </td>
@@ -96,8 +100,10 @@ function SoftwareRow({ product, index, onEdit, onDelete, onToggleActive }) {
 }
 
 export default function SoftwareProductPage() {
-  const navigate = useNavigate();
-  const alert    = useAlert();
+  const navigate    = useNavigate();
+  const alert       = useAlert();
+  const { i18n }    = useTranslation();
+  const isEn        = i18n.language === 'en';
 
   const [user,         setUser]         = useState(null);
   const [products,     setProducts]     = useState([]);
@@ -162,11 +168,13 @@ export default function SoftwareProductPage() {
   if (isLoading) return <PageLoader />;
 
   return (
-    <PageLayout user={user} title="Manajemen Software" alert={alert}>
+    <PageLayout user={user} title={isEn ? 'Software Management' : 'Manajemen Software'} alert={alert}>
       <ConfirmModal
         isOpen={Boolean(deleteTarget)}
-        title="Hapus Software"
-        message={`Apakah kamu yakin ingin menghapus software "${deleteTarget?.name}"? Tindakan ini tidak bisa dibatalkan.`}
+        title={isEn ? 'Delete Software' : 'Hapus Software'}
+        message={isEn
+          ? `Are you sure you want to delete "${deleteTarget?.nameEn || deleteTarget?.name}"? This action cannot be undone.`
+          : `Apakah kamu yakin ingin menghapus software "${deleteTarget?.name}"? Tindakan ini tidak bisa dibatalkan.`}
         onConfirm={handleDelete}
         onCancel={() => setDeleteTarget(null)}
         isLoading={isDeleting}
@@ -176,15 +184,15 @@ export default function SoftwareProductPage() {
       <div ref={headerRef} className="flex flex-wrap items-center gap-3 mb-6">
         <input
           type="text" value={search} onChange={e => setSearch(e.target.value)}
-          placeholder="Cari software..."
+          placeholder={isEn ? 'Search software...' : 'Cari software...'}
           className="flex-1 min-w-48 px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black placeholder:text-neu-black/30 outline-none focus:shadow-neu transition-all duration-150"
         />
         <span className="font-mono text-xs text-neu-black/50">
-          <strong className="text-neu-black">{filtered.length}</strong> dari <strong className="text-neu-black">{products.length}</strong> software
+          <strong className="text-neu-black">{filtered.length}</strong> {isEn ? 'of' : 'dari'} <strong className="text-neu-black">{products.length}</strong> software
         </span>
         <button onClick={() => navigate('/software-products/new')}
           className="px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase tracking-wide text-neu-black transition-all duration-150 whitespace-nowrap hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm active:translate-x-1 active:translate-y-1 active:shadow-none">
-          + Tambah Software
+          + {isEn ? 'Add Software' : 'Tambah Software'}
         </button>
       </div>
 
@@ -193,12 +201,14 @@ export default function SoftwareProductPage() {
         {filtered.length === 0 ? (
           <div className="p-16 text-center">
             <p className="font-display font-bold text-xl text-neu-black/40">
-              {products.length === 0 ? 'Belum ada software.' : 'Tidak ada hasil pencarian.'}
+              {products.length === 0
+                ? (isEn ? 'No software yet.' : 'Belum ada software.')
+                : (isEn ? 'No search results.' : 'Tidak ada hasil pencarian.')}
             </p>
             {products.length === 0 && (
               <button onClick={() => navigate('/software-products/new')}
                 className="mt-4 px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm transition-all duration-150">
-                Tambah Software Pertama
+                {isEn ? 'Add First Software' : 'Tambah Software Pertama'}
               </button>
             )}
           </div>
@@ -207,7 +217,10 @@ export default function SoftwareProductPage() {
             <table className="w-full border-collapse">
               <thead>
                 <tr className="bg-neu-black text-neu-white">
-                  {['No', 'Thumbnail', 'Nama / Kategori', 'Harga', 'Demo', 'Status', 'Aksi'].map((h, i) => (
+                  {(isEn
+            ? ['No', 'Thumbnail', 'Name / Category', 'Price', 'Demo', 'Status', 'Actions']
+            : ['No', 'Thumbnail', 'Nama / Kategori', 'Harga', 'Demo', 'Status', 'Aksi']
+          ).map((h, i) => (
                     <th key={h} className={cn('px-4 py-3 font-display font-bold text-xs uppercase tracking-wide text-left', i < 6 && 'border-r-2 border-neu-white/20')}>
                       {h}
                     </th>

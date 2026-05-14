@@ -387,7 +387,11 @@ export default function MySoftwarePage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {software.map(sw => (
+              {software.map(sw => {
+                const isEn   = i18n.language === 'en';
+                const swName = (isEn && sw.nameEn)        ? sw.nameEn        : sw.name;
+                const swDesc = (isEn && sw.descriptionEn) ? sw.descriptionEn : sw.description;
+                return (
                 <div key={sw.id} className="border-2 border-neu-black shadow-neu bg-neu-white flex flex-col">
                   <div onClick={() => setPreviewTarget(sw)}
                     className="relative border-b-2 border-neu-black bg-neu-bg h-40 overflow-hidden flex items-center justify-center cursor-pointer group">
@@ -405,10 +409,10 @@ export default function MySoftwarePage() {
                   </div>
                   <div className="p-4 flex-1">
                     <div className="flex items-start justify-between gap-2 mb-2">
-                      <p className="font-display font-bold text-base text-neu-black leading-tight">{sw.name}</p>
+                      <p className="font-display font-bold text-base text-neu-black leading-tight">{swName}</p>
                       {sw.category && <span className="flex-shrink-0 font-mono text-[10px] text-neu-black/50 uppercase border border-neu-black/20 px-1.5 py-0.5">{sw.category}</span>}
                     </div>
-                    {sw.description && <p className="font-body text-xs text-neu-black/60 mb-3 line-clamp-2">{sw.description}</p>}
+                    {swDesc && <p className="font-body text-xs text-neu-black/60 mb-3 line-clamp-2">{swDesc}</p>}
                     <p className="font-display font-bold text-xl text-neu-black mb-3">{fmt(sw.price)}</p>
                     {sw.techStack && (
                       <div className="flex flex-wrap gap-1 mb-3">
@@ -433,7 +437,7 @@ export default function MySoftwarePage() {
                     </button>
                   </div>
                 </div>
-              ))}
+              );})}
             </div>
           )}
         </section>
