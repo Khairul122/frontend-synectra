@@ -11,4 +11,10 @@ export const paymentService = {
   reject(id, notes) {
     return apiClient.patch(`${API_ENDPOINTS.PAYMENTS}/${id}/reject`, { notes }).then(r => r.data);
   },
+  getIncome(view = 'monthly', year, month) {
+    const params = new URLSearchParams({ view });
+    if (year)  params.set('year',  String(year));
+    if (month) params.set('month', String(month));
+    return apiClient.get(`${API_ENDPOINTS.PAYMENTS}/income?${params}`).then(r => r.data);
+  },
 };
