@@ -49,6 +49,13 @@ Berikut adalah daftar fitur dan komponen yang telah berhasil diimplementasikan (
    - Implementasi state management notifikasi menggunakan custom hook `useAlert.js`.
    - Utility class builder `cn.js` untuk styling Tailwind CSS.
 
+5. **Pembaruan UI/UX & Layout (Terbaru)**
+   - Transisi palet warna pada panel dan login UI ke palet biru-putih modern yang konsisten dengan gaya *neubrutalism*.
+   - Perbaikan masalah penyelarasan tata letak (alignment issues) pada dashboard, logo sidebar, tombol form, dan toggle switches.
+   - Optimasi `image preview modal` dengan bounding dimensi gambar untuk mencegah overflow pada layout.
+   - Perbaikan tautan email pada Landing Page dengan utilitas `fixContactUrl` untuk mendeteksi alamat email dan menambahkan protokol `mailto:` dengan benar.
+   - Pembuatan dan integrasi desain ikon proyek Synectra.
+
 ---
 
 ## 🛠️ Tech Stack & Instalasi
