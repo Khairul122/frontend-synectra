@@ -56,6 +56,11 @@ Berikut adalah daftar fitur dan komponen yang telah berhasil diimplementasikan (
    - Perbaikan tautan email pada Landing Page dengan utilitas `fixContactUrl` untuk mendeteksi alamat email dan menambahkan protokol `mailto:` dengan benar.
    - Pembuatan dan integrasi desain ikon proyek Synectra.
 
+6. **Manajemen Order & Landing Page (Terbaru)**
+   - **Sistem Manajemen Pesanan:** Implementasi form pembuatan order, halaman detail pesanan (`MyOrderDetailPage`), pelacakan progres (progress tracking), dan unggah bukti pembayaran terintegrasi dengan Payment Service.
+   - **Pembaruan Landing Page:** Penambahan section *Software Siap Pakai* dengan horizontal drag-scroll slider, modal detail software (`SoftwareDetailModal`), pembaruan struktur navigasi, serta penghapusan tombol view all.
+   - **Fitur Interaktif:** Implementasi fitur Kritik, Saran & Rating pada Landing Page yang terhubung langsung dengan panel Admin.
+
 ---
 
 ## 🛠️ Tech Stack & Instalasi
