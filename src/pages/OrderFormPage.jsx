@@ -31,6 +31,7 @@ export default function OrderFormPage() {
     description:     '',
     totalPrice:      '',
     deadline:        '',
+    phone:           '',
   });
   const [errors, setErrors] = useState({});
   const formRef = useRef(null);
@@ -87,6 +88,7 @@ export default function OrderFormPage() {
         description:     form.description || null,
         totalPrice:      form.totalPrice ? Number(form.totalPrice) : null,
         deadline:        form.deadline ? new Date(form.deadline).toISOString() : null,
+        phone:           form.phone.trim() || null,
       };
       const res = await orderService.create(payload);
       alert.success('Pesanan berhasil dibuat!');
@@ -159,6 +161,16 @@ export default function OrderFormPage() {
             <textarea value={form.description} onChange={e => setField('description', e.target.value)}
               rows={4} placeholder="Detail kebutuhan client..."
               className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu focus:translate-x-[-2px] focus:translate-y-[-2px] transition-all duration-150 resize-none" />
+          </div>
+
+          {/* No. WhatsApp */}
+          <div className="flex flex-col gap-1.5">
+            <label className="font-display font-bold text-sm text-neu-black uppercase tracking-wide">
+              No. WhatsApp Client <span className="font-mono text-neu-black/40 normal-case text-xs">(untuk notifikasi)</span>
+            </label>
+            <input type="tel" value={form.phone} onChange={e => setField('phone', e.target.value)}
+              placeholder="Contoh: 08123456789"
+              className={inputCls(false)} />
           </div>
 
           {/* Total Price & Deadline */}

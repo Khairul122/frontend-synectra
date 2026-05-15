@@ -30,7 +30,7 @@ export default function MyOrderFormPage() {
   const [contacts,  setContacts]  = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving,  setIsSaving]  = useState(false);
-  const [form,      setForm]      = useState({ title: '', serviceCategory: '', description: '' });
+  const [form,      setForm]      = useState({ title: '', serviceCategory: '', description: '', phone: '' });
   const [errors,    setErrors]    = useState({});
 
   const formRef = useRef(null);
@@ -66,7 +66,7 @@ export default function MyOrderFormPage() {
     if (Object.keys(errs).length) { setErrors(errs); return; }
     setIsSaving(true);
     try {
-      const payload = { title: form.title.trim(), serviceCategory: form.serviceCategory || null, description: form.description.trim() || null };
+      const payload = { title: form.title.trim(), serviceCategory: form.serviceCategory || null, description: form.description.trim() || null, phone: form.phone.trim() || null };
       const res = await orderService.create(payload);
       alert.success(t('myOrderForm.success'));
       setTimeout(() => navigate(`/my-orders/${res.data.id}`), 900);
@@ -132,6 +132,19 @@ export default function MyOrderFormPage() {
                 </option>
               ))}
             </select>
+          </div>
+
+          {/* No. WhatsApp */}
+          <div className="flex flex-col gap-1.5">
+            <label className="font-display font-bold text-sm text-neu-black uppercase tracking-wide">
+              No. WhatsApp <span className="font-mono text-neu-black/40 normal-case text-xs">(untuk notifikasi)</span>
+            </label>
+            <input type="tel" value={form.phone} onChange={e => setField('phone', e.target.value)}
+              placeholder="Contoh: 08123456789"
+              className={inputCls(false)} />
+            <p className="font-mono text-xs text-neu-black/40">
+              Nomor ini akan digunakan untuk mengirimkan update status order via WhatsApp.
+            </p>
           </div>
 
           {/* Deskripsi */}

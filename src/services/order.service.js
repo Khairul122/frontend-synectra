@@ -23,4 +23,7 @@ export const orderService = {
   requestRevision(id, items) {
     return apiClient.patch(`${API_ENDPOINTS.ORDERS}/${id}/request-revision`, { items }).then(r => r.data);
   },
+  delete(id) {
+    return apiClient.delete(`${API_ENDPOINTS.ORDERS}/${id}`).then(r => r.data);
+  },
 };

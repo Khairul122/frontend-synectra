@@ -6,6 +6,7 @@ import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
 import { orderService } from '../services/order.service';
 import { PageLayout } from '../components/layout/PageLayout';
+import { ConfirmModal } from '../components/ui/ConfirmModal';
 import { useAlert } from '../hooks/useAlert';
 import { PageLoader } from '../components/ui/PageLoader';
 
@@ -29,7 +30,7 @@ function StatusBadge({ status }) {
   );
 }
 
-function OrderRow({ order, index, onOpen }) {
+function OrderRow({ order, index, onOpen, onEdit, onDelete }) {
   const ref = useRef(null);
   useEffect(() => { gsap.from(ref.current, { x: -20, opacity: 0, duration: 0.4, delay: index * 0.04, ease: 'power2.out' }); }, [index]);
   const fmt     = (val) => val ? `Rp ${Number(val).toLocaleString('id-ID')}` : '—';
@@ -48,7 +49,31 @@ function OrderRow({ order, index, onOpen }) {
       <td className="px-4 py-3 border-r-2 border-neu-black font-mono text-sm text-neu-black w-36">{fmt(order.totalPrice)}</td>
       <td className="px-4 py-3 border-r-2 border-neu-black font-mono text-xs text-neu-black/60 w-32">{fmtDate(order.deadline)}</td>
       <td className="px-4 py-3 border-r-2 border-neu-black w-32"><StatusBadge status={order.status} /></td>
-      <td className="px-4 py-3 font-mono text-xs text-neu-black/40 w-32">{fmtDate(order.createdAt)}</td>
+      <td className="px-4 py-3 border-r-2 border-neu-black font-mono text-xs text-neu-black/40 w-32">{fmtDate(order.createdAt)}</td>
+      <td className="px-4 py-3 w-28" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center gap-1.5">
+          <button
+            onClick={() => onEdit(order.id)}
+            className={cn(
+              'px-2.5 py-1.5 bg-neu-blue border-2 border-neu-black shadow-neu-sm',
+              'font-display font-bold text-xs uppercase text-neu-white',
+              'hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150',
+            )}
+          >
+            Edit
+          </button>
+          <button
+            onClick={() => onDelete(order)}
+            className={cn(
+              'px-2.5 py-1.5 bg-neu-white border-2 border-neu-black shadow-neu-sm',
+              'font-display font-bold text-xs uppercase text-neu-accent',
+              'hover:bg-neu-accent hover:text-neu-white hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150',
+            )}
+          >
+            Hapus
+          </button>
+        </div>
+      </td>
     </tr>
   );
 }
@@ -58,11 +83,13 @@ export default function OrderPage() {
   const alert    = useAlert();
   const { t }    = useTranslation();
 
-  const [user,      setUser]      = useState(null);
-  const [orders,    setOrders]    = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [filter,    setFilter]    = useState('all');
-  const [search,    setSearch]    = useState('');
+  const [user,         setUser]         = useState(null);
+  const [orders,       setOrders]       = useState([]);
+  const [isLoading,    setIsLoading]    = useState(true);
+  const [filter,       setFilter]       = useState('all');
+  const [search,       setSearch]       = useState('');
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [isDeleting,   setIsDeleting]   = useState(false);
 
   const headerRef = useRef(null);
   const tableRef  = useRef(null);
@@ -93,10 +120,35 @@ export default function OrderPage() {
     return matchStatus && matchSearch;
   });
 
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    setIsDeleting(true);
+    try {
+      await orderService.delete(deleteTarget.id);
+      setOrders(prev => prev.filter(o => o.id !== deleteTarget.id));
+      alert.success(`Order "${deleteTarget.title}" berhasil dihapus.`);
+      setDeleteTarget(null);
+    } catch {
+      alert.error('Gagal menghapus order.');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   if (isLoading) return <PageLoader />;
 
   return (
     <PageLayout user={user} title={t('orders.title')} alert={alert}>
+      <ConfirmModal
+        isOpen={Boolean(deleteTarget)}
+        title="Hapus Order"
+        message={`Yakin ingin menghapus order "${deleteTarget?.title}"? Semua pembayaran, progress, dan revisi terkait akan ikut terhapus permanen.`}
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteTarget(null)}
+        isLoading={isDeleting}
+        confirmText="Ya, Hapus"
+        confirmColor="bg-neu-accent text-neu-white"
+      />
       <div ref={headerRef} className="flex flex-wrap items-center gap-3 mb-6">
         <input type="text" value={search} onChange={e => setSearch(e.target.value)}
           placeholder={t('orders.search')}
@@ -154,12 +206,20 @@ export default function OrderPage() {
                   <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase text-left w-36">{t('orders.cols.total')}</th>
                   <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase text-left w-32">{t('orders.cols.deadline')}</th>
                   <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase text-left w-32">{t('orders.cols.status')}</th>
-                  <th className="px-4 py-3 font-display font-bold text-xs uppercase text-left w-32">{t('orders.cols.createdAt')}</th>
+                  <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase text-left w-32">{t('orders.cols.createdAt')}</th>
+                  <th className="px-4 py-3 font-display font-bold text-xs uppercase text-center w-28">Aksi</th>
                 </tr>
               </thead>
               <tbody>
                 {filtered.map((order, idx) => (
-                  <OrderRow key={order.id} order={order} index={idx} onOpen={id => navigate(`/orders/${id}`)} />
+                  <OrderRow
+                    key={order.id}
+                    order={order}
+                    index={idx}
+                    onOpen={id => navigate(`/orders/${id}`)}
+                    onEdit={id => navigate(`/orders/${id}`)}
+                    onDelete={order => setDeleteTarget(order)}
+                  />
                 ))}
               </tbody>
             </table>

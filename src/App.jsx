@@ -18,6 +18,7 @@ const ContactPage        = lazy(() => import('./pages/ContactPage'));
 const ContactFormPage    = lazy(() => import('./pages/ContactFormPage'));
 const ClientPage         = lazy(() => import('./pages/ClientPage'));
 const ProfilePage        = lazy(() => import('./pages/ProfilePage'));
+const IncomePage         = lazy(() => import('./pages/IncomePage'));
 const OrderPage          = lazy(() => import('./pages/OrderPage'));
 const OrderFormPage      = lazy(() => import('./pages/OrderFormPage'));
 const OrderDetailPage    = lazy(() => import('./pages/OrderDetailPage'));
@@ -94,6 +95,7 @@ function App() {
         <Route path="/contacts/:id/edit"         element={<ContactFormPage />} />
         <Route path="/profile"                   element={<ProfilePage />} />
         <Route path="/clients"                   element={<ClientPage />} />
+        <Route path="/income"                    element={<IncomePage />} />
         <Route path="/orders"                    element={<OrderPage />} />
         <Route path="/orders/new"                element={<OrderFormPage />} />
         <Route path="/orders/:id"                element={<OrderDetailPage />} />
