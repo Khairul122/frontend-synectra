@@ -163,6 +163,8 @@ export function Navbar({ title, user, onMenuClick }) {
           </svg>
         </button>
 
+        <img src="/logo-synectra.jpeg" alt="Synectra"
+          className="hidden lg:block h-8 w-auto max-w-[120px] object-contain border border-neu-black/20 flex-shrink-0" />
         <h1 className="font-display font-bold text-base lg:text-lg text-neu-black uppercase tracking-wide truncate">
           {title}
         </h1>
