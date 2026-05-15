@@ -306,7 +306,7 @@ function UploadPaymentModal({ orderId, onClose, onUploaded }) {
             <select value={form.paymentType} onChange={e => setForm(p => ({ ...p, paymentType: e.target.value }))}
               className="px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black outline-none cursor-pointer">
               <option value="dp">DP (Down Payment)</option>
-              <option value="termin_1">Termin 1</option>
+              <option value="termin_1">Termin</option>
               <option value="pelunasan">Pelunasan</option>
             </select>
           </div>

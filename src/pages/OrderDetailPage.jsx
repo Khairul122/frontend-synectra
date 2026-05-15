@@ -11,7 +11,7 @@ import { progressReportService } from '../services/progressReport.service';
 import { PageLayout } from '../components/layout/PageLayout';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
 import { useAlert } from '../hooks/useAlert';
-import { PROGRESS_ATTACH_BUCKET } from '../constants/api';
+import { PROGRESS_ATTACH_BUCKET, PAYMENT_RECEIPT_BUCKET } from '../constants/api';
 import supabase from '../lib/supabase';
 import { PageLoader } from '../components/ui/PageLoader';
 
@@ -223,7 +223,7 @@ function ReceiptPreviewModal({ payment, onClose }) {
     gsap.to(backdropRef.current, { opacity: 0, duration: 0.2, onComplete: onClose });
   };
 
-  const PAYMENT_LABEL = { dp: 'Down Payment (DP)', termin_1: 'Termin 1', pelunasan: 'Pelunasan' };
+  const PAYMENT_LABEL = { dp: 'Down Payment (DP)', termin_1: 'Termin', pelunasan: 'Pelunasan' };
   const STATUS_LABEL  = { pending_verification: 'Menunggu Verifikasi', verified: 'Terverifikasi', rejected: 'Ditolak' };
   const STATUS_COLOR  = { pending_verification: 'bg-neu-primary text-neu-black', verified: 'bg-neu-green text-neu-white', rejected: 'bg-neu-accent text-neu-white' };
 
@@ -498,6 +498,173 @@ function RejectModal({ paymentId, onClose, onRejected }) {
   );
 }
 
+/* ─── Add Payment Modal (Admin) ─────────────────────────────────────────── */
+function AddPaymentModal({ orderId, onClose, onAdded, alert }) {
+  const backdropRef = useRef(null);
+  const cardRef     = useRef(null);
+  const [form, setForm] = useState({
+    paymentType:     'dp',
+    amount:          '',
+    paymentNumber:   '',
+    receiptImageUrl: '',
+    notes:           '',
+  });
+  const [isUploading, setIsUploading] = useState(false);
+  const [isSaving,    setIsSaving]    = useState(false);
+  const [autoVerify,  setAutoVerify]  = useState(true);
+
+  useEffect(() => {
+    gsap.fromTo(backdropRef.current, { opacity: 0 }, { opacity: 1, duration: 0.2 });
+    gsap.fromTo(cardRef.current,
+      { y: -30, opacity: 0, scale: 0.95 },
+      { y: 0, opacity: 1, scale: 1, duration: 0.3, ease: 'power3.out' },
+    );
+    const handleKey = (e) => { if (e.key === 'Escape') handleClose(); };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, []);
+
+  const handleClose = () => {
+    gsap.to(cardRef.current,     { y: -20, opacity: 0, scale: 0.95, duration: 0.2, ease: 'power2.in' });
+    gsap.to(backdropRef.current, { opacity: 0, duration: 0.2, onComplete: onClose });
+  };
+
+  const handleFile = async (file) => {
+    if (!file.type.startsWith('image/')) { alert.error('File harus berupa gambar.'); return; }
+    setIsUploading(true);
+    try {
+      const url = await uploadFile(file, PAYMENT_RECEIPT_BUCKET);
+      setForm(p => ({ ...p, receiptImageUrl: url }));
+    } catch { alert.error('Gagal upload bukti transfer.'); }
+    finally { setIsUploading(false); }
+  };
+
+  const handleSubmit = async () => {
+    if (!form.amount || Number(form.amount) <= 0) return;
+    setIsSaving(true);
+    try {
+      const payload = {
+        orderId,
+        paymentType: form.paymentType,
+        amount:      Number(form.amount),
+        ...(form.paymentNumber   && { paymentNumber:   form.paymentNumber }),
+        ...(form.receiptImageUrl && { receiptImageUrl: form.receiptImageUrl }),
+        ...(form.notes           && { notes:           form.notes }),
+      };
+      const result = await paymentService.create(payload);
+      if (autoVerify && result?.data?.id) {
+        await paymentService.verify(result.data.id);
+      }
+      onAdded();
+      handleClose();
+    } catch { alert.error('Gagal mencatat pembayaran.'); }
+    finally { setIsSaving(false); }
+  };
+
+  const isValid = form.amount && Number(form.amount) > 0;
+
+  return createPortal(
+    <div ref={backdropRef}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/70"
+      onClick={(e) => { if (e.target === e.currentTarget) handleClose(); }}>
+      <div ref={cardRef} className="w-full max-w-lg bg-neu-white border-2 border-neu-black shadow-neu-xl">
+
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-3 border-b-2 border-neu-black bg-neu-green">
+          <div className="flex items-center gap-2">
+            <svg className="w-4 h-4 text-neu-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            <h3 className="font-display font-bold text-sm text-neu-white uppercase tracking-wide">Catat Pembayaran</h3>
+          </div>
+          <button onClick={handleClose} className="text-neu-white/60 hover:text-neu-white font-mono text-2xl leading-none">×</button>
+        </div>
+
+        {/* Body */}
+        <div className="px-5 py-5 space-y-4 max-h-[70vh] overflow-y-auto">
+
+          {/* Jenis Pembayaran */}
+          <div className="flex flex-col gap-1.5">
+            <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wide">Jenis Pembayaran *</label>
+            <select value={form.paymentType} onChange={e => setForm(p => ({ ...p, paymentType: e.target.value }))}
+              className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black outline-none focus:shadow-neu transition-all duration-150 cursor-pointer">
+              <option value="dp">Down Payment (DP)</option>
+              <option value="termin_1">Termin</option>
+              <option value="pelunasan">Pelunasan</option>
+            </select>
+          </div>
+
+          {/* Jumlah */}
+          <div className="flex flex-col gap-1.5">
+            <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wide">Jumlah (Rp) *</label>
+            <input type="number" min="1" value={form.amount}
+              onChange={e => setForm(p => ({ ...p, amount: e.target.value }))}
+              placeholder="Contoh: 750000"
+              className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu transition-all duration-150" />
+          </div>
+
+          {/* No. Referensi */}
+          <div className="flex flex-col gap-1.5">
+            <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wide">No. Referensi <span className="font-mono text-neu-black/40 normal-case">(opsional)</span></label>
+            <input type="text" value={form.paymentNumber}
+              onChange={e => setForm(p => ({ ...p, paymentNumber: e.target.value }))}
+              placeholder="Contoh: TRF-001 atau nomor bukti transfer"
+              className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu transition-all duration-150" />
+          </div>
+
+          {/* Upload Bukti */}
+          <div className="flex flex-col gap-1.5">
+            <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wide">Bukti Transfer <span className="font-mono text-neu-black/40 normal-case">(opsional)</span></label>
+            <ScreenshotUploader
+              value={form.receiptImageUrl}
+              isUploading={isUploading}
+              onFile={handleFile}
+              onClear={() => setForm(p => ({ ...p, receiptImageUrl: '' }))}
+            />
+          </div>
+
+          {/* Catatan */}
+          <div className="flex flex-col gap-1.5">
+            <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wide">Catatan <span className="font-mono text-neu-black/40 normal-case">(opsional)</span></label>
+            <textarea value={form.notes} onChange={e => setForm(p => ({ ...p, notes: e.target.value }))}
+              rows={2} placeholder="Catatan tambahan..."
+              className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu transition-all duration-150 resize-none" />
+          </div>
+
+          {/* Auto-verify toggle */}
+          <div className="border-t-2 border-neu-black/10 pt-3">
+            <label className="flex items-center gap-3 cursor-pointer">
+              <input type="checkbox" checked={autoVerify} onChange={e => setAutoVerify(e.target.checked)}
+                className="w-4 h-4 border-2 border-neu-black accent-neu-primary" />
+              <span className="font-mono text-sm font-bold text-neu-black uppercase">Langsung tandai Terverifikasi</span>
+            </label>
+            <p className="font-body text-xs text-neu-black/50 mt-1 ml-7">
+              Centang jika pembayaran sudah dikonfirmasi diterima. Jika tidak, status akan jadi <em>Menunggu Verifikasi</em>.
+            </p>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="px-5 pb-5 flex gap-3">
+          <button onClick={handleSubmit} disabled={isSaving || !isValid || isUploading}
+            className={cn(
+              'flex-1 py-2.5 bg-neu-green border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-white',
+              'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm',
+              (isSaving || !isValid || isUploading) && 'opacity-50 cursor-not-allowed',
+            )}>
+            {isSaving ? 'Menyimpan...' : 'Catat Pembayaran'}
+          </button>
+          <button onClick={handleClose}
+            className="flex-1 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">
+            Batal
+          </button>
+        </div>
+      </div>
+    </div>,
+    document.body,
+  );
+}
+
 /* ─── Revision Detail Modal ──────────────────────────────────────────────── */
 function RevisionDetailModal({ batch, batchIndex, onClose, onViewImage }) {
   const backdropRef = useRef(null);
@@ -588,6 +755,7 @@ export default function OrderDetailPage() {
   const [order,           setOrder]           = useState(null);
   const [isLoading,       setIsLoading]       = useState(true);
   const [showProgress,    setShowProgress]    = useState(false);
+  const [showAddPayment,  setShowAddPayment]  = useState(false);
   const [rejectPaymentId, setRejectPaymentId] = useState(null);
   const [verifyTarget,    setVerifyTarget]    = useState(null);
   const [isVerifying,     setIsVerifying]     = useState(false);
@@ -702,6 +870,7 @@ export default function OrderDetailPage() {
         />
       )}
       {showProgress && <ProgressModal orderId={id} onClose={() => setShowProgress(false)} onAdded={loadOrder} />}
+      {showAddPayment && <AddPaymentModal orderId={id} onClose={() => setShowAddPayment(false)} onAdded={loadOrder} alert={alert} />}
       {rejectPaymentId && <RejectModal paymentId={rejectPaymentId} onClose={() => setRejectPaymentId(null)} onRejected={loadOrder} />}
       <ConfirmModal
         isOpen={Boolean(verifyTarget)}
@@ -844,6 +1013,13 @@ export default function OrderDetailPage() {
             <h3 className="font-display font-bold text-base text-neu-black uppercase tracking-wide">
               Pembayaran ({order.payments?.length ?? 0})
             </h3>
+            <button onClick={() => setShowAddPayment(true)}
+              className={cn(
+                'px-4 py-2 bg-neu-green border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-white',
+                'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none',
+              )}>
+              + Catat Pembayaran
+            </button>
           </div>
           {!order.payments?.length ? (
             <p className="px-6 py-8 font-body text-sm text-neu-black/40 text-center">Belum ada pembayaran.</p>
@@ -852,17 +1028,25 @@ export default function OrderDetailPage() {
               {order.payments.map(p => (
                 <div key={p.id} className="px-6 py-4 flex items-start gap-4">
                   {/* Receipt thumbnail — klik untuk preview modal */}
-                  <button
-                    type="button"
-                    onClick={() => setPreviewReceipt(p)}
-                    title="Klik untuk memperbesar"
-                    className={cn(
-                      'flex-shrink-0 w-16 h-12 border-2 border-neu-black overflow-hidden bg-neu-bg',
-                      'hover:border-neu-primary hover:shadow-neu-sm hover:translate-x-[-1px] hover:translate-y-[-1px] transition-all duration-150',
-                    )}
-                  >
-                    <img src={p.receiptImageUrl} alt="receipt" className="w-full h-full object-cover" />
-                  </button>
+                  {p.receiptImageUrl ? (
+                    <button
+                      type="button"
+                      onClick={() => setPreviewReceipt(p)}
+                      title="Klik untuk memperbesar"
+                      className={cn(
+                        'flex-shrink-0 w-16 h-12 border-2 border-neu-black overflow-hidden bg-neu-bg',
+                        'hover:border-neu-primary hover:shadow-neu-sm hover:translate-x-[-1px] hover:translate-y-[-1px] transition-all duration-150',
+                      )}
+                    >
+                      <img src={p.receiptImageUrl} alt="receipt" className="w-full h-full object-cover" />
+                    </button>
+                  ) : (
+                    <div className="flex-shrink-0 w-16 h-12 border-2 border-dashed border-neu-black/30 bg-neu-bg flex items-center justify-center" title="Tidak ada bukti transfer">
+                      <svg className="w-5 h-5 text-neu-black/20" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5M21 3H3" />
+                      </svg>
+                    </div>
+                  )}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <StatusBadge status={p.status} config={PAYMENT_STATUS} />
