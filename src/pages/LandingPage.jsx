@@ -985,9 +985,8 @@ export default function LandingPage() {
       <nav className="sticky top-0 z-40 bg-neu-white border-b-2 border-neu-black">
         <div className="max-w-7xl mx-auto px-4 lg:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-5">
-            <div className="bg-neu-primary border-2 border-neu-black px-3 py-1 shadow-neu-sm">
-              <span className="font-mono font-bold text-xs text-neu-black uppercase tracking-widest">Synectra</span>
-            </div>
+            <img src="/logo-synectra.jpeg" alt="Synectra"
+              className="h-9 w-auto max-w-[120px] border-2 border-neu-black object-contain shadow-neu-sm" />
             <div className="hidden md:flex items-center gap-6">
               {[
                 { tKey: 'nav.services',    id: 'layanan'   },
@@ -1545,9 +1544,8 @@ export default function LandingPage() {
             {/* Brand col — 2/5 */}
             <div className="lg:col-span-2">
               <div className="flex items-center gap-3 mb-5">
-                <div className="bg-neu-primary border-2 border-neu-primary px-3 py-1">
-                  <span className="font-mono font-bold text-sm text-neu-black uppercase tracking-widest">Synectra</span>
-                </div>
+                <img src="/logo-synectra.jpeg" alt="Synectra"
+                  className="h-9 w-auto max-w-[130px] border-2 border-neu-white/30 object-contain brightness-0 invert" />
               </div>
               <p className="font-body text-sm text-neu-white/50 leading-relaxed mb-6 max-w-sm">
                 {t('landing.footer.desc')}

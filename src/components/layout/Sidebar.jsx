@@ -212,11 +212,10 @@ export function Sidebar({ user, isOpen, onClose }) {
       >
         {/* Brand */}
         <div className="px-5 py-5 border-b-2 border-neu-black flex items-center justify-between">
-          <div>
-            <div className="inline-block bg-neu-primary border-2 border-neu-black px-3 py-1 shadow-neu-sm mb-2">
-              <span className="font-mono font-bold text-xs text-neu-black uppercase tracking-widest">Synectra</span>
-            </div>
-            <h2 className="font-display font-bold text-xl text-neu-black leading-tight">{t('admin.panel')}</h2>
+          <div className="flex items-center gap-3">
+            <img src="/logo-synectra.jpeg" alt="Synectra"
+              className="h-10 w-auto max-w-[110px] border-2 border-neu-black object-contain shadow-neu-sm flex-shrink-0" />
+            <h2 className="font-display font-bold text-sm text-neu-black/60 uppercase tracking-widest leading-tight">{t('admin.panel')}</h2>
           </div>
           <button onClick={onClose} className="lg:hidden w-8 h-8 flex items-center justify-center border-2 border-neu-black hover:bg-neu-bg transition-colors">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
