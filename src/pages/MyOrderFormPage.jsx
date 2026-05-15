@@ -137,13 +137,13 @@ export default function MyOrderFormPage() {
           {/* No. WhatsApp */}
           <div className="flex flex-col gap-1.5">
             <label className="font-display font-bold text-sm text-neu-black uppercase tracking-wide">
-              No. WhatsApp <span className="font-mono text-neu-black/40 normal-case text-xs">(untuk notifikasi)</span>
+              No. HP / WhatsApp <span className="font-mono text-neu-black/40 normal-case text-xs">(opsional)</span>
             </label>
             <input type="tel" value={form.phone} onChange={e => setField('phone', e.target.value)}
               placeholder="Contoh: 08123456789"
               className={inputCls(false)} />
             <p className="font-mono text-xs text-neu-black/40">
-              Nomor ini akan digunakan untuk mengirimkan update status order via WhatsApp.
+              Nomor HP untuk dihubungi admin jika diperlukan.
             </p>
           </div>
 
