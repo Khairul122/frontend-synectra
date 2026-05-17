@@ -5,8 +5,7 @@ import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
 import { orderService } from '../services/order.service';
-import apiClient from '../services/apiClient';
-import { API_ENDPOINTS } from '../constants/api';
+import { clientService } from '../services/client.service';
 import { PageLayout } from '../components/layout/PageLayout';
 import { useAlert } from '../hooks/useAlert';
 import { PageLoader } from '../components/ui/PageLoader';
@@ -42,11 +41,8 @@ export default function OrderFormPage() {
         const me = await authService.getMe();
         if (me.data.role !== 'admin') { navigate('/dashboard'); return; }
         setUser(me.data);
-        // Fetch users dengan role client
-        const res = await apiClient.get(`${API_ENDPOINTS.ME.replace('/auth/me', '/auth/users') || ''}`)
-          .catch(() => ({ data: { data: [] } }));
-        // Fallback: gunakan endpoint users jika ada, atau biarkan kosong
-        setClients(res?.data?.data ?? []);
+        const res = await clientService.getAll();
+        setClients(res.data ?? []);
       } catch {
         navigate('/login');
       } finally {
@@ -120,17 +116,29 @@ export default function OrderFormPage() {
 
         <form onSubmit={handleSubmit} className="space-y-6">
 
-          {/* Client ID — input manual jika belum ada endpoint list users */}
+          {/* Client — dropdown list client */}
           <div className="flex flex-col gap-1.5">
             <label className="font-display font-bold text-sm text-neu-black uppercase tracking-wide">
-              Client ID <span className="text-neu-accent">*</span>
+              Client <span className="text-neu-accent">*</span>
             </label>
-            <input type="text" value={form.clientId}
+            <select
+              value={form.clientId}
               onChange={e => setField('clientId', e.target.value)}
-              placeholder="UUID client (dari tabel users)"
-              className={inputCls(errors.clientId)} />
+              className={cn(
+                'w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-neu-black',
+                'outline-none focus:shadow-neu transition-all duration-150 cursor-pointer',
+                errors.clientId && 'border-neu-accent shadow-[4px_4px_0px_#FF5C5C]',
+              )}
+            >
+              <option value="">-- Pilih Client --</option>
+              {clients.map(c => (
+                <option key={c.id} value={c.id}>
+                  {c.fullName ?? c.companyName ?? c.email}
+                  {c.companyName && c.fullName ? ` — ${c.companyName}` : ''}
+                </option>
+              ))}
+            </select>
             {errors.clientId && <span className="text-neu-accent font-body font-semibold text-xs">{errors.clientId}</span>}
-            <p className="font-mono text-xs text-neu-black/40">Isi dengan UUID user yang memiliki role 'client'</p>
           </div>
 
           {/* Title */}
@@ -196,7 +204,7 @@ export default function OrderFormPage() {
               'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm active:translate-x-1 active:translate-y-1 active:shadow-none',
               isSaving && 'opacity-60 cursor-not-allowed',
             )}>
-              {isSaving ? t('common.saving') : 'Buat Pesanan'}
+              {isSaving ? 'Menyimpan...' : 'Buat Pesanan'}
             </button>
             <button type="button" onClick={() => navigate('/orders')} disabled={isSaving} className={cn(
               'px-6 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase tracking-wide text-neu-black',
