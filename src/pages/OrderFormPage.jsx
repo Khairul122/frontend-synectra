@@ -132,9 +132,10 @@ export default function OrderFormPage() {
             >
               <option value="">-- Pilih Client --</option>
               {clients.map(c => (
-                <option key={c.id} value={c.id}>
+                <option key={c.id} value={c.userId ?? ''} disabled={!c.userId}>
                   {c.fullName ?? c.companyName ?? c.email}
                   {c.companyName && c.fullName ? ` — ${c.companyName}` : ''}
+                  {!c.userId ? ' (tidak ada akun)' : ''}
                 </option>
               ))}
             </select>
