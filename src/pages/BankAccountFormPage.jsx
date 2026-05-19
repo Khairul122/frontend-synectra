@@ -94,6 +94,67 @@ function LogoUploader({ value, onChange }) {
   );
 }
 
+/* ─── QRIS Uploader ──────────────────────────────────────────────────────── */
+function QrisUploader({ value, onChange }) {
+  const [isDragging,  setIsDragging]  = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const inputRef = useRef(null);
+
+  const processFile = async (file) => {
+    if (!file.type.startsWith('image/')) return;
+    setIsUploading(true);
+    try {
+      const url = await uploadQrisImage(file);
+      onChange(url);
+    } catch {
+      // error handled by parent
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-3">
+      <div
+        onClick={() => !isUploading && inputRef.current.click()}
+        onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+        onDragLeave={() => setIsDragging(false)}
+        onDrop={(e) => { e.preventDefault(); setIsDragging(false); const f = e.dataTransfer.files[0]; if (f) processFile(f); }}
+        className={cn(
+          'border-2 border-dashed border-neu-black p-8 text-center cursor-pointer transition-all duration-150',
+          isDragging ? 'bg-neu-primary/20 border-solid' : 'hover:bg-neu-bg',
+          isUploading && 'opacity-60 cursor-not-allowed',
+        )}
+      >
+        <input ref={inputRef} type="file" accept="image/*" className="hidden"
+          onChange={e => { if (e.target.files[0]) processFile(e.target.files[0]); }} />
+        {isUploading ? (
+          <p className="font-display font-bold text-sm text-neu-black animate-pulse">Mengupload...</p>
+        ) : (
+          <>
+            <svg className="w-8 h-8 mx-auto mb-2 text-neu-black/40" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 013.75 9.375v-4.5zM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 01-1.125-1.125v-4.5zM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0113.5 9.375v-4.5z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 6.75h.75v.75h-.75v-.75zM6.75 16.5h.75v.75h-.75v-.75zM16.5 6.75h.75v.75h-.75v-.75zM13.5 13.5h.75v.75h-.75v-.75zM13.5 19.5h.75v.75h-.75v-.75zM19.5 13.5h.75v.75h-.75v-.75zM19.5 19.5h.75v.75h-.75v-.75zM16.5 16.5h.75v.75h-.75v-.75z" />
+            </svg>
+            <p className="font-display font-bold text-sm text-neu-black">Klik atau drag gambar QR Code ke sini</p>
+            <p className="font-body text-xs text-neu-black/40 mt-1">PNG, JPG, WEBP — maks 5MB</p>
+          </>
+        )}
+      </div>
+      {value && (
+        <div className="relative border-2 border-neu-black shadow-neu-sm overflow-hidden bg-neu-bg flex items-center justify-center p-4">
+          <img src={value} alt="Preview QR Code QRIS" className="max-h-48 object-contain" />
+          <button type="button" onClick={() => onChange('')} className={cn(
+            'absolute top-2 right-2 w-8 h-8 flex items-center justify-center',
+            'bg-neu-accent border-2 border-neu-black text-neu-white font-bold text-xs',
+            'shadow-neu-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150',
+          )}>✕</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ─── Toggle ─────────────────────────────────────────────────────────────── */
 function Toggle({ checked, onChange, label }) {
   return (
@@ -122,7 +183,7 @@ export default function BankAccountFormPage() {
   const [user,      setUser]      = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving,  setIsSaving]  = useState(false);
-  const [form,      setForm]      = useState({ bankName: '', accountNumber: '', accountHolder: '', bankLogo: '', isActive: true });
+  const [form,      setForm]      = useState({ bankName: '', accountNumber: '', accountHolder: '', bankLogo: '', paymentType: 'bank', qrisImageUrl: '', isActive: true });
   const [errors,    setErrors]    = useState({});
 
   const formRef = useRef(null);
@@ -142,6 +203,8 @@ export default function BankAccountFormPage() {
             accountNumber: a.accountNumber ?? '',
             accountHolder: a.accountHolder ?? '',
             bankLogo:      a.bankLogo      ?? '',
+            paymentType:   a.paymentType   ?? 'bank',
+            qrisImageUrl:  a.qrisImageUrl  ?? '',
             isActive:      a.isActive      ?? true,
           });
         }
@@ -184,7 +247,9 @@ export default function BankAccountFormPage() {
         bankName:      form.bankName.trim(),
         accountNumber: form.accountNumber.trim(),
         accountHolder: form.accountHolder.trim(),
-        bankLogo:      form.bankLogo || null,
+        bankLogo:      form.bankLogo     || null,
+        paymentType:   form.paymentType,
+        qrisImageUrl:  form.qrisImageUrl || null,
         isActive:      form.isActive,
       };
 
@@ -287,6 +352,32 @@ export default function BankAccountFormPage() {
             <LogoUploader value={form.bankLogo} onChange={url => setField('bankLogo', url)} />
           </div>
 
+          {/* Payment Type */}
+          <div className="flex flex-col gap-1.5">
+            <label className="font-display font-bold text-sm text-neu-black uppercase tracking-wide">
+              Jenis Metode Pembayaran
+            </label>
+            <select
+              value={form.paymentType}
+              onChange={e => setField('paymentType', e.target.value)}
+              className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-neu-black outline-none focus:shadow-neu transition-all duration-150 cursor-pointer"
+            >
+              <option value="bank">Transfer Bank</option>
+              <option value="qris">QRIS</option>
+              <option value="both">Bank + QRIS</option>
+            </select>
+          </div>
+
+          {/* QRIS Image Uploader */}
+          {(form.paymentType === 'qris' || form.paymentType === 'both') && (
+            <div className="flex flex-col gap-1.5">
+              <label className="font-display font-bold text-sm text-neu-black uppercase tracking-wide">
+                Gambar QR Code QRIS
+              </label>
+              <QrisUploader value={form.qrisImageUrl} onChange={url => setField('qrisImageUrl', url)} />
+            </div>
+          )}
+
           {/* Is Active */}
           <div className="bg-neu-white border-2 border-neu-black shadow-neu-sm p-4">
             <Toggle
@@ -306,7 +397,7 @@ export default function BankAccountFormPage() {
               'active:translate-x-1 active:translate-y-1 active:shadow-none',
               isSaving && 'opacity-60 cursor-not-allowed',
             )}>
-              {isSaving ? t('common.saving') : isEditMode ? 'Simpan Perubahan' : 'Buat Akun Bank'}
+              {isSaving ? 'Menyimpan...' : isEditMode ? 'Simpan Perubahan' : 'Buat Akun Bank'}
             </button>
             <button type="button" onClick={() => navigate('/bank-accounts')} disabled={isSaving} className={cn(
               'px-6 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu',

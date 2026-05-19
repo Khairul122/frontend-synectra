@@ -42,9 +42,19 @@ function LogoPreviewModal({ account, onClose }) {
           </div>
           <button onClick={handleClose} className="text-neu-white/60 hover:text-neu-white font-mono text-2xl leading-none">×</button>
         </div>
-        <div className="bg-neu-bg border-b-2 border-neu-black flex items-center justify-center p-8">
-          <img src={account.bankLogo} alt={account.bankName} className="max-h-40 max-w-full object-contain" />
-        </div>
+        {account.bankLogo && (
+          <div className="bg-neu-bg border-b-2 border-neu-black flex items-center justify-center p-8">
+            <img src={account.bankLogo} alt={account.bankName} className="max-h-40 max-w-full object-contain" />
+          </div>
+        )}
+        {account.qrisImageUrl && (
+          <div className="border-b-2 border-neu-black px-5 py-4">
+            <p className="font-mono text-xs text-neu-black/40 uppercase mb-3">QR Code QRIS</p>
+            <div className="bg-neu-bg flex items-center justify-center p-4">
+              <img src={account.qrisImageUrl} alt="QRIS QR Code" className="max-h-48 object-contain" />
+            </div>
+          </div>
+        )}
         <div className="px-5 py-4 flex items-center justify-between">
           <div className="flex flex-col gap-1">
             <p className="font-display font-bold text-sm text-neu-black">{account.bankName}</p>
@@ -60,24 +70,40 @@ function LogoPreviewModal({ account, onClose }) {
   );
 }
 
+const PT_BADGE = {
+  bank: { label: 'Transfer', bg: 'bg-neu-blue',   text: 'text-neu-white' },
+  qris: { label: 'QRIS',     bg: 'bg-neu-purple', text: 'text-neu-white' },
+  both: { label: 'Bank+QRIS',bg: 'bg-neu-green',  text: 'text-neu-white' },
+};
+
 function BankAccountRow({ account, index, onEdit, onDelete, onToggleActive, onPreview }) {
   const { t } = useTranslation();
   const ref = useRef(null);
   useEffect(() => { gsap.from(ref.current, { x: -20, opacity: 0, duration: 0.4, delay: index * 0.04, ease: 'power2.out' }); }, [index]);
 
+  const ptBadge = PT_BADGE[account.paymentType] ?? PT_BADGE.bank;
+  const hasPreview = account.bankLogo || account.qrisImageUrl;
+
   return (
     <tr ref={ref} className="border-b-2 border-neu-black bg-neu-white hover:bg-neu-bg transition-colors duration-150">
       <td className="px-4 py-3 border-r-2 border-neu-black font-mono text-xs text-neu-black/50 text-center w-10">{index + 1}</td>
       <td className="px-4 py-3 border-r-2 border-neu-black w-20">
-        <div onClick={() => account.bankLogo && onPreview(account)}
-          className={cn('w-14 h-10 border-2 border-neu-black overflow-hidden bg-neu-bg flex-shrink-0 flex items-center justify-center transition-all duration-150', account.bankLogo && 'cursor-pointer hover:border-neu-primary hover:shadow-neu-sm hover:translate-x-[-1px] hover:translate-y-[-1px]')}>
+        <div onClick={() => hasPreview && onPreview(account)}
+          className={cn('w-14 h-10 border-2 border-neu-black overflow-hidden bg-neu-bg flex-shrink-0 flex items-center justify-center transition-all duration-150', hasPreview && 'cursor-pointer hover:border-neu-primary hover:shadow-neu-sm hover:translate-x-[-1px] hover:translate-y-[-1px]')}>
           {account.bankLogo
             ? <img src={account.bankLogo} alt={account.bankName} className="w-full h-full object-contain p-1" onError={e => { e.target.style.display = 'none'; }} />
+            : account.qrisImageUrl
+            ? <img src={account.qrisImageUrl} alt="QRIS" className="w-full h-full object-contain p-1" onError={e => { e.target.style.display = 'none'; }} />
             : <span className="font-display font-bold text-base text-neu-black/20">{account.bankName.charAt(0).toUpperCase()}</span>
           }
         </div>
       </td>
-      <td className="px-4 py-3 border-r-2 border-neu-black w-36"><p className="font-display font-bold text-sm text-neu-black">{account.bankName}</p></td>
+      <td className="px-4 py-3 border-r-2 border-neu-black w-36">
+        <p className="font-display font-bold text-sm text-neu-black">{account.bankName}</p>
+        <span className={cn('inline-block mt-1 px-1.5 py-0 border border-neu-black font-mono font-bold text-[10px] uppercase', ptBadge.bg, ptBadge.text)}>
+          {ptBadge.label}
+        </span>
+      </td>
       <td className="px-4 py-3 border-r-2 border-neu-black w-40"><p className="font-mono text-sm text-neu-black">{account.accountNumber}</p></td>
       <td className="px-4 py-3 border-r-2 border-neu-black"><p className="font-body text-sm text-neu-black">{account.accountHolder}</p></td>
       <td className="px-4 py-3 border-r-2 border-neu-black text-center w-28">
