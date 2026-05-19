@@ -6,21 +6,18 @@ import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
 import { orderService } from '../services/order.service';
 import { clientService } from '../services/client.service';
+import { servicePackageService } from '../services/servicePackage.service';
 import { PageLayout } from '../components/layout/PageLayout';
 import { useAlert } from '../hooks/useAlert';
 import { PageLoader } from '../components/ui/PageLoader';
-
-const SERVICE_CATEGORIES = [
-  'software_development', 'ui_ux', 'joki', 'mobile_app',
-  'web_design', 'backend', 'data_science', 'other',
-];
 
 export default function OrderFormPage() {
   const navigate   = useNavigate();
   const alert      = useAlert();
 
   const [user,      setUser]      = useState(null);
-  const [clients,   setClients]   = useState([]);
+  const [clients,        setClients]        = useState([]);
+  const [servicePackages, setServicePackages] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving,  setIsSaving]  = useState(false);
   const [form,      setForm]      = useState({
@@ -41,8 +38,13 @@ export default function OrderFormPage() {
         const me = await authService.getMe();
         if (me.data.role !== 'admin') { navigate('/dashboard'); return; }
         setUser(me.data);
-        const res = await clientService.getAll();
-        setClients(res.data ?? []);
+        const [clientRes, pkgRes] = await Promise.allSettled([
+          clientService.getAll(),
+          servicePackageService.getAll(),
+        ]);
+        if (clientRes.status === 'fulfilled') setClients(clientRes.value.data ?? []);
+        if (pkgRes.status === 'fulfilled')
+          setServicePackages((pkgRes.value.data ?? []).filter(p => p.isActive).sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)));
       } catch {
         navigate('/login');
       } finally {
@@ -156,11 +158,15 @@ export default function OrderFormPage() {
 
           {/* Service Category */}
           <div className="flex flex-col gap-1.5">
-            <label className="font-display font-bold text-sm text-neu-black uppercase tracking-wide">Kategori Layanan</label>
+            <label className="font-display font-bold text-sm text-neu-black uppercase tracking-wide">Paket Layanan</label>
             <select value={form.serviceCategory} onChange={e => setField('serviceCategory', e.target.value)}
               className="px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-neu-black outline-none focus:shadow-neu transition-all duration-150 cursor-pointer">
-              <option value="">-- Pilih Kategori --</option>
-              {SERVICE_CATEGORIES.map(c => <option key={c} value={c}>{c.replace('_', ' ')}</option>)}
+              <option value="">-- Pilih Paket Layanan --</option>
+              {servicePackages.map(pkg => (
+                <option key={pkg.id} value={pkg.name}>
+                  {pkg.name}{pkg.category ? ` — ${pkg.category}` : ''}
+                </option>
+              ))}
             </select>
           </div>
 

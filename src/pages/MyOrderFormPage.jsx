@@ -6,28 +6,19 @@ import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
 import { orderService } from '../services/order.service';
 import { contactService } from '../services/contact.service';
+import { servicePackageService } from '../services/servicePackage.service';
 import { PageLayout } from '../components/layout/PageLayout';
 import { useAlert } from '../hooks/useAlert';
 import { getPlatform } from '../constants/platforms';
 
-const SERVICE_CATEGORY_VALUES = [
-  'software_development',
-  'mobile_app',
-  'web_design',
-  'ui_ux',
-  'backend',
-  'joki',
-  'data_science',
-  'other',
-];
-
 export default function MyOrderFormPage() {
   const navigate   = useNavigate();
-  const { t }      = useTranslation();
+  const { t, i18n } = useTranslation();
   const alert      = useAlert();
 
   const [user,      setUser]      = useState(null);
-  const [contacts,  setContacts]  = useState([]);
+  const [contacts,        setContacts]        = useState([]);
+  const [servicePackages, setServicePackages] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving,  setIsSaving]  = useState(false);
   const [form,      setForm]      = useState({ title: '', serviceCategory: '', description: '', phone: '' });
@@ -36,13 +27,17 @@ export default function MyOrderFormPage() {
   const formRef = useRef(null);
 
   useEffect(() => {
-    Promise.all([authService.getMe(), contactService.getAll()])
-      .then(([me, ct]) => {
-        setUser(me.data);
-        setContacts((ct.data ?? []).filter(c => c.isActive));
-      })
-      .catch(() => navigate('/login'))
-      .finally(() => setIsLoading(false));
+    Promise.allSettled([
+      authService.getMe(),
+      contactService.getAll(),
+      servicePackageService.getPublic(),
+    ]).then(([me, ct, pkg]) => {
+      if (me.status === 'rejected') { navigate('/login'); return; }
+      setUser(me.value.data);
+      if (ct.status === 'fulfilled') setContacts((ct.value.data ?? []).filter(c => c.isActive));
+      if (pkg.status === 'fulfilled')
+        setServicePackages((pkg.value.data ?? []).filter(p => p.isActive).sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)));
+    }).finally(() => setIsLoading(false));
   }, [navigate]);
 
   useEffect(() => {
@@ -82,8 +77,7 @@ export default function MyOrderFormPage() {
     hasError && 'border-neu-accent shadow-[4px_4px_0px_#FF5C5C]',
   );
 
-  const categoryLabels = t('myOrderForm.categories', { returnObjects: true });
-  const steps          = t('myOrderForm.steps',      { returnObjects: true });
+  const steps = t('myOrderForm.steps', { returnObjects: true });
 
   return (
     <PageLayout user={user} title={t('myOrderForm.title')} alert={alert}>
@@ -126,11 +120,12 @@ export default function MyOrderFormPage() {
             <select value={form.serviceCategory} onChange={e => setField('serviceCategory', e.target.value)}
               className="px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-neu-black outline-none focus:shadow-neu transition-all duration-150 cursor-pointer">
               <option value="">{t('myOrderForm.categoryOptional')}</option>
-              {SERVICE_CATEGORY_VALUES.map((val, i) => (
-                <option key={val} value={val}>
-                  {Array.isArray(categoryLabels) ? categoryLabels[i] ?? val : val}
-                </option>
-              ))}
+              {servicePackages.map(pkg => {
+                const label = (i18n.language === 'en' && pkg.nameEn) ? pkg.nameEn : pkg.name;
+                return (
+                  <option key={pkg.id} value={pkg.name}>{label}</option>
+                );
+              })}
             </select>
           </div>
 
