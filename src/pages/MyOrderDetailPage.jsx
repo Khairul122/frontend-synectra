@@ -211,12 +211,19 @@ function UploadPaymentModal({ orderId, onClose, onUploaded }) {
   const [form, setForm]               = useState({ paymentType: 'dp', amount: '', receiptImageUrl: '', paymentNumber: '' });
   const [isUploading, setIsUploading] = useState(false);
   const [isSaving,    setIsSaving]    = useState(false);
-  const [bankAccounts, setBankAccounts] = useState([]);
-  const [copiedId,     setCopiedId]     = useState(null);
+  const [bankAccounts,   setBankAccounts]   = useState([]);
+  const [copiedId,       setCopiedId]       = useState(null);
+  const [selectedMethod, setSelectedMethod] = useState('bank');
 
   useEffect(() => {
     bankAccountService.getAll()
-      .then(r => setBankAccounts((r.data ?? []).filter(b => b.isActive)))
+      .then(r => {
+        const active = (r.data ?? []).filter(b => b.isActive);
+        setBankAccounts(active);
+        const hasBank = active.some(b => b.paymentType === 'bank' || b.paymentType === 'both' || !b.paymentType);
+        const hasQris = active.some(b => (b.paymentType === 'qris' || b.paymentType === 'both') && b.qrisImageUrl);
+        if (!hasBank && hasQris) setSelectedMethod('qris');
+      })
       .catch(() => {});
   }, []);
 
@@ -257,55 +264,78 @@ function UploadPaymentModal({ orderId, onClose, onUploaded }) {
         </div>
         <div className="px-5 py-5 space-y-4">
 
-          {/* Bank accounts */}
-          {bankAccounts.length > 0 && (
-            <div className="space-y-2">
-              <p className="font-mono text-[10px] text-neu-black/50 uppercase tracking-widest">
-                Metode Pembayaran:
-              </p>
-              {bankAccounts.map(bank => (
-                <div key={bank.id} className="border-2 border-neu-black bg-neu-bg overflow-hidden">
-                  {(bank.paymentType === 'bank' || bank.paymentType === 'both' || !bank.paymentType) && (
-                    <div className="flex items-center gap-3 p-3">
-                      {bank.bankLogo ? (
-                        <img src={bank.bankLogo} alt={bank.bankName} className="w-10 h-10 object-contain flex-shrink-0 border border-neu-black/10 bg-neu-white p-1" />
-                      ) : (
-                        <div className="w-10 h-10 flex-shrink-0 border-2 border-neu-black bg-neu-primary flex items-center justify-center">
-                          <span className="font-display font-bold text-[9px] text-neu-black uppercase">{bank.bankName?.slice(0, 3)}</span>
-                        </div>
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <p className="font-display font-bold text-sm text-neu-black">{bank.bankName}</p>
-                        <p className="font-mono text-base font-bold text-neu-black tracking-wider">{bank.accountNumber}</p>
-                        <p className="font-body text-xs text-neu-black/60">{bank.accountHolder}</p>
-                      </div>
-                      <button type="button" onClick={() => copyNumber(bank.id, bank.accountNumber)}
-                        className={cn('flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 border-2 border-neu-black font-display font-bold text-[10px] uppercase transition-all duration-150 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none shadow-neu-sm',
-                          copiedId === bank.id ? 'bg-neu-green text-neu-white' : 'bg-neu-white text-neu-black')}>
-                        {copiedId === bank.id ? (
-                          <><svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>Tersalin</>
+          {/* Metode Pembayaran */}
+          {bankAccounts.length > 0 && (() => {
+            const hasBank = bankAccounts.some(b => b.paymentType === 'bank' || b.paymentType === 'both' || !b.paymentType);
+            const hasQris = bankAccounts.some(b => (b.paymentType === 'qris' || b.paymentType === 'both') && b.qrisImageUrl);
+            const bankList = bankAccounts.filter(b => b.paymentType === 'bank' || b.paymentType === 'both' || !b.paymentType);
+            const qrisList = bankAccounts.filter(b => (b.paymentType === 'qris' || b.paymentType === 'both') && b.qrisImageUrl);
+            return (
+              <div className="space-y-3">
+                {/* Tab selector — hanya jika kedua metode tersedia */}
+                {hasBank && hasQris && (
+                  <div className="flex border-2 border-neu-black overflow-hidden">
+                    <button type="button" onClick={() => setSelectedMethod('bank')}
+                      className={cn('flex-1 py-2 font-display font-bold text-xs uppercase tracking-wide transition-all duration-150',
+                        selectedMethod === 'bank' ? 'bg-neu-black text-neu-white' : 'bg-neu-white text-neu-black hover:bg-neu-bg')}>
+                      Transfer Bank
+                    </button>
+                    <button type="button" onClick={() => setSelectedMethod('qris')}
+                      className={cn('flex-1 py-2 font-display font-bold text-xs uppercase tracking-wide border-l-2 border-neu-black transition-all duration-150',
+                        selectedMethod === 'qris' ? 'bg-neu-black text-neu-white' : 'bg-neu-white text-neu-black hover:bg-neu-bg')}>
+                      QRIS
+                    </button>
+                  </div>
+                )}
+
+                {/* Transfer Bank view */}
+                {selectedMethod === 'bank' && hasBank && (
+                  <div className="space-y-2">
+                    {bankList.map(bank => (
+                      <div key={bank.id} className="flex items-center gap-3 p-3 border-2 border-neu-black bg-neu-bg">
+                        {bank.bankLogo ? (
+                          <img src={bank.bankLogo} alt={bank.bankName} className="w-10 h-10 object-contain flex-shrink-0 border border-neu-black/10 bg-neu-white p-1" />
                         ) : (
-                          <><svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" /></svg>Salin</>
+                          <div className="w-10 h-10 flex-shrink-0 border-2 border-neu-black bg-neu-primary flex items-center justify-center">
+                            <span className="font-display font-bold text-[9px] text-neu-black uppercase">{bank.bankName?.slice(0, 3)}</span>
+                          </div>
                         )}
-                      </button>
-                    </div>
-                  )}
-                  {(bank.paymentType === 'qris' || bank.paymentType === 'both') && bank.qrisImageUrl && (
-                    <div className={cn('flex flex-col items-center gap-2 p-4 bg-neu-white', bank.paymentType === 'both' && 'border-t-2 border-neu-black')}>
-                      <p className="font-mono text-[10px] text-neu-black/50 uppercase tracking-widest self-start">
-                        {bank.paymentType === 'both' ? 'Atau scan QRIS:' : `QRIS — ${bank.bankName}`}
-                      </p>
-                      <img src={bank.qrisImageUrl} alt={`QR Code QRIS ${bank.bankName}`}
-                        className="w-44 h-44 object-contain border-2 border-neu-black" />
-                      <p className="font-body text-xs text-neu-black/50 text-center">
-                        Scan menggunakan aplikasi pembayaran apapun
-                      </p>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
+                        <div className="flex-1 min-w-0">
+                          <p className="font-display font-bold text-sm text-neu-black">{bank.bankName}</p>
+                          <p className="font-mono text-base font-bold text-neu-black tracking-wider">{bank.accountNumber}</p>
+                          <p className="font-body text-xs text-neu-black/60">{bank.accountHolder}</p>
+                        </div>
+                        <button type="button" onClick={() => copyNumber(bank.id, bank.accountNumber)}
+                          className={cn('flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 border-2 border-neu-black font-display font-bold text-[10px] uppercase transition-all duration-150 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none shadow-neu-sm',
+                            copiedId === bank.id ? 'bg-neu-green text-neu-white' : 'bg-neu-white text-neu-black')}>
+                          {copiedId === bank.id
+                            ? <><svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>Tersalin</>
+                            : <><svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" /></svg>Salin</>
+                          }
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* QRIS view */}
+                {selectedMethod === 'qris' && hasQris && (
+                  <div className="space-y-3">
+                    {qrisList.map(bank => (
+                      <div key={bank.id} className="flex flex-col items-center gap-3 p-5 border-2 border-neu-black bg-neu-white">
+                        <p className="font-display font-bold text-sm text-neu-black">{bank.bankName}</p>
+                        <img src={bank.qrisImageUrl} alt={`QR Code QRIS ${bank.bankName}`}
+                          className="w-52 h-52 object-contain border-2 border-neu-black" />
+                        <p className="font-body text-xs text-neu-black/40 text-center">
+                          Scan menggunakan aplikasi pembayaran apapun
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })()}
 
           <div className="flex flex-col gap-1.5">
             <label className="font-display font-bold text-xs text-neu-black uppercase">Tipe Pembayaran</label>
