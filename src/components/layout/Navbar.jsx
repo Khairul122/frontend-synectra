@@ -148,7 +148,7 @@ function AvatarDropdown({ user }) {
 /* ─── Navbar ─────────────────────────────────────────────────────────────── */
 export function Navbar({ title, user, onMenuClick }) {
   return (
-    <header className="h-16 bg-neu-white border-b-2 border-neu-black flex items-center justify-between px-4 lg:px-6 shrink-0">
+    <header className="h-20 bg-neu-white border-b-2 border-neu-black flex items-center justify-between px-4 lg:px-6 shrink-0">
       <div className="flex items-center gap-3 min-w-0">
         {/* Hamburger — mobile only */}
         <button
