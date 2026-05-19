@@ -34,4 +34,5 @@ export const PROGRESS_ATTACH_BUCKET  = 'progress-attachments';
 export const PACKAGE_ICON_BUCKET      = 'package-icons';
 export const SOFTWARE_THUMBNAIL_BUCKET = 'software-thumbnails';
 export const REVISION_IMAGE_BUCKET     = 'revision-images';
+export const QRIS_IMAGE_BUCKET         = 'qris-images';
 export const FEEDBACKS_ENDPOINT        = `${API_BASE_URL}/api/feedbacks`;

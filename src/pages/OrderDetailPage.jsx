@@ -447,7 +447,7 @@ function ProgressModal({ orderId, onClose, onAdded }) {
             'flex-1 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black',
             'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm',
             (isSaving || !form.title.trim()) && 'opacity-50 cursor-not-allowed',
-          )}>{isSaving ? t('common.saving') : 'Simpan Progress'}</button>
+          )}>{isSaving ? 'Menyimpan...' : 'Simpan Progress'}</button>
           <button onClick={onClose} className="flex-1 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">Batal</button>
         </div>
       </div>
@@ -542,6 +542,7 @@ function AddPaymentModal({ orderId, onClose, onAdded, alert }) {
   const handleSubmit = async () => {
     if (!form.amount || Number(form.amount) <= 0) return;
     setIsSaving(true);
+    let paymentCreated = false;
     try {
       const payload = {
         orderId,
@@ -552,16 +553,24 @@ function AddPaymentModal({ orderId, onClose, onAdded, alert }) {
         ...(form.notes           && { notes:           form.notes }),
       };
       const result = await paymentService.create(payload);
+      paymentCreated = true;
       if (autoVerify && result?.data?.id) {
-        await paymentService.verify(result.data.id);
-        alert.success('Pembayaran berhasil dicatat & terverifikasi!');
+        try {
+          await paymentService.verify(result.data.id);
+          alert.success('Pembayaran berhasil dicatat & terverifikasi!');
+        } catch {
+          alert.error('Pembayaran dicatat, tapi gagal diverifikasi. Verifikasi manual dari daftar pembayaran.');
+        }
       } else {
         alert.success('Pembayaran berhasil dicatat.');
       }
       onAdded();
       handleClose();
-    } catch { alert.error('Gagal mencatat pembayaran.'); }
-    finally { setIsSaving(false); }
+    } catch {
+      if (!paymentCreated) alert.error('Gagal mencatat pembayaran.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const isValid = form.amount && Number(form.amount) > 0;

@@ -7,7 +7,7 @@ import { authService } from '../services/auth.service';
 import { bankAccountService } from '../services/bankAccount.service';
 import { PageLayout } from '../components/layout/PageLayout';
 import { useAlert } from '../hooks/useAlert';
-import { BANK_LOGO_BUCKET } from '../constants/api';
+import { BANK_LOGO_BUCKET, QRIS_IMAGE_BUCKET } from '../constants/api';
 import supabase from '../lib/supabase';
 import { PageLoader } from '../components/ui/PageLoader';
 
@@ -19,6 +19,17 @@ async function uploadBankLogo(file) {
     .upload(filename, file, { cacheControl: '3600', upsert: false });
   if (error) throw error;
   const { data } = supabase.storage.from(BANK_LOGO_BUCKET).getPublicUrl(filename);
+  return data.publicUrl;
+}
+
+async function uploadQrisImage(file) {
+  const ext      = file.name.split('.').pop();
+  const filename = `${crypto.randomUUID()}.${ext}`;
+  const { error } = await supabase.storage
+    .from(QRIS_IMAGE_BUCKET)
+    .upload(filename, file, { cacheControl: '3600', upsert: false });
+  if (error) throw error;
+  const { data } = supabase.storage.from(QRIS_IMAGE_BUCKET).getPublicUrl(filename);
   return data.publicUrl;
 }
 
