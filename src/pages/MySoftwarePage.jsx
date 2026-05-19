@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
@@ -220,6 +221,7 @@ function UploadReceiptModal({ purchaseId, onClose, onUploaded }) {
   const [bankAccounts,   setBankAccounts]   = useState([]);
   const [copiedId,       setCopiedId]       = useState(null);
   const [selectedMethod, setSelectedMethod] = useState('bank');
+  const [qrisPreview,    setQrisPreview]    = useState(null);
   const inputRef = useRef(null);
 
   useEffect(() => {
@@ -329,9 +331,11 @@ function UploadReceiptModal({ purchaseId, onClose, onUploaded }) {
                       <div key={bank.id} className="flex flex-col items-center gap-3 p-5 border-2 border-neu-black bg-neu-white">
                         <p className="font-display font-bold text-sm text-neu-black">{bank.bankName}</p>
                         <img src={bank.qrisImageUrl} alt={`QR Code QRIS ${bank.bankName}`}
-                          className="w-52 h-52 object-contain border-2 border-neu-black" />
+                          onClick={() => setQrisPreview(bank)}
+                          className="w-52 h-52 object-contain border-2 border-neu-black cursor-zoom-in hover:shadow-neu transition-all duration-150" />
                         <p className="font-body text-xs text-neu-black/40 text-center">
-                          Scan menggunakan aplikasi pembayaran apapun
+                          Scan menggunakan aplikasi pembayaran apapun •{' '}
+                          <button type="button" onClick={() => setQrisPreview(bank)} className="underline hover:text-neu-black transition-colors">perbesar</button>
                         </p>
                       </div>
                     ))}
@@ -373,6 +377,29 @@ function UploadReceiptModal({ purchaseId, onClose, onUploaded }) {
         </div>
       </div>
     </div>
+
+    {/* QRIS Full-screen Preview Modal */}
+    {qrisPreview && createPortal(
+      <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-neu-black/80"
+        onClick={() => setQrisPreview(null)}>
+        <div className="bg-neu-white border-2 border-neu-black shadow-neu-xl flex flex-col items-center gap-4 p-6 max-w-sm w-full"
+          onClick={e => e.stopPropagation()}>
+          <div className="flex items-center justify-between w-full">
+            <p className="font-display font-bold text-sm text-neu-black uppercase">{qrisPreview.bankName}</p>
+            <button type="button" onClick={() => setQrisPreview(null)}
+              className="w-8 h-8 flex items-center justify-center border-2 border-neu-black bg-neu-white font-mono font-bold text-lg leading-none hover:bg-neu-accent hover:text-neu-white transition-all duration-150">
+              ×
+            </button>
+          </div>
+          <img src={qrisPreview.qrisImageUrl} alt={`QR Code QRIS ${qrisPreview.bankName}`}
+            className="w-full max-w-xs border-2 border-neu-black" />
+          <p className="font-body text-xs text-neu-black/50 text-center">
+            Scan menggunakan aplikasi pembayaran apapun
+          </p>
+        </div>
+      </div>,
+      document.body,
+    )}
   );
 }
 
