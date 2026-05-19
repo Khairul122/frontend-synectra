@@ -261,41 +261,47 @@ function UploadPaymentModal({ orderId, onClose, onUploaded }) {
           {bankAccounts.length > 0 && (
             <div className="space-y-2">
               <p className="font-mono text-[10px] text-neu-black/50 uppercase tracking-widest">
-                Transfer ke rekening berikut:
+                Metode Pembayaran:
               </p>
               {bankAccounts.map(bank => (
-                <div key={bank.id} className="flex items-center gap-3 p-3 border-2 border-neu-black bg-neu-bg">
-                  {bank.bankLogo ? (
-                    <img src={bank.bankLogo} alt={bank.bankName} className="w-10 h-10 object-contain flex-shrink-0 border border-neu-black/10 bg-neu-white p-1" />
-                  ) : (
-                    <div className="w-10 h-10 flex-shrink-0 border-2 border-neu-black bg-neu-primary flex items-center justify-center">
-                      <span className="font-display font-bold text-[9px] text-neu-black uppercase">{bank.bankName?.slice(0, 3)}</span>
+                <div key={bank.id} className="border-2 border-neu-black bg-neu-bg overflow-hidden">
+                  {(bank.paymentType === 'bank' || bank.paymentType === 'both' || !bank.paymentType) && (
+                    <div className="flex items-center gap-3 p-3">
+                      {bank.bankLogo ? (
+                        <img src={bank.bankLogo} alt={bank.bankName} className="w-10 h-10 object-contain flex-shrink-0 border border-neu-black/10 bg-neu-white p-1" />
+                      ) : (
+                        <div className="w-10 h-10 flex-shrink-0 border-2 border-neu-black bg-neu-primary flex items-center justify-center">
+                          <span className="font-display font-bold text-[9px] text-neu-black uppercase">{bank.bankName?.slice(0, 3)}</span>
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-display font-bold text-sm text-neu-black">{bank.bankName}</p>
+                        <p className="font-mono text-base font-bold text-neu-black tracking-wider">{bank.accountNumber}</p>
+                        <p className="font-body text-xs text-neu-black/60">{bank.accountHolder}</p>
+                      </div>
+                      <button type="button" onClick={() => copyNumber(bank.id, bank.accountNumber)}
+                        className={cn('flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 border-2 border-neu-black font-display font-bold text-[10px] uppercase transition-all duration-150 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none shadow-neu-sm',
+                          copiedId === bank.id ? 'bg-neu-green text-neu-white' : 'bg-neu-white text-neu-black')}>
+                        {copiedId === bank.id ? (
+                          <><svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>Tersalin</>
+                        ) : (
+                          <><svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" /></svg>Salin</>
+                        )}
+                      </button>
                     </div>
                   )}
-                  <div className="flex-1 min-w-0">
-                    <p className="font-display font-bold text-sm text-neu-black">{bank.bankName}</p>
-                    <p className="font-mono text-base font-bold text-neu-black tracking-wider">{bank.accountNumber}</p>
-                    <p className="font-body text-xs text-neu-black/60">{bank.accountHolder}</p>
-                  </div>
-                  <button type="button" onClick={() => copyNumber(bank.id, bank.accountNumber)}
-                    className={cn('flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 border-2 border-neu-black font-display font-bold text-[10px] uppercase transition-all duration-150 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none shadow-neu-sm',
-                      copiedId === bank.id ? 'bg-neu-green text-neu-white' : 'bg-neu-white text-neu-black')}>
-                    {copiedId === bank.id ? (
-                      <>
-                        <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
-                        Tersalin
-                      </>
-                    ) : (
-                      <>
-                        <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                          <rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
-                        </svg>
-                        Salin
-                      </>
-                    )}
-                  </button>
+                  {(bank.paymentType === 'qris' || bank.paymentType === 'both') && bank.qrisImageUrl && (
+                    <div className={cn('flex flex-col items-center gap-2 p-4 bg-neu-white', bank.paymentType === 'both' && 'border-t-2 border-neu-black')}>
+                      <p className="font-mono text-[10px] text-neu-black/50 uppercase tracking-widest self-start">
+                        {bank.paymentType === 'both' ? 'Atau scan QRIS:' : `QRIS — ${bank.bankName}`}
+                      </p>
+                      <img src={bank.qrisImageUrl} alt={`QR Code QRIS ${bank.bankName}`}
+                        className="w-44 h-44 object-contain border-2 border-neu-black" />
+                      <p className="font-body text-xs text-neu-black/50 text-center">
+                        Scan menggunakan aplikasi pembayaran apapun
+                      </p>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
