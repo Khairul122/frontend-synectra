@@ -256,6 +256,7 @@ function UploadPaymentModal({ orderId, onClose, onUploaded }) {
   };
 
   return (
+    <>
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/60"
       onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
       <div className="w-full max-w-md bg-neu-white border-2 border-neu-black shadow-neu-xl">
@@ -403,6 +404,7 @@ function UploadPaymentModal({ orderId, onClose, onUploaded }) {
       </div>,
       document.body,
     )}
+    </>
   );
 }
 
