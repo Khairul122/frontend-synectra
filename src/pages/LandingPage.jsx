@@ -846,14 +846,7 @@ export default function LandingPage() {
       .to('.hero-cta',      { opacity: 1, duration: 0.5, ease: 'power2.out' }, 0.95)
       .to('.hero-stats',    { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }, 1.05)
       .to('.hero-scroll',   { opacity: 1, duration: 0.6 }, 1.3)
-      .fromTo('.hero-float-card-1', { opacity: 0, x: 60 }, { opacity: 1, x: 0, duration: 0.6, ease: 'power3.out' }, 1.15)
-      .fromTo('.hero-float-card-2', { opacity: 0, x: 60 }, { opacity: 1, x: 0, duration: 0.6, ease: 'power3.out' }, 1.35);
-
-    // Continuous float for cards
-    gsap.to('.hero-float-card-1', { y: -10, duration: 2.5, ease: 'sine.inOut', repeat: -1, yoyo: true, delay: 2 });
-    gsap.to('.hero-float-card-2', { y: -10, duration: 3.2, ease: 'sine.inOut', repeat: -1, yoyo: true, delay: 2.4 });
-
-    return () => { tl.kill(); gsap.killTweensOf('.hero-float-card-1'); gsap.killTweensOf('.hero-float-card-2'); };
+    return () => tl.kill();
   }, []);
 
   const scrollTo = (ref) => ref.current?.scrollIntoView({ behavior: 'smooth' });
@@ -1215,28 +1208,6 @@ export default function LandingPage() {
                 </div>
               ))}
             </div>
-          </div>
-        </div>
-
-        {/* Floating stats cards — desktop only */}
-        <div className="absolute right-[5%] xl:right-[8%] top-1/2 -translate-y-[60%] z-30 hidden lg:flex flex-col gap-4">
-          {/* Card 1 — Projects */}
-          <div className="hero-float-card-1 bg-neu-white border-2 border-neu-black px-5 py-4 min-w-[168px]"
-               style={{ opacity: 0, boxShadow: '6px 6px 0px #0D0D0D' }}>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="font-mono text-neu-primary text-sm">★</span>
-              <span className="font-display font-bold text-2xl text-neu-black">150+</span>
-            </div>
-            <span className="font-mono text-[10px] text-neu-black/50 uppercase tracking-wide">{t('landing.stats.projects')}</span>
-          </div>
-          {/* Card 2 — Satisfaction */}
-          <div className="hero-float-card-2 bg-neu-black border-2 border-neu-black px-5 py-4 min-w-[168px]"
-               style={{ opacity: 0, boxShadow: '6px 6px 0px #FFD000' }}>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="font-mono text-neu-green text-sm">✓</span>
-              <span className="font-display font-bold text-2xl text-neu-primary">98%</span>
-            </div>
-            <span className="font-mono text-[10px] text-neu-white/50 uppercase tracking-wide">{t('landing.stats.satisfaction')}</span>
           </div>
         </div>
 
@@ -1623,13 +1594,33 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── TECH STACK ── */}
-      <section className="border-b-2 border-neu-black bg-neu-bg py-12">
-        <div className="max-w-7xl mx-auto px-4 lg:px-6">
-          <p className="font-mono text-xs text-neu-black/40 uppercase tracking-widest text-center mb-6">{t('landing.tech.label')}</p>
-          <div className="flex flex-wrap justify-center gap-3">
-            {techStack.map(tech => (
-              <div key={tech} className="px-4 py-2 bg-neu-white border-2 border-neu-black shadow-neu-sm font-mono font-bold text-xs text-neu-black uppercase hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-neu transition-all duration-150 cursor-default">{tech}</div>
+      {/* ── TECH STACK — Double marquee running text ── */}
+      <section className="border-b-2 border-neu-black bg-neu-bg py-8 overflow-hidden">
+        {/* Label */}
+        <p className="font-mono text-[10px] text-neu-black/35 uppercase tracking-widest text-center mb-5">
+          {t('landing.tech.label')}
+        </p>
+
+        {/* Row 1 — kiri ke kanan */}
+        <div className="relative overflow-hidden mb-3">
+          <div className="flex gap-4 animate-marquee whitespace-nowrap">
+            {[...techStack, ...techStack, ...techStack].map((tech, i) => (
+              <div key={i} className="inline-flex items-center gap-3 flex-shrink-0 px-4 py-2 bg-neu-white border-2 border-neu-black shadow-neu-sm font-mono font-bold text-xs text-neu-black uppercase">
+                <span className="w-1.5 h-1.5 bg-neu-primary flex-shrink-0" />
+                {tech}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Row 2 — kanan ke kiri (reverse) */}
+        <div className="relative overflow-hidden">
+          <div className="flex gap-4 whitespace-nowrap" style={{ animation: 'marquee 22s linear infinite reverse' }}>
+            {[...techStack.slice().reverse(), ...techStack.slice().reverse(), ...techStack.slice().reverse()].map((tech, i) => (
+              <div key={i} className="inline-flex items-center gap-3 flex-shrink-0 px-4 py-2 bg-neu-black border-2 border-neu-black font-mono font-bold text-xs text-neu-white/60 uppercase">
+                <span className="w-1.5 h-1.5 bg-neu-blue flex-shrink-0" />
+                {tech}
+              </div>
             ))}
           </div>
         </div>
