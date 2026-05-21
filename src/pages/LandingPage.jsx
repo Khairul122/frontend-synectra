@@ -275,6 +275,7 @@ function LetterReveal({ text, className, delay = 0 }) {
 
 /* ─── Portfolio Modal ───────────────────────────────────────────────── */
 function PortfolioModal({ item, onClose, transitionTo }) {
+  const { t } = useTranslation();
   const [imgIdx, setImgIdx] = useState(0);
   const imgs = item.images?.length ? item.images : (item.image ? [item.image] : []);
 
