@@ -105,55 +105,60 @@ function SplineOrR3F({ scene, bg, r3fFallback, ...containerProps }) {
   );
 }
 
-/* ─── Modern Hero 3D Scene ──────────────────────────────────────────── */
+/* ─── Modern Hero 3D Scene (full-width background mode) ─────────────── */
 function HeroScene() {
   const groupRef = useRef(null);
   useFrame(({ clock }) => {
-    if (groupRef.current) groupRef.current.rotation.y = clock.elapsedTime * 0.12;
+    if (groupRef.current) groupRef.current.rotation.y = clock.elapsedTime * 0.08;
   });
   return (
-    <group ref={groupRef}>
-      {/* Central sphere - holographic */}
+    <group ref={groupRef} position={[1.5, 0, 0]}>
+      {/* Central sphere — primary focus, shifted right */}
       <Float speed={1.5} rotationIntensity={0.3} floatIntensity={0.8}>
-        <Sphere args={[1.1, 128, 128]}>
-          <MeshDistortMaterial color="#FFD000" distort={0.3} speed={3} roughness={0} metalness={0.9} envMapIntensity={1} />
+        <Sphere args={[1.2, 128, 128]}>
+          <MeshDistortMaterial color="#FFD000" distort={0.3} speed={3} roughness={0} metalness={0.9} />
         </Sphere>
       </Float>
 
-      {/* Orbiting icosahedron */}
       <Float speed={3} rotationIntensity={2} floatIntensity={1}>
-        <Icosahedron args={[0.4, 0]} position={[2, 0.5, 0]}>
-          <meshStandardMaterial color="#4D61FF" roughness={0.1} metalness={1} wireframe={false} />
+        <Icosahedron args={[0.45, 0]} position={[2.2, 0.6, 0]}>
+          <meshStandardMaterial color="#4D61FF" roughness={0.1} metalness={1} />
         </Icosahedron>
       </Float>
 
-      {/* Small octahedron */}
       <Float speed={2.5} rotationIntensity={3} floatIntensity={1.5}>
-        <Octahedron args={[0.3, 0]} position={[-1.8, -0.8, 0.5]}>
+        <Octahedron args={[0.35, 0]} position={[-1.5, -1, 0.5]}>
           <meshStandardMaterial color="#FF5C5C" roughness={0} metalness={1} />
         </Octahedron>
       </Float>
 
-      {/* Outer wobble ring */}
       <Float speed={1} floatIntensity={0.3}>
-        <Torus args={[2, 0.04, 8, 80]}>
+        <Torus args={[2.2, 0.04, 8, 80]}>
           <meshBasicMaterial color="#FFD000" opacity={0.6} transparent />
         </Torus>
       </Float>
       <Float speed={0.8} floatIntensity={0.2}>
-        <Torus args={[2.6, 0.02, 8, 80]} rotation={[Math.PI / 4, 0, 0]}>
-          <meshBasicMaterial color="#4D61FF" opacity={0.4} transparent />
+        <Torus args={[3, 0.025, 8, 80]} rotation={[Math.PI / 4, 0, 0]}>
+          <meshBasicMaterial color="#4D61FF" opacity={0.35} transparent />
         </Torus>
       </Float>
 
-      {/* Small floating dots */}
-      {[[-1.2, 1.5, 0.3],[1.5, -1.2, 0.5],[0.8, 1.8, -0.3],[-1.8, 0.2, 0.8]].map((pos, i) => (
-        <Float key={i} speed={2 + i * 0.5} floatIntensity={0.8}>
-          <Sphere args={[0.08, 16, 16]} position={pos}>
-            <meshBasicMaterial color={i % 2 === 0 ? '#FFD000' : '#4D61FF'} />
+      {/* Floating accent dots */}
+      {[[-1.5, 1.8, 0.3],[2.5, -1.5, 0.5],[1, 2.2, -0.3],[-2, 0.3, 0.8],[3.2, 1, -0.5],[-0.5, -2, 0.4]].map((pos, i) => (
+        <Float key={i} speed={2 + i * 0.3} floatIntensity={0.8}>
+          <Sphere args={[0.07, 16, 16]} position={pos}>
+            <meshBasicMaterial color={i % 3 === 0 ? '#FFD000' : i % 3 === 1 ? '#4D61FF' : '#00C48C'} />
           </Sphere>
         </Float>
       ))}
+
+      {/* Neubrutalism cube accent */}
+      <Float speed={1.2} rotationIntensity={1} floatIntensity={0.5}>
+        <mesh position={[2.8, 1.8, -1]} rotation={[0.5, 0.5, 0]}>
+          <boxGeometry args={[0.5, 0.5, 0.5]} />
+          <meshStandardMaterial color="#A855F7" roughness={0.1} metalness={0.8} />
+        </mesh>
+      </Float>
     </group>
   );
 }
@@ -180,6 +185,25 @@ function CtaScene() {
         </Torus>
       </Float>
     </>
+  );
+}
+
+/* ─── Hero text reveal — overflow-hidden + GSAP translateY ──────────── */
+function HeroReveal({ children, delay = 0, className = '' }) {
+  const innerRef = useRef(null);
+  useEffect(() => {
+    gsap.fromTo(
+      innerRef.current,
+      { y: '110%' },
+      { y: '0%', duration: 1.0, delay, ease: 'power3.out' },
+    );
+  }, [delay]);
+  return (
+    <div className={cn('overflow-hidden', className)}>
+      <div ref={innerRef} style={{ transform: 'translateY(110%)' }}>
+        {children}
+      </div>
+    </div>
   );
 }
 
@@ -814,6 +838,24 @@ export default function LandingPage() {
     return () => ScrollTrigger.getAll().forEach(t => t.kill());
   }, [isLoading]);
 
+  // Hero entrance timeline — runs once on mount
+  useEffect(() => {
+    const tl = gsap.timeline({ delay: 0.15 });
+    tl.to('.hero-badge',    { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }, 0)
+      .to('.hero-subtitle', { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' }, 0.75)
+      .to('.hero-cta',      { opacity: 1, duration: 0.5, ease: 'power2.out' }, 0.95)
+      .to('.hero-stats',    { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }, 1.05)
+      .to('.hero-scroll',   { opacity: 1, duration: 0.6 }, 1.3)
+      .fromTo('.hero-float-card-1', { opacity: 0, x: 60 }, { opacity: 1, x: 0, duration: 0.6, ease: 'power3.out' }, 1.15)
+      .fromTo('.hero-float-card-2', { opacity: 0, x: 60 }, { opacity: 1, x: 0, duration: 0.6, ease: 'power3.out' }, 1.35);
+
+    // Continuous float for cards
+    gsap.to('.hero-float-card-1', { y: -10, duration: 2.5, ease: 'sine.inOut', repeat: -1, yoyo: true, delay: 2 });
+    gsap.to('.hero-float-card-2', { y: -10, duration: 3.2, ease: 'sine.inOut', repeat: -1, yoyo: true, delay: 2.4 });
+
+    return () => { tl.kill(); gsap.killTweensOf('.hero-float-card-1'); gsap.killTweensOf('.hero-float-card-2'); };
+  }, []);
+
   const scrollTo = (ref) => ref.current?.scrollIntoView({ behavior: 'smooth' });
 
   const services = t('landing.services.items', { returnObjects: true });
@@ -1082,65 +1124,141 @@ export default function LandingPage() {
         )}
       </nav>
 
-      {/* ── HERO — 3D + Anime.js ── */}
-      <section className="relative min-h-[90vh] flex items-center border-b-2 border-neu-black overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: 'repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(13,13,13,.05) 39px,rgba(13,13,13,.05) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(13,13,13,.05) 39px,rgba(13,13,13,.05) 40px)' }} />
-        <div className="absolute top-10 right-10 w-24 h-24 border-2 border-neu-black bg-neu-primary hidden lg:block" />
-        <div className="absolute bottom-16 left-10 w-14 h-14 border-2 border-neu-black bg-neu-accent hidden lg:block" />
-        <div className="absolute top-1/3 right-1/4 w-6 h-6 border-2 border-neu-black bg-neu-blue hidden lg:block" />
-        <div className="absolute bottom-1/3 right-16 w-10 h-10 border-2 border-neu-black bg-neu-green hidden lg:block" />
+      {/* ══════════════════════════════════════════
+          HERO — Full-width dramatic (3D background)
+      ══════════════════════════════════════════ */}
+      <section className="relative min-h-[95vh] border-b-2 border-neu-black overflow-hidden bg-neu-bg">
 
-        <div className="max-w-7xl mx-auto px-4 lg:px-6 w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center py-20">
-          <div>
-            <div className="inline-block bg-neu-black text-neu-white px-4 py-1.5 font-mono font-bold text-xs uppercase tracking-widest mb-6">{t('landing.hero.badge')}</div>
-            <h1 className="font-display font-bold text-5xl sm:text-6xl lg:text-7xl text-neu-black leading-[0.9] mb-6">
-              <LetterReveal text={t('landing.hero.title1')} className="block" />
-              <span className="block mt-1 relative">
-                <LetterReveal text={t('landing.hero.title2')} className="relative z-10" delay={400} />
-                <span className="absolute bottom-2 left-0 h-5 w-full bg-neu-primary -z-0 block" />
-              </span>
-              <LetterReveal text={t('landing.hero.title3')} className="block mt-1" delay={800} />
-            </h1>
-            <p className="font-body text-base lg:text-lg text-neu-black/60 mb-8 max-w-lg leading-relaxed">
-              {t('landing.hero.subtitle')}
-            </p>
-            <div className="flex flex-wrap gap-3">
-              <button onClick={() => transitionTo('/register')} className="px-8 py-3.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase tracking-wide text-neu-black transition-all duration-150 hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-neu-sm">{t('landing.hero.cta')}</button>
-              <button onClick={() => scrollTo(portfolioRef)} className="px-8 py-3.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase tracking-wide text-neu-black transition-all duration-150 hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-neu-sm">{t('landing.hero.ctaSecondary')}</button>
-            </div>
-          </div>
+        {/* Layer 0 — 3D scene as full background */}
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          <SplineOrR3F
+            scene={SPLINE_HERO}
+            bg="transparent"
+            r3fFallback={
+              <Canvas
+                camera={{ position: [0, 0, 7], fov: 50 }}
+                gl={{ antialias: true, alpha: true }}
+                style={{ background: 'transparent', width: '100%', height: '100%' }}
+              >
+                <ambientLight intensity={0.6} />
+                <pointLight position={[5, 5, 5]} intensity={2} color="#ffffff" />
+                <pointLight position={[-3, -3, 3]} intensity={1} color="#4D61FF" />
+                <pointLight position={[0, -5, 2]} intensity={0.5} color="#FFD000" />
+                <HeroScene />
+              </Canvas>
+            }
+          />
+        </div>
 
-          {/* ── Hero 3D (Spline jika URL diisi, else R3F) ── */}
-          <div className="h-80 lg:h-[520px] border-2 border-neu-black bg-neu-bg relative overflow-hidden"
-               style={{ boxShadow: '8px 8px 0px #0D0D0D' }}>
+        {/* Layer 1 — Grid dot pattern */}
+        <div className="absolute inset-0 z-[1] pointer-events-none"
+             style={{ backgroundImage: 'radial-gradient(circle, rgba(13,13,13,0.07) 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
+
+        {/* Layer 2 — Gradient overlay: left readable, right transparent */}
+        <div className="absolute inset-0 z-[2] pointer-events-none"
+             style={{ background: 'linear-gradient(to right, #F5F0E8 38%, rgba(245,240,232,0.88) 55%, rgba(245,240,232,0.45) 72%, transparent 100%)' }} />
+
+        {/* Layer 3 — Content */}
+        <div className="relative z-20 max-w-7xl mx-auto px-4 lg:px-6 min-h-[95vh] flex flex-col justify-center py-24">
+          <div className="max-w-2xl">
 
             {/* Badge */}
-            <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5 px-2.5 py-1 bg-neu-black border border-neu-primary">
-              <span className="w-1.5 h-1.5 rounded-full bg-neu-primary animate-pulse" />
-              <span className="font-mono font-bold text-[9px] text-neu-primary uppercase tracking-widest">Interactive 3D</span>
+            <div className="hero-badge inline-flex items-center gap-2 bg-neu-black text-neu-white px-4 py-1.5 font-mono font-bold text-xs uppercase tracking-widest mb-8"
+                 style={{ opacity: 0 }}>
+              <span className="w-1.5 h-1.5 bg-neu-green animate-pulse" />
+              {t('landing.hero.badge')}
             </div>
 
-            {/* Accent corner */}
-            <div className="absolute bottom-0 right-0 w-14 h-14 bg-neu-primary border-t-2 border-l-2 border-neu-black z-10
-                            flex items-center justify-center pointer-events-none">
-              <svg className="w-5 h-5 text-neu-black" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
+            {/* Title — clip reveal per baris */}
+            <h1 className="font-display font-bold text-6xl sm:text-7xl lg:text-8xl text-neu-black leading-[0.88] mb-6">
+              <HeroReveal delay={0.1}>
+                <span className="block">{t('landing.hero.title1')}</span>
+              </HeroReveal>
+              <HeroReveal delay={0.3} className="relative">
+                <span className="relative z-10 block">{t('landing.hero.title2')}</span>
+                <span className="absolute bottom-1 left-0 h-4 w-full bg-neu-primary -z-0 block pointer-events-none" />
+              </HeroReveal>
+              <HeroReveal delay={0.5}>
+                <span className="block">{t('landing.hero.title3')}</span>
+              </HeroReveal>
+            </h1>
+
+            {/* Subtitle */}
+            <p className="hero-subtitle font-body text-base lg:text-xl text-neu-black/65 mb-10 max-w-xl leading-relaxed"
+               style={{ opacity: 0, transform: 'translateY(16px)' }}>
+              {t('landing.hero.subtitle')}
+            </p>
+
+            {/* CTA Buttons */}
+            <div className="hero-cta flex flex-wrap gap-3 mb-0" style={{ opacity: 0 }}>
+              <button
+                onClick={() => transitionTo('/register')}
+                className="px-8 py-3.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase tracking-wide text-neu-black transition-all duration-150 hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-neu-sm active:translate-x-1 active:translate-y-1 active:shadow-none">
+                {t('landing.hero.cta')}
+              </button>
+              <button
+                onClick={() => scrollTo(portfolioRef)}
+                className="px-8 py-3.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase tracking-wide text-neu-black transition-all duration-150 hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-neu-sm active:translate-x-1 active:translate-y-1 active:shadow-none">
+                {t('landing.hero.ctaSecondary')}
+              </button>
             </div>
 
-            <SplineOrR3F
-              scene={SPLINE_HERO}
-              bg="#F5F0E8"
-              r3fFallback={
-                <Canvas camera={{ position: [0, 0, 5.5], fov: 50 }} style={{ background: '#F5F0E8' }}>
-                  <ambientLight intensity={0.6} />
-                  <pointLight position={[5, 5, 5]} intensity={2} color="#ffffff" />
-                  <pointLight position={[-3, -3, 3]} intensity={1} color="#4D61FF" />
-                  <HeroScene />
-                </Canvas>
-              }
-            />
+            {/* Mini stats row */}
+            <div className="hero-stats flex flex-wrap items-center gap-x-6 gap-y-3 pt-7 mt-7 border-t-2 border-neu-black/10"
+                 style={{ opacity: 0, transform: 'translateY(12px)' }}>
+              {stats.map((s, i) => (
+                <div key={s.labelKey} className={cn('flex flex-col', i > 0 && 'sm:border-l sm:border-neu-black/15 sm:pl-6')}>
+                  <span className="font-display font-bold text-2xl text-neu-black leading-none">
+                    <AnimatedCounter target={s.value} suffix={s.suffix} />
+                  </span>
+                  <span className="font-mono text-[10px] text-neu-black/45 uppercase tracking-wide mt-1">{t(s.labelKey)}</span>
+                </div>
+              ))}
+            </div>
           </div>
+        </div>
+
+        {/* Floating stats cards — desktop only */}
+        <div className="absolute right-[5%] xl:right-[8%] top-1/2 -translate-y-[60%] z-30 hidden lg:flex flex-col gap-4">
+          {/* Card 1 — Projects */}
+          <div className="hero-float-card-1 bg-neu-white border-2 border-neu-black px-5 py-4 min-w-[168px]"
+               style={{ opacity: 0, boxShadow: '6px 6px 0px #0D0D0D' }}>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="font-mono text-neu-primary text-sm">★</span>
+              <span className="font-display font-bold text-2xl text-neu-black">150+</span>
+            </div>
+            <span className="font-mono text-[10px] text-neu-black/50 uppercase tracking-wide">{t('landing.stats.projects')}</span>
+          </div>
+          {/* Card 2 — Satisfaction */}
+          <div className="hero-float-card-2 bg-neu-black border-2 border-neu-black px-5 py-4 min-w-[168px]"
+               style={{ opacity: 0, boxShadow: '6px 6px 0px #FFD000' }}>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="font-mono text-neu-green text-sm">✓</span>
+              <span className="font-display font-bold text-2xl text-neu-primary">98%</span>
+            </div>
+            <span className="font-mono text-[10px] text-neu-white/50 uppercase tracking-wide">{t('landing.stats.satisfaction')}</span>
+          </div>
+        </div>
+
+        {/* Scroll indicator */}
+        <div className="hero-scroll absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2"
+             style={{ opacity: 0 }}>
+          <span className="font-mono text-[9px] text-neu-black/35 uppercase tracking-widest">Scroll</span>
+          <div className="w-5 h-8 border-2 border-neu-black/25 flex items-start justify-center pt-1.5">
+            <div className="w-1 h-2 bg-neu-black/35 animate-bounce" />
+          </div>
+        </div>
+      </section>
+
+      {/* ── MARQUEE — Tech Stack scrolling strip ── */}
+      <section className="border-b-2 border-neu-black bg-neu-black overflow-hidden py-3.5">
+        <div className="flex gap-10 animate-marquee whitespace-nowrap">
+          {[...techStack, ...techStack, ...techStack].map((tech, i) => (
+            <span key={i} className="inline-flex items-center gap-3 font-mono text-[11px] text-neu-white/40 uppercase tracking-widest flex-shrink-0">
+              <span className="w-1 h-1 bg-neu-primary inline-block flex-shrink-0" />
+              {tech}
+            </span>
+          ))}
         </div>
       </section>
 

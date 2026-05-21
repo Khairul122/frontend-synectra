@@ -41,6 +41,18 @@ body {
   margin: 0;
 }
 
+/* ── Marquee animation ── */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marquee 28s linear infinite;
+}
+.animate-marquee-slow {
+  animation: marquee 40s linear infinite;
+}
+
 /* ── TipTap rich text editor ── */
 .tiptap p.is-editor-empty:first-child::before {
   color: rgba(13,13,13,0.3);
