@@ -2,7 +2,7 @@ import { Component, Suspense, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { gsap } from 'gsap';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Float, MeshDistortMaterial, Sphere, Torus, MeshWobbleMaterial, Icosahedron, Octahedron } from '@react-three/drei';
@@ -275,34 +275,35 @@ function LetterReveal({ text, className, delay = 0 }) {
 
 /* ─── Portfolio Modal ───────────────────────────────────────────────── */
 function PortfolioModal({ item, onClose, transitionTo }) {
-  const backdropRef = useRef(null);
-  const cardRef = useRef(null);
   const [imgIdx, setImgIdx] = useState(0);
   const imgs = item.images?.length ? item.images : (item.image ? [item.image] : []);
 
   useEffect(() => {
-    gsap.fromTo(backdropRef.current, { opacity: 0 }, { opacity: 1, duration: 0.2 });
-    gsap.fromTo(cardRef.current, { y: -40, opacity: 0, scale: 0.95 }, { y: 0, opacity: 1, scale: 1, duration: 0.35, ease: 'power3.out' });
-    const handler = (e) => { if (e.key === 'Escape') handleClose(); };
+    const handler = (e) => { if (e.key === 'Escape') onClose(); };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, []);
-
-  const handleClose = () => {
-    gsap.to(cardRef.current, { y: -20, opacity: 0, scale: 0.95, duration: 0.2, ease: 'power2.in' });
-    gsap.to(backdropRef.current, { opacity: 0, duration: 0.2, onComplete: onClose });
-  };
+  }, [onClose]);
 
   return createPortal(
-    <div ref={backdropRef} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/75 overflow-y-auto"
-      onClick={(e) => { if (e.target === e.currentTarget) handleClose(); }}>
-      <div ref={cardRef} className="w-full max-w-2xl bg-neu-white border-2 border-neu-black shadow-neu-xl my-4">
+    <motion.div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/75 overflow-y-auto"
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <motion.div
+        className="w-full max-w-2xl bg-neu-white border-2 border-neu-black shadow-neu-xl my-4"
+        initial={{ y: -40, opacity: 0, scale: 0.95 }}
+        animate={{ y: 0, opacity: 1, scale: 1 }}
+        exit={{ y: -20, opacity: 0, scale: 0.95 }}
+        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+      >
         <div className="flex items-center justify-between px-5 py-4 border-b-2 border-neu-black bg-neu-black">
           <div>
             <h3 className="font-display font-bold text-base text-neu-white">{item.title}</h3>
             {item.category && <span className="font-mono text-xs text-neu-white/60 uppercase">{item.category.replace(/_/g,' ')}</span>}
           </div>
-          <button onClick={handleClose} className="text-neu-white/60 hover:text-neu-white font-mono text-2xl leading-none">×</button>
+          <button onClick={onClose} className="text-neu-white/60 hover:text-neu-white font-mono text-2xl leading-none">×</button>
         </div>
         {imgs.length > 0 && (
           <div className="relative border-b-2 border-neu-black bg-neu-bg">
@@ -323,17 +324,17 @@ function PortfolioModal({ item, onClose, transitionTo }) {
             : <p className="font-body text-sm text-neu-black/40 italic">Tidak ada deskripsi.</p>}
         </div>
         <div className="px-5 py-4 flex gap-3 flex-wrap">
-          <button onClick={() => { handleClose(); setTimeout(() => transitionTo('/register'), 350); }}
+          <button onClick={() => { onClose(); setTimeout(() => transitionTo('/register'), 350); }}
             className="flex-1 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">
             {t('landing.order')}
           </button>
-          <button onClick={handleClose}
+          <button onClick={onClose}
             className="px-5 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">
             Tutup
           </button>
         </div>
-      </div>
-    </div>,
+      </motion.div>
+    </motion.div>,
     document.body,
   );
 }
@@ -341,8 +342,6 @@ function PortfolioModal({ item, onClose, transitionTo }) {
 /* ─── Software Detail Modal ─────────────────────────────────────────── */
 function SoftwareDetailModal({ sw, onClose, transitionTo }) {
   const { t, i18n }  = useTranslation();
-  const backdropRef  = useRef(null);
-  const cardRef      = useRef(null);
   const isEn         = i18n.language === 'en';
   const swName       = (isEn && sw.nameEn)        ? sw.nameEn        : sw.name;
   const swDesc       = (isEn && sw.descriptionEn) ? sw.descriptionEn : sw.description;
@@ -350,22 +349,25 @@ function SoftwareDetailModal({ sw, onClose, transitionTo }) {
   const fmt          = (v) => `Rp ${Number(v).toLocaleString('id-ID')}`;
 
   useEffect(() => {
-    gsap.fromTo(backdropRef.current, { opacity: 0 }, { opacity: 1, duration: 0.2 });
-    gsap.fromTo(cardRef.current, { y: -40, opacity: 0, scale: 0.95 }, { y: 0, opacity: 1, scale: 1, duration: 0.35, ease: 'power3.out' });
-    const handler = (e) => { if (e.key === 'Escape') handleClose(); };
+    const handler = (e) => { if (e.key === 'Escape') onClose(); };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, []);
-
-  const handleClose = () => {
-    gsap.to(cardRef.current,     { y: -20, opacity: 0, scale: 0.95, duration: 0.2, ease: 'power2.in' });
-    gsap.to(backdropRef.current, { opacity: 0, duration: 0.2, onComplete: onClose });
-  };
+  }, [onClose]);
 
   return createPortal(
-    <div ref={backdropRef} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/75 overflow-y-auto"
-      onClick={e => { if (e.target === e.currentTarget) handleClose(); }}>
-      <div ref={cardRef} className="w-full max-w-lg bg-neu-white border-2 border-neu-black shadow-neu-xl my-4 flex flex-col max-h-[90vh]">
+    <motion.div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/75 overflow-y-auto"
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+      onClick={e => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <motion.div
+        className="w-full max-w-lg bg-neu-white border-2 border-neu-black shadow-neu-xl my-4 flex flex-col max-h-[90vh]"
+        initial={{ y: -40, opacity: 0, scale: 0.95 }}
+        animate={{ y: 0, opacity: 1, scale: 1 }}
+        exit={{ y: -20, opacity: 0, scale: 0.95 }}
+        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+      >
 
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b-2 border-neu-black bg-neu-black flex-shrink-0">
@@ -373,7 +375,7 @@ function SoftwareDetailModal({ sw, onClose, transitionTo }) {
             <h3 className="font-display font-bold text-base text-neu-white leading-tight">{swName}</h3>
             {sw.category && <span className="font-mono text-xs text-neu-white/50 uppercase">{sw.category}</span>}
           </div>
-          <button onClick={handleClose} className="text-neu-white/60 hover:text-neu-white font-mono text-2xl leading-none ml-4 flex-shrink-0">×</button>
+          <button onClick={onClose} className="text-neu-white/60 hover:text-neu-white font-mono text-2xl leading-none ml-4 flex-shrink-0">×</button>
         </div>
 
         {/* Thumbnail */}
@@ -440,17 +442,17 @@ function SoftwareDetailModal({ sw, onClose, transitionTo }) {
               {t('landing.software.demo')}
             </a>
           )}
-          <button onClick={() => { handleClose(); setTimeout(() => transitionTo('/my-software'), 300); }}
+          <button onClick={() => { onClose(); setTimeout(() => transitionTo('/my-software'), 300); }}
             className="flex-1 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">
             {t('landing.software.buyNow')}
           </button>
-          <button onClick={handleClose}
+          <button onClick={onClose}
             className="px-5 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">
             Tutup
           </button>
         </div>
-      </div>
-    </div>,
+      </motion.div>
+    </motion.div>,
     document.body,
   );
 }
@@ -794,12 +796,16 @@ export default function LandingPage() {
 
   return (
     <div ref={pageRef} className="min-h-screen bg-neu-bg overflow-x-hidden">
-      {activePortfolio && (
-        <PortfolioModal item={activePortfolio} onClose={() => setActivePortfolio(null)} transitionTo={transitionTo} />
-      )}
-      {activeSoftware && (
-        <SoftwareDetailModal sw={activeSoftware} onClose={() => setActiveSoftware(null)} transitionTo={transitionTo} />
-      )}
+      <AnimatePresence>
+        {activePortfolio && (
+          <PortfolioModal key="portfolio-modal" item={activePortfolio} onClose={() => setActivePortfolio(null)} transitionTo={transitionTo} />
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {activeSoftware && (
+          <SoftwareDetailModal key="software-modal" sw={activeSoftware} onClose={() => setActiveSoftware(null)} transitionTo={transitionTo} />
+        )}
+      </AnimatePresence>
 
       {/* ── Custom Toast Notification ── */}
       {toast && createPortal(
@@ -820,12 +826,20 @@ export default function LandingPage() {
 
       {/* ── Banner Iklan Popup ── */}
       {bannerAd && createPortal(
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/70"
-          onClick={(e) => { if (e.target === e.currentTarget) { setBannerAd(null); setBannerExpanded(false); } }}>
-
+        <motion.div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/70"
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          onClick={(e) => { if (e.target === e.currentTarget) { setBannerAd(null); setBannerExpanded(false); } }}
+        >
           {!bannerExpanded ? (
             /* ── State 1: Gambar penuh, klik untuk expand ── */
-            <div className="relative cursor-pointer group" onClick={() => setBannerExpanded(true)}>
+            <motion.div
+              className="relative cursor-pointer group"
+              initial={{ scale: 0.92, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.92, opacity: 0 }}
+              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              onClick={() => setBannerExpanded(true)}
+            >
               <button
                 onClick={(e) => { e.stopPropagation(); setBannerAd(null); setBannerExpanded(false); }}
                 className="absolute top-3 right-3 z-10 w-9 h-9 bg-neu-black text-neu-white border-2 border-neu-black flex items-center justify-center font-mono text-base hover:bg-neu-accent transition-colors">
@@ -857,10 +871,14 @@ export default function LandingPage() {
                   <p className="font-mono text-xs text-neu-black/50 mt-2">{t('landing.banner.clickDetail')}</p>
                 </div>
               )}
-            </div>
+            </motion.div>
           ) : (
             /* ── State 2: Split screen ── */
-            <div className="w-full max-w-3xl border-2 border-neu-black shadow-neu-xl overflow-hidden flex flex-col sm:flex-row max-h-[85vh]">
+            <motion.div
+              className="w-full max-w-3xl border-2 border-neu-black shadow-neu-xl overflow-hidden flex flex-col sm:flex-row max-h-[85vh]"
+              initial={{ scale: 0.94, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            >
               {/* Kiri: Gambar */}
               {bannerAd.image && (
                 <div className="sm:w-1/2 flex-shrink-0 border-b-2 sm:border-b-0 sm:border-r-2 border-neu-black">
@@ -914,19 +932,28 @@ export default function LandingPage() {
                   </button>
                 </div>
               </div>
-            </div>
+            </motion.div>
           )}
-        </div>,
+        </motion.div>,
         document.body
       )}
 
       {/* ── Modal Banner dari Section Banners ── */}
       {bannerModal && createPortal(
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/70"
-          onClick={(e) => { if (e.target === e.currentTarget) { setBannerModal(null); setBannerModalExp(false); } }}>
+        <motion.div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/70"
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          onClick={(e) => { if (e.target === e.currentTarget) { setBannerModal(null); setBannerModalExp(false); } }}
+        >
           {!bannerModalExp ? (
             /* State 1: Gambar penuh */
-            <div className="relative cursor-pointer group" onClick={() => bannerModal.description ? setBannerModalExp(true) : null}>
+            <motion.div
+              className="relative cursor-pointer group"
+              initial={{ scale: 0.92, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.92, opacity: 0 }}
+              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              onClick={() => bannerModal.description ? setBannerModalExp(true) : null}
+            >
               <button onClick={(e) => { e.stopPropagation(); setBannerModal(null); setBannerModalExp(false); }}
                 className="absolute top-3 right-3 z-10 w-9 h-9 bg-neu-black text-neu-white border-2 border-neu-black flex items-center justify-center font-mono text-base hover:bg-neu-accent transition-colors">×</button>
               <div className="absolute top-3 left-3 z-10 bg-neu-accent border-2 border-neu-black px-2 py-0.5">
@@ -948,10 +975,14 @@ export default function LandingPage() {
                   {bannerModal.description && <p className="font-mono text-xs text-neu-black/50 mt-2">Klik untuk lihat detail →</p>}
                 </div>
               )}
-            </div>
+            </motion.div>
           ) : (
             /* State 2: Split screen */
-            <div className="w-full max-w-3xl border-2 border-neu-black shadow-neu-xl overflow-hidden flex flex-col sm:flex-row max-h-[85vh]">
+            <motion.div
+              className="w-full max-w-3xl border-2 border-neu-black shadow-neu-xl overflow-hidden flex flex-col sm:flex-row max-h-[85vh]"
+              initial={{ scale: 0.94, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            >
               {bannerModal.image && (
                 <div className="sm:w-1/2 flex-shrink-0 border-b-2 sm:border-b-0 sm:border-r-2 border-neu-black">
                   <img src={bannerModal.image} alt={bannerModal.title} className="w-full h-52 sm:h-full object-cover" loading="lazy" decoding="async" />
@@ -976,9 +1007,9 @@ export default function LandingPage() {
                   <button onClick={() => { setBannerModal(null); setBannerModalExp(false); }} className="px-4 py-2.5 bg-neu-white border-2 border-neu-black font-display font-bold text-xs uppercase text-neu-black/60 hover:text-neu-black transition-colors">{t('landing.banner.close')}</button>
                 </div>
               </div>
-            </div>
+            </motion.div>
           )}
-        </div>,
+        </motion.div>,
         document.body
       )}
 
