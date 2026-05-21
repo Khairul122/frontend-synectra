@@ -2,8 +2,8 @@ import { Component, Suspense, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
+import { motion } from 'framer-motion';
 import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Float, MeshDistortMaterial, Sphere, Torus, MeshWobbleMaterial, Icosahedron, Octahedron } from '@react-three/drei';
 import Lenis from 'lenis';
@@ -14,8 +14,30 @@ import { getPlatform } from '../constants/platforms';
 import { API_BASE_URL } from '../constants/api';
 import { LanguageSwitcher } from '../components/ui/LanguageSwitcher';
 
-gsap.registerPlugin(ScrollTrigger);
 const BASE = API_BASE_URL || '';
+
+/* ─── Framer Motion variants ────────────────────────────────────────── */
+const motionFadeUp = {
+  hidden: { y: 50, opacity: 0 },
+  show:   { y: 0,  opacity: 1, transition: { duration: 0.7, ease: 'easeOut' } },
+};
+const motionFadeLeft = {
+  hidden: { x: -50, opacity: 0 },
+  show:   { x: 0,   opacity: 1, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } },
+};
+const motionScaleUp = {
+  hidden: { scale: 0.85, opacity: 0 },
+  show:   { scale: 1,    opacity: 1, transition: { duration: 0.5, ease: [0.34, 1.56, 0.64, 1] } },
+};
+const motionCard = {
+  hidden: { y: 40, opacity: 0, scale: 0.97 },
+  show:   { y: 0,  opacity: 1, scale: 1,    transition: { duration: 0.55, ease: 'easeOut' } },
+};
+const motionStagger = (stagger = 0.07) => ({
+  hidden: {},
+  show:   { transition: { staggerChildren: stagger } },
+});
+const VP = { once: false, margin: '-10% 0px' };
 
 /* ─── Pastikan URL kontak punya prefix yang benar ────────────────────── */
 function fixContactUrl(linkUrl, iconKey) {
@@ -35,25 +57,20 @@ function fixContactUrl(linkUrl, iconKey) {
   return `https://${linkUrl}`;
 }
 
-/* ─── Lenis smooth scroll + GSAP ScrollTrigger sync ─────────────────── */
+/* ─── Lenis smooth scroll ────────────────────────────────────────────── */
 function useLenis() {
   useEffect(() => {
     const lenis = new Lenis({
-      duration:  1.4,
-      easing:    (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      duration:    1.4,
+      easing:      (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
       syncTouch:   false,
     });
 
-    // Sync Lenis dengan GSAP ScrollTrigger
-    lenis.on('scroll', ScrollTrigger.update);
-    gsap.ticker.add((time) => lenis.raf(time * 1000));
-    gsap.ticker.lagSmoothing(0);
+    function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+    const rafId = requestAnimationFrame(raf);
 
-    return () => {
-      lenis.destroy();
-      gsap.ticker.remove((time) => lenis.raf(time * 1000));
-    };
+    return () => { lenis.destroy(); cancelAnimationFrame(rafId); };
   }, []);
 }
 
@@ -746,97 +763,6 @@ export default function LandingPage() {
     }).finally(() => setIsLoading(false));
   }, []);
 
-  useEffect(() => {
-    if (isLoading) return;
-
-    // reveal-up: animasi masuk saat scroll down, keluar saat scroll up
-    document.querySelectorAll('.reveal-up').forEach(el => {
-      gsap.fromTo(el,
-        { y: 50, opacity: 0 },
-        {
-          y: 0, opacity: 1, duration: 0.7, ease: 'power2.out',
-          scrollTrigger: {
-            trigger: el,
-            start: 'top 88%',
-            end: 'top 30%',
-            toggleActions: 'play reverse play reverse',
-          },
-        },
-      );
-    });
-
-    // Portfolio cards: stagger masuk + keluar
-    document.querySelectorAll('.portfolio-card').forEach((card, i) => {
-      gsap.fromTo(card,
-        { y: 40, opacity: 0, scale: 0.97 },
-        {
-          y: 0, opacity: 1, scale: 1,
-          duration: 0.55, ease: 'power2.out',
-          delay: (i % 3) * 0.07,
-          scrollTrigger: {
-            trigger: card,
-            start: 'top 90%',
-            end: 'top 20%',
-            toggleActions: 'play reverse play reverse',
-          },
-        },
-      );
-    });
-
-    // Software cards: stagger masuk + keluar
-    document.querySelectorAll('.software-card').forEach((card, i) => {
-      gsap.fromTo(card,
-        { y: 40, opacity: 0, scale: 0.97 },
-        {
-          y: 0, opacity: 1, scale: 1,
-          duration: 0.55, ease: 'power2.out',
-          delay: (i % 3) * 0.06,
-          scrollTrigger: {
-            trigger: card,
-            start: 'top 90%',
-            end: 'top 20%',
-            toggleActions: 'play reverse play reverse',
-          },
-        },
-      );
-    });
-
-    // Section titles: slide dari kiri
-    document.querySelectorAll('.reveal-left').forEach(el => {
-      gsap.fromTo(el,
-        { x: -50, opacity: 0 },
-        {
-          x: 0, opacity: 1, duration: 0.7, ease: 'power3.out',
-          scrollTrigger: {
-            trigger: el,
-            start: 'top 88%',
-            end: 'top 30%',
-            toggleActions: 'play reverse play reverse',
-          },
-        },
-      );
-    });
-
-    // Stat cards: scale masuk
-    document.querySelectorAll('.reveal-scale').forEach((el, i) => {
-      gsap.fromTo(el,
-        { scale: 0.85, opacity: 0 },
-        {
-          scale: 1, opacity: 1,
-          duration: 0.5, ease: 'back.out(1.4)',
-          delay: i * 0.06,
-          scrollTrigger: {
-            trigger: el,
-            start: 'top 90%',
-            end: 'top 20%',
-            toggleActions: 'play reverse play reverse',
-          },
-        },
-      );
-    });
-
-    return () => ScrollTrigger.getAll().forEach(t => t.kill());
-  }, [isLoading]);
 
   // Hero entrance timeline — runs once on mount
   useEffect(() => {
@@ -1231,34 +1157,37 @@ export default function LandingPage() {
       {/* ── STATS — Anime.js ── */}
       <section className="border-b-2 border-neu-black bg-neu-black py-14">
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
-          <div className="grid grid-cols-2 lg:grid-cols-4 divide-x-0 lg:divide-x-2 divide-neu-white/10">
+          <motion.div
+            className="grid grid-cols-2 lg:grid-cols-4 divide-x-0 lg:divide-x-2 divide-neu-white/10"
+            variants={motionStagger(0.06)} initial="hidden" whileInView="show" viewport={VP}
+          >
             {stats.map((s, i) => (
-              <div key={s.labelKey} className={cn('p-8 text-center reveal-scale', i > 0 && 'border-t-2 lg:border-t-0 border-neu-white/10')}>
+              <motion.div key={s.labelKey} variants={motionScaleUp} className={cn('p-8 text-center', i > 0 && 'border-t-2 lg:border-t-0 border-neu-white/10')}>
                 <p className="font-display font-bold text-4xl lg:text-5xl text-neu-primary mb-2"><AnimatedCounter key={s.value} target={s.value} suffix={s.suffix} /></p>
                 <p className="font-body text-sm text-neu-white/60">{t(s.labelKey)}</p>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* ── SERVICES ── */}
       <section id="layanan" className="border-b-2 border-neu-black py-20">
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
-          <div className="max-w-2xl mb-12 reveal-left">
+          <motion.div className="max-w-2xl mb-12" variants={motionFadeLeft} initial="hidden" whileInView="show" viewport={VP}>
             <div className="flex items-center gap-3 mb-2"><div className="h-1 w-10 bg-neu-accent" /><span className="font-mono text-xs text-neu-black/50 uppercase tracking-widest">{t('landing.services.tag')}</span></div>
             <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-black">{t('landing.services.title').split('\n').map((line, i) => <span key={i}>{line}{i === 0 && <br />}</span>)}</h2>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          </motion.div>
+          <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5" variants={motionStagger(0.07)} initial="hidden" whileInView="show" viewport={VP}>
             {services.map(svc => (
-              <div key={svc.title} className="reveal-up border-2 border-neu-black bg-neu-white shadow-neu p-6 group hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-neu-lg transition-all duration-150">
+              <motion.div key={svc.title} variants={motionFadeUp} className="border-2 border-neu-black bg-neu-white shadow-neu p-6 group hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-neu-lg transition-all duration-150">
                 <div className="text-4xl mb-4">{svc.icon}</div>
                 <h3 className="font-display font-bold text-lg text-neu-black mb-2">{svc.title}</h3>
                 <p className="font-body text-sm text-neu-black/60 leading-relaxed">{svc.desc}</p>
                 <div className="mt-4 h-0.5 w-0 bg-neu-primary group-hover:w-full transition-all duration-300" />
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -1266,7 +1195,7 @@ export default function LandingPage() {
       <section className="border-b-2 border-neu-black bg-neu-black py-20 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="reveal-up">
+            <motion.div variants={motionFadeUp} initial="hidden" whileInView="show" viewport={VP}>
               <div className="flex items-center gap-3 mb-4"><div className="h-1 w-10 bg-neu-blue" /><span className="font-mono text-xs text-neu-white/50 uppercase tracking-widest">{t('landing.about.tag')}</span></div>
               <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-white mb-4">{t('landing.about.title').split('\n').map((l,i)=><span key={i}>{l}{i===0&&<br/>}</span>)}</h2>
               <p className="font-body text-sm text-neu-white/60 leading-relaxed mb-6">
@@ -1282,7 +1211,7 @@ export default function LandingPage() {
                   </div>
                 ))}
               </div>
-            </div>
+            </motion.div>
             {/* ── About 3D (Spline jika URL diisi, else R3F) ── */}
             <div className="h-80 lg:h-[420px] border-2 border-neu-white/20 relative overflow-hidden"
                  style={{ boxShadow: '8px 8px 0px #FFD000' }}>
@@ -1326,10 +1255,10 @@ export default function LandingPage() {
           <div className="max-w-7xl mx-auto px-4 lg:px-6">
 
             {/* Section header */}
-            <div className="flex items-center gap-3 mb-8">
+            <motion.div className="flex items-center gap-3 mb-8" variants={motionFadeUp} initial="hidden" whileInView="show" viewport={VP}>
               <div className="h-1 w-8 bg-neu-black" />
               <h2 className="font-display font-bold text-2xl uppercase tracking-wide text-neu-black">{t('landing.packages.title')}</h2>
-            </div>
+            </motion.div>
 
             {/* Drag-to-scroll slider */}
             <div
@@ -1378,7 +1307,7 @@ export default function LandingPage() {
           <div className="max-w-7xl mx-auto px-4 lg:px-6">
 
             {/* Header */}
-            <div className="flex items-center gap-3 mb-10 reveal-left">
+            <motion.div className="flex items-center gap-3 mb-10" variants={motionFadeLeft} initial="hidden" whileInView="show" viewport={VP}>
               <div className="h-1 w-8 bg-neu-primary" />
               <div>
                 <h2 className="font-display font-bold text-2xl uppercase tracking-wide text-neu-white">
@@ -1386,7 +1315,7 @@ export default function LandingPage() {
                 </h2>
                 <p className="font-body text-sm text-neu-white/50 mt-0.5">{t('landing.software.subtitle')}</p>
               </div>
-            </div>
+            </motion.div>
 
             {/* Drag-to-scroll slider — no scrollbar UI */}
             <div
@@ -1412,7 +1341,7 @@ export default function LandingPage() {
                 const swDesc = (isEn && sw.descriptionEn) ? sw.descriptionEn : sw.description;
                 const fmt    = (v) => `Rp ${Number(v).toLocaleString('id-ID')}`;
                 return (
-                  <div key={sw.id} onClick={() => setActiveSoftware(sw)} className="software-card flex-shrink-0 w-72 flex flex-col bg-neu-white border-2 border-neu-black shadow-neu transition-all duration-200 hover:translate-x-[-3px] hover:translate-y-[-3px] hover:shadow-neu-lg cursor-pointer">
+                  <motion.div key={sw.id} onClick={() => setActiveSoftware(sw)} variants={motionCard} initial="hidden" whileInView="show" viewport={{ once: false, margin: '-5% 0px' }} className="flex-shrink-0 w-72 flex flex-col bg-neu-white border-2 border-neu-black shadow-neu transition-all duration-200 hover:translate-x-[-3px] hover:translate-y-[-3px] hover:shadow-neu-lg cursor-pointer">
 
                     {/* Thumbnail */}
                     <div className="relative border-b-2 border-neu-black h-40 bg-neu-bg overflow-hidden flex items-center justify-center">
@@ -1465,7 +1394,7 @@ export default function LandingPage() {
                         </button>
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 );
               })}
             </div>
@@ -1506,23 +1435,23 @@ export default function LandingPage() {
       <section id="portofolio" ref={portfolioRef} className="border-b-2 border-neu-black py-20">
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
           <div className="flex items-end justify-between mb-10 flex-wrap gap-4">
-            <div className="reveal-up">
+            <motion.div variants={motionFadeUp} initial="hidden" whileInView="show" viewport={VP}>
               <div className="flex items-center gap-3 mb-2"><div className="h-1 w-10 bg-neu-blue" /><span className="font-mono text-xs text-neu-black/50 uppercase tracking-widest">{t('landing.portfolio.tag')}</span></div>
               <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-black">{t('landing.portfolio.title')}</h2>
               <p className="font-body text-sm text-neu-black/60 mt-1 max-w-md">{t('landing.portfolio.subtitle')}</p>
-            </div>
-            <button onClick={() => transitionTo('/register')} className="reveal-up px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-black hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-150">{t('landing.portfolio.cta')}</button>
+            </motion.div>
+            <motion.button variants={motionFadeUp} initial="hidden" whileInView="show" viewport={VP} onClick={() => transitionTo('/register')} className="px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-black hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-150">{t('landing.portfolio.cta')}</motion.button>
           </div>
           {isLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">{[1,2,3].map(i => <div key={i} className="border-2 border-neu-black bg-neu-white h-64 animate-pulse" />)}</div>
           ) : portfolios.length === 0 ? (
             <div className="border-2 border-dashed border-neu-black p-16 text-center"><p className="font-body text-neu-black/40">{t('landing.portfolio.noPortfolio')}</p></div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5" variants={motionStagger(0.07)} initial="hidden" whileInView="show" viewport={VP}>
               {portfolios.map(item => {
                 const imgs = item.images?.length ? item.images : (item.image ? [item.image] : []);
                 return (
-                  <div key={item.id} className="portfolio-card border-2 border-neu-black shadow-neu bg-neu-white overflow-hidden group cursor-pointer" onClick={() => setActivePortfolio(item)}>
+                  <motion.div key={item.id} variants={motionCard} className="border-2 border-neu-black shadow-neu bg-neu-white overflow-hidden group cursor-pointer" onClick={() => setActivePortfolio(item)}>
                     <div className="relative h-48 bg-neu-bg border-b-2 border-neu-black overflow-hidden">
                       {imgs[0]
                         ? <img src={imgs[0]} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" loading="lazy" decoding="async" />
@@ -1536,10 +1465,10 @@ export default function LandingPage() {
                       <h3 className="font-display font-bold text-base text-neu-black leading-tight mb-3">{item.title}</h3>
                       <button className="w-full py-2 bg-neu-primary border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-black transition-all duration-150 group-hover:translate-x-[2px] group-hover:translate-y-[2px] group-hover:shadow-none">{t('landing.portfolio.viewDetail')}</button>
                     </div>
-                  </div>
+                  </motion.div>
                 );
               })}
-            </div>
+            </motion.div>
           )}
         </div>
       </section>
@@ -1547,45 +1476,45 @@ export default function LandingPage() {
       {/* ── WHY CHOOSE US ── */}
       <section className="border-b-2 border-neu-black bg-neu-bg py-20">
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
-          <div className="text-center mb-12 reveal-left">
+          <motion.div className="text-center mb-12" variants={motionFadeLeft} initial="hidden" whileInView="show" viewport={VP}>
             <div className="flex items-center justify-center gap-3 mb-2"><div className="h-1 w-8 bg-neu-green" /><span className="font-mono text-xs text-neu-black/50 uppercase tracking-widest">{t('landing.why.tag')}</span><div className="h-1 w-8 bg-neu-green" /></div>
             <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-black">{t('landing.why.title')}</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          </motion.div>
+          <motion.div className="grid grid-cols-1 md:grid-cols-3 gap-6" variants={motionStagger(0.08)} initial="hidden" whileInView="show" viewport={VP}>
             {(t('landing.why.items', { returnObjects: true })).map(w => (
-              <div key={w.title} className="reveal-up border-2 border-neu-black bg-neu-white shadow-neu p-6 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-neu-lg transition-all duration-150">
+              <motion.div key={w.title} variants={motionFadeUp} className="border-2 border-neu-black bg-neu-white shadow-neu p-6 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-neu-lg transition-all duration-150">
                 <span className="text-3xl">{w.icon}</span>
                 <h3 className="font-display font-bold text-base text-neu-black mt-3 mb-2">{w.title}</h3>
                 <p className="font-body text-sm text-neu-black/60 leading-relaxed">{w.desc}</p>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* ── HOW IT WORKS ── */}
       <section id="cara-kerja" className="border-b-2 border-neu-black bg-neu-black py-20">
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
-          <div className="text-center mb-12 reveal-up">
+          <motion.div className="text-center mb-12" variants={motionFadeUp} initial="hidden" whileInView="show" viewport={VP}>
             <span className="font-mono text-xs text-neu-white/40 uppercase tracking-widest">{t('landing.howItWorks.tag')}</span>
             <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-white mt-1">{t('landing.howItWorks.title')}</h2>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          </motion.div>
+          <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" variants={motionStagger(0.1)} initial="hidden" whileInView="show" viewport={VP}>
             {(t('landing.howItWorks.steps', { returnObjects: true })).map((step, si) => {
               const colors = ['bg-neu-primary','bg-neu-blue','bg-neu-green','bg-neu-accent'];
               const shadows = ['4px 4px 0px #FFD000','4px 4px 0px #4D61FF','4px 4px 0px #00C48C','4px 4px 0px #FF5C5C'];
               return { ...step, color: colors[si], shadow: shadows[si] };
             }).map(step => (
-              <div key={step.no} className="reveal-up border-2 border-neu-white/20 bg-neu-white/5 p-6" style={{ boxShadow: step.shadow }}>
+              <motion.div key={step.no} variants={motionFadeUp} className="border-2 border-neu-white/20 bg-neu-white/5 p-6" style={{ boxShadow: step.shadow }}>
                 <div className={cn('w-12 h-12 border-2 border-neu-white/20 flex items-center justify-center mb-4', step.color)}>
                   <span className="font-display font-bold text-xl text-neu-black">{step.no.charAt(1)}</span>
                 </div>
                 <p className="font-mono font-bold text-xs text-neu-white/40 uppercase mb-1">{step.no}</p>
                 <h3 className="font-display font-bold text-lg text-neu-white mb-2">{step.title}</h3>
                 <p className="font-body text-xs text-neu-white/60 leading-relaxed">{step.desc}</p>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -1615,7 +1544,7 @@ export default function LandingPage() {
         <section id="kontak" className="border-b-2 border-neu-black py-20">
           <div className="max-w-7xl mx-auto px-4 lg:px-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-              <div className="reveal-up">
+              <motion.div variants={motionFadeUp} initial="hidden" whileInView="show" viewport={VP}>
                 <div className="flex items-center gap-3 mb-2"><div className="h-1 w-10 bg-neu-green" /><span className="font-mono text-xs text-neu-black/50 uppercase tracking-widest">{t('landing.contact.tag')}</span></div>
                 <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-black mb-3">{t('landing.contact.title').split('\n').map((l,i)=><span key={i}>{l}{i===0&&<br/>}</span>)}</h2>
                 <p className="font-body text-sm text-neu-black/60 mb-6 leading-relaxed">{t('landing.contact.subtitle')}</p>
@@ -1651,9 +1580,9 @@ export default function LandingPage() {
                     })}
                   </div>
                 )}
-              </div>
+              </motion.div>
               {socialMedia.length > 0 && (
-                <div className="reveal-up">
+                <motion.div variants={motionFadeUp} initial="hidden" whileInView="show" viewport={VP}>
                   <p className="font-display font-bold text-sm text-neu-black uppercase mb-4">{t('landing.contact.social')}</p>
                   <div className="grid grid-cols-2 gap-3">
                     {socialMedia.map(s => {
@@ -1667,7 +1596,7 @@ export default function LandingPage() {
                       );
                     })}
                   </div>
-                </div>
+                </motion.div>
               )}
             </div>
           </div>
@@ -1691,14 +1620,14 @@ export default function LandingPage() {
               </Canvas>
             </div>
             {/* Text Side */}
-            <div className="py-16 px-8 lg:px-12">
-              <h2 className="font-display font-bold text-4xl lg:text-5xl text-neu-black mb-4 reveal-up">{t('landing.cta.title').split('\n').map((l,i)=><span key={i}>{l}{i===0&&<br/>}</span>)}</h2>
-              <p className="font-body text-base text-neu-black/70 mb-8 max-w-md reveal-up">{t('landing.cta.subtitle')}</p>
-              <div className="flex flex-col sm:flex-row gap-3 reveal-up">
+            <motion.div className="py-16 px-8 lg:px-12" variants={motionFadeUp} initial="hidden" whileInView="show" viewport={VP}>
+              <h2 className="font-display font-bold text-4xl lg:text-5xl text-neu-black mb-4">{t('landing.cta.title').split('\n').map((l,i)=><span key={i}>{l}{i===0&&<br/>}</span>)}</h2>
+              <p className="font-body text-base text-neu-black/70 mb-8 max-w-md">{t('landing.cta.subtitle')}</p>
+              <div className="flex flex-col sm:flex-row gap-3">
                 <button onClick={() => transitionTo('/register')} className="px-8 py-4 bg-neu-black border-2 border-neu-black text-neu-white font-display font-bold text-sm uppercase shadow-[6px_6px_0px_#0D0D0D] hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none transition-all duration-150">{t('landing.cta.primary')}</button>
                 <button onClick={() => transitionTo('/login')} className="px-8 py-4 bg-neu-white border-2 border-neu-black text-neu-black font-display font-bold text-sm uppercase shadow-[6px_6px_0px_#0D0D0D] hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none transition-all duration-150">{t('landing.cta.secondary')}</button>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
@@ -1706,7 +1635,7 @@ export default function LandingPage() {
       {/* ══════════════════════════════════════════
           FOOTER — Modern 2025
       ══════════════════════════════════════════ */}
-      <footer className="bg-neu-black">
+      <motion.footer className="bg-neu-black" variants={motionFadeUp} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-5% 0px' }}>
 
         {/* Top strip */}
         <div className="border-b border-neu-white/10">
@@ -1815,7 +1744,7 @@ export default function LandingPage() {
             ))}
           </div>
         </div>
-      </footer>
+      </motion.footer>
     </div>
   );
 }
