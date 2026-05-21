@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useRef, useState } from 'react';
+import { Component, Suspense, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
@@ -70,16 +70,38 @@ function usePageTransition() {
 }
 
 /* ─── Public Spline scene URLs ──────────────────────────────────────── */
-// Ganti URL di bawah dengan scene pilihan dari spline.design/community
-const SPLINE_HERO   = 'https://prod.spline.design/6Wq1Q7YGyM-iab9i/scene.splinecode';
-const SPLINE_ABOUT  = 'https://prod.spline.design/Br2ec3WwqtHL7XEp/scene.splinecode';
+// Cara mendapatkan URL: buka spline.design → buat/pilih scene →
+// Share → Public URL → copy link .splinecode → tempel di sini
+const SPLINE_HERO   = '';   // ← tempel URL hero scene di sini
+const SPLINE_ABOUT  = '';   // ← tempel URL about scene di sini
 
-/* ─── Spline fallback spinner ────────────────────────────────────────── */
+/* ─── Error boundary: Spline crash → render fallback R3F ────────────── */
+class SplineErrorBoundary extends Component {
+  constructor(props) { super(props); this.state = { failed: false }; }
+  static getDerivedStateFromError() { return { failed: true }; }
+  render() {
+    return this.state.failed ? this.props.fallback : this.props.children;
+  }
+}
+
+/* ─── Suspense fallback spinner ─────────────────────────────────────── */
 function SplineFallback({ bg = '#F5F0E8' }) {
   return (
     <div className="w-full h-full flex items-center justify-center" style={{ background: bg }}>
       <div className="w-10 h-10 border-[3px] border-neu-black border-t-neu-primary animate-spin" />
     </div>
+  );
+}
+
+/* ─── Wrapper: tampilkan Spline jika URL ada & valid, else R3F ──────── */
+function SplineOrR3F({ scene, bg, r3fFallback, ...containerProps }) {
+  if (!scene) return r3fFallback;
+  return (
+    <SplineErrorBoundary fallback={r3fFallback}>
+      <Suspense fallback={<SplineFallback bg={bg} />}>
+        <Spline scene={scene} style={{ width: '100%', height: '100%' }} />
+      </Suspense>
+    </SplineErrorBoundary>
   );
 }
 
@@ -1088,17 +1110,17 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* ── Hero Spline 3D ── */}
+          {/* ── Hero 3D (Spline jika URL diisi, else R3F) ── */}
           <div className="h-80 lg:h-[520px] border-2 border-neu-black bg-neu-bg relative overflow-hidden"
                style={{ boxShadow: '8px 8px 0px #0D0D0D' }}>
 
-            {/* Neubrutalism badge */}
+            {/* Badge */}
             <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5 px-2.5 py-1 bg-neu-black border border-neu-primary">
               <span className="w-1.5 h-1.5 rounded-full bg-neu-primary animate-pulse" />
               <span className="font-mono font-bold text-[9px] text-neu-primary uppercase tracking-widest">Interactive 3D</span>
             </div>
 
-            {/* Accent corner — kanan bawah */}
+            {/* Accent corner */}
             <div className="absolute bottom-0 right-0 w-14 h-14 bg-neu-primary border-t-2 border-l-2 border-neu-black z-10
                             flex items-center justify-center pointer-events-none">
               <svg className="w-5 h-5 text-neu-black" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -1106,12 +1128,18 @@ export default function LandingPage() {
               </svg>
             </div>
 
-            <Suspense fallback={<SplineFallback bg="#F5F0E8" />}>
-              <Spline
-                scene={SPLINE_HERO}
-                style={{ width: '100%', height: '100%' }}
-              />
-            </Suspense>
+            <SplineOrR3F
+              scene={SPLINE_HERO}
+              bg="#F5F0E8"
+              r3fFallback={
+                <Canvas camera={{ position: [0, 0, 5.5], fov: 50 }} style={{ background: '#F5F0E8' }}>
+                  <ambientLight intensity={0.6} />
+                  <pointLight position={[5, 5, 5]} intensity={2} color="#ffffff" />
+                  <pointLight position={[-3, -3, 3]} intensity={1} color="#4D61FF" />
+                  <HeroScene />
+                </Canvas>
+              }
+            />
           </div>
         </div>
       </section>
@@ -1171,25 +1199,38 @@ export default function LandingPage() {
                 ))}
               </div>
             </div>
-            {/* ── About Spline 3D ── */}
+            {/* ── About 3D (Spline jika URL diisi, else R3F) ── */}
             <div className="h-80 lg:h-[420px] border-2 border-neu-white/20 relative overflow-hidden"
                  style={{ boxShadow: '8px 8px 0px #FFD000' }}>
 
-              {/* Top-left badge */}
+              {/* Badge */}
               <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5 px-2.5 py-1 bg-neu-primary border border-neu-black">
                 <span className="w-1.5 h-1.5 rounded-full bg-neu-black animate-pulse" />
                 <span className="font-mono font-bold text-[9px] text-neu-black uppercase tracking-widest">3D Scene</span>
               </div>
 
-              {/* Bottom-right accent */}
+              {/* Accent corner */}
               <div className="absolute bottom-0 right-0 w-12 h-12 bg-neu-blue border-t-2 border-l-2 border-neu-white/30 z-10 pointer-events-none" />
 
-              <Suspense fallback={<SplineFallback bg="#0D0D0D" />}>
-                <Spline
-                  scene={SPLINE_ABOUT}
-                  style={{ width: '100%', height: '100%' }}
-                />
-              </Suspense>
+              <SplineOrR3F
+                scene={SPLINE_ABOUT}
+                bg="#0D0D0D"
+                r3fFallback={
+                  <Canvas camera={{ position: [0, 0, 4], fov: 60 }} style={{ background: '#0D0D0D' }}>
+                    <ambientLight intensity={0.5} />
+                    <pointLight position={[3, 3, 3]} intensity={2} color="#FFD000" />
+                    <Float speed={3} floatIntensity={2}>
+                      <mesh rotation={[0.5, 0.5, 0]}>
+                        <octahedronGeometry args={[1.2, 0]} />
+                        <meshStandardMaterial color="#4D61FF" wireframe />
+                      </mesh>
+                    </Float>
+                    <Float speed={2} floatIntensity={1}>
+                      <Torus args={[2, 0.05, 8, 64]}><meshBasicMaterial color="#FFD000" /></Torus>
+                    </Float>
+                  </Canvas>
+                }
+              />
             </div>
           </div>
         </div>
