@@ -844,8 +844,7 @@ export default function LandingPage() {
     tl.to('.hero-badge',    { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }, 0)
       .to('.hero-subtitle', { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' }, 0.75)
       .to('.hero-cta',      { opacity: 1, duration: 0.5, ease: 'power2.out' }, 0.95)
-      .to('.hero-stats',    { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }, 1.05)
-      .to('.hero-scroll',   { opacity: 1, duration: 0.6 }, 1.3)
+      .to('.hero-scroll',   { opacity: 1, duration: 0.6 }, 1.05)
     return () => tl.kill();
   }, []);
 
@@ -853,11 +852,15 @@ export default function LandingPage() {
 
   const services = t('landing.services.items', { returnObjects: true });
 
+  const avgRating = feedbacks.length > 0
+    ? Math.round((feedbacks.reduce((s, f) => s + f.rating, 0) / feedbacks.length) / 5 * 100)
+    : 0;
+
   const stats = [
-    { labelKey: 'landing.stats.projects',    value: 150, suffix: '+' },
-    { labelKey: 'landing.stats.clients',     value: 80,  suffix: '+' },
-    { labelKey: 'landing.stats.experience',  value: 5,   suffix: '+' },
-    { labelKey: 'landing.stats.satisfaction',value: 98,  suffix: '%' },
+    { labelKey: 'landing.stats.projects',    value: portfolios.length, suffix: '+' },
+    { labelKey: 'landing.stats.clients',     value: feedbacks.length,  suffix: '+' },
+    { labelKey: 'landing.stats.experience',  value: 5,                 suffix: '+' },
+    { labelKey: 'landing.stats.satisfaction',value: avgRating,         suffix: '%' },
   ];
 
   const techStack = ['React', 'Next.js', 'Node.js', 'NestJS', 'Flutter', 'Laravel', 'Python', 'PostgreSQL', 'MongoDB', 'Docker', 'AWS', 'Figma'];
@@ -1196,18 +1199,6 @@ export default function LandingPage() {
               </button>
             </div>
 
-            {/* Mini stats row */}
-            <div className="hero-stats flex flex-wrap items-center gap-x-6 gap-y-3 pt-7 mt-7 border-t-2 border-neu-black/10"
-                 style={{ opacity: 0, transform: 'translateY(12px)' }}>
-              {stats.map((s, i) => (
-                <div key={s.labelKey} className={cn('flex flex-col', i > 0 && 'sm:border-l sm:border-neu-black/15 sm:pl-6')}>
-                  <span className="font-display font-bold text-2xl text-neu-black leading-none">
-                    <AnimatedCounter target={s.value} suffix={s.suffix} />
-                  </span>
-                  <span className="font-mono text-[10px] text-neu-black/45 uppercase tracking-wide mt-1">{t(s.labelKey)}</span>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
 
@@ -1239,7 +1230,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-2 lg:grid-cols-4 divide-x-0 lg:divide-x-2 divide-neu-white/10">
             {stats.map((s, i) => (
               <div key={s.labelKey} className={cn('p-8 text-center reveal-scale', i > 0 && 'border-t-2 lg:border-t-0 border-neu-white/10')}>
-                <p className="font-display font-bold text-4xl lg:text-5xl text-neu-primary mb-2"><AnimatedCounter target={s.value} suffix={s.suffix} /></p>
+                <p className="font-display font-bold text-4xl lg:text-5xl text-neu-primary mb-2"><AnimatedCounter key={s.value} target={s.value} suffix={s.suffix} /></p>
                 <p className="font-body text-sm text-neu-white/60">{t(s.labelKey)}</p>
               </div>
             ))}
@@ -1602,7 +1593,7 @@ export default function LandingPage() {
         </p>
 
         {/* Row 1 — kiri ke kanan */}
-        <div className="relative overflow-hidden mb-3">
+        <div className="relative overflow-hidden">
           <div className="flex gap-4 animate-marquee whitespace-nowrap">
             {[...techStack, ...techStack, ...techStack].map((tech, i) => (
               <div key={i} className="inline-flex items-center gap-3 flex-shrink-0 px-4 py-2 bg-neu-white border-2 border-neu-black shadow-neu-sm font-mono font-bold text-xs text-neu-black uppercase">
@@ -1613,17 +1604,6 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* Row 2 — kanan ke kiri (reverse) */}
-        <div className="relative overflow-hidden">
-          <div className="flex gap-4 whitespace-nowrap" style={{ animation: 'marquee 22s linear infinite reverse' }}>
-            {[...techStack.slice().reverse(), ...techStack.slice().reverse(), ...techStack.slice().reverse()].map((tech, i) => (
-              <div key={i} className="inline-flex items-center gap-3 flex-shrink-0 px-4 py-2 bg-neu-black border-2 border-neu-black font-mono font-bold text-xs text-neu-white/60 uppercase">
-                <span className="w-1.5 h-1.5 bg-neu-blue flex-shrink-0" />
-                {tech}
-              </div>
-            ))}
-          </div>
-        </div>
       </section>
 
       {/* ── CONTACT ── */}
