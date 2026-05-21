@@ -23,11 +23,11 @@ const motionFadeUp = {
 };
 const motionFadeLeft = {
   hidden: { x: -50, opacity: 0 },
-  show:   { x: 0,   opacity: 1, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } },
+  show:   { x: 0,   opacity: 1, transition: { duration: 0.7, ease: 'easeOut' } },
 };
 const motionScaleUp = {
   hidden: { scale: 0.85, opacity: 0 },
-  show:   { scale: 1,    opacity: 1, transition: { duration: 0.5, ease: [0.34, 1.56, 0.64, 1] } },
+  show:   { scale: 1,    opacity: 1, transition: { type: 'spring', stiffness: 280, damping: 22 } },
 };
 const motionCard = {
   hidden: { y: 40, opacity: 0, scale: 0.97 },
@@ -297,7 +297,7 @@ function PortfolioModal({ item, onClose, transitionTo }) {
         initial={{ y: -40, opacity: 0, scale: 0.95 }}
         animate={{ y: 0, opacity: 1, scale: 1 }}
         exit={{ y: -20, opacity: 0, scale: 0.95 }}
-        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 0.35, ease: 'easeOut' }}
       >
         <div className="flex items-center justify-between px-5 py-4 border-b-2 border-neu-black bg-neu-black">
           <div>
@@ -367,7 +367,7 @@ function SoftwareDetailModal({ sw, onClose, transitionTo }) {
         initial={{ y: -40, opacity: 0, scale: 0.95 }}
         animate={{ y: 0, opacity: 1, scale: 1 }}
         exit={{ y: -20, opacity: 0, scale: 0.95 }}
-        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 0.35, ease: 'easeOut' }}
       >
 
         {/* Header */}
@@ -838,7 +838,7 @@ export default function LandingPage() {
             <motion.div
               className="relative cursor-pointer group"
               initial={{ scale: 0.92, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.92, opacity: 0 }}
-              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
               onClick={() => setBannerExpanded(true)}
             >
               <button
@@ -878,7 +878,7 @@ export default function LandingPage() {
             <motion.div
               className="w-full max-w-3xl border-2 border-neu-black shadow-neu-xl overflow-hidden flex flex-col sm:flex-row max-h-[85vh]"
               initial={{ scale: 0.94, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
             >
               {/* Kiri: Gambar */}
               {bannerAd.image && (
@@ -952,7 +952,7 @@ export default function LandingPage() {
             <motion.div
               className="relative cursor-pointer group"
               initial={{ scale: 0.92, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.92, opacity: 0 }}
-              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
               onClick={() => bannerModal.description ? setBannerModalExp(true) : null}
             >
               <button onClick={(e) => { e.stopPropagation(); setBannerModal(null); setBannerModalExp(false); }}
@@ -982,7 +982,7 @@ export default function LandingPage() {
             <motion.div
               className="w-full max-w-3xl border-2 border-neu-black shadow-neu-xl overflow-hidden flex flex-col sm:flex-row max-h-[85vh]"
               initial={{ scale: 0.94, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
             >
               {bannerModal.image && (
                 <div className="sm:w-1/2 flex-shrink-0 border-b-2 sm:border-b-0 sm:border-r-2 border-neu-black">
