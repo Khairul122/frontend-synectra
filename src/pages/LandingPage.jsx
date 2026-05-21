@@ -33,10 +33,10 @@ const motionCard = {
   hidden: { y: 40, opacity: 0, scale: 0.97 },
   show:   { y: 0,  opacity: 1, scale: 1,    transition: { duration: 0.55, ease: 'easeOut' } },
 };
-const motionStagger = (stagger = 0.07) => ({
-  hidden: {},
-  show:   { transition: { staggerChildren: stagger } },
-});
+const motionStagger06 = { hidden: {}, show: { transition: { staggerChildren: 0.06 } } };
+const motionStagger07 = { hidden: {}, show: { transition: { staggerChildren: 0.07 } } };
+const motionStagger08 = { hidden: {}, show: { transition: { staggerChildren: 0.08 } } };
+const motionStagger10 = { hidden: {}, show: { transition: { staggerChildren: 0.10 } } };
 const VP = { once: false, margin: '-10% 0px' };
 
 /* ─── Pastikan URL kontak punya prefix yang benar ────────────────────── */
@@ -829,7 +829,7 @@ export default function LandingPage() {
       {bannerAd && createPortal(
         <motion.div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/70"
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }}
           transition={{ duration: 0.2 }}
           onClick={(e) => { if (e.target === e.currentTarget) { setBannerAd(null); setBannerExpanded(false); } }}
         >
@@ -837,7 +837,7 @@ export default function LandingPage() {
             /* ── State 1: Gambar penuh, klik untuk expand ── */
             <motion.div
               className="relative cursor-pointer group"
-              initial={{ scale: 0.92, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.92, opacity: 0 }}
+              initial={{ scale: 0.92, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.3, ease: 'easeOut' }}
               onClick={() => setBannerExpanded(true)}
             >
@@ -943,7 +943,7 @@ export default function LandingPage() {
       {bannerModal && createPortal(
         <motion.div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/70"
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }}
           transition={{ duration: 0.2 }}
           onClick={(e) => { if (e.target === e.currentTarget) { setBannerModal(null); setBannerModalExp(false); } }}
         >
@@ -951,7 +951,7 @@ export default function LandingPage() {
             /* State 1: Gambar penuh */
             <motion.div
               className="relative cursor-pointer group"
-              initial={{ scale: 0.92, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.92, opacity: 0 }}
+              initial={{ scale: 0.92, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.3, ease: 'easeOut' }}
               onClick={() => bannerModal.description ? setBannerModalExp(true) : null}
             >
@@ -1191,7 +1191,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
           <motion.div
             className="grid grid-cols-2 lg:grid-cols-4 divide-x-0 lg:divide-x-2 divide-neu-white/10"
-            variants={motionStagger(0.06)} initial="hidden" whileInView="show" viewport={VP}
+            variants={motionStagger06} initial="hidden" whileInView="show" viewport={VP}
           >
             {stats.map((s, i) => (
               <motion.div key={s.labelKey} variants={motionScaleUp} className={cn('p-8 text-center', i > 0 && 'border-t-2 lg:border-t-0 border-neu-white/10')}>
@@ -1210,7 +1210,7 @@ export default function LandingPage() {
             <div className="flex items-center gap-3 mb-2"><div className="h-1 w-10 bg-neu-accent" /><span className="font-mono text-xs text-neu-black/50 uppercase tracking-widest">{t('landing.services.tag')}</span></div>
             <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-black">{t('landing.services.title').split('\n').map((line, i) => <span key={i}>{line}{i === 0 && <br />}</span>)}</h2>
           </motion.div>
-          <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5" variants={motionStagger(0.07)} initial="hidden" whileInView="show" viewport={VP}>
+          <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5" variants={motionStagger07} initial="hidden" whileInView="show" viewport={VP}>
             {services.map(svc => (
               <motion.div key={svc.title} variants={motionFadeUp} className="border-2 border-neu-black bg-neu-white shadow-neu p-6 group hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-neu-lg transition-all duration-150">
                 <div className="text-4xl mb-4">{svc.icon}</div>
@@ -1479,7 +1479,7 @@ export default function LandingPage() {
           ) : portfolios.length === 0 ? (
             <div className="border-2 border-dashed border-neu-black p-16 text-center"><p className="font-body text-neu-black/40">{t('landing.portfolio.noPortfolio')}</p></div>
           ) : (
-            <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5" variants={motionStagger(0.07)} initial="hidden" whileInView="show" viewport={VP}>
+            <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5" variants={motionStagger07} initial="hidden" whileInView="show" viewport={VP}>
               {portfolios.map(item => {
                 const imgs = item.images?.length ? item.images : (item.image ? [item.image] : []);
                 return (
@@ -1512,7 +1512,7 @@ export default function LandingPage() {
             <div className="flex items-center justify-center gap-3 mb-2"><div className="h-1 w-8 bg-neu-green" /><span className="font-mono text-xs text-neu-black/50 uppercase tracking-widest">{t('landing.why.tag')}</span><div className="h-1 w-8 bg-neu-green" /></div>
             <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-black">{t('landing.why.title')}</h2>
           </motion.div>
-          <motion.div className="grid grid-cols-1 md:grid-cols-3 gap-6" variants={motionStagger(0.08)} initial="hidden" whileInView="show" viewport={VP}>
+          <motion.div className="grid grid-cols-1 md:grid-cols-3 gap-6" variants={motionStagger08} initial="hidden" whileInView="show" viewport={VP}>
             {(t('landing.why.items', { returnObjects: true })).map(w => (
               <motion.div key={w.title} variants={motionFadeUp} className="border-2 border-neu-black bg-neu-white shadow-neu p-6 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-neu-lg transition-all duration-150">
                 <span className="text-3xl">{w.icon}</span>
@@ -1531,7 +1531,7 @@ export default function LandingPage() {
             <span className="font-mono text-xs text-neu-white/40 uppercase tracking-widest">{t('landing.howItWorks.tag')}</span>
             <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-white mt-1">{t('landing.howItWorks.title')}</h2>
           </motion.div>
-          <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" variants={motionStagger(0.1)} initial="hidden" whileInView="show" viewport={VP}>
+          <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" variants={motionStagger10} initial="hidden" whileInView="show" viewport={VP}>
             {(t('landing.howItWorks.steps', { returnObjects: true })).map((step, si) => {
               const colors = ['bg-neu-primary','bg-neu-blue','bg-neu-green','bg-neu-accent'];
               const shadows = ['4px 4px 0px #FFD000','4px 4px 0px #4D61FF','4px 4px 0px #00C48C','4px 4px 0px #FF5C5C'];
