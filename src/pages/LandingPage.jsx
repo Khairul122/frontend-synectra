@@ -17,27 +17,31 @@ import { LanguageSwitcher } from '../components/ui/LanguageSwitcher';
 const BASE = API_BASE_URL || '';
 
 /* ─── Framer Motion variants ────────────────────────────────────────── */
-const motionFadeUp = {
-  hidden: { y: 50, opacity: 0 },
-  show:   { y: 0,  opacity: 1, transition: { duration: 0.7, ease: 'easeOut' } },
-};
-const motionFadeLeft = {
-  hidden: { x: -50, opacity: 0 },
-  show:   { x: 0,   opacity: 1, transition: { duration: 0.7, ease: 'easeOut' } },
-};
-const motionScaleUp = {
-  hidden: { scale: 0.85, opacity: 0 },
-  show:   { scale: 1,    opacity: 1, transition: { type: 'spring', stiffness: 280, damping: 22 } },
-};
-const motionCard = {
-  hidden: { y: 40, opacity: 0, scale: 0.97 },
-  show:   { y: 0,  opacity: 1, scale: 1,    transition: { duration: 0.55, ease: 'easeOut' } },
-};
-const motionStagger06 = { hidden: {}, show: { transition: { staggerChildren: 0.06 } } };
-const motionStagger07 = { hidden: {}, show: { transition: { staggerChildren: 0.07 } } };
-const motionStagger08 = { hidden: {}, show: { transition: { staggerChildren: 0.08 } } };
-const motionStagger10 = { hidden: {}, show: { transition: { staggerChildren: 0.10 } } };
-const VP = { once: false, margin: '-10% 0px' };
+// Inline animation helpers — menghindari variants/stagger untuk kompatibilitas Framer Motion v12
+const fadeUp   = (delay = 0) => ({
+  initial:     { opacity: 0, y: 40 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport:    { once: true },
+  transition:  { duration: 0.6, delay, type: 'tween' },
+});
+const fadeLeft = (delay = 0) => ({
+  initial:     { opacity: 0, x: -40 },
+  whileInView: { opacity: 1, x: 0 },
+  viewport:    { once: true },
+  transition:  { duration: 0.6, delay, type: 'tween' },
+});
+const scaleUp  = (delay = 0) => ({
+  initial:     { opacity: 0, scale: 0.88 },
+  whileInView: { opacity: 1, scale: 1 },
+  viewport:    { once: true },
+  transition:  { duration: 0.5, delay, type: 'tween' },
+});
+const cardAnim = (delay = 0) => ({
+  initial:     { opacity: 0, y: 30 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport:    { once: true },
+  transition:  { duration: 0.5, delay, type: 'tween' },
+});
 
 /* ─── Pastikan URL kontak punya prefix yang benar ────────────────────── */
 function fixContactUrl(linkUrl, iconKey) {
@@ -1189,37 +1193,34 @@ export default function LandingPage() {
       {/* ── STATS — Anime.js ── */}
       <section className="border-b-2 border-neu-black bg-neu-black py-14">
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
-          <motion.div
-            className="grid grid-cols-2 lg:grid-cols-4 divide-x-0 lg:divide-x-2 divide-neu-white/10"
-            variants={motionStagger06} initial="hidden" whileInView="show" viewport={VP}
-          >
+          <div className="grid grid-cols-2 lg:grid-cols-4 divide-x-0 lg:divide-x-2 divide-neu-white/10">
             {stats.map((s, i) => (
-              <motion.div key={s.labelKey} variants={motionScaleUp} className={cn('p-8 text-center', i > 0 && 'border-t-2 lg:border-t-0 border-neu-white/10')}>
+              <motion.div key={s.labelKey} {...scaleUp(i * 0.06)} className={cn('p-8 text-center', i > 0 && 'border-t-2 lg:border-t-0 border-neu-white/10')}>
                 <p className="font-display font-bold text-4xl lg:text-5xl text-neu-primary mb-2"><AnimatedCounter key={s.value} target={s.value} suffix={s.suffix} /></p>
                 <p className="font-body text-sm text-neu-white/60">{t(s.labelKey)}</p>
               </motion.div>
             ))}
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* ── SERVICES ── */}
       <section id="layanan" className="border-b-2 border-neu-black py-20">
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
-          <motion.div className="max-w-2xl mb-12" variants={motionFadeLeft} initial="hidden" whileInView="show" viewport={VP}>
+          <motion.div className="max-w-2xl mb-12" {...fadeLeft()}>
             <div className="flex items-center gap-3 mb-2"><div className="h-1 w-10 bg-neu-accent" /><span className="font-mono text-xs text-neu-black/50 uppercase tracking-widest">{t('landing.services.tag')}</span></div>
             <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-black">{t('landing.services.title').split('\n').map((line, i) => <span key={i}>{line}{i === 0 && <br />}</span>)}</h2>
           </motion.div>
-          <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5" variants={motionStagger07} initial="hidden" whileInView="show" viewport={VP}>
-            {services.map(svc => (
-              <motion.div key={svc.title} variants={motionFadeUp} className="border-2 border-neu-black bg-neu-white shadow-neu p-6 group hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-neu-lg transition-all duration-150">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {services.map((svc, i) => (
+              <motion.div key={svc.title} {...fadeUp(i * 0.07)} className="border-2 border-neu-black bg-neu-white shadow-neu p-6 group hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-neu-lg transition-all duration-150">
                 <div className="text-4xl mb-4">{svc.icon}</div>
                 <h3 className="font-display font-bold text-lg text-neu-black mb-2">{svc.title}</h3>
                 <p className="font-body text-sm text-neu-black/60 leading-relaxed">{svc.desc}</p>
                 <div className="mt-4 h-0.5 w-0 bg-neu-primary group-hover:w-full transition-all duration-300" />
               </motion.div>
             ))}
-          </motion.div>
+          </div>
         </div>
       </section>
 
@@ -1227,7 +1228,7 @@ export default function LandingPage() {
       <section className="border-b-2 border-neu-black bg-neu-black py-20 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <motion.div variants={motionFadeUp} initial="hidden" whileInView="show" viewport={VP}>
+            <motion.div {...fadeUp()}>
               <div className="flex items-center gap-3 mb-4"><div className="h-1 w-10 bg-neu-blue" /><span className="font-mono text-xs text-neu-white/50 uppercase tracking-widest">{t('landing.about.tag')}</span></div>
               <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-white mb-4">{t('landing.about.title').split('\n').map((l,i)=><span key={i}>{l}{i===0&&<br/>}</span>)}</h2>
               <p className="font-body text-sm text-neu-white/60 leading-relaxed mb-6">
@@ -1287,7 +1288,7 @@ export default function LandingPage() {
           <div className="max-w-7xl mx-auto px-4 lg:px-6">
 
             {/* Section header */}
-            <motion.div className="flex items-center gap-3 mb-8" variants={motionFadeUp} initial="hidden" whileInView="show" viewport={VP}>
+            <motion.div className="flex items-center gap-3 mb-8" {...fadeUp()}>
               <div className="h-1 w-8 bg-neu-black" />
               <h2 className="font-display font-bold text-2xl uppercase tracking-wide text-neu-black">{t('landing.packages.title')}</h2>
             </motion.div>
@@ -1339,7 +1340,7 @@ export default function LandingPage() {
           <div className="max-w-7xl mx-auto px-4 lg:px-6">
 
             {/* Header */}
-            <motion.div className="flex items-center gap-3 mb-10" variants={motionFadeLeft} initial="hidden" whileInView="show" viewport={VP}>
+            <motion.div className="flex items-center gap-3 mb-10" {...fadeLeft()}>
               <div className="h-1 w-8 bg-neu-primary" />
               <div>
                 <h2 className="font-display font-bold text-2xl uppercase tracking-wide text-neu-white">
@@ -1373,7 +1374,7 @@ export default function LandingPage() {
                 const swDesc = (isEn && sw.descriptionEn) ? sw.descriptionEn : sw.description;
                 const fmt    = (v) => `Rp ${Number(v).toLocaleString('id-ID')}`;
                 return (
-                  <motion.div key={sw.id} onClick={() => setActiveSoftware(sw)} variants={motionCard} initial="hidden" whileInView="show" viewport={{ once: false, margin: '-5% 0px' }} className="flex-shrink-0 w-72 flex flex-col bg-neu-white border-2 border-neu-black shadow-neu transition-all duration-200 hover:translate-x-[-3px] hover:translate-y-[-3px] hover:shadow-neu-lg cursor-pointer">
+                  <motion.div key={sw.id} onClick={() => setActiveSoftware(sw)} {...cardAnim(0)} className="flex-shrink-0 w-72 flex flex-col bg-neu-white border-2 border-neu-black shadow-neu transition-all duration-200 hover:translate-x-[-3px] hover:translate-y-[-3px] hover:shadow-neu-lg cursor-pointer">
 
                     {/* Thumbnail */}
                     <div className="relative border-b-2 border-neu-black h-40 bg-neu-bg overflow-hidden flex items-center justify-center">
@@ -1467,23 +1468,23 @@ export default function LandingPage() {
       <section id="portofolio" ref={portfolioRef} className="border-b-2 border-neu-black py-20">
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
           <div className="flex items-end justify-between mb-10 flex-wrap gap-4">
-            <motion.div variants={motionFadeUp} initial="hidden" whileInView="show" viewport={VP}>
+            <motion.div {...fadeUp()}>
               <div className="flex items-center gap-3 mb-2"><div className="h-1 w-10 bg-neu-blue" /><span className="font-mono text-xs text-neu-black/50 uppercase tracking-widest">{t('landing.portfolio.tag')}</span></div>
               <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-black">{t('landing.portfolio.title')}</h2>
               <p className="font-body text-sm text-neu-black/60 mt-1 max-w-md">{t('landing.portfolio.subtitle')}</p>
             </motion.div>
-            <motion.button variants={motionFadeUp} initial="hidden" whileInView="show" viewport={VP} onClick={() => transitionTo('/register')} className="px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-black hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-150">{t('landing.portfolio.cta')}</motion.button>
+            <motion.button {...fadeUp()} onClick={() => transitionTo('/register')} className="px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-black hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-150">{t('landing.portfolio.cta')}</motion.button>
           </div>
           {isLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">{[1,2,3].map(i => <div key={i} className="border-2 border-neu-black bg-neu-white h-64 animate-pulse" />)}</div>
           ) : portfolios.length === 0 ? (
             <div className="border-2 border-dashed border-neu-black p-16 text-center"><p className="font-body text-neu-black/40">{t('landing.portfolio.noPortfolio')}</p></div>
           ) : (
-            <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5" variants={motionStagger07} initial="hidden" whileInView="show" viewport={VP}>
-              {portfolios.map(item => {
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {portfolios.map((item, i) => {
                 const imgs = item.images?.length ? item.images : (item.image ? [item.image] : []);
                 return (
-                  <motion.div key={item.id} variants={motionCard} className="border-2 border-neu-black shadow-neu bg-neu-white overflow-hidden group cursor-pointer" onClick={() => setActivePortfolio(item)}>
+                  <motion.div key={item.id} {...cardAnim(i * 0.07)} className="border-2 border-neu-black shadow-neu bg-neu-white overflow-hidden group cursor-pointer" onClick={() => setActivePortfolio(item)}>
                     <div className="relative h-48 bg-neu-bg border-b-2 border-neu-black overflow-hidden">
                       {imgs[0]
                         ? <img src={imgs[0]} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" loading="lazy" decoding="async" />
@@ -1500,7 +1501,7 @@ export default function LandingPage() {
                   </motion.div>
                 );
               })}
-            </motion.div>
+            </div>
           )}
         </div>
       </section>
@@ -1508,36 +1509,36 @@ export default function LandingPage() {
       {/* ── WHY CHOOSE US ── */}
       <section className="border-b-2 border-neu-black bg-neu-bg py-20">
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
-          <motion.div className="text-center mb-12" variants={motionFadeLeft} initial="hidden" whileInView="show" viewport={VP}>
+          <motion.div className="text-center mb-12" {...fadeLeft()}>
             <div className="flex items-center justify-center gap-3 mb-2"><div className="h-1 w-8 bg-neu-green" /><span className="font-mono text-xs text-neu-black/50 uppercase tracking-widest">{t('landing.why.tag')}</span><div className="h-1 w-8 bg-neu-green" /></div>
             <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-black">{t('landing.why.title')}</h2>
           </motion.div>
-          <motion.div className="grid grid-cols-1 md:grid-cols-3 gap-6" variants={motionStagger08} initial="hidden" whileInView="show" viewport={VP}>
-            {(t('landing.why.items', { returnObjects: true })).map(w => (
-              <motion.div key={w.title} variants={motionFadeUp} className="border-2 border-neu-black bg-neu-white shadow-neu p-6 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-neu-lg transition-all duration-150">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {(t('landing.why.items', { returnObjects: true })).map((w, i) => (
+              <motion.div key={w.title} {...fadeUp(i * 0.08)} className="border-2 border-neu-black bg-neu-white shadow-neu p-6 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-neu-lg transition-all duration-150">
                 <span className="text-3xl">{w.icon}</span>
                 <h3 className="font-display font-bold text-base text-neu-black mt-3 mb-2">{w.title}</h3>
                 <p className="font-body text-sm text-neu-black/60 leading-relaxed">{w.desc}</p>
               </motion.div>
             ))}
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* ── HOW IT WORKS ── */}
       <section id="cara-kerja" className="border-b-2 border-neu-black bg-neu-black py-20">
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
-          <motion.div className="text-center mb-12" variants={motionFadeUp} initial="hidden" whileInView="show" viewport={VP}>
+          <motion.div className="text-center mb-12" {...fadeUp()}>
             <span className="font-mono text-xs text-neu-white/40 uppercase tracking-widest">{t('landing.howItWorks.tag')}</span>
             <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-white mt-1">{t('landing.howItWorks.title')}</h2>
           </motion.div>
-          <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" variants={motionStagger10} initial="hidden" whileInView="show" viewport={VP}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {(t('landing.howItWorks.steps', { returnObjects: true })).map((step, si) => {
               const colors = ['bg-neu-primary','bg-neu-blue','bg-neu-green','bg-neu-accent'];
               const shadows = ['4px 4px 0px #FFD000','4px 4px 0px #4D61FF','4px 4px 0px #00C48C','4px 4px 0px #FF5C5C'];
-              return { ...step, color: colors[si], shadow: shadows[si] };
+              return { ...step, color: colors[si], shadow: shadows[si], idx: si };
             }).map(step => (
-              <motion.div key={step.no} variants={motionFadeUp} className="border-2 border-neu-white/20 bg-neu-white/5 p-6" style={{ boxShadow: step.shadow }}>
+              <motion.div key={step.no} {...fadeUp(step.idx * 0.1)} className="border-2 border-neu-white/20 bg-neu-white/5 p-6" style={{ boxShadow: step.shadow }}>
                 <div className={cn('w-12 h-12 border-2 border-neu-white/20 flex items-center justify-center mb-4', step.color)}>
                   <span className="font-display font-bold text-xl text-neu-black">{step.no.charAt(1)}</span>
                 </div>
@@ -1546,7 +1547,7 @@ export default function LandingPage() {
                 <p className="font-body text-xs text-neu-white/60 leading-relaxed">{step.desc}</p>
               </motion.div>
             ))}
-          </motion.div>
+          </div>
         </div>
       </section>
 
@@ -1576,7 +1577,7 @@ export default function LandingPage() {
         <section id="kontak" className="border-b-2 border-neu-black py-20">
           <div className="max-w-7xl mx-auto px-4 lg:px-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-              <motion.div variants={motionFadeUp} initial="hidden" whileInView="show" viewport={VP}>
+              <motion.div {...fadeUp()}>
                 <div className="flex items-center gap-3 mb-2"><div className="h-1 w-10 bg-neu-green" /><span className="font-mono text-xs text-neu-black/50 uppercase tracking-widest">{t('landing.contact.tag')}</span></div>
                 <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-black mb-3">{t('landing.contact.title').split('\n').map((l,i)=><span key={i}>{l}{i===0&&<br/>}</span>)}</h2>
                 <p className="font-body text-sm text-neu-black/60 mb-6 leading-relaxed">{t('landing.contact.subtitle')}</p>
@@ -1614,7 +1615,7 @@ export default function LandingPage() {
                 )}
               </motion.div>
               {socialMedia.length > 0 && (
-                <motion.div variants={motionFadeUp} initial="hidden" whileInView="show" viewport={VP}>
+                <motion.div {...fadeUp()}>
                   <p className="font-display font-bold text-sm text-neu-black uppercase mb-4">{t('landing.contact.social')}</p>
                   <div className="grid grid-cols-2 gap-3">
                     {socialMedia.map(s => {
@@ -1652,7 +1653,7 @@ export default function LandingPage() {
               </Canvas>
             </div>
             {/* Text Side */}
-            <motion.div className="py-16 px-8 lg:px-12" variants={motionFadeUp} initial="hidden" whileInView="show" viewport={VP}>
+            <motion.div className="py-16 px-8 lg:px-12" {...fadeUp()}>
               <h2 className="font-display font-bold text-4xl lg:text-5xl text-neu-black mb-4">{t('landing.cta.title').split('\n').map((l,i)=><span key={i}>{l}{i===0&&<br/>}</span>)}</h2>
               <p className="font-body text-base text-neu-black/70 mb-8 max-w-md">{t('landing.cta.subtitle')}</p>
               <div className="flex flex-col sm:flex-row gap-3">
@@ -1667,7 +1668,7 @@ export default function LandingPage() {
       {/* ══════════════════════════════════════════
           FOOTER — Modern 2025
       ══════════════════════════════════════════ */}
-      <motion.footer className="bg-neu-black" variants={motionFadeUp} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-5% 0px' }}>
+      <motion.footer className="bg-neu-black" {...fadeUp()}>
 
         {/* Top strip */}
         <div className="border-b border-neu-white/10">
