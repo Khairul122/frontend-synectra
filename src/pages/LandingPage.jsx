@@ -1170,9 +1170,13 @@ export default function LandingPage() {
               <HeroReveal delay={0.1}>
                 <span className="block">{t('landing.hero.title1')}</span>
               </HeroReveal>
-              <HeroReveal delay={0.3} className="relative">
-                <span className="relative z-10 block">{t('landing.hero.title2')}</span>
-                <span className="absolute bottom-1 left-0 h-4 w-full bg-neu-primary -z-0 block pointer-events-none" />
+              <HeroReveal delay={0.3}>
+                <span className="block">
+                  <span className="relative inline-block">
+                    <span className="relative z-10">{t('landing.hero.title2')}</span>
+                    <span className="absolute bottom-1 left-0 right-0 h-4 bg-neu-primary -z-10 pointer-events-none" />
+                  </span>
+                </span>
               </HeroReveal>
               <HeroReveal delay={0.5}>
                 <span className="block">{t('landing.hero.title3')}</span>
