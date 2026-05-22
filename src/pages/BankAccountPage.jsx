@@ -2,7 +2,6 @@
 import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
 import { bankAccountService } from '../services/bankAccount.service';
@@ -12,26 +11,19 @@ import { useAlert } from '../hooks/useAlert';
 
 function LogoPreviewModal({ account, onClose }) {
   const { t } = useTranslation();
-  const backdropRef = useRef(null);
-  const cardRef     = useRef(null);
 
   useEffect(() => {
-    gsap.fromTo(backdropRef.current, { opacity: 0 }, { opacity: 1, duration: 0.2 });
-    gsap.fromTo(cardRef.current, { y: -30, opacity: 0, scale: 0.95 }, { y: 0, opacity: 1, scale: 1, duration: 0.3, ease: 'power3.out' });
     const handleKey = (e) => { if (e.key === 'Escape') handleClose(); };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
   }, []);
 
-  const handleClose = () => {
-    gsap.to(cardRef.current,     { y: -20, opacity: 0, scale: 0.95, duration: 0.2, ease: 'power2.in' });
-    gsap.to(backdropRef.current, { opacity: 0, duration: 0.2, onComplete: onClose });
-  };
+  const handleClose = onClose;
 
   return createPortal(
-    <div ref={backdropRef} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/70"
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/70"
       onClick={(e) => { if (e.target === e.currentTarget) handleClose(); }}>
-      <div ref={cardRef} className="w-full max-w-md bg-neu-white border-2 border-neu-black shadow-neu-xl">
+      <div className="w-full max-w-md bg-neu-white border-2 border-neu-black shadow-neu-xl">
         <div className="flex items-center justify-between px-5 py-3 border-b-2 border-neu-black bg-neu-black">
           <div className="flex items-center gap-2">
             <svg className="w-4 h-4 text-neu-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -59,7 +51,7 @@ function LogoPreviewModal({ account, onClose }) {
             <p className="font-display font-bold text-sm text-neu-black">{account.bankName}</p>
             <p className="font-body text-xs text-neu-black/50">{account.accountHolder}</p>
           </div>
-          <button onClick={handleClose} className={cn('px-4 py-2 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase tracking-wide text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm')}>
+          <button onClick={handleClose} className={cn('px-4 py-2 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase tracking-wide text-neu-black hover:shadow-neu-sm')}>
             {t('common.close')}
           </button>
         </div>
@@ -77,18 +69,16 @@ const PT_BADGE = {
 
 function BankAccountRow({ account, index, onEdit, onDelete, onToggleActive, onPreview }) {
   const { t } = useTranslation();
-  const ref = useRef(null);
-  useEffect(() => { gsap.from(ref.current, { x: -20, opacity: 0, duration: 0.4, delay: index * 0.04, ease: 'power2.out' }); }, [index]);
 
   const ptBadge = PT_BADGE[account.paymentType] ?? PT_BADGE.bank;
   const hasPreview = account.bankLogo || account.qrisImageUrl;
 
   return (
-    <tr ref={ref} className="border-b-2 border-neu-black bg-neu-white hover:bg-neu-bg transition-colors duration-150">
+    <tr className="border-b-2 border-neu-black bg-neu-white hover:bg-neu-bg">
       <td className="px-4 py-3 border-r-2 border-neu-black font-mono text-xs text-neu-black/50 text-center w-10">{index + 1}</td>
       <td className="px-4 py-3 border-r-2 border-neu-black w-20">
         <div onClick={() => hasPreview && onPreview(account)}
-          className={cn('w-14 h-10 border-2 border-neu-black overflow-hidden bg-neu-bg flex-shrink-0 flex items-center justify-center transition-all duration-150', hasPreview && 'cursor-pointer hover:border-neu-primary hover:shadow-neu-sm hover:translate-x-[-1px] hover:translate-y-[-1px]')}>
+          className={cn('w-14 h-10 border-2 border-neu-black overflow-hidden bg-neu-bg flex-shrink-0 flex items-center justify-center', hasPreview && 'cursor-pointer hover:border-neu-primary hover:shadow-neu-sm
           {account.bankLogo
             ? <img src={account.bankLogo} alt={account.bankName} className="w-full h-full object-contain p-1" onError={e => { e.target.style.display = 'none'; }} />
             : account.qrisImageUrl
@@ -115,11 +105,11 @@ function BankAccountRow({ account, index, onEdit, onDelete, onToggleActive, onPr
       </td>
       <td className="px-4 py-3 w-52">
         <div className="flex items-center gap-2">
-          <button onClick={() => onToggleActive(account)} className={cn('px-2.5 py-1 border-2 border-neu-black font-display font-bold text-[10px] uppercase tracking-wide transition-all duration-150 shadow-neu-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none', account.isActive ? 'bg-neu-black/10 text-neu-black' : 'bg-neu-green text-neu-white')}>
+          <button onClick={() => onToggleActive(account)} className={cn('px-2.5 py-1 border-2 border-neu-black font-display font-bold text-[10px] uppercase tracking-wide shadow-neu-sm hover:shadow-none', account.isActive ? 'bg-neu-black/10 text-neu-black' : 'bg-neu-green text-neu-white')}>
             {account.isActive ? t('common.deactivate') : t('common.activate')}
           </button>
-          <button onClick={() => onEdit(account.id)} className="px-2.5 py-1 border-2 border-neu-black bg-neu-primary font-display font-bold text-[10px] uppercase tracking-wide text-neu-black shadow-neu-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150">{t('common.edit')}</button>
-          <button onClick={() => onDelete(account)} className="px-2.5 py-1 border-2 border-neu-black bg-neu-white font-display font-bold text-[10px] uppercase tracking-wide text-neu-accent shadow-neu-sm hover:bg-neu-accent hover:text-neu-white hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150">{t('common.delete')}</button>
+          <button onClick={() => onEdit(account.id)} className="px-2.5 py-1 border-2 border-neu-black bg-neu-primary font-display font-bold text-[10px] uppercase tracking-wide text-neu-black shadow-neu-sm hover:shadow-none">{t('common.edit')}</button>
+          <button onClick={() => onDelete(account)} className="px-2.5 py-1 border-2 border-neu-black bg-neu-white font-display font-bold text-[10px] uppercase tracking-wide text-neu-accent shadow-neu-sm hover:bg-neu-accent hover:text-neu-white hover:shadow-none">{t('common.delete')}</button>
         </div>
       </td>
     </tr>
@@ -139,8 +129,6 @@ export default function BankAccountPage() {
   const [isDeleting,     setIsDeleting]     = useState(false);
   const [previewAccount, setPreviewAccount] = useState(null);
 
-  const headerRef = useRef(null);
-  const tableRef  = useRef(null);
 
   useEffect(() => {
     authService.getMe()
@@ -157,9 +145,7 @@ export default function BankAccountPage() {
 
   useEffect(() => {
     if (!isLoading) {
-      if (headerRef.current) gsap.from(headerRef.current, { y: -20, opacity: 0, duration: 0.4, ease: 'power2.out' });
-      if (tableRef.current)  gsap.from(tableRef.current,  { y: 20,  opacity: 0, duration: 0.5, delay: 0.1, ease: 'power2.out' });
-    }
+      if (headerRef.current)      if (tableRef.current)    }
   }, [isLoading]);
 
   const handleToggleActive = async (account) => {
@@ -199,20 +185,20 @@ export default function BankAccountPage() {
         isLoading={isDeleting}
       />
 
-      <div ref={headerRef} className="flex flex-wrap items-center gap-3 mb-6">
+      <div className="flex flex-wrap items-center gap-3 mb-6">
         <input type="text" value={search} onChange={e => setSearch(e.target.value)}
           placeholder={t('bankAccounts.search')}
-          className="flex-1 min-w-48 px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black placeholder:text-neu-black/30 outline-none focus:shadow-neu transition-all duration-150" />
+          className="flex-1 min-w-48 px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black placeholder:text-neu-black/30 outline-none focus:shadow-neu" />
         <span className="font-mono text-xs text-neu-black/50">
           {t('common.showing')} <strong className="text-neu-black">{filtered.length}</strong> {t('common.from')} <strong className="text-neu-black">{accounts.length}</strong>
         </span>
         <button onClick={() => navigate('/bank-accounts/new')}
-          className="px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase tracking-wide text-neu-black whitespace-nowrap transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm active:translate-x-1 active:translate-y-1 active:shadow-none">
+          className="px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase tracking-wide text-neu-black whitespace-nowrap hover:shadow-neu-sm">
           {t('bankAccounts.add')}
         </button>
       </div>
 
-      <div ref={tableRef} className="border-2 border-neu-black shadow-neu bg-neu-white overflow-hidden">
+      <div className="border-2 border-neu-black shadow-neu bg-neu-white overflow-hidden">
         {filtered.length === 0 ? (
           <div className="p-16 text-center">
             <p className="font-display font-bold text-xl text-neu-black/40">
@@ -220,7 +206,7 @@ export default function BankAccountPage() {
             </p>
             {accounts.length === 0 && (
               <button onClick={() => navigate('/bank-accounts/new')}
-                className="mt-4 px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm transition-all duration-150">
+                className="mt-4 px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase hover:shadow-neu-sm">
                 {t('bankAccounts.addFirst')}
               </button>
             )}

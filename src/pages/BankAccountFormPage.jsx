@@ -1,7 +1,6 @@
 ﻿import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
 import { bankAccountService } from '../services/bankAccount.service';
@@ -59,7 +58,7 @@ function LogoUploader({ value, onChange }) {
         onDragLeave={() => setIsDragging(false)}
         onDrop={(e) => { e.preventDefault(); setIsDragging(false); const f = e.dataTransfer.files[0]; if (f) processFile(f); }}
         className={cn(
-          'border-2 border-dashed border-neu-black p-8 text-center cursor-pointer transition-all duration-150',
+          'border-2 border-dashed border-neu-black p-8 text-center cursor-pointer',
           isDragging ? 'bg-neu-primary/20 border-solid' : 'hover:bg-neu-bg',
           isUploading && 'opacity-60 cursor-not-allowed',
         )}
@@ -67,7 +66,7 @@ function LogoUploader({ value, onChange }) {
         <input ref={inputRef} type="file" accept="image/*" className="hidden"
           onChange={e => { if (e.target.files[0]) processFile(e.target.files[0]); }} />
         {isUploading ? (
-          <p className="font-display font-bold text-sm text-neu-black animate-pulse">Mengupload...</p>
+          <p className="font-display font-bold text-sm text-neu-black">Mengupload...</p>
         ) : (
           <>
             <svg className="w-8 h-8 mx-auto mb-2 text-neu-black/40" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
@@ -85,7 +84,7 @@ function LogoUploader({ value, onChange }) {
           <button type="button" onClick={() => onChange('')} className={cn(
             'absolute top-2 right-2 w-8 h-8 flex items-center justify-center',
             'bg-neu-accent border-2 border-neu-black text-neu-white font-bold text-xs',
-            'shadow-neu-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150',
+            'shadow-neu-sm hover:shadow-none',
           )}>✕</button>
         </div>
       )}
@@ -120,7 +119,7 @@ function QrisUploader({ value, onChange }) {
         onDragLeave={() => setIsDragging(false)}
         onDrop={(e) => { e.preventDefault(); setIsDragging(false); const f = e.dataTransfer.files[0]; if (f) processFile(f); }}
         className={cn(
-          'border-2 border-dashed border-neu-black p-8 text-center cursor-pointer transition-all duration-150',
+          'border-2 border-dashed border-neu-black p-8 text-center cursor-pointer',
           isDragging ? 'bg-neu-primary/20 border-solid' : 'hover:bg-neu-bg',
           isUploading && 'opacity-60 cursor-not-allowed',
         )}
@@ -128,7 +127,7 @@ function QrisUploader({ value, onChange }) {
         <input ref={inputRef} type="file" accept="image/*" className="hidden"
           onChange={e => { if (e.target.files[0]) processFile(e.target.files[0]); }} />
         {isUploading ? (
-          <p className="font-display font-bold text-sm text-neu-black animate-pulse">Mengupload...</p>
+          <p className="font-display font-bold text-sm text-neu-black">Mengupload...</p>
         ) : (
           <>
             <svg className="w-8 h-8 mx-auto mb-2 text-neu-black/40" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
@@ -146,7 +145,7 @@ function QrisUploader({ value, onChange }) {
           <button type="button" onClick={() => onChange('')} className={cn(
             'absolute top-2 right-2 w-8 h-8 flex items-center justify-center',
             'bg-neu-accent border-2 border-neu-black text-neu-white font-bold text-xs',
-            'shadow-neu-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150',
+            'shadow-neu-sm hover:shadow-none',
           )}>✕</button>
         </div>
       )}
@@ -159,11 +158,11 @@ function Toggle({ checked, onChange, label }) {
   return (
     <label className="flex items-center gap-3 cursor-pointer select-none">
       <div onClick={() => onChange(!checked)} className={cn(
-        'w-12 h-6 border-2 border-neu-black relative transition-colors duration-150',
+        'w-12 h-6 border-2 border-neu-black relative',
         checked ? 'bg-neu-green' : 'bg-neu-black/20',
       )}>
         <div className={cn(
-          'absolute top-0.5 w-4 h-4 border-2 border-neu-black bg-neu-white transition-all duration-150',
+          'absolute top-0.5 w-4 h-4 border-2 border-neu-black bg-neu-white',
           checked ? 'left-[22px]' : 'left-0.5',
         )} />
       </div>
@@ -185,7 +184,6 @@ export default function BankAccountFormPage() {
   const [form,      setForm]      = useState({ bankName: '', accountNumber: '', accountHolder: '', bankLogo: '', paymentType: 'bank', qrisImageUrl: '', isActive: true });
   const [errors,    setErrors]    = useState({});
 
-  const formRef = useRef(null);
 
   useEffect(() => {
     const init = async () => {
@@ -218,7 +216,6 @@ export default function BankAccountFormPage() {
 
   useEffect(() => {
     if (!isLoading && formRef.current) {
-      gsap.from(formRef.current, { y: 30, opacity: 0, duration: 0.5, ease: 'power2.out' });
     }
   }, [isLoading]);
 
@@ -273,12 +270,12 @@ export default function BankAccountFormPage() {
 
   return (
     <PageLayout user={user} title={isEditMode ? 'Edit Akun Bank' : 'Tambah Akun Bank'} alert={alert}>
-      <div ref={formRef} className="max-w-2xl mx-auto">
+      <div className="max-w-2xl mx-auto">
 
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 mb-6 font-mono text-xs text-neu-black/50">
           <button type="button" onClick={() => navigate('/bank-accounts')}
-            className="hover:text-neu-black transition-colors">Bank Accounts</button>
+            className="hover:text-neu-black">Bank Accounts</button>
           <span>/</span>
           <span className="text-neu-black">{isEditMode ? 'Edit' : 'Tambah Baru'}</span>
         </div>
@@ -297,7 +294,7 @@ export default function BankAccountFormPage() {
               className={cn(
                 'w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm',
                 'font-body text-neu-black placeholder:text-gray-400',
-                'outline-none focus:shadow-neu focus:translate-x-[-2px] focus:translate-y-[-2px] transition-all duration-150',
+                'outline-none focus:shadow-neu
                 errors.bankName && 'border-neu-accent shadow-[4px_4px_0px_#FF5C5C]',
               )}
             />
@@ -316,7 +313,7 @@ export default function BankAccountFormPage() {
               className={cn(
                 'w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm',
                 'font-body text-neu-black placeholder:text-gray-400',
-                'outline-none focus:shadow-neu focus:translate-x-[-2px] focus:translate-y-[-2px] transition-all duration-150',
+                'outline-none focus:shadow-neu
                 errors.accountNumber && 'border-neu-accent shadow-[4px_4px_0px_#FF5C5C]',
               )}
             />
@@ -335,7 +332,7 @@ export default function BankAccountFormPage() {
               className={cn(
                 'w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm',
                 'font-body text-neu-black placeholder:text-gray-400',
-                'outline-none focus:shadow-neu focus:translate-x-[-2px] focus:translate-y-[-2px] transition-all duration-150',
+                'outline-none focus:shadow-neu
                 errors.accountHolder && 'border-neu-accent shadow-[4px_4px_0px_#FF5C5C]',
               )}
             />
@@ -358,7 +355,7 @@ export default function BankAccountFormPage() {
             <select
               value={form.paymentType}
               onChange={e => setField('paymentType', e.target.value)}
-              className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-neu-black outline-none focus:shadow-neu transition-all duration-150 cursor-pointer"
+              className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-neu-black outline-none focus:shadow-neu cursor-pointer"
             >
               <option value="bank">Transfer Bank</option>
               <option value="qris">QRIS</option>
@@ -390,20 +387,18 @@ export default function BankAccountFormPage() {
             <button type="submit" disabled={isSaving} className={cn(
               'px-8 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu',
               'font-display font-bold text-sm uppercase tracking-wide text-neu-black',
-              'transition-all duration-150',
-              'hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm',
-              'active:translate-x-1 active:translate-y-1 active:shadow-none',
-              isSaving && 'opacity-60 cursor-not-allowed',
+              '',
+              'hover:shadow-neu-sm',
+              'isSaving && 'opacity-60 cursor-not-allowed',
             )}>
               {isSaving ? 'Menyimpan...' : isEditMode ? 'Simpan Perubahan' : 'Buat Akun Bank'}
             </button>
             <button type="button" onClick={() => navigate('/bank-accounts')} disabled={isSaving} className={cn(
               'px-6 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu',
               'font-display font-bold text-sm uppercase tracking-wide text-neu-black',
-              'transition-all duration-150',
-              'hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm',
-              'active:translate-x-1 active:translate-y-1 active:shadow-none',
-            )}>
+              '',
+              'hover:shadow-neu-sm',
+              ')}>
               Batal
             </button>
           </div>

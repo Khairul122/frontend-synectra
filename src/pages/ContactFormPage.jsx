@@ -1,7 +1,6 @@
 ﻿import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
 import { contactService } from '../services/contact.service';
@@ -21,10 +20,10 @@ function IconPicker({ value, onChange }) {
             type="button"
             onClick={() => onChange(key)}
             className={cn(
-              'flex flex-col items-center gap-1.5 p-3 border-2 border-neu-black transition-all duration-150',
+              'flex flex-col items-center gap-1.5 p-3 border-2 border-neu-black',
               selected
                 ? 'bg-neu-primary shadow-none translate-x-[2px] translate-y-[2px]'
-                : 'bg-neu-white shadow-neu-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none',
+                : 'bg-neu-white shadow-neu-sm hover:shadow-none',
             )}
           >
             <Icon style={{ color: selected ? '#0D0D0D' : color }} className="w-7 h-7" />
@@ -43,11 +42,11 @@ function Toggle({ checked, onChange, label }) {
   return (
     <label className="flex items-center gap-3 cursor-pointer select-none">
       <div onClick={() => onChange(!checked)} className={cn(
-        'w-12 h-6 border-2 border-neu-black relative transition-colors duration-150',
+        'w-12 h-6 border-2 border-neu-black relative',
         checked ? 'bg-neu-green' : 'bg-neu-black/20',
       )}>
         <div className={cn(
-          'absolute top-0.5 w-4 h-4 border-2 border-neu-black bg-neu-white transition-all duration-150',
+          'absolute top-0.5 w-4 h-4 border-2 border-neu-black bg-neu-white',
           checked ? 'left-[22px]' : 'left-0.5',
         )} />
       </div>
@@ -76,7 +75,6 @@ export default function ContactFormPage() {
   });
   const [errors, setErrors] = useState({});
 
-  const formRef = useRef(null);
 
   useEffect(() => {
     const init = async () => {
@@ -107,7 +105,6 @@ export default function ContactFormPage() {
 
   useEffect(() => {
     if (!isLoading && formRef.current) {
-      gsap.from(formRef.current, { y: 30, opacity: 0, duration: 0.5, ease: 'power2.out' });
     }
   }, [isLoading]);
 
@@ -172,7 +169,7 @@ export default function ContactFormPage() {
   const inputCls = (hasError) => cn(
     'w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm',
     'font-body text-neu-black placeholder:text-gray-400',
-    'outline-none focus:shadow-neu focus:translate-x-[-2px] focus:translate-y-[-2px] transition-all duration-150',
+    'outline-none focus:shadow-neu
     hasError && 'border-neu-accent shadow-[4px_4px_0px_#FF5C5C]',
   );
 
@@ -181,12 +178,12 @@ export default function ContactFormPage() {
 
   return (
     <PageLayout user={user} title={isEditMode ? 'Edit Kontak' : 'Tambah Kontak'} alert={alert}>
-      <div ref={formRef} className="max-w-2xl mx-auto">
+      <div className="max-w-2xl mx-auto">
 
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 mb-6 font-mono text-xs text-neu-black/50">
           <button type="button" onClick={() => navigate('/contacts')}
-            className="hover:text-neu-black transition-colors">Contacts</button>
+            className="hover:text-neu-black">Contacts</button>
           <span>/</span>
           <span className="text-neu-black">{isEditMode ? 'Edit' : 'Tambah Baru'}</span>
         </div>
@@ -279,7 +276,7 @@ export default function ContactFormPage() {
             <button type="submit" disabled={isSaving} className={cn(
               'px-8 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu',
               'font-display font-bold text-sm uppercase tracking-wide text-neu-black',
-              'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm active:translate-x-1 active:translate-y-1 active:shadow-none',
+              'hover:shadow-neu-sm',
               isSaving && 'opacity-60 cursor-not-allowed',
             )}>
               {isSaving ? t('common.saving') : isEditMode ? 'Simpan Perubahan' : 'Buat Kontak'}
@@ -287,7 +284,7 @@ export default function ContactFormPage() {
             <button type="button" onClick={() => navigate('/contacts')} disabled={isSaving} className={cn(
               'px-6 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu',
               'font-display font-bold text-sm uppercase tracking-wide text-neu-black',
-              'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm active:translate-x-1 active:translate-y-1 active:shadow-none',
+              'hover:shadow-neu-sm',
             )}>
               Batal
             </button>

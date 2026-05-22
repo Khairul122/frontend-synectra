@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { cn } from '../utils/cn';
@@ -30,7 +30,7 @@ function StatusBadge({ status }) {
 function StatCard({ label, value, valueColor, barColor, onClick }) {
   return (
     <div onClick={onClick}
-      className={cn('bg-neu-white border-2 border-neu-black shadow-neu p-5 flex flex-col gap-2', onClick && 'cursor-pointer hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-neu-lg transition-all duration-150')}>
+      className={cn('bg-neu-white border-2 border-neu-black shadow-neu p-5 flex flex-col gap-2', onClick && 'cursor-pointer hover:shadow-neu-lg')}>
       {barColor && <div className="h-1 w-8" style={{ backgroundColor: barColor }} />}
       <p className="font-body text-xs text-neu-black/50 uppercase tracking-wide">{label}</p>
       <p className={cn('font-display font-bold text-3xl leading-none', valueColor ?? 'text-neu-black')}>{value}</p>
@@ -87,7 +87,7 @@ function AdminDashboard({ user, orders, clients, navigate }) {
             <div className="divide-y-2 divide-neu-black">
               {recentOrders.map(o => (
                 <div key={o.id} onClick={() => navigate(`/orders/${o.id}`)}
-                  className="px-5 py-3 flex items-center gap-3 hover:bg-neu-bg transition-colors cursor-pointer">
+                  className="px-5 py-3 flex items-center gap-3 hover:bg-neu-bg cursor-pointer">
                   <div className="flex-1 min-w-0">
                     <p className="font-display font-bold text-sm text-neu-black truncate">{o.title}</p>
                     <p className="font-mono text-xs text-neu-black/40 truncate">{o.clientName ?? '—'}</p>
@@ -114,7 +114,7 @@ function AdminDashboard({ user, orders, clients, navigate }) {
             <div className="divide-y-2 divide-neu-black">
               {needAction.map(o => (
                 <div key={o.id} onClick={() => navigate(`/orders/${o.id}`)}
-                  className="px-5 py-3 hover:bg-neu-bg transition-colors cursor-pointer">
+                  className="px-5 py-3 hover:bg-neu-bg cursor-pointer">
                   <p className="font-display font-bold text-sm text-neu-black truncate">{o.title}</p>
                   <p className="font-mono text-xs text-neu-black/40">{o.clientName ?? '—'}</p>
                   {o.totalPrice && <p className="font-mono text-xs text-neu-primary font-bold mt-0.5">{fmt(o.totalPrice)}</p>}
@@ -125,7 +125,7 @@ function AdminDashboard({ user, orders, clients, navigate }) {
           {needAction.length > 0 && (
             <div className="px-5 py-3 border-t-2 border-neu-black">
               <button onClick={() => navigate('/orders')}
-                className="w-full py-2 bg-neu-primary border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-black hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-150">
+                className="w-full py-2 bg-neu-primary border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-black hover:shadow-none">
                 {t('dashboard.manageOrders')}
               </button>
             </div>
@@ -160,7 +160,7 @@ function ClientDashboard({ user, orders, navigate }) {
             <p className="font-body text-sm text-neu-black/60 mt-1">{t('dashboard.clientSubtitle')}</p>
           </div>
           <button onClick={() => navigate('/my-orders/new')}
-            className="px-4 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase tracking-wide text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">
+            className="px-4 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase tracking-wide text-neu-black hover:shadow-neu-sm">
             {t('dashboard.createOrder')}
           </button>
         </div>
@@ -182,7 +182,7 @@ function ClientDashboard({ user, orders, navigate }) {
           <div className="bg-neu-white border-2 border-dashed border-neu-black p-12 text-center">
             <p className="font-display font-bold text-lg text-neu-black/40 mb-3">{t('dashboard.noOrdersClient')}</p>
             <button onClick={() => navigate('/my-orders/new')}
-              className="px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase text-neu-black hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm transition-all duration-150">
+              className="px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase text-neu-black hover:shadow-neu-sm">
               {t('dashboard.createFirstOrder')}
             </button>
           </div>
@@ -193,7 +193,7 @@ function ClientDashboard({ user, orders, navigate }) {
               const lastPct = o.progressReports?.length ? o.progressReports[o.progressReports.length - 1].progressPercentage : null;
               return (
                 <div key={o.id} onClick={() => navigate(`/my-orders/${o.id}`)}
-                  className="bg-neu-white border-2 border-neu-black shadow-neu hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-neu-lg transition-all duration-150 cursor-pointer p-5">
+                  className="bg-neu-white border-2 border-neu-black shadow-neu hover:shadow-neu-lg cursor-pointer p-5">
                   <div className="flex items-center justify-between mb-2">
                     <StatusBadge status={o.status} />
                     <span className="font-mono text-xs text-neu-black/40">{fmtDate(o.deadline)}</span>

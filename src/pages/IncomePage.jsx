@@ -1,6 +1,5 @@
 ﻿import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
 import { paymentService } from '../services/payment.service';
@@ -165,12 +164,8 @@ function LineChart({ data, view }) {
 
 /* ─── Summary Card ─────────────────────────────────────────────────────────── */
 function SummaryCard({ label, value, accentClass, delay }) {
-  const ref = useRef(null);
-  useEffect(() => {
-    gsap.from(ref.current, { y: 20, opacity: 0, duration: 0.5, delay, ease: 'power2.out' });
-  }, [delay]);
   return (
-    <div ref={ref} className={cn('bg-neu-white border-2 border-neu-black shadow-neu p-5', accentClass)}>
+    <div className={cn('bg-neu-white border-2 border-neu-black shadow-neu p-5', accentClass)}>
       <p className="font-mono text-xs text-neu-black/40 uppercase tracking-wide mb-1">{label}</p>
       <p className="font-display font-bold text-xl text-neu-black">{fmtRpFull(value)}</p>
     </div>
@@ -191,7 +186,6 @@ export default function IncomePage() {
   const [incomeData, setIncomeData] = useState(null);
   const [isFetching, setIsFetching] = useState(false);
 
-  const pageRef = useRef(null);
 
   useEffect(() => {
     authService.getMe()
@@ -226,7 +220,6 @@ export default function IncomePage() {
 
   useEffect(() => {
     if (!isLoading && pageRef.current) {
-      gsap.from(pageRef.current, { y: 20, opacity: 0, duration: 0.5, ease: 'power2.out' });
     }
   }, [isLoading]);
 
@@ -245,7 +238,7 @@ export default function IncomePage() {
 
   return (
     <PageLayout user={user} title="Pemasukan" alert={alert}>
-      <div ref={pageRef} className="max-w-5xl mx-auto space-y-6">
+      <div className="max-w-5xl mx-auto space-y-6">
 
         {/* ─── Header + Controls ─── */}
         <div className="flex flex-wrap items-start justify-between gap-4">
@@ -260,10 +253,10 @@ export default function IncomePage() {
             {['daily', 'monthly', 'yearly'].map(v => (
               <button key={v} onClick={() => setView(v)}
                 className={cn(
-                  'px-4 py-2 border-2 border-neu-black font-display font-bold text-xs uppercase transition-all duration-150',
+                  'px-4 py-2 border-2 border-neu-black font-display font-bold text-xs uppercase',
                   view === v
                     ? 'bg-neu-primary shadow-neu text-neu-black'
-                    : 'bg-neu-white text-neu-black/60 shadow-neu-sm hover:bg-neu-bg hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none',
+                    : 'bg-neu-white text-neu-black/60 shadow-neu-sm hover:bg-neu-bg hover:shadow-none',
                 )}>
                 {v === 'daily' ? 'Harian' : v === 'monthly' ? 'Bulanan' : 'Tahunan'}
               </button>
@@ -315,7 +308,7 @@ export default function IncomePage() {
                 </span>
               )}
               {isFetching && (
-                <div className="w-4 h-4 border-2 border-neu-black border-t-neu-primary animate-spin" />
+                <div className="w-4 h-4 border-2 border-neu-black border-t-neu-primary" />
               )}
             </div>
           </div>
@@ -324,7 +317,7 @@ export default function IncomePage() {
           <div className="p-6">
             {isFetching ? (
               <div className="h-72 flex items-center justify-center">
-                <div className="w-6 h-6 border-2 border-neu-black border-t-neu-primary animate-spin" />
+                <div className="w-6 h-6 border-2 border-neu-black border-t-neu-primary" />
               </div>
             ) : !hasData ? (
               <div className="h-72 flex flex-col items-center justify-center gap-3">
@@ -365,7 +358,7 @@ export default function IncomePage() {
                     .map((p, i) => (
                       <tr key={p.label}
                         className={cn(
-                          'border-b border-neu-black/10 hover:bg-neu-bg transition-colors duration-100',
+                          'border-b border-neu-black/10 hover:bg-neu-bg',
                           i % 2 === 0 ? 'bg-neu-white' : 'bg-neu-bg/50',
                         )}>
                         <td className="px-5 py-2.5 font-mono text-xs text-neu-black border-r-2 border-neu-black/10">

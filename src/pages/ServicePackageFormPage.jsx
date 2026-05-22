@@ -1,6 +1,5 @@
 ﻿import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
 import { servicePackageService } from '../services/servicePackage.service';
@@ -46,7 +45,7 @@ function ImageUploader({ value, onChange }) {
         onDragLeave={() => setIsDragging(false)}
         onDrop={e => { e.preventDefault(); setIsDragging(false); const f = e.dataTransfer.files[0]; if (f) processFile(f); }}
         className={cn(
-          'border-2 border-dashed border-neu-black p-8 text-center cursor-pointer transition-all duration-150',
+          'border-2 border-dashed border-neu-black p-8 text-center cursor-pointer',
           isDragging ? 'bg-neu-primary/20 border-solid' : 'hover:bg-neu-bg',
           isUploading && 'opacity-60 cursor-not-allowed',
         )}
@@ -54,7 +53,7 @@ function ImageUploader({ value, onChange }) {
         <input ref={inputRef} type="file" accept="image/*" className="hidden"
           onChange={e => { if (e.target.files[0]) processFile(e.target.files[0]); }} />
         {isUploading ? (
-          <p className="font-display font-bold text-sm text-neu-black animate-pulse">Mengupload...</p>
+          <p className="font-display font-bold text-sm text-neu-black">Mengupload...</p>
         ) : (
           <>
             <svg className="w-8 h-8 mx-auto mb-2 text-neu-black/40" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
@@ -69,7 +68,7 @@ function ImageUploader({ value, onChange }) {
         <div className="relative w-24 h-24 border-2 border-neu-black shadow-neu-sm overflow-hidden">
           <img src={value} alt="Icon preview" className="w-full h-full object-cover" />
           <button type="button" onClick={() => onChange('')}
-            className="absolute top-1 right-1 w-6 h-6 flex items-center justify-center bg-neu-accent border-2 border-neu-black text-neu-white font-bold text-[10px] shadow-neu-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150">
+            className="absolute top-1 right-1 w-6 h-6 flex items-center justify-center bg-neu-accent border-2 border-neu-black text-neu-white font-bold text-[10px] shadow-neu-sm hover:shadow-none">
             ✕
           </button>
         </div>
@@ -83,8 +82,8 @@ function Toggle({ checked, onChange, label }) {
   return (
     <label className="flex items-center gap-3 cursor-pointer select-none">
       <div onClick={() => onChange(!checked)}
-        className={cn('w-12 h-6 border-2 border-neu-black relative transition-colors duration-150', checked ? 'bg-neu-green' : 'bg-neu-black/20')}>
-        <div className={cn('absolute top-0.5 w-4 h-4 border-2 border-neu-black bg-neu-white transition-all duration-150', checked ? 'left-[22px]' : 'left-0.5')} />
+        className={cn('w-12 h-6 border-2 border-neu-black relative', checked ? 'bg-neu-green' : 'bg-neu-black/20')}>
+        <div className={cn('absolute top-0.5 w-4 h-4 border-2 border-neu-black bg-neu-white', checked ? 'left-[22px]' : 'left-0.5')} />
       </div>
       <span className="font-display font-bold text-sm text-neu-black">{label}</span>
     </label>
@@ -107,7 +106,6 @@ export default function ServicePackageFormPage() {
     sortOrder: '0', isActive: true,
   });
   const [errors, setErrors] = useState({});
-  const formRef = useRef(null);
 
   useEffect(() => {
     const init = async () => {
@@ -144,7 +142,6 @@ export default function ServicePackageFormPage() {
 
   useEffect(() => {
     if (!isLoading && formRef.current)
-      gsap.from(formRef.current, { y: 30, opacity: 0, duration: 0.5, ease: 'power2.out' });
   }, [isLoading]);
 
   const setField = (key, value) => {
@@ -202,17 +199,17 @@ export default function ServicePackageFormPage() {
 
   const inputClass = (err) => cn(
     'w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-neu-black placeholder:text-gray-400',
-    'outline-none focus:shadow-neu focus:translate-x-[-2px] focus:translate-y-[-2px] transition-all duration-150',
+    'outline-none focus:shadow-neu
     err && 'border-neu-accent shadow-[4px_4px_0px_#FF5C5C]',
   );
 
   return (
     <PageLayout user={user} title={isEditMode ? 'Edit Paket Layanan' : 'Tambah Paket Layanan'} alert={alert}>
-      <div ref={formRef} className="max-w-2xl mx-auto">
+      <div className="max-w-2xl mx-auto">
 
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 mb-6 font-mono text-xs text-neu-black/50">
-          <button type="button" onClick={() => navigate('/service-packages')} className="hover:text-neu-black transition-colors">
+          <button type="button" onClick={() => navigate('/service-packages')} className="hover:text-neu-black">
             Paket Layanan
           </button>
           <span>/</span>
@@ -236,7 +233,7 @@ export default function ServicePackageFormPage() {
             <div className="flex flex-col gap-1.5">
               <label className="font-display font-bold text-sm text-neu-black uppercase tracking-wide">Kategori</label>
               <select value={form.category} onChange={e => setField('category', e.target.value)}
-                className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-neu-black outline-none cursor-pointer focus:shadow-neu transition-all duration-150">
+                className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-neu-black outline-none cursor-pointer focus:shadow-neu">
                 <option value="">-- Pilih Kategori --</option>
                 {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
@@ -274,7 +271,7 @@ export default function ServicePackageFormPage() {
             <textarea value={form.features} onChange={e => setField('features', e.target.value)}
               rows={5}
               placeholder={"Desain responsif\nRevisi 2x\nSumber file disertakan\nDukungan 30 hari"}
-              className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu transition-all duration-150 resize-none" />
+              className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu resize-none" />
           </div>
 
           {/* Deskripsi */}
@@ -282,7 +279,7 @@ export default function ServicePackageFormPage() {
             <label className="font-display font-bold text-sm text-neu-black uppercase tracking-wide">Deskripsi</label>
             <textarea value={form.description} onChange={e => setField('description', e.target.value)}
               rows={3} placeholder="Deskripsi singkat paket layanan..."
-              className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu transition-all duration-150 resize-none" />
+              className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu resize-none" />
           </div>
 
           {/* Icon/Gambar */}
@@ -317,13 +314,13 @@ export default function ServicePackageFormPage() {
               <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wide">Fitur (EN) <span className="font-body normal-case text-neu-black/40 text-xs">(satu per baris)</span></label>
               <textarea value={form.featuresEn} onChange={e => setField('featuresEn', e.target.value)}
                 rows={4} placeholder={"Responsive design\n2 revisions\nSource files included"}
-                className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu transition-all duration-150 resize-none" />
+                className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu resize-none" />
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wide">Deskripsi (EN)</label>
               <textarea value={form.descriptionEn} onChange={e => setField('descriptionEn', e.target.value)}
                 rows={2} placeholder="Description in English..."
-                className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu transition-all duration-150 resize-none" />
+                className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu resize-none" />
             </div>
           </div>
 
@@ -351,14 +348,14 @@ export default function ServicePackageFormPage() {
           <div className="flex items-center gap-3 pt-2">
             <button type="submit" disabled={isSaving}
               className={cn(
-                'px-8 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase tracking-wide text-neu-black transition-all duration-150',
-                'hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm active:translate-x-1 active:translate-y-1 active:shadow-none',
+                'px-8 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase tracking-wide text-neu-black',
+                'hover:shadow-neu-sm',
                 isSaving && 'opacity-60 cursor-not-allowed',
               )}>
               {isSaving ? 'Menyimpan...' : isEditMode ? 'Simpan Perubahan' : 'Buat Paket'}
             </button>
             <button type="button" onClick={() => navigate('/service-packages')} disabled={isSaving}
-              className="px-6 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase tracking-wide text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm active:translate-x-1 active:translate-y-1 active:shadow-none">
+              className="px-6 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase tracking-wide text-neu-black hover:shadow-neu-sm">
               Batal
             </button>
           </div>

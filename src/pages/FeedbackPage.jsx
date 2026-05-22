@@ -1,6 +1,5 @@
 ﻿import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
 import { feedbackService } from '../services/feedback.service';
@@ -52,12 +51,12 @@ function EditModal({ feedback, onClose, onSaved }) {
             <div className="flex flex-col gap-1.5">
               <label className="font-display font-bold text-xs text-neu-black uppercase">Nama *</label>
               <input type="text" value={form.name} onChange={e => setForm(p => ({...p, name: e.target.value}))}
-                className="w-full px-3 py-2 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black outline-none focus:shadow-neu transition-all duration-150" />
+                className="w-full px-3 py-2 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black outline-none focus:shadow-neu" />
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="font-display font-bold text-xs text-neu-black uppercase">Email *</label>
               <input type="email" value={form.email} onChange={e => setForm(p => ({...p, email: e.target.value}))}
-                className="w-full px-3 py-2 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black outline-none focus:shadow-neu transition-all duration-150" />
+                className="w-full px-3 py-2 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black outline-none focus:shadow-neu" />
             </div>
           </div>
           <div className="flex flex-col gap-1.5">
@@ -67,7 +66,7 @@ function EditModal({ feedback, onClose, onSaved }) {
                 <button key={s} type="button"
                   onMouseEnter={() => setHovered(s)} onMouseLeave={() => setHovered(0)}
                   onClick={() => setForm(p => ({...p, rating: s}))}
-                  className="w-9 h-9 flex items-center justify-center transition-transform hover:scale-110">
+                  className="w-9 h-9 flex items-center justify-center
                   <svg className={cn('w-7 h-7', (hovered || form.rating) >= s ? 'text-[#FFD000]' : 'text-neu-black/20')} fill="currentColor" viewBox="0 0 20 20">
                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                   </svg>
@@ -78,15 +77,15 @@ function EditModal({ feedback, onClose, onSaved }) {
           <div className="flex flex-col gap-1.5">
             <label className="font-display font-bold text-xs text-neu-black uppercase">Komentar</label>
             <textarea value={form.message} onChange={e => setForm(p => ({...p, message: e.target.value}))} rows={3}
-              className="w-full px-3 py-2 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black outline-none focus:shadow-neu transition-all duration-150 resize-none" />
+              className="w-full px-3 py-2 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black outline-none focus:shadow-neu resize-none" />
           </div>
         </div>
         <div className="px-5 pb-5 flex gap-3">
           <button onClick={handleSubmit} disabled={isSaving || !form.name.trim() || !form.email.trim() || form.rating === 0}
-            className={cn('flex-1 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm', (isSaving || !form.name.trim()) && 'opacity-50 cursor-not-allowed')}>
+            className={cn('flex-1 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black hover:shadow-neu-sm', (isSaving || !form.name.trim()) && 'opacity-50 cursor-not-allowed')}>
             {isSaving ? 'Menyimpan...' : 'Simpan'}
           </button>
-          <button onClick={onClose} className="flex-1 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">
+          <button onClick={onClose} className="flex-1 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black hover:shadow-neu-sm">
             Batal
           </button>
         </div>
@@ -107,8 +106,6 @@ export default function FeedbackPage() {
   const [isDeleting,   setIsDeleting]   = useState(false);
   const [editTarget,   setEditTarget]   = useState(null);
 
-  const headerRef = useRef(null);
-  const tableRef  = useRef(null);
 
   const loadData = async () => {
     const res = await feedbackService.getAll();
@@ -129,9 +126,7 @@ export default function FeedbackPage() {
 
   useEffect(() => {
     if (!isLoading && headerRef.current)
-      gsap.from(headerRef.current, { y: -20, opacity: 0, duration: 0.4, ease: 'power2.out' });
     if (!isLoading && tableRef.current)
-      gsap.from(tableRef.current, { y: 20, opacity: 0, duration: 0.5, delay: 0.1, ease: 'power2.out' });
   }, [isLoading]);
 
   const handleDelete = async () => {
@@ -170,11 +165,11 @@ export default function FeedbackPage() {
       />
 
       {/* Stats + filter */}
-      <div ref={headerRef} className="flex flex-wrap items-center gap-3 mb-6">
+      <div className="flex flex-wrap items-center gap-3 mb-6">
         <div className="flex gap-2 flex-wrap">
           {[0, 5, 4, 3, 2, 1].map(r => (
             <button key={r} onClick={() => setFilterRating(r)}
-              className={cn('px-3 py-1.5 border-2 border-neu-black font-display font-bold text-xs uppercase transition-all duration-150',
+              className={cn('px-3 py-1.5 border-2 border-neu-black font-display font-bold text-xs uppercase',
                 filterRating === r ? 'bg-neu-black text-neu-white' : 'bg-neu-white text-neu-black hover:bg-neu-bg')}>
               {r === 0 ? 'Semua' : `${r}★`}
             </button>
@@ -186,7 +181,7 @@ export default function FeedbackPage() {
       </div>
 
       {/* Table */}
-      <div ref={tableRef} className="border-2 border-neu-black shadow-neu bg-neu-white overflow-hidden">
+      <div className="border-2 border-neu-black shadow-neu bg-neu-white overflow-hidden">
         {filtered.length === 0 ? (
           <div className="p-16 text-center">
             <p className="font-display font-bold text-xl text-neu-black/40">Belum ada feedback.</p>
@@ -205,7 +200,7 @@ export default function FeedbackPage() {
               </thead>
               <tbody>
                 {filtered.map((fb, idx) => (
-                  <tr key={fb.id} className="border-b-2 border-neu-black bg-neu-white hover:bg-neu-bg transition-colors">
+                  <tr key={fb.id} className="border-b-2 border-neu-black bg-neu-white hover:bg-neu-bg">
                     <td className="px-4 py-3 border-r-2 border-neu-black font-mono text-xs text-neu-black/50 text-center w-10">{idx + 1}</td>
                     <td className="px-4 py-3 border-r-2 border-neu-black font-display font-bold text-sm text-neu-black">{fb.name}</td>
                     <td className="px-4 py-3 border-r-2 border-neu-black font-mono text-xs text-neu-black/60">{fb.email}</td>
@@ -219,11 +214,11 @@ export default function FeedbackPage() {
                     <td className="px-4 py-3">
                       <div className="flex gap-2">
                         <button onClick={() => setEditTarget(fb)}
-                          className="px-2.5 py-1 bg-neu-primary border-2 border-neu-black font-display font-bold text-[10px] uppercase text-neu-black shadow-neu-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150">
+                          className="px-2.5 py-1 bg-neu-primary border-2 border-neu-black font-display font-bold text-[10px] uppercase text-neu-black shadow-neu-sm hover:shadow-none">
                           Edit
                         </button>
                         <button onClick={() => setDeleteTarget(fb)}
-                          className="px-2.5 py-1 bg-neu-white border-2 border-neu-black font-display font-bold text-[10px] uppercase text-neu-accent shadow-neu-sm hover:bg-neu-accent hover:text-neu-white hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150">
+                          className="px-2.5 py-1 bg-neu-white border-2 border-neu-black font-display font-bold text-[10px] uppercase text-neu-accent shadow-neu-sm hover:bg-neu-accent hover:text-neu-white hover:shadow-none">
                           Hapus
                         </button>
                       </div>

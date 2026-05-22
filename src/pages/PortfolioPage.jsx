@@ -1,7 +1,6 @@
 ﻿import { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
 import { portfolioService } from '../services/portfolio.service';
@@ -21,18 +20,14 @@ const CATEGORY_COLORS = {
 const categoryColor = (cat) => CATEGORY_COLORS[cat] ?? 'bg-neu-black text-neu-white';
 
 function PortfolioCard({ item, isAdmin, onEdit, onDelete, onDetail, delay }) {
-  const ref = useRef(null);
   const [imgIdx, setImgIdx] = useState(0);
 
   const imgs = item.images?.length ? item.images : (item.image ? [item.image] : []);
   const hasMultiple = imgs.length > 1;
 
-  useEffect(() => {
-    gsap.from(ref.current, { y: 30, opacity: 0, duration: 0.5, delay, ease: 'power2.out' });
-  }, [delay]);
 
   return (
-    <div ref={ref} className="bg-neu-white border-2 border-neu-black shadow-neu flex flex-col">
+    <div className="bg-neu-white border-2 border-neu-black shadow-neu flex flex-col">
       {/* Image / Carousel */}
       <div className="relative border-b-2 border-neu-black h-44 bg-neu-bg overflow-hidden">
         {imgs.length > 0 ? (
@@ -50,17 +45,17 @@ function PortfolioCard({ item, isAdmin, onEdit, onDelete, onDetail, delay }) {
         {hasMultiple && (
           <>
             <button onClick={() => setImgIdx(i => (i - 1 + imgs.length) % imgs.length)}
-              className="absolute left-1 top-1/2 -translate-y-1/2 w-6 h-6 bg-neu-white/90 border-2 border-neu-black font-mono text-xs flex items-center justify-center hover:bg-neu-primary transition-colors">
+              className="absolute left-1 top-1/2 -translate-y-1/2 w-6 h-6 bg-neu-white/90 border-2 border-neu-black font-mono text-xs flex items-center justify-center hover:bg-neu-primary">
               ←
             </button>
             <button onClick={() => setImgIdx(i => (i + 1) % imgs.length)}
-              className="absolute right-1 top-1/2 -translate-y-1/2 w-6 h-6 bg-neu-white/90 border-2 border-neu-black font-mono text-xs flex items-center justify-center hover:bg-neu-primary transition-colors">
+              className="absolute right-1 top-1/2 -translate-y-1/2 w-6 h-6 bg-neu-white/90 border-2 border-neu-black font-mono text-xs flex items-center justify-center hover:bg-neu-primary">
               →
             </button>
             <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
               {imgs.map((_, i) => (
                 <button key={i} onClick={() => setImgIdx(i)}
-                  className={cn('w-1.5 h-1.5 border border-neu-black transition-all', i === imgIdx ? 'bg-neu-primary' : 'bg-neu-white/70')} />
+                  className={cn('w-1.5 h-1.5 border border-neu-black', i === imgIdx ? 'bg-neu-primary' : 'bg-neu-white/70')} />
               ))}
             </div>
           </>
@@ -92,7 +87,7 @@ function PortfolioCard({ item, isAdmin, onEdit, onDelete, onDetail, delay }) {
           </p>
           <button
             onClick={() => onDetail(item)}
-            className="px-2.5 py-1 font-display font-bold text-[10px] uppercase tracking-wide border-2 border-neu-black bg-neu-white shadow-neu-sm hover:bg-neu-primary hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150"
+            className="px-2.5 py-1 font-display font-bold text-[10px] uppercase tracking-wide border-2 border-neu-black bg-neu-white shadow-neu-sm hover:bg-neu-primary hover:shadow-none"
           >
             Detail
           </button>
@@ -103,11 +98,11 @@ function PortfolioCard({ item, isAdmin, onEdit, onDelete, onDetail, delay }) {
       {isAdmin && (
         <div className="flex border-t-2 border-neu-black">
           <button onClick={() => onEdit(item)}
-            className="flex-1 py-2 font-display font-bold text-xs uppercase text-neu-black border-r-2 border-neu-black hover:bg-neu-primary transition-colors duration-150">
+            className="flex-1 py-2 font-display font-bold text-xs uppercase text-neu-black border-r-2 border-neu-black hover:bg-neu-primary">
             Edit
           </button>
           <button onClick={() => onDelete(item)}
-            className="flex-1 py-2 font-display font-bold text-xs uppercase text-neu-accent hover:bg-neu-accent hover:text-neu-white transition-colors duration-150">
+            className="flex-1 py-2 font-display font-bold text-xs uppercase text-neu-accent hover:bg-neu-accent hover:text-neu-white">
             Hapus
           </button>
         </div>
@@ -183,11 +178,11 @@ export default function PortfolioPage() {
       <div className="flex flex-wrap items-center gap-3 mb-6">
         <input type="text" value={search} onChange={e => setSearch(e.target.value)}
           placeholder="Cari portfolio..."
-          className="flex-1 min-w-48 px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black placeholder:text-neu-black/30 outline-none focus:shadow-neu transition-all duration-150" />
+          className="flex-1 min-w-48 px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black placeholder:text-neu-black/30 outline-none focus:shadow-neu" />
 
         {categories.length > 0 && (
           <select value={filterCat} onChange={e => setFilterCat(e.target.value)}
-            className="px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-black outline-none focus:shadow-neu transition-all duration-150 cursor-pointer">
+            className="px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-black outline-none focus:shadow-neu cursor-pointer">
             <option value="">Semua Kategori</option>
             {categories.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
@@ -195,7 +190,7 @@ export default function PortfolioPage() {
 
         {isAdmin && (
           <button onClick={() => navigate('/portfolio/new')}
-            className={cn('px-5 py-2.5 font-display font-bold text-xs uppercase tracking-wide', 'bg-neu-primary text-neu-black border-2 border-neu-black shadow-neu', 'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm', 'active:translate-x-1 active:translate-y-1 active:shadow-none whitespace-nowrap')}>
+            className={cn('px-5 py-2.5 font-display font-bold text-xs uppercase tracking-wide', 'bg-neu-primary text-neu-black border-2 border-neu-black shadow-neu', 'hover:shadow-neu-sm', 'whitespace-nowrap')}>
             + Tambah Portfolio
           </button>
         )}
@@ -216,7 +211,7 @@ export default function PortfolioPage() {
           </p>
           {isAdmin && items.length === 0 && (
             <button onClick={() => navigate('/portfolio/new')}
-              className="mt-4 px-5 py-2.5 font-display font-bold text-xs uppercase bg-neu-primary border-2 border-neu-black shadow-neu hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm transition-all duration-150">
+              className="mt-4 px-5 py-2.5 font-display font-bold text-xs uppercase bg-neu-primary border-2 border-neu-black shadow-neu hover:shadow-neu-sm">
               Tambah Portfolio Pertama
             </button>
           )}

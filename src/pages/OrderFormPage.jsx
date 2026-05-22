@@ -1,7 +1,6 @@
 ﻿import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
 import { orderService } from '../services/order.service';
@@ -29,7 +28,6 @@ export default function OrderFormPage() {
     phone:           '',
   });
   const [errors, setErrors] = useState({});
-  const formRef = useRef(null);
 
   useEffect(() => {
     const init = async () => {
@@ -55,7 +53,6 @@ export default function OrderFormPage() {
 
   useEffect(() => {
     if (!isLoading && formRef.current) {
-      gsap.from(formRef.current, { y: 30, opacity: 0, duration: 0.5, ease: 'power2.out' });
     }
   }, [isLoading]);
 
@@ -100,16 +97,16 @@ export default function OrderFormPage() {
 
   const inputCls = (hasError) => cn(
     'w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-neu-black placeholder:text-gray-400',
-    'outline-none focus:shadow-neu focus:translate-x-[-2px] focus:translate-y-[-2px] transition-all duration-150',
+    'outline-none focus:shadow-neu
     hasError && 'border-neu-accent shadow-[4px_4px_0px_#FF5C5C]',
   );
 
 
   return (
     <PageLayout user={user} title="Buat Pesanan Baru" alert={alert}>
-      <div ref={formRef} className="max-w-2xl mx-auto">
+      <div className="max-w-2xl mx-auto">
         <div className="flex items-center gap-2 mb-6 font-mono text-xs text-neu-black/50">
-          <button type="button" onClick={() => navigate('/orders')} className="hover:text-neu-black transition-colors">Orders</button>
+          <button type="button" onClick={() => navigate('/orders')} className="hover:text-neu-black">Orders</button>
           <span>/</span>
           <span className="text-neu-black">Buat Baru</span>
         </div>
@@ -126,7 +123,7 @@ export default function OrderFormPage() {
               onChange={e => setField('clientId', e.target.value)}
               className={cn(
                 'w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-neu-black',
-                'outline-none focus:shadow-neu transition-all duration-150 cursor-pointer',
+                'outline-none focus:shadow-neu cursor-pointer',
                 errors.clientId && 'border-neu-accent shadow-[4px_4px_0px_#FF5C5C]',
               )}
             >
@@ -158,7 +155,7 @@ export default function OrderFormPage() {
           <div className="flex flex-col gap-1.5">
             <label className="font-display font-bold text-sm text-neu-black uppercase tracking-wide">Paket Layanan</label>
             <select value={form.serviceCategory} onChange={e => setField('serviceCategory', e.target.value)}
-              className="px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-neu-black outline-none focus:shadow-neu transition-all duration-150 cursor-pointer">
+              className="px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-neu-black outline-none focus:shadow-neu cursor-pointer">
               <option value="">-- Pilih Paket Layanan --</option>
               {servicePackages.map(pkg => (
                 <option key={pkg.id} value={pkg.name}>
@@ -173,7 +170,7 @@ export default function OrderFormPage() {
             <label className="font-display font-bold text-sm text-neu-black uppercase tracking-wide">Deskripsi</label>
             <textarea value={form.description} onChange={e => setField('description', e.target.value)}
               rows={4} placeholder="Detail kebutuhan client..."
-              className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu focus:translate-x-[-2px] focus:translate-y-[-2px] transition-all duration-150 resize-none" />
+              className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu resize-none" />
           </div>
 
           {/* No. WhatsApp */}
@@ -206,14 +203,14 @@ export default function OrderFormPage() {
           <div className="flex items-center gap-3 pt-2">
             <button type="submit" disabled={isSaving} className={cn(
               'px-8 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase tracking-wide text-neu-black',
-              'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm active:translate-x-1 active:translate-y-1 active:shadow-none',
+              'hover:shadow-neu-sm',
               isSaving && 'opacity-60 cursor-not-allowed',
             )}>
               {isSaving ? 'Menyimpan...' : 'Buat Pesanan'}
             </button>
             <button type="button" onClick={() => navigate('/orders')} disabled={isSaving} className={cn(
               'px-6 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase tracking-wide text-neu-black',
-              'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm active:translate-x-1 active:translate-y-1 active:shadow-none',
+              'hover:shadow-neu-sm',
             )}>Batal</button>
           </div>
         </form>

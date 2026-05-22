@@ -1,8 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+﻿import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
-import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
 import { clientService } from '../services/client.service';
@@ -13,8 +12,6 @@ import { useAlert } from '../hooks/useAlert';
 
 /* ─── Edit Modal ─────────────────────────────────────────────────────────── */
 function EditClientModal({ client, onClose, onSaved }) {
-  const backdropRef = useRef(null);
-  const cardRef     = useRef(null);
   const [form, setForm] = useState({
     companyName: client.companyName ?? '',
     email:       client.email       ?? '',
@@ -26,20 +23,12 @@ function EditClientModal({ client, onClose, onSaved }) {
   const alert = useAlert();
 
   useEffect(() => {
-    gsap.fromTo(backdropRef.current, { opacity: 0 }, { opacity: 1, duration: 0.2 });
-    gsap.fromTo(cardRef.current,
-      { y: -30, opacity: 0, scale: 0.95 },
-      { y: 0, opacity: 1, scale: 1, duration: 0.3, ease: 'power3.out' },
-    );
     const handleKey = (e) => { if (e.key === 'Escape') handleClose(); };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
   }, []);
 
-  const handleClose = () => {
-    gsap.to(cardRef.current,     { y: -20, opacity: 0, scale: 0.95, duration: 0.2, ease: 'power2.in' });
-    gsap.to(backdropRef.current, { opacity: 0, duration: 0.2, onComplete: onClose });
-  };
+  const handleClose = onClose;
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -77,14 +66,14 @@ function EditClientModal({ client, onClose, onSaved }) {
   const inputCls = cn(
     'w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm',
     'font-body text-neu-black placeholder:text-gray-400',
-    'outline-none focus:shadow-neu focus:translate-x-[-2px] focus:translate-y-[-2px] transition-all duration-150',
+    'outline-none focus:shadow-neu
   );
 
   return createPortal(
-    <div ref={backdropRef}
+    <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/60"
       onClick={(e) => { if (e.target === e.currentTarget) handleClose(); }}>
-      <div ref={cardRef} className="w-full max-w-md bg-neu-white border-2 border-neu-black shadow-neu-xl">
+      <div className="w-full max-w-md bg-neu-white border-2 border-neu-black shadow-neu-xl">
         <div className="flex items-center justify-between px-5 py-3 border-b-2 border-neu-black bg-neu-black">
           <h3 className="font-display font-bold text-sm text-neu-white uppercase tracking-wide">Edit Data Client</h3>
           <button onClick={handleClose} className="text-neu-white/60 hover:text-neu-white font-mono text-2xl leading-none">×</button>
@@ -122,13 +111,13 @@ function EditClientModal({ client, onClose, onSaved }) {
             <button onClick={handleSave} disabled={isSaving}
               className={cn(
                 'flex-1 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black',
-                'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm',
+                'hover:shadow-neu-sm',
                 isSaving && 'opacity-60 cursor-not-allowed',
               )}>
               {isSaving ? t('common.saving') : 'Simpan'}
             </button>
             <button onClick={handleClose}
-              className="flex-1 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">
+              className="flex-1 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black hover:shadow-neu-sm">
               Batal
             </button>
           </div>
@@ -153,7 +142,7 @@ function EditClientModal({ client, onClose, onSaved }) {
               <button onClick={handleResetPassword} disabled={isSavingPw || !pwForm.newPassword}
                 className={cn(
                   'w-full py-2 bg-neu-accent border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase text-neu-white',
-                  'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm',
+                  'hover:shadow-neu-sm',
                   (isSavingPw || !pwForm.newPassword) && 'opacity-50 cursor-not-allowed',
                 )}>
                 {isSavingPw ? 'Mereset...' : 'Reset Password'}
@@ -169,16 +158,12 @@ function EditClientModal({ client, onClose, onSaved }) {
 
 /* ─── Table Row ──────────────────────────────────────────────────────────── */
 function ClientRow({ client, index, onEdit, onDelete }) {
-  const ref = useRef(null);
-  useEffect(() => {
-    gsap.from(ref.current, { x: -20, opacity: 0, duration: 0.4, delay: index * 0.04, ease: 'power2.out' });
-  }, [index]);
 
   const fmtDate = (val) => val ? new Date(val).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
   const initial = (client.fullName ?? client.companyName ?? client.email ?? '?').charAt(0).toUpperCase();
 
   return (
-    <tr ref={ref} className="border-b-2 border-neu-black bg-neu-white hover:bg-neu-bg transition-colors duration-150">
+    <tr className="border-b-2 border-neu-black bg-neu-white hover:bg-neu-bg">
       <td className="px-4 py-3 border-r-2 border-neu-black font-mono text-xs text-neu-black/50 text-center w-10">{index + 1}</td>
 
       {/* Avatar + Nama */}
@@ -211,11 +196,11 @@ function ClientRow({ client, index, onEdit, onDelete }) {
       <td className="px-4 py-3 w-36">
         <div className="flex items-center gap-2">
           <button onClick={() => onEdit(client)}
-            className="px-2.5 py-1 border-2 border-neu-black bg-neu-primary font-display font-bold text-[10px] uppercase tracking-wide text-neu-black shadow-neu-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150">
+            className="px-2.5 py-1 border-2 border-neu-black bg-neu-primary font-display font-bold text-[10px] uppercase tracking-wide text-neu-black shadow-neu-sm hover:shadow-none">
             Edit
           </button>
           <button onClick={() => onDelete(client)}
-            className="px-2.5 py-1 border-2 border-neu-black bg-neu-white font-display font-bold text-[10px] uppercase tracking-wide text-neu-accent shadow-neu-sm hover:bg-neu-accent hover:text-neu-white hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150">
+            className="px-2.5 py-1 border-2 border-neu-black bg-neu-white font-display font-bold text-[10px] uppercase tracking-wide text-neu-accent shadow-neu-sm hover:bg-neu-accent hover:text-neu-white hover:shadow-none">
             Hapus
           </button>
         </div>
@@ -238,8 +223,6 @@ export default function ClientPage() {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [isDeleting,   setIsDeleting]   = useState(false);
 
-  const headerRef = useRef(null);
-  const tableRef  = useRef(null);
 
   const load = () => clientService.getAll().then(r => setClients(r.data ?? []));
 
@@ -256,9 +239,7 @@ export default function ClientPage() {
 
   useEffect(() => {
     if (!isLoading) {
-      if (headerRef.current) gsap.from(headerRef.current, { y: -20, opacity: 0, duration: 0.4, ease: 'power2.out' });
-      if (tableRef.current)  gsap.from(tableRef.current,  { y: 20,  opacity: 0, duration: 0.5, delay: 0.1, ease: 'power2.out' });
-    }
+      if (headerRef.current)      if (tableRef.current)    }
   }, [isLoading]);
 
   const handleDelete = async () => {
@@ -304,17 +285,17 @@ export default function ClientPage() {
       />
 
       {/* Toolbar */}
-      <div ref={headerRef} className="flex flex-wrap items-center gap-3 mb-6">
+      <div className="flex flex-wrap items-center gap-3 mb-6">
         <input type="text" value={search} onChange={e => setSearch(e.target.value)}
           placeholder="Cari nama, perusahaan, atau email..."
-          className="flex-1 min-w-48 px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black placeholder:text-neu-black/30 outline-none focus:shadow-neu transition-all duration-150" />
+          className="flex-1 min-w-48 px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black placeholder:text-neu-black/30 outline-none focus:shadow-neu" />
         <span className="font-mono text-xs text-neu-black/50">
           <strong className="text-neu-black">{filtered.length}</strong> / <strong className="text-neu-black">{clients.length}</strong> client
         </span>
       </div>
 
       {/* Table */}
-      <div ref={tableRef} className="border-2 border-neu-black shadow-neu bg-neu-white overflow-hidden">
+      <div className="border-2 border-neu-black shadow-neu bg-neu-white overflow-hidden">
         {filtered.length === 0 ? (
           <div className="p-16 text-center">
             <p className="font-display font-bold text-xl text-neu-black/40">

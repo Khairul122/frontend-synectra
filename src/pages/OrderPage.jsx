@@ -1,7 +1,6 @@
 ﻿import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
 import { orderService } from '../services/order.service';
@@ -30,12 +29,10 @@ function StatusBadge({ status }) {
 }
 
 function OrderRow({ order, index, onOpen, onEdit, onDelete }) {
-  const ref = useRef(null);
-  useEffect(() => { gsap.from(ref.current, { x: -20, opacity: 0, duration: 0.4, delay: index * 0.04, ease: 'power2.out' }); }, [index]);
   const fmt     = (val) => val ? `Rp ${Number(val).toLocaleString('id-ID')}` : '—';
   const fmtDate = (val) => val ? new Date(val).toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' }) : '—';
   return (
-    <tr ref={ref} className="border-b-2 border-neu-black bg-neu-white hover:bg-neu-bg transition-colors duration-150 cursor-pointer" onClick={() => onOpen(order.id)}>
+    <tr className="border-b-2 border-neu-black bg-neu-white hover:bg-neu-bg cursor-pointer" onClick={() => onOpen(order.id)}>
       <td className="px-4 py-3 border-r-2 border-neu-black font-mono text-xs text-neu-black/50 text-center w-10">{index + 1}</td>
       <td className="px-4 py-3 border-r-2 border-neu-black">
         <p className="font-display font-bold text-sm text-neu-black">{order.title}</p>
@@ -56,7 +53,7 @@ function OrderRow({ order, index, onOpen, onEdit, onDelete }) {
             className={cn(
               'px-2.5 py-1.5 bg-neu-blue border-2 border-neu-black shadow-neu-sm',
               'font-display font-bold text-xs uppercase text-neu-white',
-              'hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150',
+              'hover:shadow-none',
             )}
           >
             Edit
@@ -66,7 +63,7 @@ function OrderRow({ order, index, onOpen, onEdit, onDelete }) {
             className={cn(
               'px-2.5 py-1.5 bg-neu-white border-2 border-neu-black shadow-neu-sm',
               'font-display font-bold text-xs uppercase text-neu-accent',
-              'hover:bg-neu-accent hover:text-neu-white hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150',
+              'hover:bg-neu-accent hover:text-neu-white hover:shadow-none',
             )}
           >
             Hapus
@@ -90,8 +87,6 @@ export default function OrderPage() {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [isDeleting,   setIsDeleting]   = useState(false);
 
-  const headerRef = useRef(null);
-  const tableRef  = useRef(null);
 
   useEffect(() => {
     authService.getMe()
@@ -108,9 +103,7 @@ export default function OrderPage() {
 
   useEffect(() => {
     if (!isLoading) {
-      if (headerRef.current) gsap.from(headerRef.current, { y: -20, opacity: 0, duration: 0.4, ease: 'power2.out' });
-      if (tableRef.current)  gsap.from(tableRef.current,  { y: 20,  opacity: 0, duration: 0.5, delay: 0.1, ease: 'power2.out' });
-    }
+      if (headerRef.current)      if (tableRef.current)    }
   }, [isLoading]);
 
   const filtered = orders.filter(o => {
@@ -147,12 +140,12 @@ export default function OrderPage() {
         confirmText="Ya, Hapus"
         confirmColor="bg-neu-accent text-neu-white"
       />
-      <div ref={headerRef} className="flex flex-wrap items-center gap-3 mb-6">
+      <div className="flex flex-wrap items-center gap-3 mb-6">
         <input type="text" value={search} onChange={e => setSearch(e.target.value)}
           placeholder={t('orders.search')}
-          className="flex-1 min-w-48 px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm placeholder:text-neu-black/30 outline-none focus:shadow-neu transition-all duration-150" />
+          className="flex-1 min-w-48 px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm placeholder:text-neu-black/30 outline-none focus:shadow-neu" />
         <select value={filter} onChange={e => setFilter(e.target.value)}
-          className="px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase outline-none focus:shadow-neu transition-all duration-150 cursor-pointer">
+          className="px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase outline-none focus:shadow-neu cursor-pointer">
           <option value="all">{t('orders.allStatus')}</option>
           {STATUS_KEYS.map(k => <option key={k} value={k}>{t(`status.${k}`, { defaultValue: k })}</option>)}
         </select>
@@ -161,7 +154,7 @@ export default function OrderPage() {
         </span>
         <button onClick={() => navigate('/orders/new')}
           className={cn('px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase tracking-wide text-neu-black whitespace-nowrap',
-            'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm active:translate-x-1 active:translate-y-1 active:shadow-none')}>
+            'hover:shadow-neu-sm')}>
           {t('orders.createOrder')}
         </button>
       </div>
@@ -180,7 +173,7 @@ export default function OrderPage() {
         })}
       </div>
 
-      <div ref={tableRef} className="border-2 border-neu-black shadow-neu bg-neu-white overflow-hidden">
+      <div className="border-2 border-neu-black shadow-neu bg-neu-white overflow-hidden">
         {filtered.length === 0 ? (
           <div className="p-16 text-center">
             <p className="font-display font-bold text-xl text-neu-black/40">
@@ -188,7 +181,7 @@ export default function OrderPage() {
             </p>
             {orders.length === 0 && (
               <button onClick={() => navigate('/orders/new')}
-                className="mt-4 px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm transition-all duration-150">
+                className="mt-4 px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase hover:shadow-neu-sm">
                 {t('orders.createFirst')}
               </button>
             )}

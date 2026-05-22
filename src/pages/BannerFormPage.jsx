@@ -1,6 +1,5 @@
 ﻿import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
 import { bannerService } from '../services/banner.service';
@@ -59,7 +58,7 @@ function ImageUploader({ value, onChange }) {
         onDragLeave={() => setIsDragging(false)}
         onDrop={handleDrop}
         className={cn(
-          'border-2 border-dashed border-neu-black p-8 text-center cursor-pointer transition-all duration-150',
+          'border-2 border-dashed border-neu-black p-8 text-center cursor-pointer',
           isDragging ? 'bg-neu-primary/20 border-solid' : 'hover:bg-neu-bg',
           isUploading && 'opacity-60 cursor-not-allowed',
         )}
@@ -72,7 +71,7 @@ function ImageUploader({ value, onChange }) {
           onChange={e => { if (e.target.files[0]) processFile(e.target.files[0]); }}
         />
         {isUploading ? (
-          <p className="font-display font-bold text-sm text-neu-black animate-pulse">Mengupload...</p>
+          <p className="font-display font-bold text-sm text-neu-black">Mengupload...</p>
         ) : (
           <>
             <svg className="w-8 h-8 mx-auto mb-2 text-neu-black/40" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
@@ -94,7 +93,7 @@ function ImageUploader({ value, onChange }) {
             className={cn(
               'absolute top-2 right-2 w-8 h-8 flex items-center justify-center',
               'bg-neu-accent border-2 border-neu-black text-neu-white font-bold text-xs',
-              'shadow-neu-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150',
+              'shadow-neu-sm hover:shadow-none',
             )}
           >
             ✕
@@ -112,12 +111,12 @@ function Toggle({ checked, onChange, label }) {
       <div
         onClick={() => onChange(!checked)}
         className={cn(
-          'w-12 h-6 border-2 border-neu-black relative transition-colors duration-150',
+          'w-12 h-6 border-2 border-neu-black relative',
           checked ? 'bg-neu-green' : 'bg-neu-black/20',
         )}
       >
         <div className={cn(
-          'absolute top-0.5 w-4 h-4 border-2 border-neu-black bg-neu-white transition-all duration-150',
+          'absolute top-0.5 w-4 h-4 border-2 border-neu-black bg-neu-white',
           checked ? 'left-[22px]' : 'left-0.5',
         )} />
       </div>
@@ -139,7 +138,6 @@ export default function BannerFormPage() {
   const [form, setForm] = useState({ title: '', titleEn: '', description: '', descriptionEn: '', image: '', isActive: true });
   const [errors, setErrors] = useState({});
 
-  const formRef = useRef(null);
 
   useEffect(() => {
     const init = async () => {
@@ -171,7 +169,6 @@ export default function BannerFormPage() {
 
   useEffect(() => {
     if (!isLoading && formRef.current) {
-      gsap.from(formRef.current, { y: 30, opacity: 0, duration: 0.5, ease: 'power2.out' });
     }
   }, [isLoading]);
 
@@ -223,12 +220,12 @@ export default function BannerFormPage() {
 
   return (
     <PageLayout user={user} title={isEditMode ? 'Edit Banner' : 'Tambah Banner'} alert={alert}>
-      <div ref={formRef} className="max-w-2xl mx-auto">
+      <div className="max-w-2xl mx-auto">
 
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 mb-6 font-mono text-xs text-neu-black/50">
           <button type="button" onClick={() => navigate('/banners')}
-            className="hover:text-neu-black transition-colors">Banner</button>
+            className="hover:text-neu-black">Banner</button>
           <span>/</span>
           <span className="text-neu-black">{isEditMode ? 'Edit' : 'Tambah Baru'}</span>
         </div>
@@ -248,8 +245,8 @@ export default function BannerFormPage() {
               className={cn(
                 'w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm',
                 'font-body text-neu-black placeholder:text-gray-400',
-                'outline-none focus:shadow-neu focus:translate-x-[-2px] focus:translate-y-[-2px]',
-                'transition-all duration-150',
+                'outline-none focus:shadow-neu
+                '',
                 errors.title && 'border-neu-accent shadow-[4px_4px_0px_#FF5C5C]',
               )}
             />
@@ -290,13 +287,13 @@ export default function BannerFormPage() {
               <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wide">Title (English)</label>
               <input type="text" value={form.titleEn} onChange={e => setField('titleEn', e.target.value)}
                 placeholder="e.g. Eid Sale Banner 2025"
-                className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu transition-all duration-150" />
+                className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu" />
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wide">Description (English)</label>
               <textarea value={form.descriptionEn} onChange={e => setField('descriptionEn', e.target.value)}
                 rows={3} placeholder="Banner description in English..."
-                className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu transition-all duration-150 resize-none" />
+                className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu resize-none" />
             </div>
           </div>
 
@@ -317,10 +314,9 @@ export default function BannerFormPage() {
               className={cn(
                 'px-8 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu',
                 'font-display font-bold text-sm uppercase tracking-wide text-neu-black',
-                'transition-all duration-150',
-                'hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm',
-                'active:translate-x-1 active:translate-y-1 active:shadow-none',
-                isSaving && 'opacity-60 cursor-not-allowed',
+                '',
+                'hover:shadow-neu-sm',
+                'isSaving && 'opacity-60 cursor-not-allowed',
               )}
             >
               {isSaving ? 'Menyimpan...' : isEditMode ? 'Simpan Perubahan' : 'Buat Banner'}
@@ -332,10 +328,9 @@ export default function BannerFormPage() {
               className={cn(
                 'px-6 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu',
                 'font-display font-bold text-sm uppercase tracking-wide text-neu-black',
-                'transition-all duration-150',
-                'hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm',
-                'active:translate-x-1 active:translate-y-1 active:shadow-none',
-              )}
+                '',
+                'hover:shadow-neu-sm',
+                ')}
             >
               Batal
             </button>

@@ -1,7 +1,6 @@
 ﻿import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
-import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
 import { bannerService } from '../services/banner.service';
@@ -13,37 +12,24 @@ const stripHtml = (html) => html?.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').
 
 /* ─── Image Preview Modal ────────────────────────────────────────────────── */
 function ImagePreviewModal({ banner, onClose }) {
-  const backdropRef = useRef(null);
-  const cardRef     = useRef(null);
 
   useEffect(() => {
-    gsap.fromTo(backdropRef.current,
-      { opacity: 0 },
-      { opacity: 1, duration: 0.2 },
-    );
-    gsap.fromTo(cardRef.current,
-      { y: -30, opacity: 0, scale: 0.95 },
-      { y: 0, opacity: 1, scale: 1, duration: 0.3, ease: 'power3.out' },
-    );
 
     const handleKey = (e) => { if (e.key === 'Escape') handleClose(); };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
   }, []);
 
-  const handleClose = () => {
-    gsap.to(cardRef.current,     { y: -20, opacity: 0, scale: 0.95, duration: 0.2, ease: 'power2.in' });
-    gsap.to(backdropRef.current, { opacity: 0, duration: 0.2, onComplete: onClose });
-  };
+  const handleClose = onClose;
 
   return createPortal(
     <div
-      ref={backdropRef}
+     
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/70"
       onClick={(e) => { if (e.target === e.currentTarget) handleClose(); }}
     >
       <div
-        ref={cardRef}
+       
         className="w-full max-w-2xl bg-neu-white border-2 border-neu-black shadow-neu-xl"
       >
         {/* Header */}
@@ -58,7 +44,7 @@ function ImagePreviewModal({ banner, onClose }) {
           </div>
           <button
             onClick={handleClose}
-            className="text-neu-white/60 hover:text-neu-white font-mono text-2xl leading-none transition-colors"
+            className="text-neu-white/60 hover:text-neu-white font-mono text-2xl leading-none"
             aria-label="Tutup"
           >
             ×
@@ -92,10 +78,9 @@ function ImagePreviewModal({ banner, onClose }) {
             className={cn(
               'px-4 py-2 bg-neu-white border-2 border-neu-black shadow-neu',
               'font-display font-bold text-xs uppercase tracking-wide text-neu-black',
-              'transition-all duration-150',
-              'hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm',
-              'active:translate-x-1 active:translate-y-1 active:shadow-none',
-            )}
+              '',
+              'hover:shadow-neu-sm',
+              ')}
           >
             Tutup
           </button>
@@ -108,16 +93,12 @@ function ImagePreviewModal({ banner, onClose }) {
 
 /* ─── Table row ──────────────────────────────────────────────────────────── */
 function BannerRow({ banner, index, onEdit, onDelete, onToggleActive, onPreview }) {
-  const ref = useRef(null);
 
-  useEffect(() => {
-    gsap.from(ref.current, { x: -20, opacity: 0, duration: 0.4, delay: index * 0.04, ease: 'power2.out' });
-  }, [index]);
 
   return (
     <tr
-      ref={ref}
-      className="border-b-2 border-neu-black bg-neu-white hover:bg-neu-bg transition-colors duration-150"
+     
+      className="border-b-2 border-neu-black bg-neu-white hover:bg-neu-bg"
     >
       {/* No */}
       <td className="px-4 py-3 border-r-2 border-neu-black font-mono text-xs text-neu-black/50 text-center w-10">
@@ -129,8 +110,8 @@ function BannerRow({ banner, index, onEdit, onDelete, onToggleActive, onPreview 
         <div
           onClick={() => banner.image && onPreview(banner)}
           className={cn(
-            'w-14 h-10 border-2 border-neu-black overflow-hidden bg-neu-bg flex-shrink-0 transition-all duration-150',
-            banner.image && 'cursor-pointer hover:border-neu-primary hover:shadow-neu-sm hover:translate-x-[-1px] hover:translate-y-[-1px]',
+            'w-14 h-10 border-2 border-neu-black overflow-hidden bg-neu-bg flex-shrink-0',
+            banner.image && 'cursor-pointer hover:border-neu-primary hover:shadow-neu-sm
           )}
           title={banner.image ? 'Klik untuk memperbesar' : undefined}
         >
@@ -188,8 +169,8 @@ function BannerRow({ banner, index, onEdit, onDelete, onToggleActive, onPreview 
             onClick={() => onToggleActive(banner)}
             title={banner.isActive ? 'Nonaktifkan' : 'Aktifkan'}
             className={cn(
-              'px-2.5 py-1 border-2 border-neu-black font-display font-bold text-[10px] uppercase tracking-wide transition-all duration-150',
-              'shadow-neu-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none',
+              'px-2.5 py-1 border-2 border-neu-black font-display font-bold text-[10px] uppercase tracking-wide',
+              'shadow-neu-sm hover:shadow-none',
               banner.isActive ? 'bg-neu-black/10 text-neu-black' : 'bg-neu-green text-neu-white',
             )}
           >
@@ -201,7 +182,7 @@ function BannerRow({ banner, index, onEdit, onDelete, onToggleActive, onPreview 
             onClick={() => onEdit(banner.id)}
             className={cn(
               'px-2.5 py-1 border-2 border-neu-black bg-neu-primary font-display font-bold text-[10px] uppercase tracking-wide text-neu-black',
-              'shadow-neu-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150',
+              'shadow-neu-sm hover:shadow-none',
             )}
           >
             Edit
@@ -212,7 +193,7 @@ function BannerRow({ banner, index, onEdit, onDelete, onToggleActive, onPreview 
             onClick={() => onDelete(banner)}
             className={cn(
               'px-2.5 py-1 border-2 border-neu-black bg-neu-white font-display font-bold text-[10px] uppercase tracking-wide text-neu-accent',
-              'shadow-neu-sm hover:bg-neu-accent hover:text-neu-white hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150',
+              'shadow-neu-sm hover:bg-neu-accent hover:text-neu-white hover:shadow-none',
             )}
           >
             Hapus
@@ -236,8 +217,6 @@ export default function BannerPage() {
   const [isDeleting,    setIsDeleting]    = useState(false);
   const [previewBanner, setPreviewBanner] = useState(null);
 
-  const headerRef = useRef(null);
-  const tableRef  = useRef(null);
 
   useEffect(() => {
     authService.getMe()
@@ -254,10 +233,8 @@ export default function BannerPage() {
 
   useEffect(() => {
     if (!isLoading && headerRef.current) {
-      gsap.from(headerRef.current, { y: -20, opacity: 0, duration: 0.4, ease: 'power2.out' });
     }
     if (!isLoading && tableRef.current) {
-      gsap.from(tableRef.current, { y: 20, opacity: 0, duration: 0.5, delay: 0.1, ease: 'power2.out' });
     }
   }, [isLoading]);
 
@@ -307,7 +284,7 @@ export default function BannerPage() {
       />
 
       {/* Header toolbar */}
-      <div ref={headerRef} className="flex flex-wrap items-center gap-3 mb-6">
+      <div className="flex flex-wrap items-center gap-3 mb-6">
         {/* Search */}
         <input
           type="text"
@@ -317,7 +294,7 @@ export default function BannerPage() {
           className={cn(
             'flex-1 min-w-48 px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm',
             'font-body text-sm text-neu-black placeholder:text-neu-black/30',
-            'outline-none focus:shadow-neu transition-all duration-150',
+            'outline-none focus:shadow-neu',
           )}
         />
 
@@ -333,17 +310,16 @@ export default function BannerPage() {
           className={cn(
             'px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu',
             'font-display font-bold text-xs uppercase tracking-wide text-neu-black',
-            'transition-all duration-150 whitespace-nowrap',
-            'hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm',
-            'active:translate-x-1 active:translate-y-1 active:shadow-none',
-          )}
+            'whitespace-nowrap',
+            'hover:shadow-neu-sm',
+            ')}
         >
           + Tambah Banner
         </button>
       </div>
 
       {/* Table */}
-      <div ref={tableRef} className="border-2 border-neu-black shadow-neu bg-neu-white overflow-hidden">
+      <div className="border-2 border-neu-black shadow-neu bg-neu-white overflow-hidden">
         {filtered.length === 0 ? (
           <div className="p-16 text-center border-t-2 border-neu-black">
             <p className="font-display font-bold text-xl text-neu-black/40">
@@ -354,7 +330,7 @@ export default function BannerPage() {
                 onClick={() => navigate('/banners/new')}
                 className={cn(
                   'mt-4 px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu',
-                  'font-display font-bold text-xs uppercase hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm transition-all duration-150',
+                  'font-display font-bold text-xs uppercase hover:shadow-neu-sm',
                 )}
               >
                 Tambah Banner Pertama

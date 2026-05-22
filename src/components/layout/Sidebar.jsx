@@ -1,7 +1,5 @@
-import { useRef, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+﻿import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { gsap } from 'gsap';
 import { cn } from '../../utils/cn';
 import { LanguageSwitcher } from '../ui/LanguageSwitcher';
 
@@ -177,16 +175,7 @@ const NAV_ITEMS = [
 
 export function Sidebar({ user, isOpen, onClose }) {
   const location   = useLocation();
-  const sidebarRef = useRef(null);
   const { t }      = useTranslation();
-
-  useEffect(() => {
-    const mq = window.matchMedia('(min-width: 1024px)');
-    if (mq.matches && sidebarRef.current) {
-      gsap.set(sidebarRef.current, { clearProps: 'transform' });
-      gsap.from(sidebarRef.current, { opacity: 0, duration: 0.4, ease: 'power3.out' });
-    }
-  }, []);
 
   const handleNavClick = () => { if (onClose) onClose(); };
 
@@ -196,16 +185,14 @@ export function Sidebar({ user, isOpen, onClose }) {
       <div
         onClick={onClose}
         className={cn(
-          'fixed inset-0 z-30 bg-neu-black/50 lg:hidden transition-opacity duration-300',
+          'fixed inset-0 z-30 bg-neu-black/50 lg:hidden',
           isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none',
         )}
       />
 
       <aside
-        ref={sidebarRef}
         className={cn(
           'fixed left-0 top-0 h-screen w-64 bg-neu-white border-r-2 border-neu-black flex flex-col z-40',
-          'transition-transform duration-300 ease-in-out',
           'lg:translate-x-0',
           isOpen ? 'translate-x-0' : '-translate-x-full',
         )}
@@ -217,7 +204,7 @@ export function Sidebar({ user, isOpen, onClose }) {
               className="h-10 w-auto max-w-[110px] border-2 border-neu-black object-contain shadow-neu-sm flex-shrink-0" />
             <h2 className="font-display font-bold text-sm text-neu-black/60 uppercase tracking-widest leading-tight">{t('admin.panel')}</h2>
           </div>
-          <button onClick={onClose} className="lg:hidden w-8 h-8 flex items-center justify-center border-2 border-neu-black hover:bg-neu-bg transition-colors">
+          <button onClick={onClose} className="lg:hidden w-8 h-8 flex items-center justify-center border-2 border-neu-black hover:bg-neu-bg">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
               <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
             </svg>
@@ -231,7 +218,7 @@ export function Sidebar({ user, isOpen, onClose }) {
             return (
               <Link key={item.path} to={item.path} onClick={handleNavClick}
                 className={cn(
-                  'flex items-center gap-3 px-4 py-3 font-display font-bold text-sm uppercase tracking-wide border-2 transition-all duration-150',
+                  'flex items-center gap-3 px-4 py-3 font-display font-bold text-sm uppercase tracking-wide border-2',
                   active
                     ? 'bg-neu-primary border-neu-black shadow-neu text-neu-black'
                     : 'border-transparent text-neu-black/60 hover:bg-neu-bg hover:border-neu-black hover:text-neu-black',

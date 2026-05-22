@@ -2,7 +2,6 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
-import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
 import { orderService } from '../services/order.service';
@@ -51,32 +50,22 @@ async function uploadFile(file, bucket) {
 
 /* ─── Progress Detail Modal ──────────────────────────────────────────────── */
 function ProgressDetailModal({ report, onClose, onViewImage }) {
-  const backdropRef = useRef(null);
-  const cardRef     = useRef(null);
 
   useEffect(() => {
-    gsap.fromTo(backdropRef.current, { opacity: 0 }, { opacity: 1, duration: 0.2 });
-    gsap.fromTo(cardRef.current,
-      { y: -30, opacity: 0, scale: 0.95 },
-      { y: 0, opacity: 1, scale: 1, duration: 0.3, ease: 'power3.out' },
-    );
     const handleKey = (e) => { if (e.key === 'Escape') handleClose(); };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
   }, []);
 
-  const handleClose = () => {
-    gsap.to(cardRef.current,     { y: -20, opacity: 0, scale: 0.95, duration: 0.2, ease: 'power2.in' });
-    gsap.to(backdropRef.current, { opacity: 0, duration: 0.2, onComplete: onClose });
-  };
+  const handleClose = onClose;
 
   const fmtDT = (val) => val ? new Date(val).toLocaleString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—';
 
   return createPortal(
-    <div ref={backdropRef}
+    <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/70"
       onClick={(e) => { if (e.target === e.currentTarget) handleClose(); }}>
-      <div ref={cardRef} className="w-full max-w-lg bg-neu-white border-2 border-neu-black shadow-neu-xl">
+      <div className="w-full max-w-lg bg-neu-white border-2 border-neu-black shadow-neu-xl">
 
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-3 border-b-2 border-neu-black bg-neu-blue">
@@ -99,7 +88,7 @@ function ProgressDetailModal({ report, onClose, onViewImage }) {
               <span className="font-display font-bold text-2xl text-neu-blue">{report.progressPercentage}%</span>
             </div>
             <div className="h-4 border-2 border-neu-black bg-neu-bg overflow-hidden">
-              <div className="h-full bg-neu-blue transition-all duration-500" style={{ width: `${report.progressPercentage}%` }} />
+              <div className="h-full bg-neu-blue" style={{ width: `${report.progressPercentage}%` }} />
             </div>
           </div>
 
@@ -129,8 +118,8 @@ function ProgressDetailModal({ report, onClose, onViewImage }) {
                 onClick={() => { handleClose(); setTimeout(() => onViewImage(report.attachmentUrl, report.title), 300); }}
                 className="relative w-full border-2 border-neu-black overflow-hidden group">
                 <img src={report.attachmentUrl} alt="screenshot" className="w-full max-h-48 object-cover" />
-                <div className="absolute inset-0 bg-neu-black/0 group-hover:bg-neu-black/30 transition-all duration-150 flex items-center justify-center">
-                  <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-150 font-display font-bold text-xs text-neu-white bg-neu-black/80 px-3 py-1.5 border border-neu-white/30">
+                <div className="absolute inset-0 bg-neu-black/0 group-hover:bg-neu-black/30 flex items-center justify-center">
+                  <span className="opacity-0 group-hover:opacity-100 font-display font-bold text-xs text-neu-white bg-neu-black/80 px-3 py-1.5 border border-neu-white/30">
                     Klik untuk memperbesar
                   </span>
                 </div>
@@ -147,7 +136,7 @@ function ProgressDetailModal({ report, onClose, onViewImage }) {
           <button onClick={handleClose} className={cn(
             'w-full py-2.5 bg-neu-white border-2 border-neu-black shadow-neu',
             'font-display font-bold text-sm uppercase tracking-wide text-neu-black',
-            'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm',
+            'hover:shadow-neu-sm',
           )}>Tutup</button>
         </div>
       </div>
@@ -158,30 +147,20 @@ function ProgressDetailModal({ report, onClose, onViewImage }) {
 
 /* ─── Generic Image Modal ────────────────────────────────────────────────── */
 function ImageModal({ src, caption, onClose }) {
-  const backdropRef = useRef(null);
-  const cardRef     = useRef(null);
 
   useEffect(() => {
-    gsap.fromTo(backdropRef.current, { opacity: 0 }, { opacity: 1, duration: 0.2 });
-    gsap.fromTo(cardRef.current,
-      { y: -30, opacity: 0, scale: 0.95 },
-      { y: 0, opacity: 1, scale: 1, duration: 0.3, ease: 'power3.out' },
-    );
     const handleKey = (e) => { if (e.key === 'Escape') handleClose(); };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
   }, []);
 
-  const handleClose = () => {
-    gsap.to(cardRef.current,     { y: -20, opacity: 0, scale: 0.95, duration: 0.2, ease: 'power2.in' });
-    gsap.to(backdropRef.current, { opacity: 0, duration: 0.2, onComplete: onClose });
-  };
+  const handleClose = onClose;
 
   return createPortal(
-    <div ref={backdropRef}
+    <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/80"
       onClick={(e) => { if (e.target === e.currentTarget) handleClose(); }}>
-      <div ref={cardRef} className="w-full max-w-2xl bg-neu-white border-2 border-neu-black shadow-neu-xl">
+      <div className="w-full max-w-2xl bg-neu-white border-2 border-neu-black shadow-neu-xl">
         <div className="flex items-center justify-between px-5 py-3 border-b-2 border-neu-black bg-neu-black">
           <p className="font-display font-bold text-sm text-neu-white truncate">{caption}</p>
           <button onClick={handleClose} className="text-neu-white/60 hover:text-neu-white font-mono text-2xl leading-none ml-4">×</button>
@@ -192,7 +171,7 @@ function ImageModal({ src, caption, onClose }) {
         <div className="px-5 py-3 flex justify-end">
           <button onClick={handleClose} className={cn(
             'px-5 py-2 bg-neu-black border-2 border-neu-black font-display font-bold text-xs uppercase text-neu-white',
-            'shadow-neu-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150',
+            'shadow-neu-sm hover:shadow-none',
           )}>Tutup</button>
         </div>
       </div>
@@ -203,24 +182,14 @@ function ImageModal({ src, caption, onClose }) {
 
 /* ─── Receipt Preview Modal ──────────────────────────────────────────────── */
 function ReceiptPreviewModal({ payment, onClose }) {
-  const backdropRef = useRef(null);
-  const cardRef     = useRef(null);
 
   useEffect(() => {
-    gsap.fromTo(backdropRef.current, { opacity: 0 }, { opacity: 1, duration: 0.2 });
-    gsap.fromTo(cardRef.current,
-      { y: -30, opacity: 0, scale: 0.95 },
-      { y: 0, opacity: 1, scale: 1, duration: 0.3, ease: 'power3.out' },
-    );
     const handleKey = (e) => { if (e.key === 'Escape') handleClose(); };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
   }, []);
 
-  const handleClose = () => {
-    gsap.to(cardRef.current,     { y: -20, opacity: 0, scale: 0.95, duration: 0.2, ease: 'power2.in' });
-    gsap.to(backdropRef.current, { opacity: 0, duration: 0.2, onComplete: onClose });
-  };
+  const handleClose = onClose;
 
   const PAYMENT_LABEL = { dp: 'Down Payment (DP)', termin_1: 'Termin', pelunasan: 'Pelunasan' };
   const STATUS_LABEL  = { pending_verification: 'Menunggu Verifikasi', verified: 'Terverifikasi', rejected: 'Ditolak' };
@@ -230,10 +199,10 @@ function ReceiptPreviewModal({ payment, onClose }) {
   const fmtDT = (val) => val ? new Date(val).toLocaleString('id-ID', { day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '—';
 
   return createPortal(
-    <div ref={backdropRef}
+    <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/70"
       onClick={(e) => { if (e.target === e.currentTarget) handleClose(); }}>
-      <div ref={cardRef} className="w-full max-w-lg bg-neu-white border-2 border-neu-black shadow-neu-xl">
+      <div className="w-full max-w-lg bg-neu-white border-2 border-neu-black shadow-neu-xl">
 
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-3 border-b-2 border-neu-black bg-neu-black">
@@ -246,7 +215,7 @@ function ReceiptPreviewModal({ payment, onClose }) {
             </h3>
           </div>
           <button onClick={handleClose}
-            className="text-neu-white/60 hover:text-neu-white font-mono text-2xl leading-none transition-colors">
+            className="text-neu-white/60 hover:text-neu-white font-mono text-2xl leading-none">
             ×
           </button>
         </div>
@@ -280,7 +249,7 @@ function ReceiptPreviewModal({ payment, onClose }) {
               <button onClick={handleClose} className={cn(
                 'px-3 py-1.5 bg-neu-black border-2 border-neu-black shadow-neu-sm',
                 'font-display font-bold text-xs uppercase text-neu-white',
-                'hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150',
+                'hover:shadow-none',
               )}>
                 Tutup
               </button>
@@ -313,7 +282,7 @@ function ScreenshotUploader({ value, isUploading, onFile, onClear }) {
         onDragLeave={() => setIsDragging(false)}
         onDrop={handleDrop}
         className={cn(
-          'border-2 border-dashed border-neu-black p-5 text-center cursor-pointer transition-all duration-150',
+          'border-2 border-dashed border-neu-black p-5 text-center cursor-pointer',
           isDragging ? 'bg-neu-primary/20 border-solid' : 'hover:bg-neu-bg',
           isUploading && 'opacity-60 cursor-not-allowed',
         )}
@@ -322,10 +291,10 @@ function ScreenshotUploader({ value, isUploading, onFile, onClear }) {
           onChange={e => { if (e.target.files[0]) onFile(e.target.files[0]); }} />
         {isUploading ? (
           <div className="flex flex-col items-center gap-2">
-            <svg className="w-7 h-7 text-neu-black/40 animate-spin" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <svg className="w-7 h-7 text-neu-black/40" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <circle cx="12" cy="12" r="10" strokeDasharray="60" strokeDashoffset="20" />
             </svg>
-            <p className="font-display font-bold text-sm text-neu-black animate-pulse">Mengupload screenshot...</p>
+            <p className="font-display font-bold text-sm text-neu-black">Mengupload screenshot...</p>
           </div>
         ) : (
           <>
@@ -343,7 +312,7 @@ function ScreenshotUploader({ value, isUploading, onFile, onClear }) {
         <div className="relative border-2 border-neu-black overflow-hidden">
           <img src={value} alt="Screenshot preview" className="w-full max-h-40 object-cover" />
           <button type="button" onClick={onClear}
-            className="absolute top-2 right-2 w-7 h-7 flex items-center justify-center bg-neu-accent border-2 border-neu-black text-neu-white text-xs font-bold shadow-neu-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150">
+            className="absolute top-2 right-2 w-7 h-7 flex items-center justify-center bg-neu-accent border-2 border-neu-black text-neu-white text-xs font-bold shadow-neu-sm hover:shadow-none">
             ✕
           </button>
           <div className="absolute bottom-0 left-0 right-0 bg-neu-green/90 px-3 py-1 flex items-center gap-1.5">
@@ -398,13 +367,13 @@ function ProgressModal({ orderId, onClose, onAdded }) {
             <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wide">Judul Update *</label>
             <input type="text" value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))}
               placeholder="Contoh: Selesai fitur Login"
-              className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu transition-all duration-150" />
+              className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu" />
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wide">Deskripsi</label>
             <textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))}
               rows={3} placeholder="Detail progress..."
-              className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu transition-all duration-150 resize-none" />
+              className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu resize-none" />
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wide">
@@ -414,7 +383,7 @@ function ProgressModal({ orderId, onClose, onAdded }) {
               onChange={e => setForm(p => ({ ...p, progressPercentage: e.target.value }))}
               className="w-full accent-neu-primary" />
             <div className="h-3 border-2 border-neu-black bg-neu-bg overflow-hidden">
-              <div className="h-full bg-neu-primary transition-all duration-300" style={{ width: `${form.progressPercentage}%` }} />
+              <div className="h-full bg-neu-primary" style={{ width: `${form.progressPercentage}%` }} />
             </div>
           </div>
           <div className="flex flex-col gap-1.5">
@@ -444,10 +413,10 @@ function ProgressModal({ orderId, onClose, onAdded }) {
         <div className="px-5 pb-5 flex gap-3">
           <button onClick={handleSubmit} disabled={isSaving || !form.title.trim()} className={cn(
             'flex-1 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black',
-            'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm',
+            'hover:shadow-neu-sm',
             (isSaving || !form.title.trim()) && 'opacity-50 cursor-not-allowed',
           )}>{isSaving ? 'Menyimpan...' : 'Simpan Progress'}</button>
-          <button onClick={onClose} className="flex-1 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">Batal</button>
+          <button onClick={onClose} className="flex-1 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black hover:shadow-neu-sm">Batal</button>
         </div>
       </div>
     </div>
@@ -482,15 +451,15 @@ function RejectModal({ paymentId, onClose, onRejected }) {
           <label className="font-display font-bold text-xs text-neu-black uppercase mb-2 block">Alasan Penolakan *</label>
           <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={3}
             placeholder="Contoh: Jumlah transfer tidak sesuai"
-            className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black outline-none focus:shadow-neu transition-all duration-150 resize-none" />
+            className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black outline-none focus:shadow-neu resize-none" />
         </div>
         <div className="px-5 pb-5 flex gap-3">
           <button onClick={handleSubmit} disabled={isSaving || !notes.trim()} className={cn(
             'flex-1 py-2.5 bg-neu-accent border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-white',
-            'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm',
+            'hover:shadow-neu-sm',
             (isSaving || !notes.trim()) && 'opacity-50 cursor-not-allowed',
           )}>{isSaving ? t('common.saving') : 'Tolak'}</button>
-          <button onClick={onClose} className="flex-1 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">Batal</button>
+          <button onClick={onClose} className="flex-1 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black hover:shadow-neu-sm">Batal</button>
         </div>
       </div>
     </div>
@@ -499,8 +468,6 @@ function RejectModal({ paymentId, onClose, onRejected }) {
 
 /* ─── Add Payment Modal (Admin) ─────────────────────────────────────────── */
 function AddPaymentModal({ orderId, onClose, onAdded, alert }) {
-  const backdropRef = useRef(null);
-  const cardRef     = useRef(null);
   const [form, setForm] = useState({
     paymentType:     'dp',
     amount:          '',
@@ -513,20 +480,12 @@ function AddPaymentModal({ orderId, onClose, onAdded, alert }) {
   const [autoVerify,  setAutoVerify]  = useState(true);
 
   useEffect(() => {
-    gsap.fromTo(backdropRef.current, { opacity: 0 }, { opacity: 1, duration: 0.2 });
-    gsap.fromTo(cardRef.current,
-      { y: -30, opacity: 0, scale: 0.95 },
-      { y: 0, opacity: 1, scale: 1, duration: 0.3, ease: 'power3.out' },
-    );
     const handleKey = (e) => { if (e.key === 'Escape') handleClose(); };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
   }, []);
 
-  const handleClose = () => {
-    gsap.to(cardRef.current,     { y: -20, opacity: 0, scale: 0.95, duration: 0.2, ease: 'power2.in' });
-    gsap.to(backdropRef.current, { opacity: 0, duration: 0.2, onComplete: onClose });
-  };
+  const handleClose = onClose;
 
   const handleFile = async (file) => {
     if (!file.type.startsWith('image/')) { alert.error('File harus berupa gambar.'); return; }
@@ -575,10 +534,10 @@ function AddPaymentModal({ orderId, onClose, onAdded, alert }) {
   const isValid = form.amount && Number(form.amount) > 0;
 
   return createPortal(
-    <div ref={backdropRef}
+    <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/70"
       onClick={(e) => { if (e.target === e.currentTarget) handleClose(); }}>
-      <div ref={cardRef} className="w-full max-w-lg bg-neu-white border-2 border-neu-black shadow-neu-xl">
+      <div className="w-full max-w-lg bg-neu-white border-2 border-neu-black shadow-neu-xl">
 
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-3 border-b-2 border-neu-black bg-neu-green">
@@ -598,7 +557,7 @@ function AddPaymentModal({ orderId, onClose, onAdded, alert }) {
           <div className="flex flex-col gap-1.5">
             <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wide">Jenis Pembayaran *</label>
             <select value={form.paymentType} onChange={e => setForm(p => ({ ...p, paymentType: e.target.value }))}
-              className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black outline-none focus:shadow-neu transition-all duration-150 cursor-pointer">
+              className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black outline-none focus:shadow-neu cursor-pointer">
               <option value="dp">Down Payment (DP)</option>
               <option value="termin_1">Termin</option>
               <option value="pelunasan">Pelunasan</option>
@@ -611,7 +570,7 @@ function AddPaymentModal({ orderId, onClose, onAdded, alert }) {
             <input type="number" min="1" value={form.amount}
               onChange={e => setForm(p => ({ ...p, amount: e.target.value }))}
               placeholder="Contoh: 750000"
-              className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu transition-all duration-150" />
+              className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu" />
           </div>
 
           {/* No. Referensi */}
@@ -620,7 +579,7 @@ function AddPaymentModal({ orderId, onClose, onAdded, alert }) {
             <input type="text" value={form.paymentNumber}
               onChange={e => setForm(p => ({ ...p, paymentNumber: e.target.value }))}
               placeholder="Contoh: TRF-001 atau nomor bukti transfer"
-              className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu transition-all duration-150" />
+              className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu" />
           </div>
 
           {/* Upload Bukti */}
@@ -639,7 +598,7 @@ function AddPaymentModal({ orderId, onClose, onAdded, alert }) {
             <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wide">Catatan <span className="font-mono text-neu-black/40 normal-case">(opsional)</span></label>
             <textarea value={form.notes} onChange={e => setForm(p => ({ ...p, notes: e.target.value }))}
               rows={2} placeholder="Catatan tambahan..."
-              className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu transition-all duration-150 resize-none" />
+              className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu resize-none" />
           </div>
 
           {/* Auto-verify toggle */}
@@ -660,13 +619,13 @@ function AddPaymentModal({ orderId, onClose, onAdded, alert }) {
           <button onClick={handleSubmit} disabled={isSaving || !isValid || isUploading}
             className={cn(
               'flex-1 py-2.5 bg-neu-green border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-white',
-              'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm',
+              'hover:shadow-neu-sm',
               (isSaving || !isValid || isUploading) && 'opacity-50 cursor-not-allowed',
             )}>
             {isSaving ? 'Menyimpan...' : 'Catat Pembayaran'}
           </button>
           <button onClick={handleClose}
-            className="flex-1 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">
+            className="flex-1 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black hover:shadow-neu-sm">
             Batal
           </button>
         </div>
@@ -678,28 +637,21 @@ function AddPaymentModal({ orderId, onClose, onAdded, alert }) {
 
 /* ─── Revision Detail Modal ──────────────────────────────────────────────── */
 function RevisionDetailModal({ batch, batchIndex, onClose, onViewImage }) {
-  const backdropRef = useRef(null);
-  const cardRef     = useRef(null);
 
   useEffect(() => {
-    gsap.fromTo(backdropRef.current, { opacity: 0 }, { opacity: 1, duration: 0.2 });
-    gsap.fromTo(cardRef.current, { y: -30, opacity: 0, scale: 0.95 }, { y: 0, opacity: 1, scale: 1, duration: 0.3, ease: 'power3.out' });
     const onKey = (e) => { if (e.key === 'Escape') handleClose(); };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, []);
 
-  const handleClose = () => {
-    gsap.to(cardRef.current,     { y: -20, opacity: 0, scale: 0.95, duration: 0.2, ease: 'power2.in' });
-    gsap.to(backdropRef.current, { opacity: 0, duration: 0.2, onComplete: onClose });
-  };
+  const handleClose = onClose;
 
   const fmtDT = (val) => new Date(val).toLocaleString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 
   return createPortal(
-    <div ref={backdropRef} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/70"
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/70"
       onClick={e => { if (e.target === e.currentTarget) handleClose(); }}>
-      <div ref={cardRef} className="w-full max-w-lg bg-neu-white border-2 border-neu-black shadow-neu-xl flex flex-col max-h-[85vh]">
+      <div className="w-full max-w-lg bg-neu-white border-2 border-neu-black shadow-neu-xl flex flex-col max-h-[85vh]">
 
         <div className="flex items-center justify-between px-5 py-4 border-b-2 border-neu-black bg-[#F97316] flex-shrink-0">
           <div className="flex items-center gap-2">
@@ -730,9 +682,9 @@ function RevisionDetailModal({ batch, batchIndex, onClose, onViewImage }) {
                   {item.images.map((url, imgIdx) => (
                     <button key={imgIdx} type="button"
                       onClick={() => { handleClose(); setTimeout(() => onViewImage(url, `Revisi #${batchIndex + 1} Poin ${idx + 1}`), 300); }}
-                      className="relative w-20 h-16 border-2 border-neu-black overflow-hidden group hover:border-[#F97316] hover:shadow-neu-sm hover:translate-x-[-1px] hover:translate-y-[-1px] transition-all duration-150">
+                      className="relative w-20 h-16 border-2 border-neu-black overflow-hidden group hover:border-[#F97316] hover:shadow-neu-sm
                       <img src={url} alt="" className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-neu-black/0 group-hover:bg-neu-black/25 transition-all duration-150 flex items-center justify-center">
+                      <div className="absolute inset-0 bg-neu-black/0 group-hover:bg-neu-black/25 flex items-center justify-center">
                         <span className="opacity-0 group-hover:opacity-100 font-mono text-[9px] text-neu-white bg-neu-black/70 px-1.5 py-0.5">Perbesar</span>
                       </div>
                     </button>
@@ -745,7 +697,7 @@ function RevisionDetailModal({ batch, batchIndex, onClose, onViewImage }) {
 
         <div className="px-5 py-4 border-t-2 border-neu-black flex-shrink-0">
           <button onClick={handleClose}
-            className="w-full py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">
+            className="w-full py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black hover:shadow-neu-sm">
             Tutup
           </button>
         </div>
@@ -780,7 +732,6 @@ export default function OrderDetailPage() {
   const [priceForm,     setPriceForm]     = useState({ totalPrice: '', deadline: '' });
   const [isSavingPrice, setIsSavingPrice] = useState(false);
 
-  const pageRef = useRef(null);
 
   const loadOrder = async () => {
     const res = await orderService.getDetail(id);
@@ -802,7 +753,6 @@ export default function OrderDetailPage() {
 
   useEffect(() => {
     if (!isLoading && pageRef.current) {
-      gsap.from(pageRef.current, { y: 20, opacity: 0, duration: 0.5, ease: 'power2.out' });
     }
   }, [isLoading]);
 
@@ -893,7 +843,7 @@ export default function OrderDetailPage() {
         confirmColor="bg-neu-green text-neu-white"
       />
 
-      <div ref={pageRef} className="max-w-4xl mx-auto space-y-6">
+      <div className="max-w-4xl mx-auto space-y-6">
 
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 font-mono text-xs text-neu-black/50">
@@ -929,7 +879,7 @@ export default function OrderDetailPage() {
               <button onClick={openPriceForm}
                 className={cn(
                   'px-3 py-2 bg-neu-primary border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-black',
-                  'hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150',
+                  'hover:shadow-none',
                 )}>
                 {order.totalPrice ? 'Edit Harga' : '+ Tetapkan Harga'}
               </button>
@@ -975,7 +925,7 @@ export default function OrderDetailPage() {
                     {order.progressReports[order.progressReports.length - 1].progressPercentage}%
                   </p>
                   <div className="h-2 border border-neu-black bg-neu-bg mt-1">
-                    <div className="h-full bg-neu-blue transition-all duration-300"
+                    <div className="h-full bg-neu-blue"
                       style={{ width: `${order.progressReports[order.progressReports.length - 1].progressPercentage}%` }} />
                   </div>
                 </div>
@@ -999,26 +949,26 @@ export default function OrderDetailPage() {
                 <input type="number" value={priceForm.totalPrice}
                   onChange={e => setPriceForm(p => ({ ...p, totalPrice: e.target.value }))}
                   placeholder="Contoh: 1500000"
-                  className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-neu-black outline-none focus:shadow-neu transition-all duration-150" />
+                  className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-neu-black outline-none focus:shadow-neu" />
               </div>
               <div className="flex flex-col gap-1.5">
                 <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wide">Deadline</label>
                 <input type="datetime-local" value={priceForm.deadline}
                   onChange={e => setPriceForm(p => ({ ...p, deadline: e.target.value }))}
-                  className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-neu-black outline-none focus:shadow-neu transition-all duration-150" />
+                  className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-neu-black outline-none focus:shadow-neu" />
               </div>
             </div>
             <div className="flex gap-3">
               <button onClick={handleSavePrice} disabled={isSavingPrice}
                 className={cn(
                   'px-6 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black',
-                  'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm',
+                  'hover:shadow-neu-sm',
                   isSavingPrice && 'opacity-60 cursor-not-allowed',
                 )}>
                 {isSavingPrice ? t('common.saving') : 'Simpan'}
               </button>
               <button onClick={() => setShowPriceForm(false)}
-                className="px-6 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">
+                className="px-6 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black hover:shadow-neu-sm">
                 Batal
               </button>
             </div>
@@ -1034,7 +984,7 @@ export default function OrderDetailPage() {
             <button onClick={() => setShowAddPayment(true)}
               className={cn(
                 'px-4 py-2 bg-neu-green border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-white',
-                'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none',
+                'hover:shadow-none',
               )}>
               + Catat Pembayaran
             </button>
@@ -1053,7 +1003,7 @@ export default function OrderDetailPage() {
                       title="Klik untuk memperbesar"
                       className={cn(
                         'flex-shrink-0 w-16 h-12 border-2 border-neu-black overflow-hidden bg-neu-bg',
-                        'hover:border-neu-primary hover:shadow-neu-sm hover:translate-x-[-1px] hover:translate-y-[-1px] transition-all duration-150',
+                        'hover:border-neu-primary hover:shadow-neu-sm
                       )}
                     >
                       <img src={p.receiptImageUrl} alt="receipt" className="w-full h-full object-cover" />
@@ -1083,11 +1033,11 @@ export default function OrderDetailPage() {
                   {p.status === 'pending_verification' && (
                     <div className="flex gap-2 flex-shrink-0">
                       <button onClick={() => setVerifyTarget(p)}
-                        className="px-3 py-1.5 bg-neu-green border-2 border-neu-black font-display font-bold text-xs uppercase text-neu-white shadow-neu-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150">
+                        className="px-3 py-1.5 bg-neu-green border-2 border-neu-black font-display font-bold text-xs uppercase text-neu-white shadow-neu-sm hover:shadow-none">
                         Verifikasi
                       </button>
                       <button onClick={() => setRejectPaymentId(p.id)}
-                        className="px-3 py-1.5 bg-neu-white border-2 border-neu-black font-display font-bold text-xs uppercase text-neu-accent shadow-neu-sm hover:bg-neu-accent hover:text-neu-white hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150">
+                        className="px-3 py-1.5 bg-neu-white border-2 border-neu-black font-display font-bold text-xs uppercase text-neu-accent shadow-neu-sm hover:bg-neu-accent hover:text-neu-white hover:shadow-none">
                         Tolak
                       </button>
                     </div>
@@ -1106,7 +1056,7 @@ export default function OrderDetailPage() {
             </h3>
             <button onClick={() => setShowProgress(true)}
               className={cn('px-4 py-2 bg-neu-blue border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-white',
-                'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none')}>
+                'hover:shadow-none')}>
               + Update Progress
             </button>
           </div>
@@ -1135,7 +1085,7 @@ export default function OrderDetailPage() {
                     )}
                     <p className="font-mono text-xs text-neu-black/40 mt-1">{fmtDateTime(r.reportedAt)}</p>
                     <div className="h-1.5 border border-neu-black bg-neu-bg mt-2">
-                      <div className="h-full bg-neu-blue transition-all duration-300" style={{ width: `${r.progressPercentage}%` }} />
+                      <div className="h-full bg-neu-blue" style={{ width: `${r.progressPercentage}%` }} />
                     </div>
                   </div>
                   <div className="flex flex-col items-end gap-2 flex-shrink-0">
@@ -1150,7 +1100,7 @@ export default function OrderDetailPage() {
                       className={cn(
                         'px-3 py-1.5 bg-neu-blue border-2 border-neu-black shadow-neu-sm',
                         'font-display font-bold text-xs uppercase tracking-wide text-neu-white whitespace-nowrap',
-                        'transition-all duration-150 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none',
+                        'hover:shadow-none',
                       )}
                     >
                       Lihat Detail
@@ -1196,7 +1146,7 @@ export default function OrderDetailPage() {
                     </div>
                   </div>
                   <button onClick={() => setRevisionDetailTarget({ batch, index: batchIdx })}
-                    className="px-3 py-1.5 bg-[#F97316] border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-white hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150 whitespace-nowrap flex-shrink-0">
+                    className="px-3 py-1.5 bg-[#F97316] border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-white hover:shadow-none whitespace-nowrap flex-shrink-0">
                     Lihat Detail
                   </button>
                 </div>

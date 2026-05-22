@@ -2,7 +2,6 @@
 import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
 import { softwareProductService } from '../services/softwareProduct.service';
@@ -61,7 +60,7 @@ function SoftwareDetailModal({ sw, isPurchased, onClose, onBuy }) {
               </span>
             )}
             <button onClick={onClose}
-              className="ml-auto w-7 h-7 flex items-center justify-center bg-neu-white border-2 border-neu-black text-neu-black font-bold text-xs shadow-neu-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150">
+              className="ml-auto w-7 h-7 flex items-center justify-center bg-neu-white border-2 border-neu-black text-neu-black font-bold text-xs shadow-neu-sm hover:shadow-none">
               ✕
             </button>
           </div>
@@ -119,12 +118,12 @@ function SoftwareDetailModal({ sw, isPurchased, onClose, onBuy }) {
         <div className="flex gap-2 px-5 py-4 border-t-2 border-neu-black flex-shrink-0">
           {sw.demoUrl && (
             <a href={sw.demoUrl} target="_blank" rel="noopener noreferrer"
-              className="flex-1 py-2.5 border-2 border-neu-black bg-neu-white font-display font-bold text-xs uppercase text-neu-black text-center shadow-neu transition-all duration-150 hover:bg-neu-bg hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">
+              className="flex-1 py-2.5 border-2 border-neu-black bg-neu-white font-display font-bold text-xs uppercase text-neu-black text-center shadow-neu hover:bg-neu-bg hover:shadow-neu-sm">
               {t('client.mySoftware.demo')}
             </a>
           )}
           <button onClick={() => { onClose(); onBuy(sw); }}
-            className={cn('flex-1 py-2.5 border-2 border-neu-black font-display font-bold text-xs uppercase shadow-neu transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm',
+            className={cn('flex-1 py-2.5 border-2 border-neu-black font-display font-bold text-xs uppercase shadow-neu hover:shadow-neu-sm',
               isPurchased ? 'bg-neu-green text-neu-white' : 'bg-neu-primary text-neu-black')}>
             {isPurchased ? t('client.mySoftware.buyAgain') : t('client.mySoftware.buy')}
           </button>
@@ -170,7 +169,7 @@ function DownloadModal({ purchase, onClose }) {
 
           {/* Download button utama */}
           <a href={purchase.softcopyUrl} target="_blank" rel="noopener noreferrer"
-            className="flex items-center justify-center gap-3 w-full py-4 bg-neu-green border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-white tracking-wide transition-all duration-150 hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none active:translate-x-1 active:translate-y-1 active:shadow-none">
+            className="flex items-center justify-center gap-3 w-full py-4 bg-neu-green border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-white tracking-wide hover:shadow-none">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
             </svg>
@@ -179,7 +178,7 @@ function DownloadModal({ purchase, onClose }) {
 
           {/* Copy link */}
           <button onClick={handleCopy}
-            className={cn('flex items-center justify-center gap-2 w-full py-2.5 border-2 border-neu-black font-display font-bold text-xs uppercase tracking-wide transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none',
+            className={cn('flex items-center justify-center gap-2 w-full py-2.5 border-2 border-neu-black font-display font-bold text-xs uppercase tracking-wide hover:shadow-none',
               copied ? 'bg-neu-primary text-neu-black shadow-neu-sm' : 'bg-neu-white text-neu-black shadow-neu')}>
             {copied ? (
               <>
@@ -284,12 +283,12 @@ function UploadReceiptModal({ purchaseId, onClose, onUploaded }) {
                 {hasBank && hasQris && (
                   <div className="flex border-2 border-neu-black overflow-hidden">
                     <button type="button" onClick={() => setSelectedMethod('bank')}
-                      className={cn('flex-1 py-2 font-display font-bold text-xs uppercase tracking-wide transition-all duration-150',
+                      className={cn('flex-1 py-2 font-display font-bold text-xs uppercase tracking-wide',
                         selectedMethod === 'bank' ? 'bg-neu-black text-neu-white' : 'bg-neu-white text-neu-black hover:bg-neu-bg')}>
                       Transfer Bank
                     </button>
                     <button type="button" onClick={() => setSelectedMethod('qris')}
-                      className={cn('flex-1 py-2 font-display font-bold text-xs uppercase tracking-wide border-l-2 border-neu-black transition-all duration-150',
+                      className={cn('flex-1 py-2 font-display font-bold text-xs uppercase tracking-wide border-l-2 border-neu-black',
                         selectedMethod === 'qris' ? 'bg-neu-black text-neu-white' : 'bg-neu-white text-neu-black hover:bg-neu-bg')}>
                       QRIS
                     </button>
@@ -313,7 +312,7 @@ function UploadReceiptModal({ purchaseId, onClose, onUploaded }) {
                           <p className="font-body text-xs text-neu-black/60">{bank.accountHolder}</p>
                         </div>
                         <button type="button" onClick={() => copyNumber(bank.id, bank.accountNumber)}
-                          className={cn('flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 border-2 border-neu-black font-display font-bold text-[10px] uppercase transition-all duration-150 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none shadow-neu-sm',
+                          className={cn('flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 border-2 border-neu-black font-display font-bold text-[10px] uppercase hover:shadow-none shadow-neu-sm',
                             copiedId === bank.id ? 'bg-neu-green text-neu-white' : 'bg-neu-white text-neu-black')}>
                           {copiedId === bank.id
                             ? <><svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>Tersalin</>
@@ -332,10 +331,10 @@ function UploadReceiptModal({ purchaseId, onClose, onUploaded }) {
                         <p className="font-display font-bold text-sm text-neu-black">{bank.bankName}</p>
                         <img src={bank.qrisImageUrl} alt={`QR Code QRIS ${bank.bankName}`}
                           onClick={() => setQrisPreview(bank)}
-                          className="w-52 h-52 object-contain border-2 border-neu-black cursor-zoom-in hover:shadow-neu transition-all duration-150" />
+                          className="w-52 h-52 object-contain border-2 border-neu-black cursor-zoom-in hover:shadow-neu" />
                         <p className="font-body text-xs text-neu-black/40 text-center">
                           Scan menggunakan aplikasi pembayaran apapun •{' '}
-                          <button type="button" onClick={() => setQrisPreview(bank)} className="underline hover:text-neu-black transition-colors">perbesar</button>
+                          <button type="button" onClick={() => setQrisPreview(bank)} className="underline hover:text-neu-black">perbesar</button>
                         </p>
                       </div>
                     ))}
@@ -349,11 +348,11 @@ function UploadReceiptModal({ purchaseId, onClose, onUploaded }) {
             onDragOver={e => { e.preventDefault(); setIsDragging(true); }}
             onDragLeave={() => setIsDragging(false)}
             onDrop={e => { e.preventDefault(); setIsDragging(false); const f = e.dataTransfer.files[0]; if (f) processFile(f); }}
-            className={cn('border-2 border-dashed border-neu-black p-6 text-center cursor-pointer transition-all duration-150', isDragging ? 'bg-neu-primary/20 border-solid' : 'hover:bg-neu-bg', isUploading && 'opacity-60 cursor-not-allowed')}>
+            className={cn('border-2 border-dashed border-neu-black p-6 text-center cursor-pointer', isDragging ? 'bg-neu-primary/20 border-solid' : 'hover:bg-neu-bg', isUploading && 'opacity-60 cursor-not-allowed')}>
             <input ref={inputRef} type="file" accept="image/*" className="hidden"
               onChange={e => { if (e.target.files[0]) processFile(e.target.files[0]); }} />
             {isUploading
-              ? <p className="font-display font-bold text-sm text-neu-black animate-pulse">{t('client.uploadReceipt.uploading')}</p>
+              ? <p className="font-display font-bold text-sm text-neu-black">{t('client.uploadReceipt.uploading')}</p>
               : <><p className="font-display font-bold text-sm text-neu-black">{t('client.uploadReceipt.dragOrClick')}</p>
                  <p className="font-body text-xs text-neu-black/40 mt-1">{t('client.uploadReceipt.formats')}</p></>
             }
@@ -368,10 +367,10 @@ function UploadReceiptModal({ purchaseId, onClose, onUploaded }) {
         </div>
         <div className="px-5 pb-5 flex gap-3">
           <button onClick={handleSubmit} disabled={isSaving || !receiptUrl || isUploading}
-            className={cn('flex-1 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm', (isSaving || !receiptUrl || isUploading) && 'opacity-50 cursor-not-allowed')}>
+            className={cn('flex-1 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black hover:shadow-neu-sm', (isSaving || !receiptUrl || isUploading) && 'opacity-50 cursor-not-allowed')}>
             {isSaving ? t('client.uploadReceipt.sending') : t('client.uploadReceipt.send')}
           </button>
-          <button onClick={onClose} className="flex-1 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">
+          <button onClick={onClose} className="flex-1 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black hover:shadow-neu-sm">
             {t('common.cancel')}
           </button>
         </div>
@@ -387,7 +386,7 @@ function UploadReceiptModal({ purchaseId, onClose, onUploaded }) {
           <div className="flex items-center justify-between w-full">
             <p className="font-display font-bold text-sm text-neu-black uppercase">{qrisPreview.bankName}</p>
             <button type="button" onClick={() => setQrisPreview(null)}
-              className="w-8 h-8 flex items-center justify-center border-2 border-neu-black bg-neu-white font-mono font-bold text-lg leading-none hover:bg-neu-accent hover:text-neu-white transition-all duration-150">
+              className="w-8 h-8 flex items-center justify-center border-2 border-neu-black bg-neu-white font-mono font-bold text-lg leading-none hover:bg-neu-accent hover:text-neu-white">
               ×
             </button>
           </div>
@@ -419,7 +418,6 @@ export default function MySoftwarePage() {
   const [downloadTarget, setDownloadTarget] = useState(null);
   const [previewTarget,  setPreviewTarget]  = useState(null);
 
-  const pageRef = useRef(null);
 
   const loadData = async () => {
     const [swRes, purRes] = await Promise.all([
@@ -440,8 +438,7 @@ export default function MySoftwarePage() {
   }, [navigate]);
 
   useEffect(() => {
-    if (!isLoading && pageRef.current) gsap.from(pageRef.current, { y: 20, opacity: 0, duration: 0.5, ease: 'power2.out' });
-  }, [isLoading]);
+    if (!isLoading && pageRef.current)  }, [isLoading]);
 
   const handleBuy = async () => {
     if (!buyTarget) return;
@@ -494,7 +491,7 @@ export default function MySoftwarePage() {
         />
       )}
 
-      <div ref={pageRef} className="space-y-10">
+      <div className="space-y-10">
 
         {/* Katalog */}
         <section>
@@ -517,13 +514,13 @@ export default function MySoftwarePage() {
                   <div onClick={() => setPreviewTarget(sw)}
                     className="relative border-b-2 border-neu-black bg-neu-bg h-40 overflow-hidden flex items-center justify-center cursor-pointer group">
                     {sw.thumbnailUrl
-                      ? <img src={sw.thumbnailUrl} alt={sw.name} className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105" loading="lazy" />
-                      : <svg className="w-12 h-12 text-neu-black/15 transition-colors duration-150 group-hover:text-neu-black/30" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                      ? <img src={sw.thumbnailUrl} alt={sw.name} className="w-full h-full object-cover group-loading="lazy" />
+                      : <svg className="w-12 h-12 text-neu-black/15 group-hover:text-neu-black/30" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                           <rect x="2" y="3" width="20" height="14" /><line x1="8" y1="21" x2="16" y2="21" /><line x1="12" y1="17" x2="12" y2="21" />
                         </svg>
                     }
-                    <div className="absolute inset-0 bg-neu-black/0 group-hover:bg-neu-black/20 transition-colors duration-150 flex items-center justify-center">
-                      <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-150 bg-neu-white border-2 border-neu-black px-3 py-1.5 font-display font-bold text-[10px] uppercase shadow-neu-sm">
+                    <div className="absolute inset-0 bg-neu-black/0 group-hover:bg-neu-black/20 flex items-center justify-center">
+                      <span className="opacity-0 group-hover:opacity-100 bg-neu-white border-2 border-neu-black px-3 py-1.5 font-display font-bold text-[10px] uppercase shadow-neu-sm">
                         {t('client.mySoftware.viewDetail')}
                       </span>
                     </div>
@@ -546,12 +543,12 @@ export default function MySoftwarePage() {
                   <div className="px-4 pb-4 flex gap-2">
                     {sw.demoUrl && (
                       <a href={sw.demoUrl} target="_blank" rel="noopener noreferrer"
-                        className="flex-1 py-2 border-2 border-neu-black bg-neu-white font-display font-bold text-xs uppercase text-neu-black text-center transition-all duration-150 hover:bg-neu-bg hover:translate-x-[1px] hover:translate-y-[1px]">
+                        className="flex-1 py-2 border-2 border-neu-black bg-neu-white font-display font-bold text-xs uppercase text-neu-black text-center hover:bg-neu-bg
                         {t('client.mySoftware.demo')}
                       </a>
                     )}
                     <button onClick={() => setBuyTarget(sw)}
-                      className={cn('flex-1 py-2 border-2 border-neu-black font-display font-bold text-xs uppercase transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none',
+                      className={cn('flex-1 py-2 border-2 border-neu-black font-display font-bold text-xs uppercase hover:shadow-none',
                         purchasedIds.has(sw.id) ? 'bg-neu-green text-neu-white shadow-neu-sm' : 'bg-neu-primary text-neu-black shadow-neu',
                       )}>
                       {purchasedIds.has(sw.id) ? t('client.mySoftware.buyAgain') : t('client.mySoftware.buy')}
@@ -588,7 +585,7 @@ export default function MySoftwarePage() {
                     {purchases.map((p, idx) => {
                       const cfg = STATUS_BG[p.paymentStatus] ?? { bg: 'bg-neu-black/10', text: 'text-neu-black' };
                       return (
-                        <tr key={p.id} className="border-b-2 border-neu-black bg-neu-white hover:bg-neu-bg transition-colors">
+                        <tr key={p.id} className="border-b-2 border-neu-black bg-neu-white hover:bg-neu-bg">
                           <td className="px-4 py-3 border-r-2 border-neu-black font-mono text-xs text-neu-black/50 text-center w-10">{idx + 1}</td>
                           <td className="px-4 py-3 border-r-2 border-neu-black">
                             <p className="font-display font-bold text-sm text-neu-black">{p.softwareName}</p>
@@ -608,14 +605,14 @@ export default function MySoftwarePage() {
                           <td className="px-4 py-3">
                             {p.paymentStatus === 'pending_payment' && (
                               <button onClick={() => setUploadTarget(p.id)}
-                                className="px-3 py-1.5 bg-neu-primary border-2 border-neu-black font-display font-bold text-xs uppercase text-neu-black shadow-neu-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150 whitespace-nowrap">
+                                className="px-3 py-1.5 bg-neu-primary border-2 border-neu-black font-display font-bold text-xs uppercase text-neu-black shadow-neu-sm hover:shadow-none whitespace-nowrap">
                                 {t('client.mySoftware.uploadReceipt')}
                               </button>
                             )}
                             {p.paymentStatus === 'verified' && (
                               p.softcopyUrl ? (
                                 <button onClick={() => setDownloadTarget(p)}
-                                  className="flex items-center gap-1.5 px-3 py-1.5 bg-neu-green border-2 border-neu-black font-display font-bold text-xs uppercase text-neu-white shadow-neu-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150 whitespace-nowrap">
+                                  className="flex items-center gap-1.5 px-3 py-1.5 bg-neu-green border-2 border-neu-black font-display font-bold text-xs uppercase text-neu-white shadow-neu-sm hover:shadow-none whitespace-nowrap">
                                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                                   </svg>

@@ -2,7 +2,6 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
-import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
 import { orderService } from '../services/order.service';
@@ -40,28 +39,21 @@ async function uploadReceipt(file) {
 
 function ProgressDetailModal({ report, onClose, onViewImage }) {
   const { t }       = useTranslation();
-  const backdropRef = useRef(null);
-  const cardRef     = useRef(null);
 
   useEffect(() => {
-    gsap.fromTo(backdropRef.current, { opacity: 0 }, { opacity: 1, duration: 0.2 });
-    gsap.fromTo(cardRef.current, { y: -30, opacity: 0, scale: 0.95 }, { y: 0, opacity: 1, scale: 1, duration: 0.3, ease: 'power3.out' });
     const handleKey = (e) => { if (e.key === 'Escape') handleClose(); };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
   }, []);
 
-  const handleClose = () => {
-    gsap.to(cardRef.current,     { y: -20, opacity: 0, scale: 0.95, duration: 0.2, ease: 'power2.in' });
-    gsap.to(backdropRef.current, { opacity: 0, duration: 0.2, onComplete: onClose });
-  };
+  const handleClose = onClose;
 
   const fmtDT = (val) => val ? new Date(val).toLocaleString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—';
 
   return createPortal(
-    <div ref={backdropRef} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/70"
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/70"
       onClick={(e) => { if (e.target === e.currentTarget) handleClose(); }}>
-      <div ref={cardRef} className="w-full max-w-lg bg-neu-white border-2 border-neu-black shadow-neu-xl">
+      <div className="w-full max-w-lg bg-neu-white border-2 border-neu-black shadow-neu-xl">
         <div className="flex items-center justify-between px-5 py-3 border-b-2 border-neu-black bg-neu-blue">
           <div className="flex items-center gap-2">
             <svg className="w-4 h-4 text-neu-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -78,7 +70,7 @@ function ProgressDetailModal({ report, onClose, onViewImage }) {
               <span className="font-display font-bold text-2xl text-neu-blue">{report.progressPercentage}%</span>
             </div>
             <div className="h-4 border-2 border-neu-black bg-neu-bg overflow-hidden">
-              <div className="h-full bg-neu-blue transition-all duration-500" style={{ width: `${report.progressPercentage}%` }} />
+              <div className="h-full bg-neu-blue" style={{ width: `${report.progressPercentage}%` }} />
             </div>
           </div>
           <div>
@@ -99,8 +91,8 @@ function ProgressDetailModal({ report, onClose, onViewImage }) {
               <button type="button" onClick={() => { handleClose(); setTimeout(() => onViewImage(report.attachmentUrl, report.title), 300); }}
                 className="relative w-full border-2 border-neu-black overflow-hidden group">
                 <img src={report.attachmentUrl} alt="screenshot" className="w-full max-h-48 object-cover" />
-                <div className="absolute inset-0 bg-neu-black/0 group-hover:bg-neu-black/30 transition-all duration-150 flex items-center justify-center">
-                  <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-150 font-display font-bold text-xs text-neu-white bg-neu-black/80 px-3 py-1.5 border border-neu-white/30">{t('orderDetail.zoomIn')}</span>
+                <div className="absolute inset-0 bg-neu-black/0 group-hover:bg-neu-black/30 flex items-center justify-center">
+                  <span className="opacity-0 group-hover:opacity-100 font-display font-bold text-xs text-neu-white bg-neu-black/80 px-3 py-1.5 border border-neu-white/30">{t('orderDetail.zoomIn')}</span>
                 </div>
               </button>
             </div>
@@ -108,7 +100,7 @@ function ProgressDetailModal({ report, onClose, onViewImage }) {
           <p className="font-mono text-xs text-neu-black/40">{t('orderDetail.reportedAt')} {fmtDT(report.reportedAt)}</p>
         </div>
         <div className="px-5 pb-5">
-          <button onClick={handleClose} className="w-full py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase tracking-wide text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">
+          <button onClick={handleClose} className="w-full py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase tracking-wide text-neu-black hover:shadow-neu-sm">
             {t('common.close')}
           </button>
         </div>
@@ -120,26 +112,19 @@ function ProgressDetailModal({ report, onClose, onViewImage }) {
 
 function ImageModal({ src, caption, onClose }) {
   const { t }       = useTranslation();
-  const backdropRef = useRef(null);
-  const cardRef     = useRef(null);
 
   useEffect(() => {
-    gsap.fromTo(backdropRef.current, { opacity: 0 }, { opacity: 1, duration: 0.2 });
-    gsap.fromTo(cardRef.current, { y: -30, opacity: 0, scale: 0.95 }, { y: 0, opacity: 1, scale: 1, duration: 0.3, ease: 'power3.out' });
     const handleKey = (e) => { if (e.key === 'Escape') handleClose(); };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
   }, []);
 
-  const handleClose = () => {
-    gsap.to(cardRef.current,     { y: -20, opacity: 0, scale: 0.95, duration: 0.2, ease: 'power2.in' });
-    gsap.to(backdropRef.current, { opacity: 0, duration: 0.2, onComplete: onClose });
-  };
+  const handleClose = onClose;
 
   return createPortal(
-    <div ref={backdropRef} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/80"
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/80"
       onClick={(e) => { if (e.target === e.currentTarget) handleClose(); }}>
-      <div ref={cardRef} className="w-full max-w-2xl bg-neu-white border-2 border-neu-black shadow-neu-xl">
+      <div className="w-full max-w-2xl bg-neu-white border-2 border-neu-black shadow-neu-xl">
         <div className="flex items-center justify-between px-5 py-3 border-b-2 border-neu-black bg-neu-black">
           <p className="font-display font-bold text-sm text-neu-white truncate">{caption}</p>
           <button onClick={handleClose} className="text-neu-white/60 hover:text-neu-white font-mono text-2xl leading-none ml-4">×</button>
@@ -148,7 +133,7 @@ function ImageModal({ src, caption, onClose }) {
           <img src={src} alt={caption} className="max-w-full max-h-[65vh] object-contain" />
         </div>
         <div className="px-5 py-3 flex justify-end">
-          <button onClick={handleClose} className="px-5 py-2 bg-neu-black border-2 border-neu-black font-display font-bold text-xs uppercase text-neu-white shadow-neu-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150">
+          <button onClick={handleClose} className="px-5 py-2 bg-neu-black border-2 border-neu-black font-display font-bold text-xs uppercase text-neu-white shadow-neu-sm hover:shadow-none">
             {t('common.close')}
           </button>
         </div>
@@ -169,15 +154,15 @@ function ReceiptUploader({ value, onChange, isUploading, onFile }) {
         onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
         onDragLeave={() => setIsDragging(false)}
         onDrop={(e) => { e.preventDefault(); setIsDragging(false); const f = e.dataTransfer.files[0]; if (f) onFile(f); }}
-        className={cn('border-2 border-dashed border-neu-black p-6 text-center cursor-pointer transition-all duration-150', isDragging ? 'bg-neu-primary/20 border-solid' : 'hover:bg-neu-bg', isUploading && 'opacity-60 cursor-not-allowed')}>
+        className={cn('border-2 border-dashed border-neu-black p-6 text-center cursor-pointer', isDragging ? 'bg-neu-primary/20 border-solid' : 'hover:bg-neu-bg', isUploading && 'opacity-60 cursor-not-allowed')}>
         <input ref={inputRef} type="file" accept="image/*" className="hidden"
           onChange={e => { if (e.target.files[0]) onFile(e.target.files[0]); }} />
         {isUploading ? (
           <div className="flex flex-col items-center gap-2">
-            <svg className="w-8 h-8 text-neu-black/40 animate-spin" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <svg className="w-8 h-8 text-neu-black/40" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <circle cx="12" cy="12" r="10" strokeDasharray="60" strokeDashoffset="20" />
             </svg>
-            <p className="font-display font-bold text-sm text-neu-black animate-pulse">{t('client.uploadReceipt.uploading')}</p>
+            <p className="font-display font-bold text-sm text-neu-black">{t('client.uploadReceipt.uploading')}</p>
           </div>
         ) : (
           <>
@@ -193,7 +178,7 @@ function ReceiptUploader({ value, onChange, isUploading, onFile }) {
         <div className="relative border-2 border-neu-black shadow-neu-sm overflow-hidden">
           <img src={value} alt={t('client.uploadReceipt.title')} className="w-full max-h-48 object-contain bg-neu-bg" />
           <button type="button" onClick={() => onChange('')}
-            className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center bg-neu-accent border-2 border-neu-black text-neu-white font-bold text-xs shadow-neu-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150">✕</button>
+            className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center bg-neu-accent border-2 border-neu-black text-neu-white font-bold text-xs shadow-neu-sm hover:shadow-none">✕</button>
           <div className="absolute bottom-0 left-0 right-0 bg-neu-green/90 px-3 py-1.5 flex items-center gap-2">
             <svg className="w-4 h-4 text-neu-white flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" /></svg>
             <span className="font-mono font-bold text-xs text-neu-white">{t('client.uploadReceipt.title')}</span>
@@ -277,12 +262,12 @@ function UploadPaymentModal({ orderId, onClose, onUploaded }) {
                 {hasBank && hasQris && (
                   <div className="flex border-2 border-neu-black overflow-hidden">
                     <button type="button" onClick={() => setSelectedMethod('bank')}
-                      className={cn('flex-1 py-2 font-display font-bold text-xs uppercase tracking-wide transition-all duration-150',
+                      className={cn('flex-1 py-2 font-display font-bold text-xs uppercase tracking-wide',
                         selectedMethod === 'bank' ? 'bg-neu-black text-neu-white' : 'bg-neu-white text-neu-black hover:bg-neu-bg')}>
                       Transfer Bank
                     </button>
                     <button type="button" onClick={() => setSelectedMethod('qris')}
-                      className={cn('flex-1 py-2 font-display font-bold text-xs uppercase tracking-wide border-l-2 border-neu-black transition-all duration-150',
+                      className={cn('flex-1 py-2 font-display font-bold text-xs uppercase tracking-wide border-l-2 border-neu-black',
                         selectedMethod === 'qris' ? 'bg-neu-black text-neu-white' : 'bg-neu-white text-neu-black hover:bg-neu-bg')}>
                       QRIS
                     </button>
@@ -307,7 +292,7 @@ function UploadPaymentModal({ orderId, onClose, onUploaded }) {
                           <p className="font-body text-xs text-neu-black/60">{bank.accountHolder}</p>
                         </div>
                         <button type="button" onClick={() => copyNumber(bank.id, bank.accountNumber)}
-                          className={cn('flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 border-2 border-neu-black font-display font-bold text-[10px] uppercase transition-all duration-150 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none shadow-neu-sm',
+                          className={cn('flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 border-2 border-neu-black font-display font-bold text-[10px] uppercase hover:shadow-none shadow-neu-sm',
                             copiedId === bank.id ? 'bg-neu-green text-neu-white' : 'bg-neu-white text-neu-black')}>
                           {copiedId === bank.id
                             ? <><svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>Tersalin</>
@@ -327,10 +312,10 @@ function UploadPaymentModal({ orderId, onClose, onUploaded }) {
                         <p className="font-display font-bold text-sm text-neu-black">{bank.bankName}</p>
                         <img src={bank.qrisImageUrl} alt={`QR Code QRIS ${bank.bankName}`}
                           onClick={() => setQrisPreview(bank)}
-                          className="w-52 h-52 object-contain border-2 border-neu-black cursor-zoom-in hover:shadow-neu transition-all duration-150" />
+                          className="w-52 h-52 object-contain border-2 border-neu-black cursor-zoom-in hover:shadow-neu" />
                         <p className="font-body text-xs text-neu-black/40 text-center">
                           Scan menggunakan aplikasi pembayaran apapun •{' '}
-                          <button type="button" onClick={() => setQrisPreview(bank)} className="underline hover:text-neu-black transition-colors">perbesar</button>
+                          <button type="button" onClick={() => setQrisPreview(bank)} className="underline hover:text-neu-black">perbesar</button>
                         </p>
                       </div>
                     ))}
@@ -353,7 +338,7 @@ function UploadPaymentModal({ orderId, onClose, onUploaded }) {
             <label className="font-display font-bold text-xs text-neu-black uppercase">{t('common.price')} (Rp) *</label>
             <input type="number" value={form.amount} onChange={e => setForm(p => ({ ...p, amount: e.target.value }))}
               placeholder="750000"
-              className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black outline-none focus:shadow-neu transition-all duration-150" />
+              className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black outline-none focus:shadow-neu" />
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="font-display font-bold text-xs text-neu-black uppercase">
@@ -362,7 +347,7 @@ function UploadPaymentModal({ orderId, onClose, onUploaded }) {
             </label>
             <input type="text" value={form.paymentNumber} onChange={e => setForm(p => ({ ...p, paymentNumber: e.target.value }))}
               placeholder="Contoh: TRF-20240514-001 atau 8 digit terakhir"
-              className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu transition-all duration-150" />
+              className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu" />
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="font-display font-bold text-xs text-neu-black uppercase">{t('client.uploadReceipt.title')} *</label>
@@ -371,10 +356,10 @@ function UploadPaymentModal({ orderId, onClose, onUploaded }) {
         </div>
         <div className="px-5 pb-5 flex gap-3">
           <button onClick={handleSubmit} disabled={isSaving || !form.amount || !form.receiptImageUrl}
-            className={cn('flex-1 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm', (isSaving || !form.amount || !form.receiptImageUrl) && 'opacity-50 cursor-not-allowed')}>
+            className={cn('flex-1 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black hover:shadow-neu-sm', (isSaving || !form.amount || !form.receiptImageUrl) && 'opacity-50 cursor-not-allowed')}>
             {isSaving ? t('client.uploadReceipt.sending') : t('client.uploadReceipt.send')}
           </button>
-          <button onClick={onClose} className="flex-1 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">
+          <button onClick={onClose} className="flex-1 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black hover:shadow-neu-sm">
             {t('common.cancel')}
           </button>
         </div>
@@ -390,7 +375,7 @@ function UploadPaymentModal({ orderId, onClose, onUploaded }) {
           <div className="flex items-center justify-between w-full">
             <p className="font-display font-bold text-sm text-neu-black uppercase">{qrisPreview.bankName}</p>
             <button type="button" onClick={() => setQrisPreview(null)}
-              className="w-8 h-8 flex items-center justify-center border-2 border-neu-black bg-neu-white font-mono font-bold text-lg leading-none hover:bg-neu-accent hover:text-neu-white transition-all duration-150">
+              className="w-8 h-8 flex items-center justify-center border-2 border-neu-black bg-neu-white font-mono font-bold text-lg leading-none hover:bg-neu-accent hover:text-neu-white">
               ×
             </button>
           </div>
@@ -410,27 +395,21 @@ function UploadPaymentModal({ orderId, onClose, onUploaded }) {
 function RevisionDetailModal({ batch, batchIndex, onClose, onViewImage }) {
   const { t }        = useTranslation();
   const backdropRef  = useRef(null);
-  const cardRef      = useRef(null);
 
   useEffect(() => {
-    gsap.fromTo(backdropRef.current, { opacity: 0 }, { opacity: 1, duration: 0.2 });
-    gsap.fromTo(cardRef.current, { y: -30, opacity: 0, scale: 0.95 }, { y: 0, opacity: 1, scale: 1, duration: 0.3, ease: 'power3.out' });
     const onKey = (e) => { if (e.key === 'Escape') handleClose(); };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, []);
 
-  const handleClose = () => {
-    gsap.to(cardRef.current,     { y: -20, opacity: 0, scale: 0.95, duration: 0.2, ease: 'power2.in' });
-    gsap.to(backdropRef.current, { opacity: 0, duration: 0.2, onComplete: onClose });
-  };
+  const handleClose = onClose;
 
   const fmtDT = (val) => new Date(val).toLocaleString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 
   return createPortal(
-    <div ref={backdropRef} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/70"
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/70"
       onClick={e => { if (e.target === e.currentTarget) handleClose(); }}>
-      <div ref={cardRef} className="w-full max-w-lg bg-neu-white border-2 border-neu-black shadow-neu-xl flex flex-col max-h-[85vh]">
+      <div className="w-full max-w-lg bg-neu-white border-2 border-neu-black shadow-neu-xl flex flex-col max-h-[85vh]">
 
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b-2 border-neu-black bg-[#F97316] flex-shrink-0">
@@ -461,9 +440,9 @@ function RevisionDetailModal({ batch, batchIndex, onClose, onViewImage }) {
                   {item.images.map((url, imgIdx) => (
                     <button key={imgIdx} type="button"
                       onClick={() => { handleClose(); setTimeout(() => onViewImage(url, `Revisi #${batchIndex + 1} Poin ${idx + 1}`), 300); }}
-                      className="relative w-20 h-16 border-2 border-neu-black overflow-hidden group hover:border-[#F97316] hover:shadow-neu-sm hover:translate-x-[-1px] hover:translate-y-[-1px] transition-all duration-150">
+                      className="relative w-20 h-16 border-2 border-neu-black overflow-hidden group hover:border-[#F97316] hover:shadow-neu-sm
                       <img src={url} alt="" className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-neu-black/0 group-hover:bg-neu-black/25 transition-all duration-150 flex items-center justify-center">
+                      <div className="absolute inset-0 bg-neu-black/0 group-hover:bg-neu-black/25 flex items-center justify-center">
                         <span className="opacity-0 group-hover:opacity-100 font-mono text-[9px] text-neu-white bg-neu-black/70 px-1.5 py-0.5">
                           Perbesar
                         </span>
@@ -479,7 +458,7 @@ function RevisionDetailModal({ batch, batchIndex, onClose, onViewImage }) {
         {/* Footer */}
         <div className="px-5 py-4 border-t-2 border-neu-black flex-shrink-0">
           <button onClick={handleClose}
-            className="w-full py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">
+            className="w-full py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black hover:shadow-neu-sm">
             {t('common.close') || 'Tutup'}
           </button>
         </div>
@@ -572,7 +551,7 @@ function RevisionModal({ onClose, onSubmit }) {
                 </span>
                 {items.length > 1 && (
                   <button type="button" onClick={() => removeItem(idx)}
-                    className="w-6 h-6 flex items-center justify-center bg-neu-accent border-2 border-neu-black text-neu-white font-bold text-xs hover:translate-x-[1px] hover:translate-y-[1px] transition-all duration-150">
+                    className="w-6 h-6 flex items-center justify-center bg-neu-accent border-2 border-neu-black text-neu-white font-bold text-xs
                     ✕
                   </button>
                 )}
@@ -586,7 +565,7 @@ function RevisionModal({ onClose, onSubmit }) {
                 <textarea
                   value={item.notes} onChange={e => updateNotes(idx, e.target.value)} rows={3}
                   placeholder={t('myOrderDetail.revisionModal.notesPlaceholder')}
-                  className="w-full px-3 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu transition-all duration-150 resize-none" />
+                  className="w-full px-3 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu resize-none" />
               </div>
 
               {/* Images */}
@@ -602,7 +581,7 @@ function RevisionModal({ onClose, onSubmit }) {
                       <div key={imgIdx} className="relative group">
                         <img src={url} alt="" className="w-16 h-14 object-cover border-2 border-neu-black" />
                         <button type="button" onClick={() => removeImage(idx, imgIdx)}
-                          className="absolute -top-1.5 -right-1.5 w-5 h-5 flex items-center justify-center bg-neu-accent border border-neu-black text-neu-white text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+                          className="absolute -top-1.5 -right-1.5 w-5 h-5 flex items-center justify-center bg-neu-accent border border-neu-black text-neu-white text-[10px] font-bold opacity-0 group-hover:opacity-100">
                           ✕
                         </button>
                       </div>
@@ -611,13 +590,13 @@ function RevisionModal({ onClose, onSubmit }) {
                 )}
 
                 {/* Upload zone */}
-                <label className={cn('flex items-center justify-center gap-2 border-2 border-dashed border-neu-black px-4 py-3 cursor-pointer transition-colors duration-150',
+                <label className={cn('flex items-center justify-center gap-2 border-2 border-dashed border-neu-black px-4 py-3 cursor-pointer',
                   uploadingIdx === idx ? 'opacity-60 cursor-not-allowed bg-neu-black/5' : 'hover:bg-neu-white')}>
                   <input type="file" accept="image/*" multiple className="hidden"
                     disabled={uploadingIdx !== null}
                     onChange={e => { if (e.target.files) handleImageFiles(idx, e.target.files); e.target.value = ''; }} />
                   {uploadingIdx === idx ? (
-                    <span className="font-display font-bold text-xs text-neu-black animate-pulse">
+                    <span className="font-display font-bold text-xs text-neu-black">
                       {t('myOrderDetail.revisionModal.uploading')}
                     </span>
                   ) : (
@@ -637,7 +616,7 @@ function RevisionModal({ onClose, onSubmit }) {
 
           {/* Add item button */}
           <button type="button" onClick={addItem}
-            className="w-full py-2.5 border-2 border-dashed border-[#F97316] bg-[#F97316]/5 font-display font-bold text-xs uppercase text-[#F97316] transition-all duration-150 hover:bg-[#F97316]/10">
+            className="w-full py-2.5 border-2 border-dashed border-[#F97316] bg-[#F97316]/5 font-display font-bold text-xs uppercase text-[#F97316] hover:bg-[#F97316]/10">
             {t('myOrderDetail.revisionModal.addItem')}
           </button>
         </div>
@@ -645,12 +624,12 @@ function RevisionModal({ onClose, onSubmit }) {
         {/* Footer */}
         <div className="px-5 py-4 border-t-2 border-neu-black flex gap-3 flex-shrink-0">
           <button onClick={handleSubmit} disabled={!canSubmit}
-            className={cn('flex-1 py-2.5 bg-[#F97316] border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-white transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm',
+            className={cn('flex-1 py-2.5 bg-[#F97316] border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-white hover:shadow-neu-sm',
               !canSubmit && 'opacity-50 cursor-not-allowed')}>
             {isSaving ? t('myOrderDetail.revisionModal.submitting') : t('myOrderDetail.revisionModal.submit')}
           </button>
           <button onClick={onClose}
-            className="flex-1 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">
+            className="flex-1 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black hover:shadow-neu-sm">
             {t('common.cancel')}
           </button>
         </div>
@@ -676,7 +655,6 @@ export default function MyOrderDetailPage() {
   const [previewImage,         setPreviewImage]         = useState(null);
   const [detailProgress, setDetailProgress] = useState(null);
 
-  const pageRef = useRef(null);
 
   const loadOrder = async () => {
     const res = await orderService.getDetail(id);
@@ -715,8 +693,7 @@ export default function MyOrderDetailPage() {
   }, [id]);
 
   useEffect(() => {
-    if (!isLoading && pageRef.current) gsap.from(pageRef.current, { y: 20, opacity: 0, duration: 0.5, ease: 'power2.out' });
-  }, [isLoading]);
+    if (!isLoading && pageRef.current)  }, [isLoading]);
 
   const fmt         = (val) => val ? `Rp ${Number(val).toLocaleString('id-ID')}` : '—';
   const fmtDateTime = (val) => val ? new Date(val).toLocaleString('id-ID', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '—';
@@ -754,7 +731,7 @@ export default function MyOrderDetailPage() {
         confirmColor="bg-neu-green text-neu-white"
       />
 
-      <div ref={pageRef} className="max-w-3xl mx-auto space-y-6">
+      <div className="max-w-3xl mx-auto space-y-6">
 
         <div className="flex items-center gap-2 font-mono text-xs text-neu-black/50">
           <button onClick={() => navigate('/my-orders')} className="hover:text-neu-black">{t('myOrderDetail.breadcrumb')}</button>
@@ -771,19 +748,19 @@ export default function MyOrderDetailPage() {
             <div className="flex flex-wrap gap-2">
               {!['completed', 'canceled'].includes(order.status) && (
                 <button onClick={() => setShowPayment(true)}
-                  className="px-4 py-2 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase text-neu-black hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm transition-all duration-150">
+                  className="px-4 py-2 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase text-neu-black hover:shadow-neu-sm">
                   {t('myOrderDetail.uploadReceipt')}
                 </button>
               )}
               {order.status === 'testing' && (
                 <button onClick={() => setShowRevision(true)}
-                  className="px-4 py-2 bg-[#F97316] border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase text-neu-white hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm transition-all duration-150">
+                  className="px-4 py-2 bg-[#F97316] border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase text-neu-white hover:shadow-neu-sm">
                   {t('myOrderDetail.requestRevision')}
                 </button>
               )}
               {['in_progress', 'testing', 'revision'].includes(order.status) && (
                 <button onClick={() => setShowComplete(true)}
-                  className="px-4 py-2 bg-neu-green border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase text-neu-white hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm transition-all duration-150">
+                  className="px-4 py-2 bg-neu-green border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase text-neu-white hover:shadow-neu-sm">
                   {t('myOrderDetail.completeOrder')}
                 </button>
               )}
@@ -807,7 +784,7 @@ export default function MyOrderDetailPage() {
               <span className="font-mono text-sm font-bold text-neu-blue">{lastProgress}%</span>
             </div>
             <div className="h-4 border-2 border-neu-black bg-neu-bg overflow-hidden">
-              <div className="h-full bg-neu-blue transition-all duration-500" style={{ width: `${lastProgress}%` }} />
+              <div className="h-full bg-neu-blue" style={{ width: `${lastProgress}%` }} />
             </div>
           </div>
         </div>
@@ -827,7 +804,7 @@ export default function MyOrderDetailPage() {
                   <div key={p.id} className="px-6 py-4 flex items-center gap-4">
                     <button type="button"
                       onClick={() => setPreviewImage({ src: p.receiptImageUrl, caption: `Bukti ${p.paymentType} — Rp ${Number(p.amount).toLocaleString('id-ID')}` })}
-                      className="w-12 h-10 border-2 border-neu-black overflow-hidden bg-neu-bg flex-shrink-0 hover:border-neu-primary hover:shadow-neu-sm hover:translate-x-[-1px] hover:translate-y-[-1px] transition-all duration-150">
+                      className="w-12 h-10 border-2 border-neu-black overflow-hidden bg-neu-bg flex-shrink-0 hover:border-neu-primary hover:shadow-neu-sm
                       <img src={p.receiptImageUrl} alt="receipt" className="w-full h-full object-cover" />
                     </button>
                     <div className="flex-1">
@@ -896,7 +873,7 @@ export default function MyOrderDetailPage() {
                           </div>
                         )}
                         <button type="button" onClick={() => setDetailProgress(r)}
-                          className="px-3 py-1.5 bg-neu-blue border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase tracking-wide text-neu-white whitespace-nowrap transition-all duration-150 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none">
+                          className="px-3 py-1.5 bg-neu-blue border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase tracking-wide text-neu-white whitespace-nowrap hover:shadow-none">
                           {t('orderDetail.viewDetail')}
                         </button>
                       </div>
@@ -945,7 +922,7 @@ export default function MyOrderDetailPage() {
                     </div>
                   </div>
                   <button onClick={() => setRevisionDetailTarget({ batch, index: batchIdx })}
-                    className="px-3 py-1.5 bg-[#F97316] border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-white hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150 whitespace-nowrap flex-shrink-0">
+                    className="px-3 py-1.5 bg-[#F97316] border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-white hover:shadow-none whitespace-nowrap flex-shrink-0">
                     {t('orderDetail.viewDetail')}
                   </button>
                 </div>

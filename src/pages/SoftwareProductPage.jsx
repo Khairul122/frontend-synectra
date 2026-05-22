@@ -1,7 +1,6 @@
 ﻿import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
 import { softwareProductService } from '../services/softwareProduct.service';
@@ -13,15 +12,11 @@ const fmt = (val) => `Rp ${Number(val).toLocaleString('id-ID')}`;
 
 function SoftwareRow({ product, index, onEdit, onDelete, onToggleActive }) {
   const { i18n } = useTranslation();
-  const ref = useRef(null);
-  useEffect(() => {
-    gsap.from(ref.current, { x: -20, opacity: 0, duration: 0.4, delay: index * 0.04, ease: 'power2.out' });
-  }, [index]);
   const isEn       = i18n.language === 'en';
   const displayName = (isEn && product.nameEn) ? product.nameEn : product.name;
 
   return (
-    <tr ref={ref} className="border-b-2 border-neu-black bg-neu-white hover:bg-neu-bg transition-colors duration-150">
+    <tr className="border-b-2 border-neu-black bg-neu-white hover:bg-neu-bg">
       <td className="px-4 py-3 border-r-2 border-neu-black font-mono text-xs text-neu-black/50 text-center w-10">
         {index + 1}
       </td>
@@ -79,17 +74,17 @@ function SoftwareRow({ product, index, onEdit, onDelete, onToggleActive }) {
         <div className="flex items-center gap-2">
           <button onClick={() => onToggleActive(product)}
             className={cn(
-              'px-2.5 py-1 border-2 border-neu-black font-display font-bold text-[10px] uppercase transition-all duration-150 shadow-neu-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none',
+              'px-2.5 py-1 border-2 border-neu-black font-display font-bold text-[10px] uppercase shadow-neu-sm hover:shadow-none',
               product.isActive ? 'bg-neu-black/10 text-neu-black' : 'bg-neu-green text-neu-white',
             )}>
             {product.isActive ? (isEn ? 'Deactivate' : 'Nonaktifkan') : (isEn ? 'Activate' : 'Aktifkan')}
           </button>
           <button onClick={() => onEdit(product.id)}
-            className="px-2.5 py-1 border-2 border-neu-black bg-neu-primary font-display font-bold text-[10px] uppercase text-neu-black shadow-neu-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150">
+            className="px-2.5 py-1 border-2 border-neu-black bg-neu-primary font-display font-bold text-[10px] uppercase text-neu-black shadow-neu-sm hover:shadow-none">
             Edit
           </button>
           <button onClick={() => onDelete(product)}
-            className="px-2.5 py-1 border-2 border-neu-black bg-neu-white font-display font-bold text-[10px] uppercase text-neu-accent shadow-neu-sm hover:bg-neu-accent hover:text-neu-white hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150">
+            className="px-2.5 py-1 border-2 border-neu-black bg-neu-white font-display font-bold text-[10px] uppercase text-neu-accent shadow-neu-sm hover:bg-neu-accent hover:text-neu-white hover:shadow-none">
             {isEn ? 'Delete' : 'Hapus'}
           </button>
         </div>
@@ -111,8 +106,6 @@ export default function SoftwareProductPage() {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [isDeleting,   setIsDeleting]   = useState(false);
 
-  const headerRef = useRef(null);
-  const tableRef  = useRef(null);
 
   useEffect(() => {
     authService.getMe()
@@ -129,9 +122,7 @@ export default function SoftwareProductPage() {
 
   useEffect(() => {
     if (!isLoading && headerRef.current)
-      gsap.from(headerRef.current, { y: -20, opacity: 0, duration: 0.4, ease: 'power2.out' });
     if (!isLoading && tableRef.current)
-      gsap.from(tableRef.current, { y: 20, opacity: 0, duration: 0.5, delay: 0.1, ease: 'power2.out' });
   }, [isLoading]);
 
   const handleToggleActive = async (product) => {
@@ -179,23 +170,23 @@ export default function SoftwareProductPage() {
       />
 
       {/* Header toolbar */}
-      <div ref={headerRef} className="flex flex-wrap items-center gap-3 mb-6">
+      <div className="flex flex-wrap items-center gap-3 mb-6">
         <input
           type="text" value={search} onChange={e => setSearch(e.target.value)}
           placeholder={isEn ? 'Search software...' : 'Cari software...'}
-          className="flex-1 min-w-48 px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black placeholder:text-neu-black/30 outline-none focus:shadow-neu transition-all duration-150"
+          className="flex-1 min-w-48 px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black placeholder:text-neu-black/30 outline-none focus:shadow-neu"
         />
         <span className="font-mono text-xs text-neu-black/50">
           <strong className="text-neu-black">{filtered.length}</strong> {isEn ? 'of' : 'dari'} <strong className="text-neu-black">{products.length}</strong> software
         </span>
         <button onClick={() => navigate('/software-products/new')}
-          className="px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase tracking-wide text-neu-black transition-all duration-150 whitespace-nowrap hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm active:translate-x-1 active:translate-y-1 active:shadow-none">
+          className="px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase tracking-wide text-neu-black whitespace-nowrap hover:shadow-neu-sm">
           + {isEn ? 'Add Software' : 'Tambah Software'}
         </button>
       </div>
 
       {/* Table */}
-      <div ref={tableRef} className="border-2 border-neu-black shadow-neu bg-neu-white overflow-hidden">
+      <div className="border-2 border-neu-black shadow-neu bg-neu-white overflow-hidden">
         {filtered.length === 0 ? (
           <div className="p-16 text-center">
             <p className="font-display font-bold text-xl text-neu-black/40">
@@ -205,7 +196,7 @@ export default function SoftwareProductPage() {
             </p>
             {products.length === 0 && (
               <button onClick={() => navigate('/software-products/new')}
-                className="mt-4 px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm transition-all duration-150">
+                className="mt-4 px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase hover:shadow-neu-sm">
                 {isEn ? 'Add First Software' : 'Tambah Software Pertama'}
               </button>
             )}

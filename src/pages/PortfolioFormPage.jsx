@@ -1,7 +1,6 @@
 ﻿import { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
 import { portfolioService } from '../services/portfolio.service';
@@ -64,14 +63,14 @@ function MultiImageUploader({ values, onChange }) {
           onClick={() => !isUploading && inputRef.current?.click()}
           className={cn(
             'w-full border-2 border-dashed border-neu-black bg-neu-bg cursor-pointer',
-            'flex flex-col items-center justify-center gap-3 py-12 transition-all duration-150',
+            'flex flex-col items-center justify-center gap-3 py-12',
             isDragging  && 'bg-neu-primary/20 border-solid',
             isUploading && 'opacity-60 cursor-not-allowed',
           )}
         >
           {isUploading ? (
             <>
-              <span className="animate-spin font-mono text-3xl text-neu-black/40">⟳</span>
+              <span className="font-mono text-3xl text-neu-black/40">⟳</span>
               <span className="font-display font-bold text-xs text-neu-black/50 uppercase">Mengunggah...</span>
             </>
           ) : (
@@ -100,20 +99,20 @@ function MultiImageUploader({ values, onChange }) {
                 </span>
               )}
               <img src={url} alt={`img-${idx}`} className="w-full h-28 object-cover" />
-              <div className="absolute inset-0 bg-neu-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5">
+              <div className="absolute inset-0 bg-neu-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-1.5">
                 <button type="button" onClick={() => moveLeft(idx)} disabled={idx === 0}
-                  className="w-7 h-7 bg-neu-white border-2 border-neu-black font-mono text-xs disabled:opacity-30 flex items-center justify-center hover:bg-neu-primary transition-colors">←</button>
+                  className="w-7 h-7 bg-neu-white border-2 border-neu-black font-mono text-xs disabled:opacity-30 flex items-center justify-center hover:bg-neu-primary">←</button>
                 <button type="button" onClick={() => removeAt(idx)}
                   className="w-7 h-7 bg-neu-accent text-neu-white border-2 border-neu-black font-mono text-sm flex items-center justify-center">×</button>
                 <button type="button" onClick={() => moveRight(idx)} disabled={idx === values.length - 1}
-                  className="w-7 h-7 bg-neu-white border-2 border-neu-black font-mono text-xs disabled:opacity-30 flex items-center justify-center hover:bg-neu-primary transition-colors">→</button>
+                  className="w-7 h-7 bg-neu-white border-2 border-neu-black font-mono text-xs disabled:opacity-30 flex items-center justify-center hover:bg-neu-primary">→</button>
               </div>
             </div>
           ))}
 
           {!isUploading && (
             <button type="button" onClick={() => inputRef.current?.click()}
-              className="h-28 border-2 border-dashed border-neu-black/40 bg-neu-bg flex flex-col items-center justify-center gap-1 hover:border-neu-black hover:bg-neu-primary/10 transition-all duration-150">
+              className="h-28 border-2 border-dashed border-neu-black/40 bg-neu-bg flex flex-col items-center justify-center gap-1 hover:border-neu-black hover:bg-neu-primary/10">
               <span className="font-mono text-2xl text-neu-black/30">+</span>
               <span className="font-mono text-[9px] text-neu-black/25 uppercase">Tambah</span>
             </button>
@@ -123,7 +122,7 @@ function MultiImageUploader({ values, onChange }) {
 
       {values.length > 0 && isUploading && (
         <div className="flex items-center gap-2 px-4 py-2.5 border-2 border-neu-black bg-neu-bg">
-          <span className="animate-spin font-mono">⟳</span>
+          <span className="font-mono">⟳</span>
           <span className="font-display font-bold text-xs uppercase text-neu-black/60">Mengunggah {uploading.length} gambar...</span>
         </div>
       )}
@@ -150,7 +149,6 @@ export default function PortfolioFormPage() {
   const [form, setForm]                 = useState(EMPTY);
   const [errors, setErrors]             = useState({});
 
-  const contentRef = useRef(null);
 
   useEffect(() => {
     const init = async () => {
@@ -185,7 +183,6 @@ export default function PortfolioFormPage() {
 
   useEffect(() => {
     if (isLoading) return;
-    gsap.from(contentRef.current, { y: 24, opacity: 0, duration: 0.4, ease: 'power2.out' });
   }, [isLoading]);
 
   const set = (k, v) => { setForm(p => ({ ...p, [k]: v })); setErrors(p => ({ ...p, [k]: '' })); };
@@ -226,14 +223,14 @@ export default function PortfolioFormPage() {
   const inputCls = (k) => cn(
     'w-full px-4 py-3 bg-neu-white border-2 border-neu-black shadow-neu-sm',
     'font-body text-sm text-neu-black placeholder:text-neu-black/30',
-    'outline-none focus:shadow-neu focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150',
+    'outline-none focus:shadow-neu focus:-translate-x-0.5 focus:-translate-y-0.5',
     errors[k] && 'border-neu-accent shadow-[4px_4px_0px_#FF5C5C]',
   );
 
 
   return (
     <PageLayout user={user} title={isEdit ? 'Edit Portfolio' : 'Tambah Portfolio'} alert={alert}>
-      <div ref={contentRef} className="flex flex-col gap-6">
+      <div className="flex flex-col gap-6">
 
         {/* Form — mengisi sisa area */}
         <form onSubmit={handleSubmit}
@@ -261,10 +258,10 @@ export default function PortfolioFormPage() {
                   <button key={cat} type="button"
                     onClick={() => set('category', form.category === cat ? '' : cat)}
                     className={cn(
-                      'px-4 py-2 font-display font-bold text-xs uppercase tracking-wide border-2 border-neu-black transition-all duration-150',
+                      'px-4 py-2 font-display font-bold text-xs uppercase tracking-wide border-2 border-neu-black',
                       form.category === cat
                         ? 'bg-neu-black text-neu-white translate-x-[2px] translate-y-[2px] shadow-none'
-                        : 'bg-neu-white text-neu-black shadow-neu-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none',
+                        : 'bg-neu-white text-neu-black shadow-neu-sm hover:shadow-none',
                     )}>
                     {cat}
                   </button>
@@ -299,9 +296,8 @@ export default function PortfolioFormPage() {
               className={cn(
                 'px-5 py-2.5 font-display font-bold text-xs uppercase tracking-wide',
                 'bg-neu-white text-neu-black border-2 border-neu-black shadow-neu',
-                'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm',
-                'active:translate-x-1 active:translate-y-1 active:shadow-none',
-                isSaving && 'opacity-40 cursor-not-allowed',
+                'hover:shadow-neu-sm',
+                'isSaving && 'opacity-40 cursor-not-allowed',
               )}>
               ← Kembali
             </button>
@@ -312,9 +308,8 @@ export default function PortfolioFormPage() {
               className={cn(
                 'px-5 py-2.5 font-display font-bold text-xs uppercase tracking-wide',
                 'bg-neu-white text-neu-black border-2 border-neu-black shadow-neu',
-                'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm',
-                'active:translate-x-1 active:translate-y-1 active:shadow-none',
-                isSaving && 'opacity-40 cursor-not-allowed',
+                'hover:shadow-neu-sm',
+                'isSaving && 'opacity-40 cursor-not-allowed',
               )}>
               Batal
             </button>
@@ -323,12 +318,11 @@ export default function PortfolioFormPage() {
               className={cn(
                 'flex-1 py-2.5 font-display font-bold text-sm uppercase tracking-wide',
                 'bg-neu-primary text-neu-black border-2 border-neu-black shadow-neu',
-                'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm',
-                'active:translate-x-1 active:translate-y-1 active:shadow-none',
-                isSaving && 'opacity-60 cursor-not-allowed',
+                'hover:shadow-neu-sm',
+                'isSaving && 'opacity-60 cursor-not-allowed',
               )}>
               {isSaving
-                ? <span className="inline-flex items-center gap-2 justify-center"><span className="animate-spin">⟳</span> Menyimpan...</span>
+                ? <span className="inline-flex items-center gap-2 justify-center"><span className="">⟳</span> Menyimpan...</span>
                 : (isEdit ? 'Simpan Perubahan' : 'Tambah Portfolio')}
             </button>
           </div>

@@ -1,7 +1,6 @@
 ﻿import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
 import { orderService } from '../services/order.service';
@@ -26,7 +25,6 @@ export default function MyOrderPage() {
   const [orders,    setOrders]    = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const headerRef = useRef(null);
 
   useEffect(() => {
     authService.getMe()
@@ -41,7 +39,6 @@ export default function MyOrderPage() {
 
   useEffect(() => {
     if (!isLoading && headerRef.current) {
-      gsap.from(headerRef.current, { y: 20, opacity: 0, duration: 0.5, ease: 'power2.out' });
     }
   }, [isLoading]);
 
@@ -62,7 +59,7 @@ export default function MyOrderPage() {
           className={cn(
             'px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu',
             'font-display font-bold text-xs uppercase tracking-wide text-neu-black whitespace-nowrap',
-            'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm active:translate-x-1 active:translate-y-1 active:shadow-none',
+            'hover:shadow-neu-sm',
           )}
         >
           {t('myOrders.create')}
@@ -74,12 +71,12 @@ export default function MyOrderPage() {
           <p className="font-display font-bold text-xl text-neu-black/40">{t('myOrders.noOrders')}</p>
           <p className="font-body text-sm text-neu-black/30 mt-1">Klik "Buat Pesanan Baru" untuk mulai.</p>
           <button onClick={() => navigate('/my-orders/new')}
-            className="mt-4 px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm transition-all duration-150">
+            className="mt-4 px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase hover:shadow-neu-sm">
             {t('myOrders.createFirst')}
           </button>
         </div>
       ) : (
-        <div ref={headerRef} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {orders.map((order, idx) => {
             const cfg = STATUS_CONFIG[order.status] ?? { label: order.status, bg: 'bg-neu-black/20', text: 'text-neu-black' };
             const lastProgress = order.progressReports?.length
@@ -88,7 +85,7 @@ export default function MyOrderPage() {
             return (
               <div key={order.id}
                 onClick={() => navigate(`/my-orders/${order.id}`)}
-                className="bg-neu-white border-2 border-neu-black shadow-neu hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-neu-lg transition-all duration-150 cursor-pointer p-5 flex flex-col gap-3">
+                className="bg-neu-white border-2 border-neu-black shadow-neu hover:shadow-neu-lg cursor-pointer p-5 flex flex-col gap-3">
                 <div className="flex items-center justify-between">
                   <span className={cn('inline-block px-2 py-0.5 border-2 border-neu-black font-mono font-bold text-xs uppercase', cfg.bg, cfg.text)}>
                     {cfg.label}
@@ -107,7 +104,7 @@ export default function MyOrderPage() {
                       <span className="font-mono text-xs font-bold text-neu-blue">{lastProgress}%</span>
                     </div>
                     <div className="h-2 border border-neu-black bg-neu-bg">
-                      <div className="h-full bg-neu-blue transition-all duration-300" style={{ width: `${lastProgress}%` }} />
+                      <div className="h-full bg-neu-blue" style={{ width: `${lastProgress}%` }} />
                     </div>
                   </div>
                 )}

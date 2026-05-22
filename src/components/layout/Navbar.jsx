@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+﻿import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '../../utils/cn';
 import { authService } from '../../services/auth.service';
@@ -68,8 +68,8 @@ function AvatarDropdown({ user }) {
           onClick={() => setOpen(o => !o)}
           className={cn(
             'w-9 h-9 border-2 border-neu-black flex items-center justify-center overflow-hidden flex-shrink-0',
-            'shadow-neu-sm transition-all duration-150',
-            'hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none',
+            'shadow-neu-sm',
+            'hover:shadow-none',
             open && 'translate-x-[1px] translate-y-[1px] shadow-none',
           )}
           aria-label="Menu pengguna"
@@ -119,7 +119,7 @@ function AvatarDropdown({ user }) {
             <button
               type="button"
               onClick={() => { setOpen(false); navigate('/profile'); }}
-              className="w-full flex items-center gap-2.5 px-4 py-2.5 font-display font-bold text-xs uppercase tracking-wide text-neu-black hover:bg-neu-bg transition-colors duration-150 border-b-2 border-neu-black"
+              className="w-full flex items-center gap-2.5 px-4 py-2.5 font-display font-bold text-xs uppercase tracking-wide text-neu-black hover:bg-neu-bg border-b-2 border-neu-black"
             >
               <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -131,7 +131,7 @@ function AvatarDropdown({ user }) {
             <button
               type="button"
               onClick={() => { setOpen(false); setShowConfirm(true); }}
-              className="w-full flex items-center gap-2.5 px-4 py-2.5 font-display font-bold text-xs uppercase tracking-wide text-neu-accent hover:bg-neu-accent hover:text-neu-white transition-colors duration-150"
+              className="w-full flex items-center gap-2.5 px-4 py-2.5 font-display font-bold text-xs uppercase tracking-wide text-neu-accent hover:bg-neu-accent hover:text-neu-white"
             >
               <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -153,7 +153,7 @@ export function Navbar({ title, user, onMenuClick }) {
         {/* Hamburger — mobile only */}
         <button
           onClick={onMenuClick}
-          className="lg:hidden w-9 h-9 flex-shrink-0 flex items-center justify-center border-2 border-neu-black shadow-neu-sm hover:bg-neu-bg hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150"
+          className="lg:hidden w-9 h-9 flex-shrink-0 flex items-center justify-center border-2 border-neu-black shadow-neu-sm hover:bg-neu-bg hover:shadow-none"
           aria-label="Buka menu"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">

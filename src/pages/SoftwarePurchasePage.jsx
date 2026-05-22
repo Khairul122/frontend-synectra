@@ -1,6 +1,5 @@
 ﻿import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
 import { softwarePurchaseService } from '../services/softwarePurchase.service';
@@ -39,7 +38,7 @@ function ReceiptModal({ url, name, onClose }) {
           <img src={url} alt="Bukti transfer" className="max-w-full max-h-[65vh] object-contain" />
         </div>
         <div className="px-5 py-3 flex justify-end">
-          <button onClick={onClose} className="px-5 py-2 bg-neu-black border-2 border-neu-black font-display font-bold text-xs uppercase text-neu-white shadow-neu-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150">Tutup</button>
+          <button onClick={onClose} className="px-5 py-2 bg-neu-black border-2 border-neu-black font-display font-bold text-xs uppercase text-neu-white shadow-neu-sm hover:shadow-none">Tutup</button>
         </div>
       </div>
     </div>
@@ -72,14 +71,14 @@ function RejectModal({ onClose, onReject }) {
           <label className="font-display font-bold text-xs text-neu-black uppercase mb-2 block">Alasan Penolakan *</label>
           <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={3}
             placeholder="Contoh: Bukti transfer tidak jelas atau jumlah tidak sesuai"
-            className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black outline-none focus:shadow-neu transition-all duration-150 resize-none" />
+            className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black outline-none focus:shadow-neu resize-none" />
         </div>
         <div className="px-5 pb-5 flex gap-3">
           <button onClick={handleSubmit} disabled={isSaving || !notes.trim()}
-            className={cn('flex-1 py-2.5 bg-neu-accent border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-white transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm', (isSaving || !notes.trim()) && 'opacity-50 cursor-not-allowed')}>
+            className={cn('flex-1 py-2.5 bg-neu-accent border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-white hover:shadow-neu-sm', (isSaving || !notes.trim()) && 'opacity-50 cursor-not-allowed')}>
             {isSaving ? 'Menyimpan...' : 'Tolak'}
           </button>
-          <button onClick={onClose} className="flex-1 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">Batal</button>
+          <button onClick={onClose} className="flex-1 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black hover:shadow-neu-sm">Batal</button>
         </div>
       </div>
     </div>
@@ -100,8 +99,6 @@ export default function SoftwarePurchasePage() {
   const [rejectTarget,  setRejectTarget]  = useState(null);
   const [receiptModal,  setReceiptModal]  = useState(null);
 
-  const headerRef = useRef(null);
-  const tableRef  = useRef(null);
 
   const loadData = async () => {
     const res = await softwarePurchaseService.getAll();
@@ -122,9 +119,7 @@ export default function SoftwarePurchasePage() {
 
   useEffect(() => {
     if (!isLoading && headerRef.current)
-      gsap.from(headerRef.current, { y: -20, opacity: 0, duration: 0.4, ease: 'power2.out' });
     if (!isLoading && tableRef.current)
-      gsap.from(tableRef.current, { y: 20, opacity: 0, duration: 0.5, delay: 0.1, ease: 'power2.out' });
   }, [isLoading]);
 
   const handleVerify = async () => {
@@ -165,11 +160,11 @@ export default function SoftwarePurchasePage() {
       {receiptModal && <ReceiptModal url={receiptModal.url} name={receiptModal.name} onClose={() => setReceiptModal(null)} />}
 
       {/* Header toolbar */}
-      <div ref={headerRef} className="flex flex-wrap items-center gap-3 mb-6">
+      <div className="flex flex-wrap items-center gap-3 mb-6">
         <div className="flex gap-2 flex-wrap">
           {FILTER_OPTIONS.map(opt => (
             <button key={opt.value} onClick={() => setFilter(opt.value)}
-              className={cn('px-3 py-1.5 border-2 border-neu-black font-display font-bold text-xs uppercase transition-all duration-150', filter === opt.value ? 'bg-neu-black text-neu-white' : 'bg-neu-white text-neu-black hover:bg-neu-bg')}>
+              className={cn('px-3 py-1.5 border-2 border-neu-black font-display font-bold text-xs uppercase', filter === opt.value ? 'bg-neu-black text-neu-white' : 'bg-neu-white text-neu-black hover:bg-neu-bg')}>
               {opt.label}
             </button>
           ))}
@@ -180,7 +175,7 @@ export default function SoftwarePurchasePage() {
       </div>
 
       {/* Table */}
-      <div ref={tableRef} className="border-2 border-neu-black shadow-neu bg-neu-white overflow-hidden">
+      <div className="border-2 border-neu-black shadow-neu bg-neu-white overflow-hidden">
         {filtered.length === 0 ? (
           <div className="p-16 text-center">
             <p className="font-display font-bold text-xl text-neu-black/40">Belum ada transaksi pembelian.</p>
@@ -201,7 +196,7 @@ export default function SoftwarePurchasePage() {
                 {filtered.map((p, idx) => {
                   const cfg = STATUS_CONFIG[p.paymentStatus] ?? { label: p.paymentStatus, bg: 'bg-neu-black/10', text: 'text-neu-black' };
                   return (
-                    <tr key={p.id} className="border-b-2 border-neu-black bg-neu-white hover:bg-neu-bg transition-colors">
+                    <tr key={p.id} className="border-b-2 border-neu-black bg-neu-white hover:bg-neu-bg">
                       <td className="px-4 py-3 border-r-2 border-neu-black font-mono text-xs text-neu-black/50 text-center w-10">{idx + 1}</td>
                       <td className="px-4 py-3 border-r-2 border-neu-black">
                         <p className="font-display font-bold text-sm text-neu-black">{p.softwareName}</p>
@@ -217,7 +212,7 @@ export default function SoftwarePurchasePage() {
                       <td className="px-4 py-3 border-r-2 border-neu-black w-20">
                         {p.receiptImageUrl ? (
                           <button onClick={() => setReceiptModal({ url: p.receiptImageUrl, name: `Bukti — ${p.softwareName}` })}
-                            className="w-14 h-10 border-2 border-neu-black overflow-hidden hover:border-neu-primary hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-neu-sm transition-all duration-150">
+                            className="w-14 h-10 border-2 border-neu-black overflow-hidden hover:border-neu-primary hover:shadow-neu-sm">
                             <img src={p.receiptImageUrl} alt="bukti" className="w-full h-full object-cover" />
                           </button>
                         ) : (
@@ -240,18 +235,18 @@ export default function SoftwarePurchasePage() {
                           {p.paymentStatus === 'pending_verification' && (
                             <div className="flex gap-2">
                               <button onClick={() => setVerifyTarget(p)}
-                                className="px-2.5 py-1 bg-neu-green border-2 border-neu-black font-display font-bold text-[10px] uppercase text-neu-white shadow-neu-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150">
+                                className="px-2.5 py-1 bg-neu-green border-2 border-neu-black font-display font-bold text-[10px] uppercase text-neu-white shadow-neu-sm hover:shadow-none">
                                 Verifikasi
                               </button>
                               <button onClick={() => setRejectTarget(p)}
-                                className="px-2.5 py-1 bg-neu-white border-2 border-neu-black font-display font-bold text-[10px] uppercase text-neu-accent shadow-neu-sm hover:bg-neu-accent hover:text-neu-white hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150">
+                                className="px-2.5 py-1 bg-neu-white border-2 border-neu-black font-display font-bold text-[10px] uppercase text-neu-accent shadow-neu-sm hover:bg-neu-accent hover:text-neu-white hover:shadow-none">
                                 Tolak
                               </button>
                             </div>
                           )}
                           {p.softcopyUrl && (
                             <a href={p.softcopyUrl} target="_blank" rel="noopener noreferrer"
-                              className="px-2.5 py-1 bg-neu-blue border-2 border-neu-black font-display font-bold text-[10px] uppercase text-neu-white shadow-neu-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all duration-150 text-center">
+                              className="px-2.5 py-1 bg-neu-blue border-2 border-neu-black font-display font-bold text-[10px] uppercase text-neu-white shadow-neu-sm hover:shadow-none text-center">
                               ↓ Softcopy
                             </a>
                           )}

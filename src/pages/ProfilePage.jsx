@@ -1,7 +1,6 @@
 ﻿import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
 import { PageLayout } from '../components/layout/PageLayout';
@@ -20,7 +19,6 @@ export default function ProfilePage() {
   const [pwForm,          setPwForm]          = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
   const [isSavingPw,      setIsSavingPw]      = useState(false);
   const [pwErrors,        setPwErrors]        = useState({});
-  const pageRef = useRef(null);
 
   useEffect(() => {
     authService.getMe()
@@ -34,8 +32,7 @@ export default function ProfilePage() {
   }, [navigate]);
 
   useEffect(() => {
-    if (!isLoading && pageRef.current) gsap.from(pageRef.current, { y: 20, opacity: 0, duration: 0.5, ease: 'power2.out' });
-  }, [isLoading]);
+    if (!isLoading && pageRef.current)  }, [isLoading]);
 
   const validateProfile = () => {
     const e = {};
@@ -85,7 +82,7 @@ export default function ProfilePage() {
   const inputCls = (hasError) => cn(
     'w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm',
     'font-body text-neu-black placeholder:text-gray-400',
-    'outline-none focus:shadow-neu focus:translate-x-[-2px] focus:translate-y-[-2px] transition-all duration-150',
+    'outline-none focus:shadow-neu
     hasError && 'border-neu-accent shadow-[4px_4px_0px_#FF5C5C]',
   );
 
@@ -102,7 +99,7 @@ export default function ProfilePage() {
 
   return (
     <PageLayout user={user} title={t('profile.title')} alert={alert}>
-      <div ref={pageRef} className="max-w-2xl mx-auto space-y-6">
+      <div className="max-w-2xl mx-auto space-y-6">
 
         {/* Avatar + Info */}
         <div className="bg-neu-white border-2 border-neu-black shadow-neu p-6 flex items-center gap-5">
@@ -148,7 +145,7 @@ export default function ProfilePage() {
             </div>
             <button type="submit" disabled={isSavingProfile} className={cn(
               'px-6 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase tracking-wide text-neu-black',
-              'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm active:translate-x-1 active:translate-y-1 active:shadow-none',
+              'hover:shadow-neu-sm',
               isSavingProfile && 'opacity-60 cursor-not-allowed',
             )}>
               {isSavingProfile ? t('common.saving') : t('profile.saveProfile')}
@@ -188,7 +185,7 @@ export default function ProfilePage() {
               ))}
               <button type="submit" disabled={isSavingPw} className={cn(
                 'px-6 py-2.5 bg-neu-black border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase tracking-wide text-neu-white',
-                'transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm active:translate-x-1 active:translate-y-1 active:shadow-none',
+                'hover:shadow-neu-sm',
                 isSavingPw && 'opacity-60 cursor-not-allowed',
               )}>
                 {isSavingPw ? t('common.saving') : t('profile.changePassBtn')}
