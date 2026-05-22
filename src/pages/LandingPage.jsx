@@ -13,6 +13,7 @@ import { cn } from '../utils/cn';
 import { getPlatform } from '../constants/platforms';
 import { API_BASE_URL } from '../constants/api';
 import { LanguageSwitcher } from '../components/ui/LanguageSwitcher';
+import { ContainerScroll } from '../components/ui/container-scroll-animation';
 
 const BASE = API_BASE_URL || '';
 
@@ -1188,6 +1189,35 @@ export default function LandingPage() {
             </span>
           ))}
         </div>
+      </section>
+
+      {/* ── PLATFORM PREVIEW ── */}
+      <section className="border-b-2 border-neu-black bg-neu-bg overflow-hidden">
+        <ContainerScroll
+          titleComponent={
+            <>
+              <span className="inline-block bg-neu-primary border-2 border-neu-black px-3 py-1 font-mono font-bold text-xs uppercase tracking-widest mb-4">
+                Platform Preview
+              </span>
+              <h2 className="font-display font-bold text-4xl md:text-[5rem] text-neu-black leading-none">
+                {lang('Lihat Platform Kami', 'See Our Platform')}
+              </h2>
+              <p className="font-body text-lg text-neu-black/70 mt-4 max-w-xl mx-auto">
+                {lang(
+                  'Dashboard intuitif untuk mengelola semua kebutuhan bisnis Anda dalam satu tempat.',
+                  'Intuitive dashboard to manage all your business needs in one place.'
+                )}
+              </p>
+            </>
+          }
+        >
+          <img
+            src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1400&auto=format&fit=crop&q=80"
+            alt="Synectra Dashboard Preview"
+            className="mx-auto object-cover h-full object-left-top w-full"
+            draggable={false}
+          />
+        </ContainerScroll>
       </section>
 
       {/* ── STATS — Anime.js ── */}
