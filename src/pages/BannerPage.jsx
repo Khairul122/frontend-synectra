@@ -230,12 +230,6 @@ export default function BannerPage() {
       .finally(() => setIsLoading(false));
   }, [navigate]);
 
-  useEffect(() => {
-    if (!isLoading && headerRef.current) {
-    }
-    if (!isLoading && tableRef.current) {
-    }
-  }, [isLoading]);
 
 
   const handleToggleActive = async (banner) => {
