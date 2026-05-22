@@ -2,7 +2,11 @@
 import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
+import {
+  Dialog, DialogClose, DialogContent, DialogFooter,
+  DialogHeader, DialogTitle, DialogDescription,
+} from '../components/ui/dialog';
 import { gsap } from 'gsap';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Float, MeshDistortMaterial, Sphere, Torus, MeshWobbleMaterial, Icosahedron, Octahedron } from '@react-three/drei';
@@ -13,7 +17,6 @@ import { cn } from '../utils/cn';
 import { getPlatform } from '../constants/platforms';
 import { API_BASE_URL } from '../constants/api';
 import { LanguageSwitcher } from '../components/ui/LanguageSwitcher';
-import { ContainerScroll } from '../components/ui/container-scroll-animation';
 
 const BASE = API_BASE_URL || '';
 
@@ -279,128 +282,93 @@ function LetterReveal({ text, className, delay = 0 }) {
 }
 
 /* ─── Portfolio Modal ───────────────────────────────────────────────── */
-function PortfolioModal({ item, onClose, transitionTo }) {
+function PortfolioModal({ item, open, onClose, transitionTo }) {
   const { t } = useTranslation();
   const [imgIdx, setImgIdx] = useState(0);
-  const imgs = item.images?.length ? item.images : (item.image ? [item.image] : []);
 
-  useEffect(() => {
-    const handler = (e) => { if (e.key === 'Escape') onClose(); };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  }, [onClose]);
+  useEffect(() => { if (open) setImgIdx(0); }, [open]);
 
-  return createPortal(
-    <motion.div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/75 overflow-y-auto"
-      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      transition={{ duration: 0.2 }}
-      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
-    >
-      <motion.div
-        className="w-full max-w-2xl bg-neu-white border-2 border-neu-black shadow-neu-xl my-4"
-        initial={{ y: -40, opacity: 0, scale: 0.95 }}
-        animate={{ y: 0, opacity: 1, scale: 1 }}
-        exit={{ y: -20, opacity: 0, scale: 0.95 }}
-        transition={{ duration: 0.35, ease: 'easeOut' }}
-      >
-        <div className="flex items-center justify-between px-5 py-4 border-b-2 border-neu-black bg-neu-black">
-          <div>
-            <h3 className="font-display font-bold text-base text-neu-white">{item.title}</h3>
-            {item.category && <span className="font-mono text-xs text-neu-white/60 uppercase">{item.category.replace(/_/g,' ')}</span>}
+  const imgs = item?.images?.length ? item.images : (item?.image ? [item.image] : []);
+
+  return (
+    <Dialog open={open} onOpenChange={(o) => { if (!o) onClose(); }}>
+      <DialogContent className="sm:max-w-2xl p-0 flex flex-col max-h-[90vh]">
+        <DialogHeader>
+          <DialogTitle>{item?.title}</DialogTitle>
+          {item?.category && (
+            <span className="font-mono text-xs text-neu-white/60 uppercase">
+              {item.category.replace(/_/g, ' ')}
+            </span>
+          )}
+        </DialogHeader>
+
+        <div className="flex-1 overflow-y-auto min-h-0">
+          {imgs.length > 0 && (
+            <div className="relative border-b-2 border-neu-black bg-neu-bg">
+              <img src={imgs[imgIdx]} alt={item?.title} className="w-full h-64 object-cover" loading="lazy" decoding="async" />
+              {imgs.length > 1 && (
+                <>
+                  <button onClick={() => setImgIdx(i => (i - 1 + imgs.length) % imgs.length)}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-neu-white/90 border-2 border-neu-black font-mono text-sm flex items-center justify-center hover:bg-neu-primary transition-colors">←</button>
+                  <button onClick={() => setImgIdx(i => (i + 1) % imgs.length)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-neu-white/90 border-2 border-neu-black font-mono text-sm flex items-center justify-center hover:bg-neu-primary transition-colors">→</button>
+                </>
+              )}
+            </div>
+          )}
+          <div className="px-5 py-4 border-b-2 border-neu-black">
+            {item?.description
+              ? <div className="font-body text-sm text-neu-black/80 leading-relaxed prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: item.description }} />
+              : <p className="font-body text-sm text-neu-black/40 italic">Tidak ada deskripsi.</p>}
           </div>
-          <button onClick={onClose} className="text-neu-white/60 hover:text-neu-white font-mono text-2xl leading-none">×</button>
         </div>
-        {imgs.length > 0 && (
-          <div className="relative border-b-2 border-neu-black bg-neu-bg">
-            <img src={imgs[imgIdx]} alt={item.title} className="w-full h-64 object-cover" loading="lazy" decoding="async" />
-            {imgs.length > 1 && (
-              <>
-                <button onClick={() => setImgIdx(i => (i - 1 + imgs.length) % imgs.length)}
-                  className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-neu-white/90 border-2 border-neu-black font-mono text-sm flex items-center justify-center hover:bg-neu-primary transition-colors">←</button>
-                <button onClick={() => setImgIdx(i => (i + 1) % imgs.length)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-neu-white/90 border-2 border-neu-black font-mono text-sm flex items-center justify-center hover:bg-neu-primary transition-colors">→</button>
-              </>
-            )}
-          </div>
-        )}
-        <div className="px-5 py-4 border-b-2 border-neu-black max-h-48 overflow-y-auto">
-          {item.description
-            ? <div className="font-body text-sm text-neu-black/80 leading-relaxed prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: item.description }} />
-            : <p className="font-body text-sm text-neu-black/40 italic">Tidak ada deskripsi.</p>}
-        </div>
-        <div className="px-5 py-4 flex gap-3 flex-wrap">
-          <button onClick={() => { onClose(); setTimeout(() => transitionTo('/register'), 350); }}
+
+        <DialogFooter className="gap-3 flex-wrap sm:flex-wrap">
+          <button
+            onClick={() => { onClose(); setTimeout(() => transitionTo('/register'), 350); }}
             className="flex-1 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">
             {t('landing.order')}
           </button>
-          <button onClick={onClose}
-            className="px-5 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">
+          <DialogClose className="px-5 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">
             Tutup
-          </button>
-        </div>
-      </motion.div>
-    </motion.div>,
-    document.body,
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
 /* ─── Software Detail Modal ─────────────────────────────────────────── */
-function SoftwareDetailModal({ sw, onClose, transitionTo }) {
+function SoftwareDetailModal({ sw, open, onClose, transitionTo }) {
   const { t, i18n }  = useTranslation();
   const isEn         = i18n.language === 'en';
-  const swName       = (isEn && sw.nameEn)        ? sw.nameEn        : sw.name;
-  const swDesc       = (isEn && sw.descriptionEn) ? sw.descriptionEn : sw.description;
-  const swFeatures   = (isEn && sw.featuresEn)    ? sw.featuresEn    : sw.features;
+  const swName       = sw ? ((isEn && sw.nameEn) ? sw.nameEn : sw.name) : '';
+  const swDesc       = sw ? ((isEn && sw.descriptionEn) ? sw.descriptionEn : sw.description) : '';
+  const swFeatures   = sw ? ((isEn && sw.featuresEn) ? sw.featuresEn : sw.features) : '';
   const fmt          = (v) => `Rp ${Number(v).toLocaleString('id-ID')}`;
 
-  useEffect(() => {
-    const handler = (e) => { if (e.key === 'Escape') onClose(); };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  }, [onClose]);
+  return (
+    <Dialog open={open} onOpenChange={(o) => { if (!o) onClose(); }}>
+      <DialogContent className="sm:max-w-lg p-0 flex flex-col max-h-[90vh]">
+        <DialogHeader>
+          <DialogTitle>{swName}</DialogTitle>
+          {sw?.category && (
+            <span className="font-mono text-xs text-neu-white/50 uppercase">{sw.category}</span>
+          )}
+        </DialogHeader>
 
-  return createPortal(
-    <motion.div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/75 overflow-y-auto"
-      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      transition={{ duration: 0.2 }}
-      onClick={e => { if (e.target === e.currentTarget) onClose(); }}
-    >
-      <motion.div
-        className="w-full max-w-lg bg-neu-white border-2 border-neu-black shadow-neu-xl my-4 flex flex-col max-h-[90vh]"
-        initial={{ y: -40, opacity: 0, scale: 0.95 }}
-        animate={{ y: 0, opacity: 1, scale: 1 }}
-        exit={{ y: -20, opacity: 0, scale: 0.95 }}
-        transition={{ duration: 0.35, ease: 'easeOut' }}
-      >
-
-        {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b-2 border-neu-black bg-neu-black flex-shrink-0">
-          <div>
-            <h3 className="font-display font-bold text-base text-neu-white leading-tight">{swName}</h3>
-            {sw.category && <span className="font-mono text-xs text-neu-white/50 uppercase">{sw.category}</span>}
-          </div>
-          <button onClick={onClose} className="text-neu-white/60 hover:text-neu-white font-mono text-2xl leading-none ml-4 flex-shrink-0">×</button>
-        </div>
-
-        {/* Thumbnail */}
-        {sw.thumbnailUrl && (
+        {sw?.thumbnailUrl && (
           <div className="border-b-2 border-neu-black bg-neu-bg flex-shrink-0">
             <img src={sw.thumbnailUrl} alt={swName} className="w-full h-52 object-cover" loading="lazy" />
           </div>
         )}
 
-        {/* Scrollable body */}
-        <div className="overflow-y-auto flex-1 divide-y-2 divide-neu-black">
-
-          {/* Price */}
+        <div className="overflow-y-auto flex-1 divide-y-2 divide-neu-black min-h-0">
           <div className="px-5 py-3 flex items-center justify-between">
             <span className="font-mono text-xs text-neu-black/40 uppercase tracking-widest">Harga</span>
-            <span className="font-display font-bold text-xl text-neu-black">{fmt(sw.price)}</span>
+            <span className="font-display font-bold text-xl text-neu-black">{sw ? fmt(sw.price) : ''}</span>
           </div>
 
-          {/* Description */}
           {swDesc && (
             <div className="px-5 py-4">
               <p className="font-mono text-[10px] text-neu-black/40 uppercase tracking-widest mb-2">Deskripsi</p>
@@ -408,7 +376,6 @@ function SoftwareDetailModal({ sw, onClose, transitionTo }) {
             </div>
           )}
 
-          {/* Features */}
           {swFeatures && (
             <div className="px-5 py-4">
               <p className="font-mono text-[10px] text-neu-black/40 uppercase tracking-widest mb-3">Fitur</p>
@@ -427,8 +394,7 @@ function SoftwareDetailModal({ sw, onClose, transitionTo }) {
             </div>
           )}
 
-          {/* Tech stack */}
-          {sw.techStack && (
+          {sw?.techStack && (
             <div className="px-5 py-4">
               <p className="font-mono text-[10px] text-neu-black/40 uppercase tracking-widest mb-2">Tech Stack</p>
               <div className="flex flex-wrap gap-1.5">
@@ -440,26 +406,24 @@ function SoftwareDetailModal({ sw, onClose, transitionTo }) {
           )}
         </div>
 
-        {/* Footer */}
-        <div className="px-5 py-4 border-t-2 border-neu-black flex gap-2 flex-shrink-0">
-          {sw.demoUrl && (
+        <DialogFooter className="gap-2 sm:flex-row">
+          {sw?.demoUrl && (
             <a href={sw.demoUrl} target="_blank" rel="noopener noreferrer"
               className="flex-1 py-2.5 border-2 border-neu-black bg-neu-white font-display font-bold text-xs uppercase text-neu-black text-center transition-all duration-150 hover:bg-neu-bg hover:translate-x-[2px] hover:translate-y-[2px]">
               {t('landing.software.demo')}
             </a>
           )}
-          <button onClick={() => { onClose(); setTimeout(() => transitionTo('/my-software'), 300); }}
+          <button
+            onClick={() => { onClose(); setTimeout(() => transitionTo('/my-software'), 300); }}
             className="flex-1 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">
             {t('landing.software.buyNow')}
           </button>
-          <button onClick={onClose}
-            className="px-5 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">
+          <DialogClose className="px-5 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">
             Tutup
-          </button>
-        </div>
-      </motion.div>
-    </motion.div>,
-    document.body,
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -802,16 +766,18 @@ export default function LandingPage() {
 
   return (
     <div ref={pageRef} className="min-h-screen bg-neu-bg overflow-x-hidden">
-      <AnimatePresence>
-        {activePortfolio && (
-          <PortfolioModal key="portfolio-modal" item={activePortfolio} onClose={() => setActivePortfolio(null)} transitionTo={transitionTo} />
-        )}
-      </AnimatePresence>
-      <AnimatePresence>
-        {activeSoftware && (
-          <SoftwareDetailModal key="software-modal" sw={activeSoftware} onClose={() => setActiveSoftware(null)} transitionTo={transitionTo} />
-        )}
-      </AnimatePresence>
+      <PortfolioModal
+        item={activePortfolio}
+        open={!!activePortfolio}
+        onClose={() => setActivePortfolio(null)}
+        transitionTo={transitionTo}
+      />
+      <SoftwareDetailModal
+        sw={activeSoftware}
+        open={!!activeSoftware}
+        onClose={() => setActiveSoftware(null)}
+        transitionTo={transitionTo}
+      />
 
       {/* ── Custom Toast Notification ── */}
       {toast && createPortal(
@@ -831,193 +797,159 @@ export default function LandingPage() {
       )}
 
       {/* ── Banner Iklan Popup ── */}
-      {bannerAd && createPortal(
-        <motion.div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/70"
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-          transition={{ duration: 0.2 }}
-          onClick={(e) => { if (e.target === e.currentTarget) { setBannerAd(null); setBannerExpanded(false); } }}
-        >
-          {!bannerExpanded ? (
-            /* ── State 1: Gambar penuh, klik untuk expand ── */
-            <motion.div
-              className="relative cursor-pointer group"
-              initial={{ scale: 0.92, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.3, ease: 'easeOut' }}
-              onClick={() => setBannerExpanded(true)}
-            >
-              <button
-                onClick={(e) => { e.stopPropagation(); setBannerAd(null); setBannerExpanded(false); }}
-                className="absolute top-3 right-3 z-10 w-9 h-9 bg-neu-black text-neu-white border-2 border-neu-black flex items-center justify-center font-mono text-base hover:bg-neu-accent transition-colors">
-                ×
-              </button>
-              <div className="absolute top-3 left-3 z-10 bg-neu-accent border-2 border-neu-black px-2 py-0.5">
-                <span className="font-mono font-bold text-[10px] text-neu-white uppercase">{t('landing.banner.promo')}</span>
-              </div>
-
-              {bannerAd.image ? (
-                <div className="relative border-2 border-neu-black shadow-neu-xl overflow-hidden">
-                  <img
-                    src={bannerAd.image}
-                    alt={bannerAd.title}
-                    className="w-[90vw] max-w-xl h-[70vh] max-h-[500px] object-cover block"
-                  />
-                  {/* Hover overlay */}
-                  <div className="absolute inset-0 bg-neu-black/0 group-hover:bg-neu-black/40 transition-all duration-300 flex items-end">
-                    <div className="w-full px-5 py-4 bg-gradient-to-t from-neu-black/80 to-transparent translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
-                      <p className="font-display font-bold text-lg text-neu-white">{bannerAd.title}</p>
-                      <p className="font-mono text-xs text-neu-white/70 mt-1">{t('landing.banner.clickDetail')}</p>
+      <Dialog
+        open={!!bannerAd}
+        onOpenChange={(o) => { if (!o) { setBannerAd(null); setBannerExpanded(false); } }}
+      >
+        <DialogContent className={cn('p-0 transition-all duration-300', bannerExpanded ? 'sm:max-w-3xl' : 'sm:max-w-xl')}>
+          <DialogTitle className="sr-only">{bannerAd?.title}</DialogTitle>
+          {bannerAd && (
+            !bannerExpanded ? (
+              /* ── State 1: Gambar penuh, klik untuk expand ── */
+              <div className="relative cursor-pointer group" onClick={() => setBannerExpanded(true)}>
+                <DialogClose
+                  onClick={(e) => e.stopPropagation()}
+                  className="absolute top-3 right-3 z-10 w-9 h-9 bg-neu-black text-neu-white border-2 border-neu-black flex items-center justify-center font-mono text-base hover:bg-neu-accent transition-colors">
+                  ×
+                </DialogClose>
+                <div className="absolute top-3 left-3 z-10 bg-neu-accent border-2 border-neu-black px-2 py-0.5">
+                  <span className="font-mono font-bold text-[10px] text-neu-white uppercase">{t('landing.banner.promo')}</span>
+                </div>
+                {bannerAd.image ? (
+                  <div className="relative overflow-hidden">
+                    <img src={bannerAd.image} alt={bannerAd.title} className="w-full h-[70vh] max-h-[500px] object-cover block" />
+                    <div className="absolute inset-0 bg-neu-black/0 group-hover:bg-neu-black/40 transition-all duration-300 flex items-end">
+                      <div className="w-full px-5 py-4 bg-gradient-to-t from-neu-black/80 to-transparent translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                        <p className="font-display font-bold text-lg text-neu-white">{bannerAd.title}</p>
+                        <p className="font-mono text-xs text-neu-white/70 mt-1">{t('landing.banner.clickDetail')}</p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ) : (
-                /* Jika tidak ada gambar — tampilkan card teks */
-                <div className="w-[90vw] max-w-sm border-2 border-neu-black shadow-neu-xl bg-neu-white p-8">
-                  <p className="font-display font-bold text-2xl text-neu-black mb-2">{bannerAd.title}</p>
-                  <p className="font-mono text-xs text-neu-black/50 mt-2">{t('landing.banner.clickDetail')}</p>
-                </div>
-              )}
-            </motion.div>
-          ) : (
-            /* ── State 2: Split screen ── */
-            <motion.div
-              className="w-full max-w-3xl border-2 border-neu-black shadow-neu-xl overflow-hidden flex flex-col sm:flex-row max-h-[85vh]"
-              initial={{ scale: 0.94, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.3, ease: 'easeOut' }}
-            >
-              {/* Kiri: Gambar */}
-              {bannerAd.image && (
-                <div className="sm:w-1/2 flex-shrink-0 border-b-2 sm:border-b-0 sm:border-r-2 border-neu-black">
-                  <img
-                    src={bannerAd.image}
-                    alt={bannerAd.title}
-                    className="w-full h-52 sm:h-full object-cover"
-                  />
-                </div>
-              )}
-
-              {/* Kanan: Deskripsi */}
-              <div className={cn(
-                'bg-neu-white flex flex-col overflow-y-auto',
-                bannerAd.image ? 'sm:w-1/2' : 'w-full',
-              )}>
-                {/* Header */}
-                <div className="flex items-center justify-between px-5 py-4 border-b-2 border-neu-black bg-neu-black flex-shrink-0">
-                  <div className="flex items-center gap-2">
-                    <div className="bg-neu-accent border-2 border-neu-accent px-2 py-0.5">
-                      <span className="font-mono font-bold text-[10px] text-neu-white uppercase">{t('landing.banner.promo')}</span>
-                    </div>
-                    <p className="font-display font-bold text-sm text-neu-white truncate">{bannerAd.title}</p>
+                ) : (
+                  <div className="p-8">
+                    <p className="font-display font-bold text-2xl text-neu-black mb-2">{bannerAd.title}</p>
+                    <p className="font-mono text-xs text-neu-black/50 mt-2">{t('landing.banner.clickDetail')}</p>
                   </div>
-                  <button onClick={() => { setBannerAd(null); setBannerExpanded(false); }}
-                    className="text-neu-white/60 hover:text-neu-white font-mono text-2xl leading-none ml-3 flex-shrink-0">×</button>
-                </div>
-
-                {/* Konten */}
-                <div className="flex-1 px-5 py-5 overflow-y-auto">
-                  <h2 className="font-display font-bold text-xl text-neu-black mb-3">{bannerAd.title}</h2>
-                  {bannerAd.description ? (
-                    <div
-                      className="font-body text-sm text-neu-black/70 leading-relaxed prose prose-sm max-w-none"
-                      dangerouslySetInnerHTML={{ __html: bannerAd.description }}
-                    />
-                  ) : (
-                    <p className="font-body text-sm text-neu-black/40 italic">{t('landing.banner.noDesc')}</p>
-                  )}
-                </div>
-
-                {/* Actions */}
-                <div className="px-5 py-4 border-t-2 border-neu-black flex gap-3 flex-shrink-0">
-                  <button onClick={() => transitionTo('/register')}
-                    className="flex-1 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none">
-                    {t('landing.banner.learnMore')}
-                  </button>
-                  <button onClick={() => { setBannerAd(null); setBannerExpanded(false); }}
-                    className="px-4 py-2.5 bg-neu-white border-2 border-neu-black font-display font-bold text-xs uppercase text-neu-black/60 hover:text-neu-black transition-colors">
-                    {t('landing.banner.close')}
-                  </button>
+                )}
+              </div>
+            ) : (
+              /* ── State 2: Split screen ── */
+              <div className="flex flex-col sm:flex-row max-h-[85vh] overflow-hidden">
+                {bannerAd.image && (
+                  <div className="sm:w-1/2 flex-shrink-0 border-b-2 sm:border-b-0 sm:border-r-2 border-neu-black">
+                    <img src={bannerAd.image} alt={bannerAd.title} className="w-full h-52 sm:h-full object-cover" />
+                  </div>
+                )}
+                <div className={cn('bg-neu-white flex flex-col overflow-y-auto', bannerAd.image ? 'sm:w-1/2' : 'w-full')}>
+                  <div className="flex items-center justify-between px-5 py-4 border-b-2 border-neu-black bg-neu-black flex-shrink-0">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="bg-neu-accent border-2 border-neu-accent px-2 py-0.5 flex-shrink-0">
+                        <span className="font-mono font-bold text-[10px] text-neu-white uppercase">{t('landing.banner.promo')}</span>
+                      </div>
+                      <p className="font-display font-bold text-sm text-neu-white truncate">{bannerAd.title}</p>
+                    </div>
+                    <DialogClose className="text-neu-white/60 hover:text-neu-white font-mono text-2xl leading-none ml-3 flex-shrink-0">×</DialogClose>
+                  </div>
+                  <div className="flex-1 px-5 py-5 overflow-y-auto">
+                    <h2 className="font-display font-bold text-xl text-neu-black mb-3">{bannerAd.title}</h2>
+                    {bannerAd.description
+                      ? <div className="font-body text-sm text-neu-black/70 leading-relaxed prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: bannerAd.description }} />
+                      : <p className="font-body text-sm text-neu-black/40 italic">{t('landing.banner.noDesc')}</p>}
+                  </div>
+                  <div className="px-5 py-4 border-t-2 border-neu-black flex gap-3 flex-shrink-0">
+                    <button onClick={() => transitionTo('/register')}
+                      className="flex-1 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none">
+                      {t('landing.banner.learnMore')}
+                    </button>
+                    <DialogClose className="px-4 py-2.5 bg-neu-white border-2 border-neu-black font-display font-bold text-xs uppercase text-neu-black/60 hover:text-neu-black transition-colors">
+                      {t('landing.banner.close')}
+                    </DialogClose>
+                  </div>
                 </div>
               </div>
-            </motion.div>
+            )
           )}
-        </motion.div>,
-        document.body
-      )}
+        </DialogContent>
+      </Dialog>
 
       {/* ── Modal Banner dari Section Banners ── */}
-      {bannerModal && createPortal(
-        <motion.div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/70"
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-          transition={{ duration: 0.2 }}
-          onClick={(e) => { if (e.target === e.currentTarget) { setBannerModal(null); setBannerModalExp(false); } }}
-        >
-          {!bannerModalExp ? (
-            /* State 1: Gambar penuh */
-            <motion.div
-              className="relative cursor-pointer group"
-              initial={{ scale: 0.92, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.3, ease: 'easeOut' }}
-              onClick={() => bannerModal.description ? setBannerModalExp(true) : null}
-            >
-              <button onClick={(e) => { e.stopPropagation(); setBannerModal(null); setBannerModalExp(false); }}
-                className="absolute top-3 right-3 z-10 w-9 h-9 bg-neu-black text-neu-white border-2 border-neu-black flex items-center justify-center font-mono text-base hover:bg-neu-accent transition-colors">×</button>
-              <div className="absolute top-3 left-3 z-10 bg-neu-accent border-2 border-neu-black px-2 py-0.5">
-                <span className="font-mono font-bold text-[10px] text-neu-white uppercase">{t('landing.banner.promo')}</span>
-              </div>
-              {bannerModal.image ? (
-                <div className="relative border-2 border-neu-black shadow-neu-xl overflow-hidden">
-                  <img src={bannerModal.image} alt={bannerModal.title} className="w-[90vw] max-w-xl h-[70vh] max-h-[500px] object-cover block" loading="lazy" decoding="async" />
-                  <div className="absolute inset-0 bg-neu-black/0 group-hover:bg-neu-black/40 transition-all duration-300 flex items-end">
-                    <div className="w-full px-5 py-4 bg-gradient-to-t from-neu-black/80 to-transparent translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
-                      <p className="font-display font-bold text-lg text-neu-white">{bannerModal.title}</p>
-                      {bannerModal.description && <p className="font-mono text-xs text-neu-white/70 mt-1">Klik untuk lihat detail →</p>}
+      <Dialog
+        open={!!bannerModal}
+        onOpenChange={(o) => { if (!o) { setBannerModal(null); setBannerModalExp(false); } }}
+      >
+        <DialogContent className={cn('p-0 transition-all duration-300', bannerModalExp ? 'sm:max-w-3xl' : 'sm:max-w-xl')}>
+          <DialogTitle className="sr-only">{bannerModal?.title}</DialogTitle>
+          {bannerModal && (
+            !bannerModalExp ? (
+              /* State 1: Gambar penuh */
+              <div
+                className="relative cursor-pointer group"
+                onClick={() => bannerModal.description ? setBannerModalExp(true) : null}
+              >
+                <DialogClose
+                  onClick={(e) => e.stopPropagation()}
+                  className="absolute top-3 right-3 z-10 w-9 h-9 bg-neu-black text-neu-white border-2 border-neu-black flex items-center justify-center font-mono text-base hover:bg-neu-accent transition-colors">
+                  ×
+                </DialogClose>
+                <div className="absolute top-3 left-3 z-10 bg-neu-accent border-2 border-neu-black px-2 py-0.5">
+                  <span className="font-mono font-bold text-[10px] text-neu-white uppercase">{t('landing.banner.promo')}</span>
+                </div>
+                {bannerModal.image ? (
+                  <div className="relative overflow-hidden">
+                    <img src={bannerModal.image} alt={bannerModal.title} className="w-full h-[70vh] max-h-[500px] object-cover block" loading="lazy" decoding="async" />
+                    <div className="absolute inset-0 bg-neu-black/0 group-hover:bg-neu-black/40 transition-all duration-300 flex items-end">
+                      <div className="w-full px-5 py-4 bg-gradient-to-t from-neu-black/80 to-transparent translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                        <p className="font-display font-bold text-lg text-neu-white">{bannerModal.title}</p>
+                        {bannerModal.description && <p className="font-mono text-xs text-neu-white/70 mt-1">Klik untuk lihat detail →</p>}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ) : (
-                <div className="w-[90vw] max-w-sm border-2 border-neu-black shadow-neu-xl bg-neu-white p-8">
-                  <p className="font-display font-bold text-2xl text-neu-black mb-2">{bannerModal.title}</p>
-                  {bannerModal.description && <p className="font-mono text-xs text-neu-black/50 mt-2">Klik untuk lihat detail →</p>}
-                </div>
-              )}
-            </motion.div>
-          ) : (
-            /* State 2: Split screen */
-            <motion.div
-              className="w-full max-w-3xl border-2 border-neu-black shadow-neu-xl overflow-hidden flex flex-col sm:flex-row max-h-[85vh]"
-              initial={{ scale: 0.94, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.3, ease: 'easeOut' }}
-            >
-              {bannerModal.image && (
-                <div className="sm:w-1/2 flex-shrink-0 border-b-2 sm:border-b-0 sm:border-r-2 border-neu-black">
-                  <img src={bannerModal.image} alt={bannerModal.title} className="w-full h-52 sm:h-full object-cover" loading="lazy" decoding="async" />
-                </div>
-              )}
-              <div className={cn('bg-neu-white flex flex-col overflow-y-auto', bannerModal.image ? 'sm:w-1/2' : 'w-full')}>
-                <div className="flex items-center justify-between px-5 py-4 border-b-2 border-neu-black bg-neu-black flex-shrink-0">
-                  <div className="flex items-center gap-2">
-                    <div className="bg-neu-accent border-2 border-neu-accent px-2 py-0.5"><span className="font-mono font-bold text-[10px] text-neu-white uppercase">Promo</span></div>
-                    <p className="font-display font-bold text-sm text-neu-white truncate">{bannerModal.title}</p>
+                ) : (
+                  <div className="p-8">
+                    <p className="font-display font-bold text-2xl text-neu-black mb-2">{bannerModal.title}</p>
+                    {bannerModal.description && <p className="font-mono text-xs text-neu-black/50 mt-2">Klik untuk lihat detail →</p>}
                   </div>
-                  <button onClick={() => { setBannerModal(null); setBannerModalExp(false); }} className="text-neu-white/60 hover:text-neu-white font-mono text-2xl leading-none ml-3 flex-shrink-0">×</button>
-                </div>
-                <div className="flex-1 px-5 py-5 overflow-y-auto">
-                  <h2 className="font-display font-bold text-xl text-neu-black mb-3">{bannerModal.title}</h2>
-                  {bannerModal.description
-                    ? <div className="font-body text-sm text-neu-black/70 leading-relaxed prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: bannerModal.description }} />
-                    : <p className="font-body text-sm text-neu-black/40 italic">Tidak ada deskripsi.</p>}
-                </div>
-                <div className="px-5 py-4 border-t-2 border-neu-black flex gap-3 flex-shrink-0">
-                  <button onClick={() => transitionTo('/register')} className="flex-1 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none">Pelajari Lebih Lanjut</button>
-                  <button onClick={() => { setBannerModal(null); setBannerModalExp(false); }} className="px-4 py-2.5 bg-neu-white border-2 border-neu-black font-display font-bold text-xs uppercase text-neu-black/60 hover:text-neu-black transition-colors">{t('landing.banner.close')}</button>
+                )}
+              </div>
+            ) : (
+              /* State 2: Split screen */
+              <div className="flex flex-col sm:flex-row max-h-[85vh] overflow-hidden">
+                {bannerModal.image && (
+                  <div className="sm:w-1/2 flex-shrink-0 border-b-2 sm:border-b-0 sm:border-r-2 border-neu-black">
+                    <img src={bannerModal.image} alt={bannerModal.title} className="w-full h-52 sm:h-full object-cover" loading="lazy" decoding="async" />
+                  </div>
+                )}
+                <div className={cn('bg-neu-white flex flex-col overflow-y-auto', bannerModal.image ? 'sm:w-1/2' : 'w-full')}>
+                  <div className="flex items-center justify-between px-5 py-4 border-b-2 border-neu-black bg-neu-black flex-shrink-0">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="bg-neu-accent border-2 border-neu-accent px-2 py-0.5 flex-shrink-0">
+                        <span className="font-mono font-bold text-[10px] text-neu-white uppercase">Promo</span>
+                      </div>
+                      <p className="font-display font-bold text-sm text-neu-white truncate">{bannerModal.title}</p>
+                    </div>
+                    <DialogClose className="text-neu-white/60 hover:text-neu-white font-mono text-2xl leading-none ml-3 flex-shrink-0">×</DialogClose>
+                  </div>
+                  <div className="flex-1 px-5 py-5 overflow-y-auto">
+                    <h2 className="font-display font-bold text-xl text-neu-black mb-3">{bannerModal.title}</h2>
+                    {bannerModal.description
+                      ? <div className="font-body text-sm text-neu-black/70 leading-relaxed prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: bannerModal.description }} />
+                      : <p className="font-body text-sm text-neu-black/40 italic">Tidak ada deskripsi.</p>}
+                  </div>
+                  <div className="px-5 py-4 border-t-2 border-neu-black flex gap-3 flex-shrink-0">
+                    <button onClick={() => transitionTo('/register')}
+                      className="flex-1 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none">
+                      Pelajari Lebih Lanjut
+                    </button>
+                    <DialogClose className="px-4 py-2.5 bg-neu-white border-2 border-neu-black font-display font-bold text-xs uppercase text-neu-black/60 hover:text-neu-black transition-colors">
+                      {t('landing.banner.close')}
+                    </DialogClose>
+                  </div>
                 </div>
               </div>
-            </motion.div>
+            )
           )}
-        </motion.div>,
-        document.body
-      )}
+        </DialogContent>
+      </Dialog>
 
       {/* ── NAVBAR ── */}
       <nav className="sticky top-0 z-40 bg-neu-white border-b-2 border-neu-black">
@@ -1189,35 +1121,6 @@ export default function LandingPage() {
             </span>
           ))}
         </div>
-      </section>
-
-      {/* ── PLATFORM PREVIEW ── */}
-      <section className="border-b-2 border-neu-black bg-neu-bg overflow-hidden">
-        <ContainerScroll
-          titleComponent={
-            <>
-              <span className="inline-block bg-neu-primary border-2 border-neu-black px-3 py-1 font-mono font-bold text-xs uppercase tracking-widest mb-4">
-                Platform Preview
-              </span>
-              <h2 className="font-display font-bold text-4xl md:text-[5rem] text-neu-black leading-none">
-                {lang('Lihat Platform Kami', 'See Our Platform')}
-              </h2>
-              <p className="font-body text-lg text-neu-black/70 mt-4 max-w-xl mx-auto">
-                {lang(
-                  'Dashboard intuitif untuk mengelola semua kebutuhan bisnis Anda dalam satu tempat.',
-                  'Intuitive dashboard to manage all your business needs in one place.'
-                )}
-              </p>
-            </>
-          }
-        >
-          <img
-            src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1400&auto=format&fit=crop&q=80"
-            alt="Synectra Dashboard Preview"
-            className="mx-auto object-cover h-full object-left-top w-full"
-            draggable={false}
-          />
-        </ContainerScroll>
       </section>
 
       {/* ── STATS — Anime.js ── */}
