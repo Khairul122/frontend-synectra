@@ -7,6 +7,7 @@ import {
   Dialog, DialogClose, DialogContent, DialogFooter,
   DialogHeader, DialogTitle, DialogDescription,
 } from '../components/ui/dialog';
+import { ElegantShape } from '../components/ui/shape-landing-hero';
 import { gsap } from 'gsap';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Float, MeshDistortMaterial, Sphere, Torus, MeshWobbleMaterial, Icosahedron, Octahedron } from '@react-three/drei';
@@ -1016,60 +1017,76 @@ export default function LandingPage() {
       </nav>
 
       {/* ══════════════════════════════════════════
-          HERO — Full-width dramatic (3D background)
+          HERO — Dark geometric hero
       ══════════════════════════════════════════ */}
-      <section className="relative min-h-[95vh] border-b-2 border-neu-black overflow-hidden bg-neu-bg">
+      <section className="relative min-h-[95vh] border-b-2 border-neu-black overflow-hidden bg-[#0D0D0D]">
 
-        {/* Layer 0 — 3D scene as full background */}
-        <div className="absolute inset-0 z-0 pointer-events-none">
-          <SplineOrR3F
-            scene={SPLINE_HERO}
-            bg="transparent"
-            r3fFallback={
-              <Canvas
-                camera={{ position: [0, 0, 7], fov: 50 }}
-                gl={{ antialias: true, alpha: true }}
-                style={{ background: 'transparent', width: '100%', height: '100%' }}
-              >
-                <ambientLight intensity={0.6} />
-                <pointLight position={[5, 5, 5]} intensity={2} color="#ffffff" />
-                <pointLight position={[-3, -3, 3]} intensity={1} color="#4D61FF" />
-                <pointLight position={[0, -5, 2]} intensity={0.5} color="#FFD000" />
-                <HeroScene />
-              </Canvas>
-            }
+        {/* Layer 0 — Ambient color gradient */}
+        <div className="absolute inset-0 z-0 pointer-events-none bg-gradient-to-br from-neu-primary/[0.04] via-transparent to-neu-blue/[0.05]" />
+
+        {/* Layer 1 — Floating geometric shapes */}
+        <div className="absolute inset-0 z-[1] overflow-hidden pointer-events-none">
+          <ElegantShape
+            delay={0.3} width={600} height={140} rotate={12}
+            gradient="from-neu-primary/[0.12]"
+            className="left-[-8%] md:left-[-3%] top-[15%] md:top-[18%]"
+          />
+          <ElegantShape
+            delay={0.5} width={480} height={115} rotate={-14}
+            gradient="from-neu-blue/[0.12]"
+            className="right-[-4%] md:right-[2%] top-[65%] md:top-[72%]"
+          />
+          <ElegantShape
+            delay={0.4} width={280} height={75} rotate={-8}
+            gradient="from-neu-purple/[0.12]"
+            className="left-[5%] md:left-[8%] bottom-[8%] md:bottom-[12%]"
+          />
+          <ElegantShape
+            delay={0.6} width={190} height={55} rotate={20}
+            gradient="from-neu-accent/[0.10]"
+            className="right-[12%] md:right-[18%] top-[8%] md:top-[12%]"
+          />
+          <ElegantShape
+            delay={0.7} width={140} height={38} rotate={-24}
+            gradient="from-neu-green/[0.10]"
+            className="left-[22%] md:left-[28%] top-[4%] md:top-[8%]"
+          />
+          {/* Extra large shape — far right, mid height */}
+          <ElegantShape
+            delay={0.2} width={360} height={90} rotate={5}
+            gradient="from-white/[0.04]"
+            className="right-[-5%] top-[30%]"
           />
         </div>
 
-        {/* Layer 1 — Grid dot pattern */}
-        <div className="absolute inset-0 z-[1] pointer-events-none"
-             style={{ backgroundImage: 'radial-gradient(circle, rgba(13,13,13,0.07) 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
-
-        {/* Layer 2 — Gradient overlay: left readable, right transparent */}
+        {/* Layer 2 — Dot grid pattern */}
         <div className="absolute inset-0 z-[2] pointer-events-none"
-             style={{ background: 'linear-gradient(to right, #F5F0E8 38%, rgba(245,240,232,0.88) 55%, rgba(245,240,232,0.45) 72%, transparent 100%)' }} />
+             style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
 
-        {/* Layer 3 — Content */}
+        {/* Layer 3 — Left-side dark vignette so text stays readable */}
+        <div className="absolute inset-0 z-[3] pointer-events-none"
+             style={{ background: 'linear-gradient(to right, #0D0D0D 30%, rgba(13,13,13,0.85) 50%, rgba(13,13,13,0.35) 70%, transparent 100%)' }} />
+
+        {/* Layer 4 — Content */}
         <div className="relative z-20 max-w-7xl mx-auto px-4 lg:px-6 min-h-[95vh] flex flex-col justify-center py-24">
           <div className="max-w-2xl">
 
             {/* Badge */}
-            <div className="hero-badge inline-flex items-center gap-2 bg-neu-black text-neu-white px-4 py-1.5 font-mono font-bold text-xs uppercase tracking-widest mb-8"
+            <div className="hero-badge inline-flex items-center gap-2 bg-white/[0.06] border border-white/[0.12] text-neu-white px-4 py-1.5 font-mono font-bold text-xs uppercase tracking-widest mb-8"
                  style={{ opacity: 0 }}>
-              <span className="w-1.5 h-1.5 bg-neu-green animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-neu-green animate-pulse" />
               {t('landing.hero.badge')}
             </div>
 
             {/* Title — clip reveal per baris */}
-            <h1 className="font-display font-bold text-6xl sm:text-7xl lg:text-8xl text-neu-black leading-[0.88] mb-6">
+            <h1 className="font-display font-bold text-6xl sm:text-7xl lg:text-8xl text-neu-white leading-[0.88] mb-6">
               <HeroReveal delay={0.1}>
                 <span className="block">{t('landing.hero.title1')}</span>
               </HeroReveal>
               <HeroReveal delay={0.3}>
                 <span className="block">
                   <span className="relative inline-block">
-                    <span className="relative z-10">{t('landing.hero.title2')}</span>
-                    <span className="absolute bottom-1 left-0 right-0 h-4 bg-neu-primary -z-10 pointer-events-none" />
+                    <span className="relative z-10 text-neu-primary">{t('landing.hero.title2')}</span>
                   </span>
                 </span>
               </HeroReveal>
@@ -1079,7 +1096,7 @@ export default function LandingPage() {
             </h1>
 
             {/* Subtitle */}
-            <p className="hero-subtitle font-body text-base lg:text-xl text-neu-black/65 mb-10 max-w-xl leading-relaxed"
+            <p className="hero-subtitle font-body text-base lg:text-xl text-neu-white/55 mb-10 max-w-xl leading-relaxed"
                style={{ opacity: 0, transform: 'translateY(16px)' }}>
               {t('landing.hero.subtitle')}
             </p>
@@ -1088,12 +1105,12 @@ export default function LandingPage() {
             <div className="hero-cta flex flex-wrap gap-3 mb-0" style={{ opacity: 0 }}>
               <button
                 onClick={() => transitionTo('/register')}
-                className="px-8 py-3.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase tracking-wide text-neu-black transition-all duration-150 hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-neu-sm active:translate-x-1 active:translate-y-1 active:shadow-none">
+                className="px-8 py-3.5 bg-neu-primary border-2 border-neu-primary shadow-[4px_4px_0px_#FFD000] font-display font-bold text-sm uppercase tracking-wide text-neu-black transition-all duration-150 hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-[2px_2px_0px_#FFD000] active:translate-x-1 active:translate-y-1 active:shadow-none">
                 {t('landing.hero.cta')}
               </button>
               <button
                 onClick={() => scrollTo(portfolioRef)}
-                className="px-8 py-3.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase tracking-wide text-neu-black transition-all duration-150 hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-neu-sm active:translate-x-1 active:translate-y-1 active:shadow-none">
+                className="px-8 py-3.5 bg-transparent border-2 border-neu-white/40 font-display font-bold text-sm uppercase tracking-wide text-neu-white/80 transition-all duration-150 hover:border-neu-white hover:text-neu-white hover:translate-x-[3px] hover:translate-y-[3px]">
                 {t('landing.hero.ctaSecondary')}
               </button>
             </div>
@@ -1104,11 +1121,15 @@ export default function LandingPage() {
         {/* Scroll indicator */}
         <div className="hero-scroll absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2"
              style={{ opacity: 0 }}>
-          <span className="font-mono text-[9px] text-neu-black/35 uppercase tracking-widest">Scroll</span>
-          <div className="w-5 h-8 border-2 border-neu-black/25 flex items-start justify-center pt-1.5">
-            <div className="w-1 h-2 bg-neu-black/35 animate-bounce" />
+          <span className="font-mono text-[9px] text-neu-white/30 uppercase tracking-widest">Scroll</span>
+          <div className="w-5 h-8 border-2 border-neu-white/20 flex items-start justify-center pt-1.5">
+            <div className="w-1 h-2 bg-neu-white/30 animate-bounce" />
           </div>
         </div>
+
+        {/* Bottom fade into next section */}
+        <div className="absolute bottom-0 left-0 right-0 h-24 z-[4] pointer-events-none"
+             style={{ background: 'linear-gradient(to bottom, transparent, #0D0D0D)' }} />
       </section>
 
       {/* ── MARQUEE — Tech Stack scrolling strip ── */}
