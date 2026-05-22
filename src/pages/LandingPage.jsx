@@ -817,8 +817,8 @@ export default function LandingPage() {
                   <span className="font-mono font-bold text-[10px] text-neu-white uppercase">{t('landing.banner.promo')}</span>
                 </div>
                 {bannerAd.image ? (
-                  <div className="relative overflow-hidden">
-                    <img src={bannerAd.image} alt={bannerAd.title} className="w-full h-[70vh] max-h-[500px] object-cover block" />
+                  <div className="relative overflow-hidden bg-neu-black">
+                    <img src={bannerAd.image} alt={bannerAd.title} className="w-full max-h-[80vh] object-contain block mx-auto" />
                     <div className="absolute inset-0 bg-neu-black/0 group-hover:bg-neu-black/40 transition-all duration-300 flex items-end">
                       <div className="w-full px-5 py-4 bg-gradient-to-t from-neu-black/80 to-transparent translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
                         <p className="font-display font-bold text-lg text-neu-white">{bannerAd.title}</p>
@@ -837,8 +837,8 @@ export default function LandingPage() {
               /* ── State 2: Split screen ── */
               <div className="flex flex-col sm:flex-row max-h-[85vh] overflow-hidden">
                 {bannerAd.image && (
-                  <div className="sm:w-1/2 flex-shrink-0 border-b-2 sm:border-b-0 sm:border-r-2 border-neu-black">
-                    <img src={bannerAd.image} alt={bannerAd.title} className="w-full h-52 sm:h-full object-cover" />
+                  <div className="sm:w-1/2 flex-shrink-0 border-b-2 sm:border-b-0 sm:border-r-2 border-neu-black bg-neu-black flex items-center justify-center min-h-[200px]">
+                    <img src={bannerAd.image} alt={bannerAd.title} className="w-full h-full object-contain" />
                   </div>
                 )}
                 <div className={cn('bg-neu-white flex flex-col overflow-y-auto', bannerAd.image ? 'sm:w-1/2' : 'w-full')}>
@@ -896,8 +896,8 @@ export default function LandingPage() {
                   <span className="font-mono font-bold text-[10px] text-neu-white uppercase">{t('landing.banner.promo')}</span>
                 </div>
                 {bannerModal.image ? (
-                  <div className="relative overflow-hidden">
-                    <img src={bannerModal.image} alt={bannerModal.title} className="w-full h-[70vh] max-h-[500px] object-cover block" loading="lazy" decoding="async" />
+                  <div className="relative overflow-hidden bg-neu-black">
+                    <img src={bannerModal.image} alt={bannerModal.title} className="w-full max-h-[80vh] object-contain block mx-auto" loading="lazy" decoding="async" />
                     <div className="absolute inset-0 bg-neu-black/0 group-hover:bg-neu-black/40 transition-all duration-300 flex items-end">
                       <div className="w-full px-5 py-4 bg-gradient-to-t from-neu-black/80 to-transparent translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
                         <p className="font-display font-bold text-lg text-neu-white">{bannerModal.title}</p>
@@ -916,8 +916,8 @@ export default function LandingPage() {
               /* State 2: Split screen */
               <div className="flex flex-col sm:flex-row max-h-[85vh] overflow-hidden">
                 {bannerModal.image && (
-                  <div className="sm:w-1/2 flex-shrink-0 border-b-2 sm:border-b-0 sm:border-r-2 border-neu-black">
-                    <img src={bannerModal.image} alt={bannerModal.title} className="w-full h-52 sm:h-full object-cover" loading="lazy" decoding="async" />
+                  <div className="sm:w-1/2 flex-shrink-0 border-b-2 sm:border-b-0 sm:border-r-2 border-neu-black bg-neu-black flex items-center justify-center min-h-[200px]">
+                    <img src={bannerModal.image} alt={bannerModal.title} className="w-full h-full object-contain" loading="lazy" decoding="async" />
                   </div>
                 )}
                 <div className={cn('bg-neu-white flex flex-col overflow-y-auto', bannerModal.image ? 'sm:w-1/2' : 'w-full')}>
