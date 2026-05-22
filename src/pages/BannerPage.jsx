@@ -270,7 +270,7 @@ export default function BannerPage() {
 
 
   return (
-    <PageLayout user={user} title="Banner Management" alert={alert}>
+    <PageLayout user={user} title="Banner Management" alert={alert} isLoading={isLoading}>
       {previewBanner && (
         <ImagePreviewModal banner={previewBanner} onClose={() => setPreviewBanner(null)} />
       )}

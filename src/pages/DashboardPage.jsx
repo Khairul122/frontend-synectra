@@ -248,7 +248,7 @@ export default function DashboardPage() {
   }, [navigate]);
 
   return (
-    <PageLayout user={user} title="Dashboard" alert={alert}>
+    <PageLayout user={user} title="Dashboard" alert={alert} isLoading={isLoading}>
       {user && (user.role === 'admin'
         ? <AdminDashboard user={user} orders={orders} clients={clients} navigate={navigate} />
         : <ClientDashboard user={user} orders={orders} navigate={navigate} />

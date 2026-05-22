@@ -117,10 +117,6 @@ export default function SoftwarePurchasePage() {
       .finally(() => setIsLoading(false));
   }, [navigate]);
 
-  useEffect(() => {
-    if (!isLoading && headerRef.current)
-    if (!isLoading && tableRef.current)
-  }, [isLoading]);
 
   const handleVerify = async () => {
     if (!verifyTarget) return;
@@ -145,7 +141,7 @@ export default function SoftwarePurchasePage() {
 
 
   return (
-    <PageLayout user={user} title="Pembelian Software" alert={alert}>
+    <PageLayout user={user} title="Pembelian Software" alert={alert} isLoading={isLoading}>
       <ConfirmModal
         isOpen={Boolean(verifyTarget)}
         title="Verifikasi Pembelian"

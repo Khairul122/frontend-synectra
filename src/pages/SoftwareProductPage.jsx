@@ -120,10 +120,6 @@ export default function SoftwareProductPage() {
       .finally(() => setIsLoading(false));
   }, [navigate]);
 
-  useEffect(() => {
-    if (!isLoading && headerRef.current)
-    if (!isLoading && tableRef.current)
-  }, [isLoading]);
 
   const handleToggleActive = async (product) => {
     try {
@@ -157,7 +153,7 @@ export default function SoftwareProductPage() {
 
 
   return (
-    <PageLayout user={user} title={isEn ? 'Software Management' : 'Manajemen Software'} alert={alert}>
+    <PageLayout user={user} title={isEn ? 'Software Management' : 'Manajemen Software'} alert={alert} isLoading={isLoading}>
       <ConfirmModal
         isOpen={Boolean(deleteTarget)}
         title={isEn ? 'Delete Software' : 'Hapus Software'}

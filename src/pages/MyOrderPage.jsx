@@ -37,17 +37,13 @@ export default function MyOrderPage() {
       .finally(() => setIsLoading(false));
   }, [navigate]);
 
-  useEffect(() => {
-    if (!isLoading && headerRef.current) {
-    }
-  }, [isLoading]);
 
   const fmt = (val) => val ? `Rp ${Number(val).toLocaleString('id-ID')}` : '—';
   const fmtDate = (val) => val ? new Date(val).toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' }) : '—';
 
 
   return (
-    <PageLayout user={user} title={t('myOrders.title')} alert={alert}>
+    <PageLayout user={user} title={t('myOrders.title')} alert={alert} isLoading={isLoading}>
       {/* Header toolbar */}
       <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
         <div>

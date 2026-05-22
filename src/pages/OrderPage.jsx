@@ -101,10 +101,6 @@ export default function OrderPage() {
       .finally(() => setIsLoading(false));
   }, [navigate]);
 
-  useEffect(() => {
-    if (!isLoading) {
-      if (headerRef.current)      if (tableRef.current)    }
-  }, [isLoading]);
 
   const filtered = orders.filter(o => {
     const matchStatus = filter === 'all' || o.status === filter;
@@ -129,7 +125,7 @@ export default function OrderPage() {
 
 
   return (
-    <PageLayout user={user} title={t('orders.title')} alert={alert}>
+    <PageLayout user={user} title={t('orders.title')} alert={alert} isLoading={isLoading}>
       <ConfirmModal
         isOpen={Boolean(deleteTarget)}
         title="Hapus Order"

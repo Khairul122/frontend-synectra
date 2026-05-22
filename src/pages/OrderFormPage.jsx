@@ -51,10 +51,6 @@ export default function OrderFormPage() {
     init();
   }, [navigate]);
 
-  useEffect(() => {
-    if (!isLoading && formRef.current) {
-    }
-  }, [isLoading]);
 
   const setField = (key, val) => {
     setForm(prev => ({ ...prev, [key]: val }));
@@ -103,7 +99,7 @@ export default function OrderFormPage() {
 
 
   return (
-    <PageLayout user={user} title="Buat Pesanan Baru" alert={alert}>
+    <PageLayout user={user} title="Buat Pesanan Baru" alert={alert} isLoading={isLoading}>
       <div className="max-w-2xl mx-auto">
         <div className="flex items-center gap-2 mb-6 font-mono text-xs text-neu-black/50">
           <button type="button" onClick={() => navigate('/orders')} className="hover:text-neu-black">Orders</button>

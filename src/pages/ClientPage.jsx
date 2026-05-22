@@ -237,10 +237,6 @@ export default function ClientPage() {
       .finally(() => setIsLoading(false));
   }, [navigate]);
 
-  useEffect(() => {
-    if (!isLoading) {
-      if (headerRef.current)      if (tableRef.current)    }
-  }, [isLoading]);
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
@@ -266,7 +262,7 @@ export default function ClientPage() {
 
 
   return (
-    <PageLayout user={user} title="Client Management" alert={alert}>
+    <PageLayout user={user} title="Client Management" alert={alert} isLoading={isLoading}>
       {editTarget && (
         <EditClientModal
           client={editTarget}

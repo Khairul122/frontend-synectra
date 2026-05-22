@@ -166,7 +166,7 @@ export default function PortfolioPage() {
 
 
   return (
-    <PageLayout user={user} title="Portfolio" alert={alert}>
+    <PageLayout user={user} title="Portfolio" alert={alert} isLoading={isLoading}>
       <ConfirmModal isOpen={Boolean(deleteItem)} title="Hapus Portfolio"
         message={`Hapus "${deleteItem?.title}"? Tindakan ini tidak bisa dibatalkan.`}
         onConfirm={handleDelete} onCancel={() => setDeleteItem(null)} isLoading={isDeleting} />

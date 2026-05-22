@@ -31,8 +31,6 @@ export default function ProfilePage() {
       .finally(() => setIsLoading(false));
   }, [navigate]);
 
-  useEffect(() => {
-    if (!isLoading && pageRef.current)  }, [isLoading]);
 
   const validateProfile = () => {
     const e = {};
@@ -98,7 +96,7 @@ export default function ProfilePage() {
   ];
 
   return (
-    <PageLayout user={user} title={t('profile.title')} alert={alert}>
+    <PageLayout user={user} title={t('profile.title')} alert={alert} isLoading={isLoading}>
       <div className="max-w-2xl mx-auto space-y-6">
 
         {/* Avatar + Info */}

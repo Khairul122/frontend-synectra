@@ -167,10 +167,6 @@ export default function BannerFormPage() {
     init();
   }, [id, isEditMode, navigate]);
 
-  useEffect(() => {
-    if (!isLoading && formRef.current) {
-    }
-  }, [isLoading]);
 
   const setField = (key, value) => {
     setForm(prev => ({ ...prev, [key]: value }));
@@ -219,7 +215,7 @@ export default function BannerFormPage() {
 
 
   return (
-    <PageLayout user={user} title={isEditMode ? 'Edit Banner' : 'Tambah Banner'} alert={alert}>
+    <PageLayout user={user} title={isEditMode ? 'Edit Banner' : 'Tambah Banner'} alert={alert} isLoading={isLoading}>
       <div className="max-w-2xl mx-auto">
 
         {/* Breadcrumb */}

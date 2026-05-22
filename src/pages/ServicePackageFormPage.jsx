@@ -140,9 +140,6 @@ export default function ServicePackageFormPage() {
     init();
   }, [id, isEditMode, navigate]);
 
-  useEffect(() => {
-    if (!isLoading && formRef.current)
-  }, [isLoading]);
 
   const setField = (key, value) => {
     setForm(prev => ({ ...prev, [key]: value }));
@@ -204,7 +201,7 @@ export default function ServicePackageFormPage() {
   );
 
   return (
-    <PageLayout user={user} title={isEditMode ? 'Edit Paket Layanan' : 'Tambah Paket Layanan'} alert={alert}>
+    <PageLayout user={user} title={isEditMode ? 'Edit Paket Layanan' : 'Tambah Paket Layanan'} alert={alert} isLoading={isLoading}>
       <div className="max-w-2xl mx-auto">
 
         {/* Breadcrumb */}

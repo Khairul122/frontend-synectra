@@ -19,7 +19,7 @@ import { API_ENDPOINTS } from '../../constants/api';
  * const alert = useAlert();
  * <PageLayout user={user} title="..." alert={alert}>
  */
-export function PageLayout({ user, title, children, alert: externalAlert }) {
+export function PageLayout({ user, title, children, alert: externalAlert, isLoading }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [waLink,      setWaLink]      = useState(null);
   const internalAlert = useAlert();
@@ -65,7 +65,14 @@ export function PageLayout({ user, title, children, alert: externalAlert }) {
             onMenuClick={() => setSidebarOpen(true)}
           />
           <main className="flex-1 p-4 lg:p-6 overflow-y-auto">
-            {children}
+            {isLoading ? (
+              <div className="flex items-center justify-center py-20">
+                <div className="border-2 border-neu-black shadow-neu px-8 py-5 bg-neu-white flex items-center gap-3">
+                  <div className="w-4 h-4 border-2 border-neu-black border-t-neu-primary animate-spin" />
+                  <span className="font-mono text-sm font-bold text-neu-black uppercase tracking-widest">Memuat...</span>
+                </div>
+              </div>
+            ) : children}
           </main>
         </div>
       </div>

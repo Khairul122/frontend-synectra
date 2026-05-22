@@ -218,10 +218,6 @@ export default function IncomePage() {
     fetchIncome();
   }, [user, view, year, month]);
 
-  useEffect(() => {
-    if (!isLoading && pageRef.current) {
-    }
-  }, [isLoading]);
 
 
   const YEAR_RANGE = Array.from({ length: 5 }, (_, i) => now.getFullYear() - i);
@@ -237,7 +233,7 @@ export default function IncomePage() {
     'Semua Waktu';
 
   return (
-    <PageLayout user={user} title="Pemasukan" alert={alert}>
+    <PageLayout user={user} title="Pemasukan" alert={alert} isLoading={isLoading}>
       <div className="max-w-5xl mx-auto space-y-6">
 
         {/* ─── Header + Controls ─── */}

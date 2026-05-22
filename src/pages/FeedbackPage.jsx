@@ -124,10 +124,6 @@ export default function FeedbackPage() {
       .finally(() => setIsLoading(false));
   }, [navigate]);
 
-  useEffect(() => {
-    if (!isLoading && headerRef.current)
-    if (!isLoading && tableRef.current)
-  }, [isLoading]);
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
@@ -151,7 +147,7 @@ export default function FeedbackPage() {
 
 
   return (
-    <PageLayout user={user} title="Feedback & Rating" alert={alert}>
+    <PageLayout user={user} title="Feedback & Rating" alert={alert} isLoading={isLoading}>
       {editTarget && (
         <EditModal feedback={editTarget} onClose={() => setEditTarget(null)} onSaved={() => { loadData(); alert.success('Feedback berhasil diperbarui.'); }} />
       )}

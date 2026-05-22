@@ -143,10 +143,6 @@ export default function BankAccountPage() {
       .finally(() => setIsLoading(false));
   }, [navigate]);
 
-  useEffect(() => {
-    if (!isLoading) {
-      if (headerRef.current)      if (tableRef.current)    }
-  }, [isLoading]);
 
   const handleToggleActive = async (account) => {
     try {
@@ -174,7 +170,7 @@ export default function BankAccountPage() {
 
 
   return (
-    <PageLayout user={user} title={t('bankAccounts.title')} alert={alert}>
+    <PageLayout user={user} title={t('bankAccounts.title')} alert={alert} isLoading={isLoading}>
       {previewAccount && <LogoPreviewModal account={previewAccount} onClose={() => setPreviewAccount(null)} />}
       <ConfirmModal
         isOpen={Boolean(deleteTarget)}

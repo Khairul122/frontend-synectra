@@ -127,9 +127,6 @@ export default function SoftwareProductFormPage() {
     init();
   }, [id, isEditMode, navigate]);
 
-  useEffect(() => {
-    if (!isLoading && formRef.current)
-  }, [isLoading]);
 
   const setField = (key, value) => {
     setForm(prev => ({ ...prev, [key]: value }));
@@ -190,7 +187,7 @@ export default function SoftwareProductFormPage() {
   );
 
   return (
-    <PageLayout user={user} title={isEditMode ? 'Edit Software' : 'Tambah Software'} alert={alert}>
+    <PageLayout user={user} title={isEditMode ? 'Edit Software' : 'Tambah Software'} alert={alert} isLoading={isLoading}>
       <div className="max-w-2xl mx-auto">
 
         <div className="flex items-center gap-2 mb-6 font-mono text-xs text-neu-black/50">

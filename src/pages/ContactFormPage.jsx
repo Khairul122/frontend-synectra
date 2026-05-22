@@ -103,10 +103,6 @@ export default function ContactFormPage() {
     init();
   }, [id, isEditMode, navigate]);
 
-  useEffect(() => {
-    if (!isLoading && formRef.current) {
-    }
-  }, [isLoading]);
 
   const setField = (key, val) => {
     setForm(prev => ({ ...prev, [key]: val }));
@@ -177,7 +173,7 @@ export default function ContactFormPage() {
   const selectedPlatform = getPlatform(form.icon);
 
   return (
-    <PageLayout user={user} title={isEditMode ? 'Edit Kontak' : 'Tambah Kontak'} alert={alert}>
+    <PageLayout user={user} title={isEditMode ? 'Edit Kontak' : 'Tambah Kontak'} alert={alert} isLoading={isLoading}>
       <div className="max-w-2xl mx-auto">
 
         {/* Breadcrumb */}

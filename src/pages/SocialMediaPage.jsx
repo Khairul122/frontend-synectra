@@ -167,10 +167,6 @@ export default function SocialMediaPage() {
       .finally(() => setIsLoading(false));
   }, [navigate]);
 
-  useEffect(() => {
-    if (!isLoading) {
-      if (headerRef.current)      if (tableRef.current)    }
-  }, [isLoading]);
 
   const handleToggleActive = async (item) => {
     try {
@@ -205,7 +201,7 @@ export default function SocialMediaPage() {
 
 
   return (
-    <PageLayout user={user} title="Social Media Management" alert={alert}>
+    <PageLayout user={user} title="Social Media Management" alert={alert} isLoading={isLoading}>
       {previewItem && <IconPreviewModal item={previewItem} onClose={() => setPreviewItem(null)} />}
       <ConfirmModal
         isOpen={Boolean(deleteTarget)}

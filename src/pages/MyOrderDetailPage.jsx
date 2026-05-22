@@ -692,8 +692,6 @@ export default function MyOrderDetailPage() {
     init();
   }, [id]);
 
-  useEffect(() => {
-    if (!isLoading && pageRef.current)  }, [isLoading]);
 
   const fmt         = (val) => val ? `Rp ${Number(val).toLocaleString('id-ID')}` : '—';
   const fmtDateTime = (val) => val ? new Date(val).toLocaleString('id-ID', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '—';
@@ -704,7 +702,7 @@ export default function MyOrderDetailPage() {
   const lastProgress = order.progressReports?.length ? order.progressReports[order.progressReports.length - 1].progressPercentage : 0;
 
   return (
-    <PageLayout user={user} title={t('myOrderDetail.breadcrumb')} alert={alert}>
+    <PageLayout user={user} title={t('myOrderDetail.breadcrumb')} alert={alert} isLoading={isLoading}>
       {detailProgress && (
         <ProgressDetailModal report={detailProgress} onClose={() => setDetailProgress(null)}
           onViewImage={(src, caption) => setPreviewImage({ src, caption })} />

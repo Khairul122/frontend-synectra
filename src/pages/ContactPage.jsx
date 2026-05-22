@@ -113,10 +113,6 @@ export default function ContactPage() {
       .finally(() => setIsLoading(false));
   }, [navigate]);
 
-  useEffect(() => {
-    if (!isLoading) {
-      if (headerRef.current)      if (tableRef.current)    }
-  }, [isLoading]);
 
   const handleToggleActive = async (item) => {
     try {
@@ -151,7 +147,7 @@ export default function ContactPage() {
 
 
   return (
-    <PageLayout user={user} title="Contact Management" alert={alert}>
+    <PageLayout user={user} title="Contact Management" alert={alert} isLoading={isLoading}>
       <ConfirmModal
         isOpen={Boolean(deleteTarget)}
         title="Hapus Kontak"

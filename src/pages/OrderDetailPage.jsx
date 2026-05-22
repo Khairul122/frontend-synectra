@@ -751,10 +751,6 @@ export default function OrderDetailPage() {
     init();
   }, [id]);
 
-  useEffect(() => {
-    if (!isLoading && pageRef.current) {
-    }
-  }, [isLoading]);
 
   const handleStatusChange = async (status) => {
     try {
@@ -809,7 +805,7 @@ export default function OrderDetailPage() {
   const statusCfg = STATUS_CONFIG[order.status] ?? { label: order.status, bg: 'bg-neu-black/20', text: 'text-neu-black' };
 
   return (
-    <PageLayout user={user} title="Detail Pesanan" alert={alert}>
+    <PageLayout user={user} title="Detail Pesanan" alert={alert} isLoading={isLoading}>
       {detailProgress && (
         <ProgressDetailModal
           report={detailProgress}

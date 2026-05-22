@@ -121,10 +121,6 @@ export default function ServicePackagePage() {
       .finally(() => setIsLoading(false));
   }, [navigate]);
 
-  useEffect(() => {
-    if (!isLoading && headerRef.current)
-    if (!isLoading && tableRef.current)
-  }, [isLoading]);
 
   const handleToggleActive = async (pkg) => {
     try {
@@ -158,7 +154,7 @@ export default function ServicePackagePage() {
 
 
   return (
-    <PageLayout user={user} title="Paket Layanan" alert={alert}>
+    <PageLayout user={user} title="Paket Layanan" alert={alert} isLoading={isLoading}>
       <ConfirmModal
         isOpen={Boolean(deleteTarget)}
         title="Hapus Paket Layanan"

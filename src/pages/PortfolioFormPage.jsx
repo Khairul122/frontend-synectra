@@ -229,7 +229,7 @@ export default function PortfolioFormPage() {
 
 
   return (
-    <PageLayout user={user} title={isEdit ? 'Edit Portfolio' : 'Tambah Portfolio'} alert={alert}>
+    <PageLayout user={user} title={isEdit ? 'Edit Portfolio' : 'Tambah Portfolio'} alert={alert} isLoading={isLoading}>
       <div className="flex flex-col gap-6">
 
         {/* Form — mengisi sisa area */}

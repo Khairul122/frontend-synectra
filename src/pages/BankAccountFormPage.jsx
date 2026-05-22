@@ -214,10 +214,6 @@ export default function BankAccountFormPage() {
     init();
   }, [id, isEditMode, navigate]);
 
-  useEffect(() => {
-    if (!isLoading && formRef.current) {
-    }
-  }, [isLoading]);
 
   const setField = (key, value) => {
     setForm(prev => ({ ...prev, [key]: value }));
@@ -269,7 +265,7 @@ export default function BankAccountFormPage() {
 
 
   return (
-    <PageLayout user={user} title={isEditMode ? 'Edit Akun Bank' : 'Tambah Akun Bank'} alert={alert}>
+    <PageLayout user={user} title={isEditMode ? 'Edit Akun Bank' : 'Tambah Akun Bank'} alert={alert} isLoading={isLoading}>
       <div className="max-w-2xl mx-auto">
 
         {/* Breadcrumb */}

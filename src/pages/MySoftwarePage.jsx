@@ -437,8 +437,6 @@ export default function MySoftwarePage() {
     init();
   }, [navigate]);
 
-  useEffect(() => {
-    if (!isLoading && pageRef.current)  }, [isLoading]);
 
   const handleBuy = async () => {
     if (!buyTarget) return;
@@ -458,7 +456,7 @@ export default function MySoftwarePage() {
   const purchasedIds = new Set(purchases.map(p => p.softwareId));
 
   return (
-    <PageLayout user={user} title={t('client.mySoftware.title')} alert={alert}>
+    <PageLayout user={user} title={t('client.mySoftware.title')} alert={alert} isLoading={isLoading}>
       <ConfirmModal
         isOpen={Boolean(buyTarget)}
         title={t('client.mySoftware.confirmTitle')}
