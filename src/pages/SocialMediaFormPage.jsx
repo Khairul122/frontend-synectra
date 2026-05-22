@@ -112,7 +112,7 @@ function Field({ label, error, children }) {
 const inputCls = (hasError) => cn(
   'w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm',
   'font-body text-neu-black placeholder:text-gray-400',
-  'outline-none focus:shadow-neu
+  'outline-none focus:shadow-neu',
   hasError && 'border-neu-accent shadow-[4px_4px_0px_#FF5C5C]',
 );
 

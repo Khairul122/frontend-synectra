@@ -512,7 +512,7 @@ export default function MySoftwarePage() {
                   <div onClick={() => setPreviewTarget(sw)}
                     className="relative border-b-2 border-neu-black bg-neu-bg h-40 overflow-hidden flex items-center justify-center cursor-pointer group">
                     {sw.thumbnailUrl
-                      ? <img src={sw.thumbnailUrl} alt={sw.name} className="w-full h-full object-cover group-loading="lazy" />
+                      ? <img src={sw.thumbnailUrl} alt={sw.name} className="w-full h-full object-cover" loading="lazy" />
                       : <svg className="w-12 h-12 text-neu-black/15 group-hover:text-neu-black/30" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                           <rect x="2" y="3" width="20" height="14" /><line x1="8" y1="21" x2="16" y2="21" /><line x1="12" y1="17" x2="12" y2="21" />
                         </svg>
@@ -541,7 +541,7 @@ export default function MySoftwarePage() {
                   <div className="px-4 pb-4 flex gap-2">
                     {sw.demoUrl && (
                       <a href={sw.demoUrl} target="_blank" rel="noopener noreferrer"
-                        className="flex-1 py-2 border-2 border-neu-black bg-neu-white font-display font-bold text-xs uppercase text-neu-black text-center hover:bg-neu-bg
+                        className="flex-1 py-2 border-2 border-neu-black bg-neu-white font-display font-bold text-xs uppercase text-neu-black text-center hover:bg-neu-bg">
                         {t('client.mySoftware.demo')}
                       </a>
                     )}

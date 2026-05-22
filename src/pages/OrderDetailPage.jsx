@@ -682,7 +682,7 @@ function RevisionDetailModal({ batch, batchIndex, onClose, onViewImage }) {
                   {item.images.map((url, imgIdx) => (
                     <button key={imgIdx} type="button"
                       onClick={() => { handleClose(); setTimeout(() => onViewImage(url, `Revisi #${batchIndex + 1} Poin ${idx + 1}`), 300); }}
-                      className="relative w-20 h-16 border-2 border-neu-black overflow-hidden group hover:border-[#F97316] hover:shadow-neu-sm
+                      className="relative w-20 h-16 border-2 border-neu-black overflow-hidden group hover:border-[#F97316] hover:shadow-neu-sm">
                       <img src={url} alt="" className="w-full h-full object-cover" />
                       <div className="absolute inset-0 bg-neu-black/0 group-hover:bg-neu-black/25 flex items-center justify-center">
                         <span className="opacity-0 group-hover:opacity-100 font-mono text-[9px] text-neu-white bg-neu-black/70 px-1.5 py-0.5">Perbesar</span>
@@ -999,7 +999,7 @@ export default function OrderDetailPage() {
                       title="Klik untuk memperbesar"
                       className={cn(
                         'flex-shrink-0 w-16 h-12 border-2 border-neu-black overflow-hidden bg-neu-bg',
-                        'hover:border-neu-primary hover:shadow-neu-sm
+                        'hover:border-neu-primary hover:shadow-neu-sm'
                       )}
                     >
                       <img src={p.receiptImageUrl} alt="receipt" className="w-full h-full object-cover" />

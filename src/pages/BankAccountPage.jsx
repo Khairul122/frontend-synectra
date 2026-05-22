@@ -78,7 +78,7 @@ function BankAccountRow({ account, index, onEdit, onDelete, onToggleActive, onPr
       <td className="px-4 py-3 border-r-2 border-neu-black font-mono text-xs text-neu-black/50 text-center w-10">{index + 1}</td>
       <td className="px-4 py-3 border-r-2 border-neu-black w-20">
         <div onClick={() => hasPreview && onPreview(account)}
-          className={cn('w-14 h-10 border-2 border-neu-black overflow-hidden bg-neu-bg flex-shrink-0 flex items-center justify-center', hasPreview && 'cursor-pointer hover:border-neu-primary hover:shadow-neu-sm
+          className={cn('w-14 h-10 border-2 border-neu-black overflow-hidden bg-neu-bg flex-shrink-0 flex items-center justify-center', hasPreview && 'cursor-pointer hover:border-neu-primary hover:shadow-neu-sm')}>
           {account.bankLogo
             ? <img src={account.bankLogo} alt={account.bankName} className="w-full h-full object-contain p-1" onError={e => { e.target.style.display = 'none'; }} />
             : account.qrisImageUrl

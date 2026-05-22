@@ -71,7 +71,7 @@ function SocialMediaRow({ item, index, onEdit, onDelete, onToggleActive, onPrevi
           onClick={() => item.icon && onPreview(item)}
           className={cn(
             'w-10 h-10 border-2 border-neu-black bg-neu-bg flex items-center justify-center overflow-hidden',
-            item.icon && 'cursor-pointer hover:border-neu-primary hover:shadow-neu-sm
+            item.icon && 'cursor-pointer hover:border-neu-primary hover:shadow-neu-sm'
           )}
           title={item.icon ? 'Klik untuk memperbesar' : undefined}
         >

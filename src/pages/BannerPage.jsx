@@ -78,9 +78,8 @@ function ImagePreviewModal({ banner, onClose }) {
             className={cn(
               'px-4 py-2 bg-neu-white border-2 border-neu-black shadow-neu',
               'font-display font-bold text-xs uppercase tracking-wide text-neu-black',
-              '',
               'hover:shadow-neu-sm',
-              ')}
+            )}
           >
             Tutup
           </button>
@@ -111,7 +110,7 @@ function BannerRow({ banner, index, onEdit, onDelete, onToggleActive, onPreview 
           onClick={() => banner.image && onPreview(banner)}
           className={cn(
             'w-14 h-10 border-2 border-neu-black overflow-hidden bg-neu-bg flex-shrink-0',
-            banner.image && 'cursor-pointer hover:border-neu-primary hover:shadow-neu-sm
+            banner.image && 'cursor-pointer hover:border-neu-primary hover:shadow-neu-sm'
           )}
           title={banner.image ? 'Klik untuk memperbesar' : undefined}
         >
@@ -312,7 +311,7 @@ export default function BannerPage() {
             'font-display font-bold text-xs uppercase tracking-wide text-neu-black',
             'whitespace-nowrap',
             'hover:shadow-neu-sm',
-            ')}
+          )}
         >
           + Tambah Banner
         </button>

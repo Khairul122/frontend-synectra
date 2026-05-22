@@ -297,7 +297,7 @@ export default function PortfolioFormPage() {
                 'px-5 py-2.5 font-display font-bold text-xs uppercase tracking-wide',
                 'bg-neu-white text-neu-black border-2 border-neu-black shadow-neu',
                 'hover:shadow-neu-sm',
-                'isSaving && 'opacity-40 cursor-not-allowed',
+                isSaving && 'opacity-40 cursor-not-allowed',
               )}>
               ← Kembali
             </button>
@@ -309,7 +309,7 @@ export default function PortfolioFormPage() {
                 'px-5 py-2.5 font-display font-bold text-xs uppercase tracking-wide',
                 'bg-neu-white text-neu-black border-2 border-neu-black shadow-neu',
                 'hover:shadow-neu-sm',
-                'isSaving && 'opacity-40 cursor-not-allowed',
+                isSaving && 'opacity-40 cursor-not-allowed',
               )}>
               Batal
             </button>
@@ -319,7 +319,7 @@ export default function PortfolioFormPage() {
                 'flex-1 py-2.5 font-display font-bold text-sm uppercase tracking-wide',
                 'bg-neu-primary text-neu-black border-2 border-neu-black shadow-neu',
                 'hover:shadow-neu-sm',
-                'isSaving && 'opacity-60 cursor-not-allowed',
+                isSaving && 'opacity-60 cursor-not-allowed',
               )}>
               {isSaving
                 ? <span className="inline-flex items-center gap-2 justify-center"><span className="">⟳</span> Menyimpan...</span>

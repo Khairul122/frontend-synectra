@@ -66,7 +66,7 @@ function EditClientModal({ client, onClose, onSaved }) {
   const inputCls = cn(
     'w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm',
     'font-body text-neu-black placeholder:text-gray-400',
-    'outline-none focus:shadow-neu
+    'outline-none focus:shadow-neu',
   );
 
   return createPortal(

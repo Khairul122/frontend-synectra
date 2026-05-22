@@ -241,7 +241,7 @@ export default function BannerFormPage() {
               className={cn(
                 'w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm',
                 'font-body text-neu-black placeholder:text-gray-400',
-                'outline-none focus:shadow-neu
+                'outline-none focus:shadow-neu',
                 '',
                 errors.title && 'border-neu-accent shadow-[4px_4px_0px_#FF5C5C]',
               )}
@@ -310,9 +310,8 @@ export default function BannerFormPage() {
               className={cn(
                 'px-8 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu',
                 'font-display font-bold text-sm uppercase tracking-wide text-neu-black',
-                '',
                 'hover:shadow-neu-sm',
-                'isSaving && 'opacity-60 cursor-not-allowed',
+                isSaving && 'opacity-60 cursor-not-allowed',
               )}
             >
               {isSaving ? 'Menyimpan...' : isEditMode ? 'Simpan Perubahan' : 'Buat Banner'}
@@ -324,9 +323,8 @@ export default function BannerFormPage() {
               className={cn(
                 'px-6 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu',
                 'font-display font-bold text-sm uppercase tracking-wide text-neu-black',
-                '',
                 'hover:shadow-neu-sm',
-                ')}
+              )}
             >
               Batal
             </button>
