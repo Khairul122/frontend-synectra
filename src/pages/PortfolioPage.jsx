@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+﻿import { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { gsap } from 'gsap';
@@ -9,7 +9,6 @@ import { PageLayout } from '../components/layout/PageLayout';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
 import { PortfolioDetailModal } from '../components/portfolio/PortfolioDetailModal';
 import { useAlert } from '../hooks/useAlert';
-import { PageLoader } from '../components/ui/PageLoader';
 
 const stripHtml = (html) => html?.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim() ?? '';
 
@@ -170,7 +169,6 @@ export default function PortfolioPage() {
     return matchSearch && matchCat;
   });
 
-  if (isLoading) return <PageLoader />;
 
   return (
     <PageLayout user={user} title="Portfolio" alert={alert}>

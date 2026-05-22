@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+﻿import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { gsap } from 'gsap';
@@ -8,7 +8,6 @@ import { bannerService } from '../services/banner.service';
 import { PageLayout } from '../components/layout/PageLayout';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
 import { useAlert } from '../hooks/useAlert';
-import { PageLoader } from '../components/ui/PageLoader';
 
 const stripHtml = (html) => html?.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim() ?? '';
 
@@ -292,7 +291,6 @@ export default function BannerPage() {
     !search || b.title.toLowerCase().includes(search.toLowerCase()),
   );
 
-  if (isLoading) return <PageLoader />;
 
   return (
     <PageLayout user={user} title="Banner Management" alert={alert}>

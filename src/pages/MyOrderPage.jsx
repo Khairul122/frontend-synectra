@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+﻿import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { gsap } from 'gsap';
@@ -7,7 +7,6 @@ import { authService } from '../services/auth.service';
 import { orderService } from '../services/order.service';
 import { PageLayout } from '../components/layout/PageLayout';
 import { useAlert } from '../hooks/useAlert';
-import { PageLoader } from '../components/ui/PageLoader';
 
 const STATUS_CONFIG = {
   pending:     { label: 'Pending',     bg: 'bg-neu-primary', text: 'text-neu-black' },
@@ -49,7 +48,6 @@ export default function MyOrderPage() {
   const fmt = (val) => val ? `Rp ${Number(val).toLocaleString('id-ID')}` : '—';
   const fmtDate = (val) => val ? new Date(val).toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' }) : '—';
 
-  if (isLoading) return <PageLoader />;
 
   return (
     <PageLayout user={user} title={t('myOrders.title')} alert={alert}>

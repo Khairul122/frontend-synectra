@@ -7,7 +7,6 @@ import { orderService } from '../services/order.service';
 import { clientService } from '../services/client.service';
 import { PageLayout } from '../components/layout/PageLayout';
 import { useAlert } from '../hooks/useAlert';
-import { PageLoader } from '../components/ui/PageLoader';
 
 const STATUS_BG = {
   pending:     { bg: 'bg-neu-primary', text: 'text-neu-black' },
@@ -248,14 +247,12 @@ export default function DashboardPage() {
       .finally(() => setIsLoading(false));
   }, [navigate]);
 
-  if (isLoading) return <PageLoader />;
-
   return (
     <PageLayout user={user} title="Dashboard" alert={alert}>
-      {user?.role === 'admin'
+      {user && (user.role === 'admin'
         ? <AdminDashboard user={user} orders={orders} clients={clients} navigate={navigate} />
         : <ClientDashboard user={user} orders={orders} navigate={navigate} />
-      }
+      )}
     </PageLayout>
   );
 }

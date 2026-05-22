@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+﻿import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { gsap } from 'gsap';
@@ -8,7 +8,6 @@ import { softwareProductService } from '../services/softwareProduct.service';
 import { PageLayout } from '../components/layout/PageLayout';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
 import { useAlert } from '../hooks/useAlert';
-import { PageLoader } from '../components/ui/PageLoader';
 
 const fmt = (val) => `Rp ${Number(val).toLocaleString('id-ID')}`;
 
@@ -165,7 +164,6 @@ export default function SoftwareProductPage() {
     (p.category || '').toLowerCase().includes(search.toLowerCase()),
   );
 
-  if (isLoading) return <PageLoader />;
 
   return (
     <PageLayout user={user} title={isEn ? 'Software Management' : 'Manajemen Software'} alert={alert}>

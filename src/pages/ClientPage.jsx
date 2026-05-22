@@ -10,7 +10,6 @@ import { userService } from '../services/user.service';
 import { PageLayout } from '../components/layout/PageLayout';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
 import { useAlert } from '../hooks/useAlert';
-import { PageLoader } from '../components/ui/PageLoader';
 
 /* ─── Edit Modal ─────────────────────────────────────────────────────────── */
 function EditClientModal({ client, onClose, onSaved }) {
@@ -284,7 +283,6 @@ export default function ClientPage() {
     (c.email ?? '').toLowerCase().includes(search.toLowerCase()),
   );
 
-  if (isLoading) return <PageLoader />;
 
   return (
     <PageLayout user={user} title="Client Management" alert={alert}>

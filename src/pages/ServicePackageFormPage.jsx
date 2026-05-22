@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+﻿import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
@@ -8,7 +8,6 @@ import { PageLayout } from '../components/layout/PageLayout';
 import { useAlert } from '../hooks/useAlert';
 import { PACKAGE_ICON_BUCKET } from '../constants/api';
 import supabase from '../lib/supabase';
-import { PageLoader } from '../components/ui/PageLoader';
 
 const CATEGORIES = ['Web', 'Mobile', 'UI/UX', 'Tugas', 'Lainnya'];
 
@@ -200,7 +199,6 @@ export default function ServicePackageFormPage() {
     }
   };
 
-  if (isLoading) return <PageLoader />;
 
   const inputClass = (err) => cn(
     'w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-neu-black placeholder:text-gray-400',

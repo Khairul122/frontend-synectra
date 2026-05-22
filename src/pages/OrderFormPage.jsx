@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+﻿import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { gsap } from 'gsap';
@@ -9,7 +9,6 @@ import { clientService } from '../services/client.service';
 import { servicePackageService } from '../services/servicePackage.service';
 import { PageLayout } from '../components/layout/PageLayout';
 import { useAlert } from '../hooks/useAlert';
-import { PageLoader } from '../components/ui/PageLoader';
 
 export default function OrderFormPage() {
   const navigate   = useNavigate();
@@ -105,7 +104,6 @@ export default function OrderFormPage() {
     hasError && 'border-neu-accent shadow-[4px_4px_0px_#FF5C5C]',
   );
 
-  if (isLoading) return <PageLoader />;
 
   return (
     <PageLayout user={user} title="Buat Pesanan Baru" alert={alert}>

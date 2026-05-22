@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+﻿import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
@@ -13,7 +13,6 @@ import { ConfirmModal } from '../components/ui/ConfirmModal';
 import { useAlert } from '../hooks/useAlert';
 import { PROGRESS_ATTACH_BUCKET, PAYMENT_RECEIPT_BUCKET } from '../constants/api';
 import supabase from '../lib/supabase';
-import { PageLoader } from '../components/ui/PageLoader';
 
 const STATUS_CONFIG = {
   pending:     { label: 'Pending',     bg: 'bg-neu-primary',  text: 'text-neu-black' },
@@ -854,7 +853,6 @@ export default function OrderDetailPage() {
   const fmtDate = (val) => val ? new Date(val).toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' }) : '—';
   const fmtDateTime = (val) => val ? new Date(val).toLocaleString('id-ID', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '—';
 
-  if (isLoading) return <PageLoader />;
 
   if (!order) return null;
 

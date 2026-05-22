@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+﻿import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { gsap } from 'gsap';
@@ -9,7 +9,6 @@ import { PageLayout } from '../components/layout/PageLayout';
 import { useAlert } from '../hooks/useAlert';
 import { BANK_LOGO_BUCKET, QRIS_IMAGE_BUCKET } from '../constants/api';
 import supabase from '../lib/supabase';
-import { PageLoader } from '../components/ui/PageLoader';
 
 async function uploadBankLogo(file) {
   const ext      = file.name.split('.').pop();
@@ -271,7 +270,6 @@ export default function BankAccountFormPage() {
   };
 
 
-  if (isLoading) return <PageLoader />;
 
   return (
     <PageLayout user={user} title={isEditMode ? 'Edit Akun Bank' : 'Tambah Akun Bank'} alert={alert}>

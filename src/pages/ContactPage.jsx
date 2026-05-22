@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+﻿import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { gsap } from 'gsap';
@@ -9,7 +9,6 @@ import { getPlatform } from '../constants/platforms';
 import { PageLayout } from '../components/layout/PageLayout';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
 import { useAlert } from '../hooks/useAlert';
-import { PageLoader } from '../components/ui/PageLoader';
 
 /* ─── Table Row ──────────────────────────────────────────────────────────── */
 function ContactRow({ item, index, onEdit, onDelete, onToggleActive }) {
@@ -159,7 +158,6 @@ export default function ContactPage() {
     i.contactInfo.toLowerCase().includes(search.toLowerCase()),
   );
 
-  if (isLoading) return <PageLoader />;
 
   return (
     <PageLayout user={user} title="Contact Management" alert={alert}>

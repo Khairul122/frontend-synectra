@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+﻿import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { gsap } from 'gsap';
@@ -8,7 +8,6 @@ import { contactService } from '../services/contact.service';
 import { PLATFORMS, getPlatform } from '../constants/platforms';
 import { PageLayout } from '../components/layout/PageLayout';
 import { useAlert } from '../hooks/useAlert';
-import { PageLoader } from '../components/ui/PageLoader';
 
 /* ─── Icon Picker ────────────────────────────────────────────────────────── */
 function IconPicker({ value, onChange }) {
@@ -177,7 +176,6 @@ export default function ContactFormPage() {
     hasError && 'border-neu-accent shadow-[4px_4px_0px_#FF5C5C]',
   );
 
-  if (isLoading) return <PageLoader />;
 
   const selectedPlatform = getPlatform(form.icon);
 

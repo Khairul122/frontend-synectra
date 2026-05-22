@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+﻿import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
@@ -9,7 +9,6 @@ import { socialMediaService } from '../services/socialMedia.service';
 import { PageLayout } from '../components/layout/PageLayout';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
 import { useAlert } from '../hooks/useAlert';
-import { PageLoader } from '../components/ui/PageLoader';
 
 /* ─── Icon Preview Modal ─────────────────────────────────────────────────── */
 function IconPreviewModal({ item, onClose }) {
@@ -223,7 +222,6 @@ export default function SocialMediaPage() {
     i.accountName.toLowerCase().includes(search.toLowerCase()),
   );
 
-  if (isLoading) return <PageLoader />;
 
   return (
     <PageLayout user={user} title="Social Media Management" alert={alert}>

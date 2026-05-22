@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+﻿import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
@@ -13,7 +13,6 @@ import { ConfirmModal } from '../components/ui/ConfirmModal';
 import { useAlert } from '../hooks/useAlert';
 import { PAYMENT_RECEIPT_BUCKET } from '../constants/api';
 import supabase from '../lib/supabase';
-import { PageLoader } from '../components/ui/PageLoader';
 
 const STATUS_BG = {
   pending_payment:      { bg: 'bg-neu-primary',  text: 'text-neu-black' },
@@ -458,7 +457,6 @@ export default function MySoftwarePage() {
     } finally { setIsBuying(false); }
   };
 
-  if (isLoading) return <PageLoader />;
 
   const purchasedIds = new Set(purchases.map(p => p.softwareId));
 

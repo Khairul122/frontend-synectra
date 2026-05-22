@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+﻿import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
@@ -7,7 +7,6 @@ import { servicePackageService } from '../services/servicePackage.service';
 import { PageLayout } from '../components/layout/PageLayout';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
 import { useAlert } from '../hooks/useAlert';
-import { PageLoader } from '../components/ui/PageLoader';
 
 const fmt = (val) => `Rp ${Number(val).toLocaleString('id-ID')}`;
 
@@ -166,7 +165,6 @@ export default function ServicePackagePage() {
     (p.category || '').toLowerCase().includes(search.toLowerCase()),
   );
 
-  if (isLoading) return <PageLoader />;
 
   return (
     <PageLayout user={user} title="Paket Layanan" alert={alert}>

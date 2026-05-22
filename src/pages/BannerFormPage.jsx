@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+﻿import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
@@ -9,7 +9,6 @@ import { RichTextEditor } from '../components/ui/RichTextEditor';
 import { useAlert } from '../hooks/useAlert';
 import { BANNER_BUCKET } from '../constants/api';
 import supabase from '../lib/supabase';
-import { PageLoader } from '../components/ui/PageLoader';
 
 async function uploadBannerImage(file) {
   const ext      = file.name.split('.').pop();
@@ -221,7 +220,6 @@ export default function BannerFormPage() {
   };
 
 
-  if (isLoading) return <PageLoader />;
 
   return (
     <PageLayout user={user} title={isEditMode ? 'Edit Banner' : 'Tambah Banner'} alert={alert}>

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+﻿import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
@@ -7,7 +7,6 @@ import { softwarePurchaseService } from '../services/softwarePurchase.service';
 import { PageLayout } from '../components/layout/PageLayout';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
 import { useAlert } from '../hooks/useAlert';
-import { PageLoader } from '../components/ui/PageLoader';
 
 const fmt = (val) => `Rp ${Number(val).toLocaleString('id-ID')}`;
 
@@ -149,7 +148,6 @@ export default function SoftwarePurchasePage() {
 
   const filtered = purchases.filter(p => filter === 'all' || p.paymentStatus === filter);
 
-  if (isLoading) return <PageLoader />;
 
   return (
     <PageLayout user={user} title="Pembelian Software" alert={alert}>

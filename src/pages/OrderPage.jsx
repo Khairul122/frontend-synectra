@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+﻿import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { gsap } from 'gsap';
@@ -8,7 +8,6 @@ import { orderService } from '../services/order.service';
 import { PageLayout } from '../components/layout/PageLayout';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
 import { useAlert } from '../hooks/useAlert';
-import { PageLoader } from '../components/ui/PageLoader';
 
 const STATUS_BG = {
   pending:     { bg: 'bg-neu-primary',  text: 'text-neu-black' },
@@ -135,7 +134,6 @@ export default function OrderPage() {
     }
   };
 
-  if (isLoading) return <PageLoader />;
 
   return (
     <PageLayout user={user} title={t('orders.title')} alert={alert}>

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+﻿import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
@@ -6,7 +6,6 @@ import { authService } from '../services/auth.service';
 import { paymentService } from '../services/payment.service';
 import { PageLayout } from '../components/layout/PageLayout';
 import { useAlert } from '../hooks/useAlert';
-import { PageLoader } from '../components/ui/PageLoader';
 
 const MONTHS_ID = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Ags','Sep','Okt','Nov','Des'];
 const MONTHS_FULL = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
@@ -231,7 +230,6 @@ export default function IncomePage() {
     }
   }, [isLoading]);
 
-  if (isLoading) return <PageLoader />;
 
   const YEAR_RANGE = Array.from({ length: 5 }, (_, i) => now.getFullYear() - i);
 

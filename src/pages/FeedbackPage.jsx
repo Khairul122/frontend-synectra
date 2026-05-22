@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+﻿import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { cn } from '../utils/cn';
@@ -7,7 +7,6 @@ import { feedbackService } from '../services/feedback.service';
 import { PageLayout } from '../components/layout/PageLayout';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
 import { useAlert } from '../hooks/useAlert';
-import { PageLoader } from '../components/ui/PageLoader';
 
 const STARS = [1, 2, 3, 4, 5];
 
@@ -155,7 +154,6 @@ export default function FeedbackPage() {
 
   const fmtDate = (v) => new Date(v).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
 
-  if (isLoading) return <PageLoader />;
 
   return (
     <PageLayout user={user} title="Feedback & Rating" alert={alert}>

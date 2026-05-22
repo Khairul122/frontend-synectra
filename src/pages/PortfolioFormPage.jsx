@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+﻿import { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { gsap } from 'gsap';
@@ -10,7 +10,6 @@ import { PageLayout } from '../components/layout/PageLayout';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
 import { RichTextEditor } from '../components/ui/RichTextEditor';
 import { useAlert } from '../hooks/useAlert';
-import { PageLoader } from '../components/ui/PageLoader';
 
 const CATEGORIES = ['Web App', 'Mobile', 'Design', 'Backend'];
 const EMPTY      = { title: '', description: '', images: [], category: '' };
@@ -231,7 +230,6 @@ export default function PortfolioFormPage() {
     errors[k] && 'border-neu-accent shadow-[4px_4px_0px_#FF5C5C]',
   );
 
-  if (isLoading) return <PageLoader />;
 
   return (
     <PageLayout user={user} title={isEdit ? 'Edit Portfolio' : 'Tambah Portfolio'} alert={alert}>

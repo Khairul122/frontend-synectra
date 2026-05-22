@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+﻿import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
@@ -9,7 +9,6 @@ import { bankAccountService } from '../services/bankAccount.service';
 import { PageLayout } from '../components/layout/PageLayout';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
 import { useAlert } from '../hooks/useAlert';
-import { PageLoader } from '../components/ui/PageLoader';
 
 function LogoPreviewModal({ account, onClose }) {
   const { t } = useTranslation();
@@ -187,7 +186,6 @@ export default function BankAccountPage() {
     !search || a.bankName.toLowerCase().includes(search.toLowerCase()) || a.accountHolder.toLowerCase().includes(search.toLowerCase()),
   );
 
-  if (isLoading) return <PageLoader />;
 
   return (
     <PageLayout user={user} title={t('bankAccounts.title')} alert={alert}>

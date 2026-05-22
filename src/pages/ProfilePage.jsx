@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+﻿import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { gsap } from 'gsap';
@@ -6,7 +6,6 @@ import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
 import { PageLayout } from '../components/layout/PageLayout';
 import { useAlert } from '../hooks/useAlert';
-import { PageLoader } from '../components/ui/PageLoader';
 
 export default function ProfilePage() {
   const navigate = useNavigate();
@@ -94,7 +93,6 @@ export default function ProfilePage() {
   const ROLE_COLOR = { admin: 'bg-neu-accent text-neu-white', staff: 'bg-neu-blue text-neu-white', client: 'bg-neu-green text-neu-white' };
   const initial    = (user?.fullName ?? user?.email ?? '?').charAt(0).toUpperCase();
 
-  if (isLoading) return <PageLoader />;
 
   const pwFields = [
     { key: 'currentPassword', label: t('profile.currentPass'), placeholder: '••••••••' },
