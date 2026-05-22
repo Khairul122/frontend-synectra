@@ -35,6 +35,17 @@ export function PageLayout({ user, title, children, alert: externalAlert, isLoad
       .catch(() => {});
   }, []);
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-neu-bg flex items-center justify-center">
+        <div className="border-2 border-neu-black shadow-neu px-8 py-5 bg-neu-white flex items-center gap-3">
+          <div className="w-4 h-4 border-2 border-neu-black border-t-neu-primary animate-spin" />
+          <span className="font-mono text-sm font-bold text-neu-black uppercase tracking-widest">Memuat...</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <AlertContainer alerts={alert.alerts} onDismiss={alert.dismiss} />
@@ -65,14 +76,7 @@ export function PageLayout({ user, title, children, alert: externalAlert, isLoad
             onMenuClick={() => setSidebarOpen(true)}
           />
           <main className="flex-1 p-4 lg:p-6 overflow-y-auto">
-            {isLoading ? (
-              <div className="flex items-center justify-center py-20">
-                <div className="border-2 border-neu-black shadow-neu px-8 py-5 bg-neu-white flex items-center gap-3">
-                  <div className="w-4 h-4 border-2 border-neu-black border-t-neu-primary animate-spin" />
-                  <span className="font-mono text-sm font-bold text-neu-black uppercase tracking-widest">Memuat...</span>
-                </div>
-              </div>
-            ) : children}
+            {children}
           </main>
         </div>
       </div>
