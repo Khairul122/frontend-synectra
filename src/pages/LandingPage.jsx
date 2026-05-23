@@ -1,4 +1,4 @@
-﻿import { Component, Suspense, useEffect, useRef, useState } from 'react';
+import { Component, Suspense, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
@@ -225,7 +225,7 @@ function HeroReveal({ children, delay = 0, className = '' }) {
     );
   }, [delay]);
   return (
-    <div className={cn('overflow-hidden', className)}>
+    <div className={cn('overflow-hidden pb-4 -mb-4', className)}>
       <div ref={innerRef} style={{ transform: 'translateY(110%)' }}>
         {children}
       </div>
@@ -1079,7 +1079,7 @@ export default function LandingPage() {
             </div>
 
             {/* Title — clip reveal per baris */}
-            <h1 className="font-display font-bold text-6xl sm:text-7xl lg:text-8xl text-neu-white leading-[0.88] mb-6">
+            <h1 className="font-display font-bold text-6xl sm:text-7xl lg:text-8xl text-neu-white leading-[0.95] mb-6">
               <HeroReveal delay={0.1}>
                 <span className="block">{t('landing.hero.title1')}</span>
               </HeroReveal>
