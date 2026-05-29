@@ -1626,7 +1626,7 @@ export default function LandingPage() {
 
         {/* Top strip */}
         <div className="border-b border-neu-white/10">
-          <div className="max-w-7xl mx-auto px-4 lg:px-6 py-10 grid grid-cols-1 lg:grid-cols-5 gap-10">
+          <div className="max-w-7xl mx-auto px-4 lg:px-6 py-10 grid grid-cols-1 lg:grid-cols-4 gap-10">
 
             {/* Brand col — 2/5 */}
             <div className="lg:col-span-2">
@@ -1689,28 +1689,6 @@ export default function LandingPage() {
                   </li>
                 ))}
               </ul>
-            </div>
-
-            {/* Pembayaran */}
-            <div>
-              <p className="font-mono font-bold text-[10px] text-neu-white/30 uppercase tracking-widest mb-5">{t('landing.footer.payment')}</p>
-              <div className="flex flex-col gap-4">
-                {bankAccounts.length > 0 ? bankAccounts.slice(0, 4).map(ba => (
-                  <div key={ba.id} className="flex items-center gap-3">
-                    {ba.bankLogo
-                      ? <img src={ba.bankLogo} alt={ba.bankName} className="w-9 h-6 object-contain flex-shrink-0" />
-                      : <div className="w-9 h-6 border border-neu-white/15 flex items-center justify-center flex-shrink-0"><span className="font-mono font-bold text-[9px] text-neu-white/40">{ba.bankName?.slice(0,3)}</span></div>
-                    }
-                    <div className="min-w-0">
-                      <p className="font-mono font-bold text-xs text-neu-white/80">{ba.bankName}</p>
-                      <p className="font-mono text-[10px] text-neu-white/35 truncate">{ba.accountNumber}</p>
-                      <p className="font-mono text-[9px] text-neu-white/25 truncate">{ba.accountHolder}</p>
-                    </div>
-                  </div>
-                )) : (
-                  <p className="font-mono text-xs text-neu-white/20">{t('common.notConfigured')}</p>
-                )}
-              </div>
             </div>
           </div>
         </div>
