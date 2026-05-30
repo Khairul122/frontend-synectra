@@ -67,7 +67,8 @@
     "contacts": "Contacts",
     "profile": "Profile",
     "users": "Users",
-    "income": "Income"
+    "income": "Income",
+    "todos": "My To-Do"
   },
   "landing": {
     "hero": {

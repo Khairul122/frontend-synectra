@@ -21,6 +21,7 @@ export const API_ENDPOINTS = {
   SERVICE_PACKAGES:  `${API_BASE_URL}/api/service-packages`,
   SOFTWARE_PRODUCTS:  `${API_BASE_URL}/api/software-products`,
   SOFTWARE_PURCHASES: `${API_BASE_URL}/api/software-purchases`,
+  TODOS:              `${API_BASE_URL}/api/todos`,
 };
 
 export const SUPABASE_URL  = 'https://ddgspjgrslhlphhaltkf.supabase.co';

@@ -32,6 +32,7 @@ const SoftwareProductFormPage = lazy(() => import('./pages/SoftwareProductFormPa
 const MySoftwarePage          = lazy(() => import('./pages/MySoftwarePage'));
 const SoftwarePurchasePage    = lazy(() => import('./pages/SoftwarePurchasePage'));
 const FeedbackPage            = lazy(() => import('./pages/FeedbackPage'));
+const TodoPage                = lazy(() => import('./pages/TodoPage'));
 const NotFoundPage       = lazy(() => import('./pages/NotFoundPage'));
 const ServerErrorPage    = lazy(() => import('./pages/ServerErrorPage'));
 
@@ -111,6 +112,7 @@ function App() {
         <Route path="/my-software"                element={<MySoftwarePage />} />
         <Route path="/software-purchases"         element={<SoftwarePurchasePage />} />
         <Route path="/feedback"                   element={<FeedbackPage />} />
+        <Route path="/todos"                      element={<TodoPage />} />
         <Route path="/500"                element={<ServerErrorPage />} />
         <Route path="*"                   element={<NotFoundPage />} />
       </Routes>
