@@ -270,9 +270,9 @@ function LetterReveal({ text, className, delay = 0 }) {
     const observer = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting && !triggered.current) {
         triggered.current = true;
-        import('animejs').then(({ default: anime }) => {
+        import('animejs').then(({ default: anime, stagger }) => {
           anime({ targets: el.querySelectorAll('span'), opacity: [0, 1], translateY: [30, 0],
-            delay: anime.stagger(40, { start: delay }), duration: 500, easing: 'easeOutExpo' });
+            delay: stagger(40, { start: delay }), duration: 500, easing: 'easeOutExpo' });
         });
       }
     }, { threshold: 0.3 });
