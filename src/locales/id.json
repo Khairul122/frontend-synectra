@@ -68,7 +68,14 @@
     "profile": "Profile",
     "users": "Users",
     "income": "Pemasukan",
-    "todos": "To-Do Saya"
+    "todos": "To-Do Saya",
+    "softwareProducts": "Produk Software",
+    "group": {
+      "bisnis":     "Bisnis",
+      "konten":     "Konten",
+      "katalog":    "Katalog",
+      "pengaturan": "Pengaturan"
+    }
   },
   "landing": {
     "hero": {

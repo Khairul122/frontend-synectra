@@ -68,7 +68,14 @@
     "profile": "Profile",
     "users": "Users",
     "income": "Income",
-    "todos": "My To-Do"
+    "todos": "My To-Do",
+    "softwareProducts": "Software Products",
+    "group": {
+      "bisnis":     "Business",
+      "konten":     "Content",
+      "katalog":    "Catalog",
+      "pengaturan": "Settings"
+    }
   },
   "landing": {
     "hero": {
