@@ -243,10 +243,10 @@ function AnimatedCounter({ target, suffix = '' }) {
     const observer = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting && !triggered.current) {
         triggered.current = true;
-        import('animejs').then(({ default: anime }) => {
+        import('animejs').then(({ animate }) => {
           const obj = { val: 0 };
-          anime({ targets: obj, val: target, round: 1, duration: 2000, easing: 'easeOutExpo',
-            update: () => { if (el) el.textContent = obj.val.toLocaleString('id-ID') + suffix; },
+          animate(obj, { val: target, duration: 2000, ease: 'outExpo',
+            onUpdate: () => { if (el) el.textContent = Math.round(obj.val).toLocaleString('id-ID') + suffix; },
           });
         });
       }
@@ -270,9 +270,9 @@ function LetterReveal({ text, className, delay = 0 }) {
     const observer = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting && !triggered.current) {
         triggered.current = true;
-        import('animejs').then(({ default: anime, stagger }) => {
-          anime({ targets: el.querySelectorAll('span'), opacity: [0, 1], translateY: [30, 0],
-            delay: stagger(40, { start: delay }), duration: 500, easing: 'easeOutExpo' });
+        import('animejs').then(({ animate, stagger }) => {
+          animate(el.querySelectorAll('span'), { opacity: [0, 1], translateY: [30, 0],
+            delay: stagger(40, { start: delay }), duration: 500, ease: 'outExpo' });
         });
       }
     }, { threshold: 0.3 });
