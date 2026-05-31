@@ -764,6 +764,11 @@ export default function LandingPage() {
     }).finally(() => setIsLoading(false));
   }, []);
 
+  // Navigasi ke halaman protected — cek token dulu, kalau tidak ada langsung ke /login
+  const navigateProtected = (path) => {
+    const token = localStorage.getItem('synectra_token');
+    transitionTo(token ? path : '/login');
+  };
 
   // Active section highlight via IntersectionObserver
   useEffect(() => {
@@ -1378,7 +1383,7 @@ export default function LandingPage() {
               >
                 {packages.map(pkg => (
                   <div key={pkg.id} className="flex-shrink-0 w-72 snap-start">
-                    <PackageCard pkg={pkg} onOrder={() => transitionTo('/my-orders/new')} />
+                    <PackageCard pkg={pkg} onOrder={() => navigateProtected('/my-orders/new')} />
                   </div>
                 ))}
               </div>
@@ -1493,7 +1498,7 @@ export default function LandingPage() {
                         )}
                         <button
                           onMouseDown={e => e.stopPropagation()}
-                          onClick={e => { e.stopPropagation(); transitionTo('/my-software'); }}
+                          onClick={e => { e.stopPropagation(); navigateProtected('/my-software'); }}
                           className="px-2.5 py-1.5 bg-neu-primary border-2 border-neu-black shadow-neu-sm font-display font-bold text-[10px] uppercase text-neu-black transition-all duration-150 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none">
                           {t('landing.software.buyNow')}
                         </button>

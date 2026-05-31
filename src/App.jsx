@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, lazy, Suspense } from 'react';
 import { tokenStorage } from './services/auth.service';
 
@@ -69,52 +69,71 @@ function OAuthTokenCapture() {
   return null;
 }
 
+// Cek token secara synchronous sebelum halaman protected dirender
+// Jika ada ?_token= di URL (OAuth callback), biarkan lewat — OAuthTokenCapture yang handle
+function ProtectedRoute() {
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  if (params.get('_token')) return <Outlet />;
+
+  const token = tokenStorage.get();
+  if (!token) {
+    return <Navigate to="/login" state={{ from: location.pathname }} replace />;
+  }
+  return <Outlet />;
+}
+
 function App() {
   return (
     <BrowserRouter>
       <OAuthTokenCapture />
       <Suspense fallback={<PageLoader />}>
       <Routes>
-        <Route path="/"                   element={<LandingPage />} />
-        <Route path="/login"              element={<LoginPage />} />
-        <Route path="/register"           element={<RegisterPage />} />
-        <Route path="/dashboard"          element={<DashboardPage />} />
-        <Route path="/portfolio"          element={<PortfolioPage />} />
-        <Route path="/portfolio/new"      element={<PortfolioFormPage />} />
-        <Route path="/portfolio/:id/edit" element={<PortfolioFormPage />} />
-        <Route path="/banners"            element={<BannerPage />} />
-        <Route path="/banners/new"        element={<BannerFormPage />} />
-        <Route path="/banners/:id/edit"          element={<BannerFormPage />} />
-        <Route path="/bank-accounts"             element={<BankAccountPage />} />
-        <Route path="/bank-accounts/new"         element={<BankAccountFormPage />} />
-        <Route path="/bank-accounts/:id/edit"    element={<BankAccountFormPage />} />
-        <Route path="/social-media"              element={<SocialMediaPage />} />
-        <Route path="/social-media/new"          element={<SocialMediaFormPage />} />
-        <Route path="/social-media/:id/edit"     element={<SocialMediaFormPage />} />
-        <Route path="/contacts"                  element={<ContactPage />} />
-        <Route path="/contacts/new"              element={<ContactFormPage />} />
-        <Route path="/contacts/:id/edit"         element={<ContactFormPage />} />
-        <Route path="/profile"                   element={<ProfilePage />} />
-        <Route path="/clients"                   element={<ClientPage />} />
-        <Route path="/income"                    element={<IncomePage />} />
-        <Route path="/orders"                    element={<OrderPage />} />
-        <Route path="/orders/new"                element={<OrderFormPage />} />
-        <Route path="/orders/:id"                element={<OrderDetailPage />} />
-        <Route path="/my-orders"                 element={<MyOrderPage />} />
-        <Route path="/my-orders/new"             element={<MyOrderFormPage />} />
-        <Route path="/my-orders/:id"             element={<MyOrderDetailPage />} />
-        <Route path="/service-packages"           element={<ServicePackagePage />} />
-        <Route path="/service-packages/new"       element={<ServicePackageFormPage />} />
-        <Route path="/service-packages/:id/edit"  element={<ServicePackageFormPage />} />
-        <Route path="/software-products"          element={<SoftwareProductPage />} />
-        <Route path="/software-products/new"      element={<SoftwareProductFormPage />} />
-        <Route path="/software-products/:id/edit" element={<SoftwareProductFormPage />} />
-        <Route path="/my-software"                element={<MySoftwarePage />} />
-        <Route path="/software-purchases"         element={<SoftwarePurchasePage />} />
-        <Route path="/feedback"                   element={<FeedbackPage />} />
-        <Route path="/todos"                      element={<TodoPage />} />
-        <Route path="/500"                element={<ServerErrorPage />} />
-        <Route path="*"                   element={<NotFoundPage />} />
+        {/* ── Public routes ── */}
+        <Route path="/"        element={<LandingPage />} />
+        <Route path="/login"   element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/500"     element={<ServerErrorPage />} />
+        <Route path="*"        element={<NotFoundPage />} />
+
+        {/* ── Protected routes — redirect ke /login jika tidak ada token ── */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/dashboard"          element={<DashboardPage />} />
+          <Route path="/portfolio"          element={<PortfolioPage />} />
+          <Route path="/portfolio/new"      element={<PortfolioFormPage />} />
+          <Route path="/portfolio/:id/edit" element={<PortfolioFormPage />} />
+          <Route path="/banners"            element={<BannerPage />} />
+          <Route path="/banners/new"        element={<BannerFormPage />} />
+          <Route path="/banners/:id/edit"          element={<BannerFormPage />} />
+          <Route path="/bank-accounts"             element={<BankAccountPage />} />
+          <Route path="/bank-accounts/new"         element={<BankAccountFormPage />} />
+          <Route path="/bank-accounts/:id/edit"    element={<BankAccountFormPage />} />
+          <Route path="/social-media"              element={<SocialMediaPage />} />
+          <Route path="/social-media/new"          element={<SocialMediaFormPage />} />
+          <Route path="/social-media/:id/edit"     element={<SocialMediaFormPage />} />
+          <Route path="/contacts"                  element={<ContactPage />} />
+          <Route path="/contacts/new"              element={<ContactFormPage />} />
+          <Route path="/contacts/:id/edit"         element={<ContactFormPage />} />
+          <Route path="/profile"                   element={<ProfilePage />} />
+          <Route path="/clients"                   element={<ClientPage />} />
+          <Route path="/income"                    element={<IncomePage />} />
+          <Route path="/orders"                    element={<OrderPage />} />
+          <Route path="/orders/new"                element={<OrderFormPage />} />
+          <Route path="/orders/:id"                element={<OrderDetailPage />} />
+          <Route path="/my-orders"                 element={<MyOrderPage />} />
+          <Route path="/my-orders/new"             element={<MyOrderFormPage />} />
+          <Route path="/my-orders/:id"             element={<MyOrderDetailPage />} />
+          <Route path="/service-packages"           element={<ServicePackagePage />} />
+          <Route path="/service-packages/new"       element={<ServicePackageFormPage />} />
+          <Route path="/service-packages/:id/edit"  element={<ServicePackageFormPage />} />
+          <Route path="/software-products"          element={<SoftwareProductPage />} />
+          <Route path="/software-products/new"      element={<SoftwareProductFormPage />} />
+          <Route path="/software-products/:id/edit" element={<SoftwareProductFormPage />} />
+          <Route path="/my-software"                element={<MySoftwarePage />} />
+          <Route path="/software-purchases"         element={<SoftwarePurchasePage />} />
+          <Route path="/feedback"                   element={<FeedbackPage />} />
+          <Route path="/todos"                      element={<TodoPage />} />
+        </Route>
       </Routes>
       </Suspense>
     </BrowserRouter>
