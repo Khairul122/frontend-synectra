@@ -2,7 +2,7 @@ import { Component, Suspense, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Dialog, DialogClose, DialogContent, DialogFooter,
   DialogHeader, DialogTitle, DialogDescription,
@@ -532,6 +532,7 @@ function FeedbackSection({ feedbacks, onSubmitted }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted]       = useState(false);
   const [error, setError]               = useState('');
+  const [formErrors, setFormErrors]     = useState({ name: '', email: '', rating: '' });
   const sliderRef = useRef(null);
   const drag      = useRef({ active: false, startX: 0, scrollLeft: 0 });
 
@@ -539,12 +540,18 @@ function FeedbackSection({ feedbacks, onSubmitted }) {
     ? (feedbacks.reduce((s, f) => s + f.rating, 0) / feedbacks.length).toFixed(1)
     : null;
 
+  const validate = () => {
+    const errs = { name: '', email: '', rating: '' };
+    if (!form.name.trim()) errs.name = 'Nama wajib diisi';
+    if (!form.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) errs.email = 'Email tidak valid';
+    if (!form.rating) errs.rating = 'Pilih rating terlebih dahulu';
+    setFormErrors(errs);
+    return !Object.values(errs).some(Boolean);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.name.trim() || !form.email.trim() || form.rating === 0) {
-      setError('Nama, email, dan rating wajib diisi.');
-      return;
-    }
+    if (!validate()) return;
     setError('');
     setIsSubmitting(true);
     try {
@@ -584,14 +591,18 @@ function FeedbackSection({ feedbacks, onSubmitted }) {
         {feedbacks.length === 0 ? (
           <p className="font-body text-sm text-neu-black/40 mb-10 border-2 border-dashed border-neu-black px-6 py-8 text-center">{t('landing.feedback.noReviews')}</p>
         ) : (
+          <div className="relative mb-10">
           <div
             ref={sliderRef}
-            className="flex gap-4 overflow-x-auto pb-3 mb-10 -mx-4 px-4 lg:mx-0 lg:px-0 select-none"
+            className="flex gap-4 overflow-x-auto pb-3 -mx-4 px-4 lg:mx-0 lg:px-0 select-none"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', cursor: 'grab' }}
             onMouseDown={e => { const el = sliderRef.current; drag.current = { active: true, startX: e.pageX - el.offsetLeft, scrollLeft: el.scrollLeft }; el.style.cursor = 'grabbing'; }}
             onMouseMove={e => { if (!drag.current.active) return; const el = sliderRef.current; el.scrollLeft = drag.current.scrollLeft - (e.pageX - el.offsetLeft - drag.current.startX); }}
             onMouseUp={() => { drag.current.active = false; sliderRef.current.style.cursor = 'grab'; }}
             onMouseLeave={() => { if (drag.current.active) { drag.current.active = false; sliderRef.current.style.cursor = 'grab'; } }}
+            onTouchStart={e => { const el = sliderRef.current; drag.current = { active: true, startX: e.touches[0].pageX, scrollLeft: el.scrollLeft }; }}
+            onTouchMove={e => { if (!drag.current.active) return; const el = sliderRef.current; el.scrollLeft = drag.current.scrollLeft - (e.touches[0].pageX - drag.current.startX); }}
+            onTouchEnd={() => { drag.current.active = false; }}
           >
             {feedbacks.map(fb => (
               <div key={fb.id} className="flex-shrink-0 w-64 border-2 border-neu-black bg-neu-bg p-4 shadow-neu flex flex-col gap-2">
@@ -603,6 +614,9 @@ function FeedbackSection({ feedbacks, onSubmitted }) {
                 </div>
               </div>
             ))}
+          </div>
+          {/* Fade overlay kanan — menandakan ada konten lebih */}
+          <div className="absolute right-0 top-0 bottom-3 w-16 bg-gradient-to-l from-neu-white to-transparent pointer-events-none" />
           </div>
         )}
 
@@ -628,35 +642,47 @@ function FeedbackSection({ feedbacks, onSubmitted }) {
           <form onSubmit={handleSubmit} className="max-w-lg mx-auto space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="flex flex-col gap-1.5">
-                <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wide">{t('landing.feedback.nameLabel')}</label>
-                <input type="text" value={form.name} onChange={e => setForm(p => ({...p, name: e.target.value}))}
+                <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wide">
+                  {t('landing.feedback.nameLabel')} <span className="text-neu-accent">*</span>
+                </label>
+                <input type="text" value={form.name} onChange={e => { setForm(p => ({...p, name: e.target.value})); setFormErrors(p => ({...p, name: ''})); }}
                   placeholder="Nama Anda"
-                  className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu transition-all duration-150" />
+                  required aria-required="true"
+                  className={cn('w-full px-4 py-2.5 bg-neu-white border-2 shadow-neu-sm font-body text-sm text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu transition-all duration-150', formErrors.name ? 'border-neu-accent' : 'border-neu-black')} />
+                {formErrors.name && <span className="font-body text-xs text-neu-accent">{formErrors.name}</span>}
               </div>
               <div className="flex flex-col gap-1.5">
-                <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wide">{t('landing.feedback.emailLabel')}</label>
-                <input type="email" value={form.email} onChange={e => setForm(p => ({...p, email: e.target.value}))}
+                <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wide">
+                  {t('landing.feedback.emailLabel')} <span className="text-neu-accent">*</span>
+                </label>
+                <input type="email" value={form.email} onChange={e => { setForm(p => ({...p, email: e.target.value})); setFormErrors(p => ({...p, email: ''})); }}
                   placeholder="email@contoh.com"
-                  className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu transition-all duration-150" />
+                  required aria-required="true"
+                  className={cn('w-full px-4 py-2.5 bg-neu-white border-2 shadow-neu-sm font-body text-sm text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu transition-all duration-150', formErrors.email ? 'border-neu-accent' : 'border-neu-black')} />
+                {formErrors.email && <span className="font-body text-xs text-neu-accent">{formErrors.email}</span>}
               </div>
             </div>
 
             {/* Star selector */}
             <div className="flex flex-col gap-1.5">
-              <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wide">{t('landing.feedback.ratingLabel')}</label>
-              <div className="flex gap-1">
+              <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wide">
+                {t('landing.feedback.ratingLabel')} <span className="text-neu-accent">*</span>
+              </label>
+              <div className="flex gap-1 items-center">
                 {[1,2,3,4,5].map(s => (
                   <button key={s} type="button"
+                    aria-label={`${s} bintang`}
                     onMouseEnter={() => setHovered(s)} onMouseLeave={() => setHovered(0)}
-                    onClick={() => setForm(p => ({...p, rating: s}))}
-                    className="w-10 h-10 flex items-center justify-center transition-transform duration-100 hover:scale-110 active:scale-95">
+                    onClick={() => { setForm(p => ({...p, rating: s})); setFormErrors(p => ({...p, rating: ''})); }}
+                    className="w-11 h-11 flex items-center justify-center transition-transform duration-100 hover:scale-110 active:scale-95">
                     <svg className={cn('w-8 h-8 transition-colors duration-100', (hovered || form.rating) >= s ? 'text-neu-primary' : 'text-neu-black/20')} fill="currentColor" viewBox="0 0 20 20">
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                     </svg>
                   </button>
                 ))}
-                {form.rating > 0 && <span className="ml-2 font-mono text-sm text-neu-black/50 self-center">{form.rating}/5</span>}
+                {form.rating > 0 && <span className="ml-2 font-mono text-sm text-neu-black/50">{form.rating}/5</span>}
               </div>
+              {formErrors.rating && <span className="font-body text-xs text-neu-accent">{formErrors.rating}</span>}
             </div>
 
             <div className="flex flex-col gap-1.5">
@@ -695,8 +721,10 @@ export default function LandingPage() {
   const [isLoading,    setIsLoading]    = useState(true);
   const [activePortfolio, setActivePortfolio] = useState(null);
   const [activeSoftware,  setActiveSoftware]  = useState(null);
-  const [menuOpen,     setMenuOpen]     = useState(false);
-  const [toast,        setToast]        = useState(null); // { msg, type }
+  const [menuOpen,      setMenuOpen]      = useState(false);
+  const [toast,         setToast]         = useState(null); // { msg, type }
+  const [activeSection, setActiveSection] = useState('');
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   const showToast = (msg, type = 'success') => {
     setToast({ msg, type });
@@ -736,6 +764,37 @@ export default function LandingPage() {
     }).finally(() => setIsLoading(false));
   }, []);
 
+
+  // Active section highlight via IntersectionObserver
+  useEffect(() => {
+    const ids = ['layanan', 'paket', 'software', 'portofolio', 'cara-kerja', 'ulasan', 'kontak'];
+    const observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(e => { if (e.isIntersecting) setActiveSection(e.target.id); });
+      },
+      { rootMargin: '-40% 0px -55% 0px', threshold: 0 },
+    );
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+    return () => observer.disconnect();
+  }, []);
+
+  // Show/hide scroll-to-top button
+  useEffect(() => {
+    const onScroll = () => setShowScrollTop(window.scrollY > 300);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  // Close mobile menu on Escape key
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handler = (e) => { if (e.key === 'Escape') setMenuOpen(false); };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [menuOpen]);
 
   // Hero entrance timeline — runs once on mount
   useEffect(() => {
@@ -970,7 +1029,12 @@ export default function LandingPage() {
               ].map(({ tKey, id }) => (
                 <button key={id}
                   onClick={() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-                  className="font-display font-bold text-xs text-neu-black/60 hover:text-neu-black uppercase tracking-wide transition-colors">
+                  className={cn(
+                    'font-display font-bold text-xs uppercase tracking-wide transition-all duration-200 pb-0.5',
+                    activeSection === id
+                      ? 'text-neu-primary border-b-2 border-neu-primary'
+                      : 'text-neu-black/60 hover:text-neu-black border-b-2 border-transparent',
+                  )}>
                   {t(tKey)}
                 </button>
               ))}
@@ -981,7 +1045,11 @@ export default function LandingPage() {
             <button onClick={() => transitionTo('/login')} className="px-4 py-2 border-2 border-neu-black font-display font-bold text-xs uppercase text-neu-black hover:bg-neu-bg transition-colors">{t('nav.login')}</button>
             <button onClick={() => transitionTo('/register')} className="px-4 py-2 bg-neu-primary border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-black transition-all duration-150 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none">{t('nav.register')}</button>
           </div>
-          <button onClick={() => setMenuOpen(o => !o)} className="sm:hidden w-9 h-9 border-2 border-neu-black flex items-center justify-center">
+          <button
+            onClick={() => setMenuOpen(o => !o)}
+            aria-expanded={menuOpen}
+            aria-label={menuOpen ? 'Tutup menu' : 'Buka menu'}
+            className="sm:hidden w-11 h-11 border-2 border-neu-black flex items-center justify-center">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
               {menuOpen ? <><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></> : <><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></>}
             </svg>
@@ -1145,7 +1213,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── STATS — Anime.js ── */}
-      <section className="border-b-2 border-neu-black bg-neu-black py-14">
+      <section id="statistik" className="border-b-2 border-neu-black bg-neu-black py-14">
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
           <div className="grid grid-cols-2 lg:grid-cols-4 divide-x-0 lg:divide-x-2 divide-neu-white/10">
             {stats.map((s, i) => (
@@ -1165,16 +1233,30 @@ export default function LandingPage() {
             <div className="flex items-center gap-3 mb-2"><div className="h-1 w-10 bg-neu-accent" /><span className="font-mono text-xs text-neu-black/50 uppercase tracking-widest">{t('landing.services.tag')}</span></div>
             <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-black">{t('landing.services.title').split('\n').map((line, i) => <span key={i}>{line}{i === 0 && <br />}</span>)}</h2>
           </motion.div>
+          {(() => {
+            const svcIcons = [
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="0"/><path d="M9 9h6M9 13h4"/></svg>,
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="0"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>,
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>,
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>,
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg>,
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>,
+            ];
+            return (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {services.map((svc, i) => (
               <motion.div key={svc.title} {...fadeUp(i * 0.07)} className="border-2 border-neu-black bg-neu-white shadow-neu p-6 group hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-neu-lg transition-all duration-150">
-                <div className="text-4xl mb-4">{svc.icon}</div>
+                <div className="w-12 h-12 border-2 border-neu-black bg-neu-primary flex items-center justify-center mb-4">
+                  {svcIcons[i % svcIcons.length]}
+                </div>
                 <h3 className="font-display font-bold text-lg text-neu-black mb-2">{svc.title}</h3>
                 <p className="font-body text-sm text-neu-black/60 leading-relaxed">{svc.desc}</p>
                 <div className="mt-4 h-0.5 w-0 bg-neu-primary group-hover:w-full transition-all duration-300" />
               </motion.div>
             ))}
           </div>
+            );
+          })()}
         </div>
       </section>
 
@@ -1248,41 +1330,61 @@ export default function LandingPage() {
             </motion.div>
 
             {/* Drag-to-scroll slider */}
-            <div
-              ref={pkgSliderRef}
-              className="flex gap-5 overflow-x-auto pt-5 pb-3 snap-x snap-mandatory -mx-4 px-4 lg:mx-0 lg:px-0 select-none"
-              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', cursor: 'grab' }}
-              onMouseDown={e => {
-                const el = pkgSliderRef.current;
-                pkgDrag.current = { active: true, startX: e.pageX - el.offsetLeft, scrollLeft: el.scrollLeft };
-                el.style.cursor = 'grabbing';
-                el.style.scrollSnapType = 'none';
-              }}
-              onMouseMove={e => {
-                if (!pkgDrag.current.active) return;
-                const el = pkgSliderRef.current;
-                const x  = e.pageX - el.offsetLeft;
-                el.scrollLeft = pkgDrag.current.scrollLeft - (x - pkgDrag.current.startX);
-              }}
-              onMouseUp={() => {
-                pkgDrag.current.active = false;
-                const el = pkgSliderRef.current;
-                el.style.cursor = 'grab';
-                el.style.scrollSnapType = 'x mandatory';
-              }}
-              onMouseLeave={() => {
-                if (!pkgDrag.current.active) return;
-                pkgDrag.current.active = false;
-                const el = pkgSliderRef.current;
-                el.style.cursor = 'grab';
-                el.style.scrollSnapType = 'x mandatory';
-              }}
-            >
-              {packages.map(pkg => (
-                <div key={pkg.id} className="flex-shrink-0 w-72 snap-start">
-                  <PackageCard pkg={pkg} onOrder={() => transitionTo('/my-orders/new')} />
+            <div className="relative">
+              {isLoading ? (
+                <div className="flex gap-5 pt-5 pb-3">
+                  {[1,2,3].map(i => <div key={i} className="flex-shrink-0 w-72 h-80 border-2 border-neu-black animate-pulse bg-neu-white" />)}
                 </div>
-              ))}
+              ) : (
+              <div
+                ref={pkgSliderRef}
+                className="flex gap-5 overflow-x-auto pt-5 pb-3 snap-x snap-mandatory -mx-4 px-4 lg:mx-0 lg:px-0 select-none"
+                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', cursor: 'grab' }}
+                onMouseDown={e => {
+                  const el = pkgSliderRef.current;
+                  pkgDrag.current = { active: true, startX: e.pageX - el.offsetLeft, scrollLeft: el.scrollLeft };
+                  el.style.cursor = 'grabbing';
+                  el.style.scrollSnapType = 'none';
+                }}
+                onMouseMove={e => {
+                  if (!pkgDrag.current.active) return;
+                  const el = pkgSliderRef.current;
+                  const x  = e.pageX - el.offsetLeft;
+                  el.scrollLeft = pkgDrag.current.scrollLeft - (x - pkgDrag.current.startX);
+                }}
+                onMouseUp={() => {
+                  pkgDrag.current.active = false;
+                  const el = pkgSliderRef.current;
+                  el.style.cursor = 'grab';
+                  el.style.scrollSnapType = 'x mandatory';
+                }}
+                onMouseLeave={() => {
+                  if (!pkgDrag.current.active) return;
+                  pkgDrag.current.active = false;
+                  const el = pkgSliderRef.current;
+                  el.style.cursor = 'grab';
+                  el.style.scrollSnapType = 'x mandatory';
+                }}
+                onTouchStart={e => {
+                  const el = pkgSliderRef.current;
+                  pkgDrag.current = { active: true, startX: e.touches[0].pageX, scrollLeft: el.scrollLeft };
+                }}
+                onTouchMove={e => {
+                  if (!pkgDrag.current.active) return;
+                  const el = pkgSliderRef.current;
+                  el.scrollLeft = pkgDrag.current.scrollLeft - (e.touches[0].pageX - pkgDrag.current.startX);
+                }}
+                onTouchEnd={() => { pkgDrag.current.active = false; }}
+              >
+                {packages.map(pkg => (
+                  <div key={pkg.id} className="flex-shrink-0 w-72 snap-start">
+                    <PackageCard pkg={pkg} onOrder={() => transitionTo('/my-orders/new')} />
+                  </div>
+                ))}
+              </div>
+              )}
+              {/* Fade overlay kanan */}
+              <div className="absolute right-0 top-0 bottom-3 w-16 bg-gradient-to-l from-neu-bg to-transparent pointer-events-none" />
             </div>
           </div>
         </section>
@@ -1305,6 +1407,12 @@ export default function LandingPage() {
             </motion.div>
 
             {/* Drag-to-scroll slider — no scrollbar UI */}
+            <div className="relative">
+            {isLoading ? (
+              <div className="flex gap-5 pt-5 pb-3">
+                {[1,2,3].map(i => <div key={i} className="flex-shrink-0 w-72 h-72 border-2 border-neu-white/20 animate-pulse bg-neu-white/10" />)}
+              </div>
+            ) : (
             <div
               ref={swSliderRef}
               className="flex gap-5 overflow-x-auto pt-5 pb-3 -mx-4 px-4 lg:mx-0 lg:px-0 select-none"
@@ -1321,6 +1429,16 @@ export default function LandingPage() {
               }}
               onMouseUp={() => { swDrag.current.active = false; swSliderRef.current.style.cursor = 'grab'; }}
               onMouseLeave={() => { if (swDrag.current.active) { swDrag.current.active = false; swSliderRef.current.style.cursor = 'grab'; } }}
+              onTouchStart={e => {
+                const el = swSliderRef.current;
+                swDrag.current = { active: true, startX: e.touches[0].pageX, scrollLeft: el.scrollLeft };
+              }}
+              onTouchMove={e => {
+                if (!swDrag.current.active) return;
+                const el = swSliderRef.current;
+                el.scrollLeft = swDrag.current.scrollLeft - (e.touches[0].pageX - swDrag.current.startX);
+              }}
+              onTouchEnd={() => { swDrag.current.active = false; }}
             >
               {softwareProducts.map(sw => {
                 const isEn   = i18n.language === 'en';
@@ -1384,6 +1502,10 @@ export default function LandingPage() {
                   </motion.div>
                 );
               })}
+            </div>
+            )}
+            {/* Fade overlay kanan */}
+            <div className="absolute right-0 top-0 bottom-3 w-16 bg-gradient-to-l from-neu-black to-transparent pointer-events-none" />
             </div>
           </div>
         </section>
@@ -1467,15 +1589,30 @@ export default function LandingPage() {
             <div className="flex items-center justify-center gap-3 mb-2"><div className="h-1 w-8 bg-neu-green" /><span className="font-mono text-xs text-neu-black/50 uppercase tracking-widest">{t('landing.why.tag')}</span><div className="h-1 w-8 bg-neu-green" /></div>
             <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-black">{t('landing.why.title')}</h2>
           </motion.div>
+          {/* SVG icon presets for Why Choose Us — index-based mapping */}
+          {(() => {
+            const whyIcons = [
+              /* 0 */ <svg className="w-6 h-6 text-neu-black" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>,
+              /* 1 */ <svg className="w-6 h-6 text-neu-black" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
+              /* 2 */ <svg className="w-6 h-6 text-neu-black" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>,
+              /* 3 */ <svg className="w-6 h-6 text-neu-black" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>,
+              /* 4 */ <svg className="w-6 h-6 text-neu-black" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>,
+              /* 5 */ <svg className="w-6 h-6 text-neu-black" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>,
+            ];
+            return (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {(t('landing.why.items', { returnObjects: true })).map((w, i) => (
               <motion.div key={w.title} {...fadeUp(i * 0.08)} className="border-2 border-neu-black bg-neu-white shadow-neu p-6 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-neu-lg transition-all duration-150">
-                <span className="text-3xl">{w.icon}</span>
-                <h3 className="font-display font-bold text-base text-neu-black mt-3 mb-2">{w.title}</h3>
+                <div className="w-12 h-12 border-2 border-neu-black bg-neu-primary flex items-center justify-center mb-3">
+                  {whyIcons[i % whyIcons.length]}
+                </div>
+                <h3 className="font-display font-bold text-base text-neu-black mb-2">{w.title}</h3>
                 <p className="font-body text-sm text-neu-black/60 leading-relaxed">{w.desc}</p>
               </motion.div>
             ))}
           </div>
+            );
+          })()}
         </div>
       </section>
 
@@ -1710,6 +1847,47 @@ export default function LandingPage() {
           </div>
         </div>
       </motion.footer>
+
+      {/* ── Back-to-Top Button ── */}
+      <AnimatePresence>
+        {showScrollTop && (
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            aria-label="Kembali ke atas"
+            className="fixed bottom-20 sm:bottom-6 right-4 sm:right-6 z-50 w-11 h-11 bg-neu-black border-2 border-neu-black shadow-neu text-neu-white flex items-center justify-center hover:bg-neu-primary hover:text-neu-black transition-colors duration-150">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
+            </svg>
+          </motion.button>
+        )}
+      </AnimatePresence>
+
+      {/* ── Mobile Sticky CTA Bar (≤640px) ── */}
+      <AnimatePresence>
+        {showScrollTop && (
+          <motion.div
+            initial={{ y: 80 }}
+            animate={{ y: 0 }}
+            exit={{ y: 80 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+            className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-neu-white border-t-2 border-neu-black px-4 py-3 flex gap-3">
+            <button
+              onClick={() => transitionTo('/register')}
+              className="flex-1 py-3 bg-neu-primary border-2 border-neu-black shadow-neu-sm font-display font-bold text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none">
+              {t('nav.register')}
+            </button>
+            <button
+              onClick={() => transitionTo('/login')}
+              className="px-5 py-3 bg-neu-white border-2 border-neu-black font-display font-bold text-sm uppercase text-neu-black/70 hover:text-neu-black transition-colors">
+              {t('nav.login')}
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
