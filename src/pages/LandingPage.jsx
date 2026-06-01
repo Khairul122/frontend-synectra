@@ -1523,10 +1523,12 @@ export default function LandingPage() {
                   >
                     <div className="relative bg-neu-bg border-b-2 border-neu-black overflow-hidden aspect-video">
                       {imgs[0]
-                        ? <img src={supaImg(imgs[0], { width: 600 })} alt={item.title} width="600" height="338" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" loading="lazy" decoding="async" />
+                        ? <img src={supaImg(imgs[0], { width: 600 })} alt={item.title} width="600" height="338" className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-400" loading="lazy" decoding="async" />
                         : <div className="w-full h-full flex items-center justify-center"><span className="font-display font-bold text-5xl text-neu-black/15">{item.title?.charAt(0)}</span></div>}
-                      {item.category && <span className="absolute top-2 left-2 bg-neu-black text-neu-white font-mono font-bold text-[10px] uppercase px-2 py-0.5">{item.category.replace(/_/g,' ')}</span>}
-                      <div className="absolute inset-0 bg-neu-black/0 group-hover:bg-neu-black/30 transition-all duration-300 flex items-center justify-center">
+                      {/* Overlay selalu tipis agar teks screenshot tidak terbaca mentah */}
+                      <div className="absolute inset-0 bg-neu-black/20" />
+                      {item.category && <span className="absolute top-2 left-2 bg-neu-black text-neu-white font-mono font-bold text-[10px] uppercase px-2 py-0.5 z-10">{item.category.replace(/_/g,' ')}</span>}
+                      <div className="absolute inset-0 group-hover:bg-neu-black/20 transition-all duration-300 flex items-center justify-center z-10">
                         <span className="opacity-0 group-hover:opacity-100 transition-opacity font-display font-bold text-sm text-neu-white px-4 py-2 border border-neu-white/30 bg-neu-black/70">{item.title}</span>
                       </div>
                     </div>
