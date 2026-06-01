@@ -192,15 +192,39 @@ function PortfolioModal({ item, open, onClose, transitionTo }) {
 
         <div className="flex-1 overflow-y-auto min-h-0">
           {imgs.length > 0 && (
-            <div className="relative border-b-2 border-neu-black bg-neu-bg">
-              <img src={supaImg(imgs[imgIdx], { width: 800 })} alt={item?.title} width="800" height="256" className="w-full h-64 object-cover" loading="lazy" decoding="async" />
+            <div className="border-b-2 border-neu-black">
+              {/* Image area */}
+              <div className="relative bg-neu-black flex items-center justify-center" style={{ maxHeight: '65vh', minHeight: '200px' }}>
+                <img
+                  key={imgs[imgIdx]}
+                  src={supaImg(imgs[imgIdx], { width: 900 })}
+                  alt={item?.title}
+                  className="max-w-full object-contain block"
+                  style={{ maxHeight: '65vh', animation: 'imgFadeIn 0.2s ease' }}
+                  loading="lazy"
+                  decoding="async"
+                />
+                {imgs.length > 1 && (
+                  <>
+                    <button onClick={() => setImgIdx(i => (i - 1 + imgs.length) % imgs.length)}
+                      className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-neu-white/90 border-2 border-neu-black font-mono text-sm flex items-center justify-center hover:bg-neu-primary transition-colors">←</button>
+                    <button onClick={() => setImgIdx(i => (i + 1) % imgs.length)}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-neu-white/90 border-2 border-neu-black font-mono text-sm flex items-center justify-center hover:bg-neu-primary transition-colors">→</button>
+                  </>
+                )}
+              </div>
+              {/* Dot indicators */}
               {imgs.length > 1 && (
-                <>
-                  <button onClick={() => setImgIdx(i => (i - 1 + imgs.length) % imgs.length)}
-                    className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-neu-white/90 border-2 border-neu-black font-mono text-sm flex items-center justify-center hover:bg-neu-primary transition-colors">←</button>
-                  <button onClick={() => setImgIdx(i => (i + 1) % imgs.length)}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-neu-white/90 border-2 border-neu-black font-mono text-sm flex items-center justify-center hover:bg-neu-primary transition-colors">→</button>
-                </>
+                <div className="flex justify-center gap-1.5 py-2.5 bg-neu-bg border-t border-neu-black/10">
+                  {imgs.map((_, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setImgIdx(idx)}
+                      className={cn('w-2 h-2 border border-neu-black transition-all duration-150', idx === imgIdx ? 'bg-neu-primary' : 'bg-neu-black/20')}
+                      aria-label={`Foto ${idx + 1}`}
+                    />
+                  ))}
+                </div>
               )}
             </div>
           )}
@@ -1490,24 +1514,18 @@ export default function LandingPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {portfolios.map((item, i) => {
                 const imgs = item.images?.length ? item.images : (item.image ? [item.image] : []);
-                const isFeatured = i === 0 && portfolios.length >= 3;
                 return (
                   <motion.div
                     key={item.id}
                     {...cardAnim(i * 0.07)}
-                    className={cn(
-                      'border-2 border-neu-black shadow-neu bg-neu-white overflow-hidden group cursor-pointer',
-                      isFeatured && 'sm:col-span-2 lg:col-span-2',
-                    )}
+                    className="border-2 border-neu-black shadow-neu bg-neu-white overflow-hidden group cursor-pointer"
                     onClick={() => setActivePortfolio(item)}
                   >
-                    <div className={cn('relative bg-neu-bg border-b-2 border-neu-black overflow-hidden', isFeatured ? 'h-64 lg:h-72' : 'h-48')}>
+                    <div className="relative bg-neu-bg border-b-2 border-neu-black overflow-hidden aspect-video">
                       {imgs[0]
-                        ? <img src={supaImg(imgs[0], { width: isFeatured ? 900 : 500 })} alt={item.title} width={isFeatured ? 800 : 400} height={isFeatured ? 288 : 192} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" loading="lazy" decoding="async" />
+                        ? <img src={supaImg(imgs[0], { width: 600 })} alt={item.title} width="600" height="338" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" loading="lazy" decoding="async" />
                         : <div className="w-full h-full flex items-center justify-center"><span className="font-display font-bold text-5xl text-neu-black/15">{item.title?.charAt(0)}</span></div>}
                       {item.category && <span className="absolute top-2 left-2 bg-neu-black text-neu-white font-mono font-bold text-[10px] uppercase px-2 py-0.5">{item.category.replace(/_/g,' ')}</span>}
-                      {/* Index number */}
-                      <span className="absolute bottom-2 right-3 font-mono font-bold text-xs text-neu-white/40">/{String(i + 1).padStart(2, '0')}</span>
                       <div className="absolute inset-0 bg-neu-black/0 group-hover:bg-neu-black/30 transition-all duration-300 flex items-center justify-center">
                         <span className="opacity-0 group-hover:opacity-100 transition-opacity font-display font-bold text-sm text-neu-white px-4 py-2 border border-neu-white/30 bg-neu-black/70">{item.title}</span>
                       </div>

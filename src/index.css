@@ -41,6 +41,12 @@ body {
   margin: 0;
 }
 
+/* ── Image fade-in (portfolio modal navigation) ── */
+@keyframes imgFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
 /* ── Marquee animation ── */
 @keyframes marquee {
   from { transform: translateX(0); }
