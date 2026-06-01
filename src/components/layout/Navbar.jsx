@@ -1,6 +1,7 @@
 ﻿import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '../../utils/cn';
+import { supaImg } from '../../utils/imageUrl';
 import { authService } from '../../services/auth.service';
 import { ConfirmModal } from '../ui/ConfirmModal';
 
@@ -76,7 +77,7 @@ function AvatarDropdown({ user }) {
           aria-expanded={open}
         >
           {user?.avatarUrl ? (
-            <img src={user.avatarUrl} alt={user.fullName ?? ''} className="w-full h-full object-cover" />
+            <img src={supaImg(user.avatarUrl, { width: 72 })} alt={user.fullName ?? ''} width="36" height="36" className="w-full h-full object-cover" loading="lazy" decoding="async" />
           ) : (
             <span className="bg-neu-primary w-full h-full flex items-center justify-center font-display font-bold text-sm text-neu-black">
               {initial}
@@ -93,7 +94,7 @@ function AvatarDropdown({ user }) {
               <div className="flex items-center gap-2.5 mb-2">
                 <div className="w-8 h-8 border-2 border-neu-black overflow-hidden flex-shrink-0">
                   {user?.avatarUrl ? (
-                    <img src={user.avatarUrl} alt="" className="w-full h-full object-cover" />
+                    <img src={supaImg(user.avatarUrl, { width: 64 })} alt="" width="32" height="32" className="w-full h-full object-cover" loading="lazy" decoding="async" />
                   ) : (
                     <span className="bg-neu-primary w-full h-full flex items-center justify-center font-display font-bold text-xs text-neu-black">
                       {initial}

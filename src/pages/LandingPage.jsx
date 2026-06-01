@@ -1,4 +1,4 @@
-import { Component, Suspense, lazy, useEffect, useRef, useState } from 'react';
+import { Suspense, lazy, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
@@ -9,15 +9,18 @@ import {
 } from '../components/ui/dialog';
 import { ElegantShape } from '../components/ui/shape-landing-hero';
 import { gsap } from 'gsap';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { Float, MeshDistortMaterial, Sphere, Torus, MeshWobbleMaterial, Icosahedron, Octahedron } from '@react-three/drei';
-import Lenis from 'lenis';
 import axios from 'axios';
-const Spline = lazy(() => import('@splinetool/react-spline'));
 import { cn } from '../utils/cn';
 import { getPlatform } from '../constants/platforms';
 import { API_BASE_URL } from '../constants/api';
 import { LanguageSwitcher } from '../components/ui/LanguageSwitcher';
+import { useIsDesktop } from '../hooks/useIsDesktop';
+import { useInView } from '../hooks/useInView';
+import { supaImg } from '../utils/imageUrl';
+
+// 3D di-lazy: vendor-three keluar dari bundle awal & hanya di-load di desktop
+const AboutCanvas = lazy(() => import('../components/3d/LandingScenes').then(m => ({ default: m.AboutCanvas })));
+const CtaCanvas   = lazy(() => import('../components/3d/LandingScenes').then(m => ({ default: m.CtaCanvas })));
 
 const BASE = API_BASE_URL || '';
 
@@ -66,21 +69,29 @@ function fixContactUrl(linkUrl, iconKey) {
   return `https://${linkUrl}`;
 }
 
-/* ─── Lenis smooth scroll ────────────────────────────────────────────── */
-function useLenis() {
+/* ─── Lenis smooth scroll — hanya desktop, lazy, hormati reduced-motion ── */
+function useLenis(enabled) {
   useEffect(() => {
-    const lenis = new Lenis({
-      duration:    1.4,
-      easing:      (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      smoothWheel: true,
-      syncTouch:   false,
+    if (!enabled) return;            // mobile / reduced-motion → native scroll
+    let lenis, rafId, cancelled = false;
+    // Lazy-load: vendor-lenis tidak masuk bundle awal & tak ter-load di mobile
+    import('lenis').then(({ default: Lenis }) => {
+      if (cancelled) return;
+      lenis = new Lenis({
+        duration:    1.4,
+        easing:      (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        smoothWheel: true,
+        syncTouch:   false,
+      });
+      const raf = (time) => { lenis.raf(time); rafId = requestAnimationFrame(raf); };
+      rafId = requestAnimationFrame(raf);
     });
-
-    function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
-    const rafId = requestAnimationFrame(raf);
-
-    return () => { lenis.destroy(); cancelAnimationFrame(rafId); };
-  }, []);
+    return () => {
+      cancelled = true;
+      if (rafId) cancelAnimationFrame(rafId);
+      if (lenis) lenis.destroy();
+    };
+  }, [enabled]);
 }
 
 /* ─── Barba-style page transition ─────────────────────────────────────── */
@@ -95,122 +106,42 @@ function usePageTransition() {
   return { pageRef, transitionTo };
 }
 
-/* ─── Public Spline scene URLs ──────────────────────────────────────── */
-// Cara mendapatkan URL: buka spline.design → buat/pilih scene →
-// Share → Public URL → copy link .splinecode → tempel di sini
-const SPLINE_HERO   = '';   // ← tempel URL hero scene di sini
-const SPLINE_ABOUT  = '';   // ← tempel URL about scene di sini
-
-/* ─── Error boundary: Spline crash → render fallback R3F ────────────── */
-class SplineErrorBoundary extends Component {
-  constructor(props) { super(props); this.state = { failed: false }; }
-  static getDerivedStateFromError() { return { failed: true }; }
-  render() {
-    return this.state.failed ? this.props.fallback : this.props.children;
-  }
-}
-
-/* ─── Suspense fallback spinner ─────────────────────────────────────── */
-function SplineFallback({ bg = '#F5F0E8' }) {
+/* ─── Static fallback untuk slot 3D (mobile / reduced-motion / loading) ── */
+function Scene3DStatic({ bg = '#0D0D0D', ring = '#FFD000' }) {
   return (
-    <div className="w-full h-full flex items-center justify-center" style={{ background: bg }}>
-      <div className="w-10 h-10 border-[3px] border-neu-black border-t-neu-primary animate-spin" />
+    <div className="w-full h-full relative overflow-hidden" style={{ background: bg }} aria-hidden="true">
+      <div className="absolute inset-0"
+           style={{ backgroundImage: `radial-gradient(circle at 50% 50%, ${ring}22, transparent 60%)` }} />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 border-2 rotate-12"
+           style={{ borderColor: ring + '55' }} />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 border-2 -rotate-12"
+           style={{ borderColor: ring + '88' }} />
     </div>
   );
 }
 
-/* ─── Wrapper: tampilkan Spline jika URL ada & valid, else R3F ──────── */
-function SplineOrR3F({ scene, bg, r3fFallback, ...containerProps }) {
-  if (!scene) return r3fFallback;
+/**
+ * Slot 3D yang sadar-perangkat: desktop → lazy Canvas (mount saat in-view,
+ * frameloop pause saat offscreen). Mobile / reduced-motion → visual statis.
+ */
+function Lazy3DSlot({ Canvas3D, bg, ring }) {
+  const isDesktop = useIsDesktop();
+  const [ref, inView] = useInView({ rootMargin: '300px' });
+  const mountedRef = useRef(false);
+  if (inView) mountedRef.current = true;
+
+  if (!isDesktop) return <Scene3DStatic bg={bg} ring={ring} />;
+
   return (
-    <SplineErrorBoundary fallback={r3fFallback}>
-      <Suspense fallback={<SplineFallback bg={bg} />}>
-        <Spline scene={scene} style={{ width: '100%', height: '100%' }} />
-      </Suspense>
-    </SplineErrorBoundary>
-  );
-}
-
-/* ─── Modern Hero 3D Scene (full-width background mode) ─────────────── */
-function HeroScene() {
-  const groupRef = useRef(null);
-  useFrame(({ clock }) => {
-    if (groupRef.current) groupRef.current.rotation.y = clock.elapsedTime * 0.08;
-  });
-  return (
-    <group ref={groupRef} position={[1.5, 0, 0]}>
-      {/* Central sphere — primary focus, shifted right */}
-      <Float speed={1.5} rotationIntensity={0.3} floatIntensity={0.8}>
-        <Sphere args={[1.2, 128, 128]}>
-          <MeshDistortMaterial color="#FFD000" distort={0.3} speed={3} roughness={0} metalness={0.9} />
-        </Sphere>
-      </Float>
-
-      <Float speed={3} rotationIntensity={2} floatIntensity={1}>
-        <Icosahedron args={[0.45, 0]} position={[2.2, 0.6, 0]}>
-          <meshStandardMaterial color="#4D61FF" roughness={0.1} metalness={1} />
-        </Icosahedron>
-      </Float>
-
-      <Float speed={2.5} rotationIntensity={3} floatIntensity={1.5}>
-        <Octahedron args={[0.35, 0]} position={[-1.5, -1, 0.5]}>
-          <meshStandardMaterial color="#FF5C5C" roughness={0} metalness={1} />
-        </Octahedron>
-      </Float>
-
-      <Float speed={1} floatIntensity={0.3}>
-        <Torus args={[2.2, 0.04, 8, 80]}>
-          <meshBasicMaterial color="#FFD000" opacity={0.6} transparent />
-        </Torus>
-      </Float>
-      <Float speed={0.8} floatIntensity={0.2}>
-        <Torus args={[3, 0.025, 8, 80]} rotation={[Math.PI / 4, 0, 0]}>
-          <meshBasicMaterial color="#4D61FF" opacity={0.35} transparent />
-        </Torus>
-      </Float>
-
-      {/* Floating accent dots */}
-      {[[-1.5, 1.8, 0.3],[2.5, -1.5, 0.5],[1, 2.2, -0.3],[-2, 0.3, 0.8],[3.2, 1, -0.5],[-0.5, -2, 0.4]].map((pos, i) => (
-        <Float key={i} speed={2 + i * 0.3} floatIntensity={0.8}>
-          <Sphere args={[0.07, 16, 16]} position={pos}>
-            <meshBasicMaterial color={i % 3 === 0 ? '#FFD000' : i % 3 === 1 ? '#4D61FF' : '#00C48C'} />
-          </Sphere>
-        </Float>
-      ))}
-
-      {/* Neubrutalism cube accent */}
-      <Float speed={1.2} rotationIntensity={1} floatIntensity={0.5}>
-        <mesh position={[2.8, 1.8, -1]} rotation={[0.5, 0.5, 0]}>
-          <boxGeometry args={[0.5, 0.5, 0.5]} />
-          <meshStandardMaterial color="#A855F7" roughness={0.1} metalness={0.8} />
-        </mesh>
-      </Float>
-    </group>
-  );
-}
-
-/* ─── CTA 3D Object ─────────────────────────────────────────────────── */
-function CtaScene() {
-  const mesh = useRef(null);
-  useFrame(({ clock }) => {
-    if (!mesh.current) return;
-    mesh.current.rotation.x = clock.elapsedTime * 0.4;
-    mesh.current.rotation.y = clock.elapsedTime * 0.6;
-  });
-  return (
-    <>
-      <Float speed={2} rotationIntensity={1} floatIntensity={1.5}>
-        <mesh ref={mesh}>
-          <torusKnotGeometry args={[0.8, 0.25, 128, 32]} />
-          <MeshWobbleMaterial color="#FFD000" factor={0.3} speed={2} roughness={0} metalness={0.8} />
-        </mesh>
-      </Float>
-      <Float speed={1.5}>
-        <Torus args={[1.8, 0.03, 8, 80]}>
-          <meshBasicMaterial color="#0D0D0D" opacity={0.5} transparent />
-        </Torus>
-      </Float>
-    </>
+    <div ref={ref} className="w-full h-full">
+      {mountedRef.current ? (
+        <Suspense fallback={<Scene3DStatic bg={bg} ring={ring} />}>
+          <Canvas3D active={inView} />
+        </Suspense>
+      ) : (
+        <Scene3DStatic bg={bg} ring={ring} />
+      )}
+    </div>
   );
 }
 
@@ -306,7 +237,7 @@ function PortfolioModal({ item, open, onClose, transitionTo }) {
         <div className="flex-1 overflow-y-auto min-h-0">
           {imgs.length > 0 && (
             <div className="relative border-b-2 border-neu-black bg-neu-bg">
-              <img src={imgs[imgIdx]} alt={item?.title} className="w-full h-64 object-cover" loading="lazy" decoding="async" />
+              <img src={supaImg(imgs[imgIdx], { width: 800 })} alt={item?.title} width="800" height="256" className="w-full h-64 object-cover" loading="lazy" decoding="async" />
               {imgs.length > 1 && (
                 <>
                   <button onClick={() => setImgIdx(i => (i - 1 + imgs.length) % imgs.length)}
@@ -360,7 +291,7 @@ function SoftwareDetailModal({ sw, open, onClose, transitionTo }) {
 
         {sw?.thumbnailUrl && (
           <div className="border-b-2 border-neu-black bg-neu-bg flex-shrink-0">
-            <img src={sw.thumbnailUrl} alt={swName} className="w-full h-52 object-cover" loading="lazy" />
+            <img src={supaImg(sw.thumbnailUrl, { width: 800 })} alt={swName} width="800" height="208" className="w-full h-52 object-cover" loading="lazy" decoding="async" />
           </div>
         )}
 
@@ -456,7 +387,7 @@ function PackageCard({ pkg, onOrder }) {
         <div className="flex items-center gap-3 mb-3">
           {pkg.iconUrl ? (
             <div className="w-10 h-10 border-2 border-neu-white/30 overflow-hidden flex-shrink-0">
-              <img src={pkg.iconUrl} alt={pkg.name} className="w-full h-full object-cover" loading="lazy" decoding="async" />
+              <img src={supaImg(pkg.iconUrl, { width: 80 })} alt={pkg.name} width="40" height="40" className="w-full h-full object-cover" loading="lazy" decoding="async" />
             </div>
           ) : (
             <div className="w-10 h-10 border-2 border-neu-white/30 bg-neu-white/10 flex items-center justify-center flex-shrink-0">
@@ -600,8 +531,8 @@ function FeedbackSection({ feedbacks, onSubmitted }) {
             ref={sliderRef}
             className="flex gap-4 overflow-x-auto pb-3 -mx-4 px-4 lg:mx-0 lg:px-0 select-none"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', cursor: 'grab' }}
-            onMouseDown={e => { const el = sliderRef.current; drag.current = { active: true, startX: e.pageX - el.offsetLeft, scrollLeft: el.scrollLeft }; el.style.cursor = 'grabbing'; }}
-            onMouseMove={e => { if (!drag.current.active) return; const el = sliderRef.current; el.scrollLeft = drag.current.scrollLeft - (e.pageX - el.offsetLeft - drag.current.startX); }}
+            onMouseDown={e => { const el = sliderRef.current; drag.current = { active: true, startX: e.pageX, scrollLeft: el.scrollLeft }; el.style.cursor = 'grabbing'; }}
+            onMouseMove={e => { if (!drag.current.active) return; sliderRef.current.scrollLeft = drag.current.scrollLeft - (e.pageX - drag.current.startX); }}
             onMouseUp={() => { drag.current.active = false; sliderRef.current.style.cursor = 'grab'; }}
             onMouseLeave={() => { if (drag.current.active) { drag.current.active = false; sliderRef.current.style.cursor = 'grab'; } }}
             onTouchStart={e => { const el = sliderRef.current; drag.current = { active: true, startX: e.touches[0].pageX, scrollLeft: el.scrollLeft }; }}
@@ -710,7 +641,8 @@ function FeedbackSection({ feedbacks, onSubmitted }) {
 }
 
 export default function LandingPage() {
-  useLenis();
+  const isDesktop = useIsDesktop();
+  useLenis(isDesktop);
   const { t, i18n } = useTranslation();
   const { pageRef, transitionTo } = usePageTransition();
   const lang = (id, en) => i18n.language === 'en' && en ? en : id;
@@ -886,7 +818,7 @@ export default function LandingPage() {
                 </div>
                 {bannerAd.image ? (
                   <div className="relative overflow-hidden bg-neu-black">
-                    <img src={bannerAd.image} alt={bannerAd.title} className="w-full max-h-[80vh] object-contain block mx-auto" loading="lazy" decoding="async" />
+                    <img src={supaImg(bannerAd.image, { width: 1200 })} alt={bannerAd.title} className="w-full max-h-[80vh] object-contain block mx-auto" loading="lazy" decoding="async" />
                     <div className="absolute inset-0 bg-neu-black/0 group-hover:bg-neu-black/40 transition-all duration-300 flex items-end">
                       <div className="w-full px-5 py-4 bg-gradient-to-t from-neu-black/80 to-transparent translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
                         <p className="font-display font-bold text-lg text-neu-white">{bannerAd.title}</p>
@@ -906,7 +838,7 @@ export default function LandingPage() {
               <div className="flex flex-col sm:flex-row max-h-[85vh] overflow-hidden">
                 {bannerAd.image && (
                   <div className="sm:w-1/2 flex-shrink-0 border-b-2 sm:border-b-0 sm:border-r-2 border-neu-black bg-neu-black flex items-center justify-center min-h-[200px]">
-                    <img src={bannerAd.image} alt={bannerAd.title} className="w-full h-full object-contain" loading="lazy" decoding="async" />
+                    <img src={supaImg(bannerAd.image, { width: 1000 })} alt={bannerAd.title} className="w-full h-full object-contain" loading="lazy" decoding="async" />
                   </div>
                 )}
                 <div className={cn('bg-neu-white flex flex-col overflow-y-auto', bannerAd.image ? 'sm:w-1/2' : 'w-full')}>
@@ -965,7 +897,7 @@ export default function LandingPage() {
                 </div>
                 {bannerModal.image ? (
                   <div className="relative overflow-hidden bg-neu-black">
-                    <img src={bannerModal.image} alt={bannerModal.title} className="w-full max-h-[80vh] object-contain block mx-auto" loading="lazy" decoding="async" />
+                    <img src={supaImg(bannerModal.image, { width: 1200 })} alt={bannerModal.title} className="w-full max-h-[80vh] object-contain block mx-auto" loading="lazy" decoding="async" />
                     <div className="absolute inset-0 bg-neu-black/0 group-hover:bg-neu-black/40 transition-all duration-300 flex items-end">
                       <div className="w-full px-5 py-4 bg-gradient-to-t from-neu-black/80 to-transparent translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
                         <p className="font-display font-bold text-lg text-neu-white">{bannerModal.title}</p>
@@ -985,7 +917,7 @@ export default function LandingPage() {
               <div className="flex flex-col sm:flex-row max-h-[85vh] overflow-hidden">
                 {bannerModal.image && (
                   <div className="sm:w-1/2 flex-shrink-0 border-b-2 sm:border-b-0 sm:border-r-2 border-neu-black bg-neu-black flex items-center justify-center min-h-[200px]">
-                    <img src={bannerModal.image} alt={bannerModal.title} className="w-full h-full object-contain" loading="lazy" decoding="async" />
+                    <img src={supaImg(bannerModal.image, { width: 1000 })} alt={bannerModal.title} className="w-full h-full object-contain" loading="lazy" decoding="async" />
                   </div>
                 )}
                 <div className={cn('bg-neu-white flex flex-col overflow-y-auto', bannerModal.image ? 'sm:w-1/2' : 'w-full')}>
@@ -1301,7 +1233,7 @@ export default function LandingPage() {
                     <h3 className="font-display font-bold text-base text-neu-black mb-2">{svc.title}</h3>
                     <p className="font-body text-sm leading-relaxed text-neu-black/55">{svc.desc}</p>
 
-                    <div className="mt-5 h-px w-0 group-hover:w-full bg-neu-primary transition-all duration-300" />
+                    <div className="mt-5 h-px w-full bg-neu-primary origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />
                   </motion.div>
                 ))}
               </div>
@@ -1342,25 +1274,7 @@ export default function LandingPage() {
                 <span className="font-mono font-bold text-[9px] text-neu-black uppercase tracking-widest">3D Scene</span>
               </div>
 
-              <SplineOrR3F
-                scene={SPLINE_ABOUT}
-                bg="#0D0D0D"
-                r3fFallback={
-                  <Canvas camera={{ position: [0, 0, 4], fov: 60 }} style={{ background: '#0D0D0D' }}>
-                    <ambientLight intensity={0.5} />
-                    <pointLight position={[3, 3, 3]} intensity={2} color="#FFD000" />
-                    <Float speed={3} floatIntensity={2}>
-                      <mesh rotation={[0.5, 0.5, 0]}>
-                        <octahedronGeometry args={[1.2, 0]} />
-                        <meshStandardMaterial color="#FAFAFA" wireframe />
-                      </mesh>
-                    </Float>
-                    <Float speed={2} floatIntensity={1}>
-                      <Torus args={[2, 0.05, 8, 64]}><meshBasicMaterial color="#FFD000" /></Torus>
-                    </Float>
-                  </Canvas>
-                }
-              />
+              <Lazy3DSlot Canvas3D={AboutCanvas} bg="#0D0D0D" ring="#FFD000" />
             </div>
           </div>
         </div>
@@ -1390,15 +1304,13 @@ export default function LandingPage() {
                 style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', cursor: 'grab' }}
                 onMouseDown={e => {
                   const el = pkgSliderRef.current;
-                  pkgDrag.current = { active: true, startX: e.pageX - el.offsetLeft, scrollLeft: el.scrollLeft };
+                  pkgDrag.current = { active: true, startX: e.pageX, scrollLeft: el.scrollLeft };
                   el.style.cursor = 'grabbing';
                   el.style.scrollSnapType = 'none';
                 }}
                 onMouseMove={e => {
                   if (!pkgDrag.current.active) return;
-                  const el = pkgSliderRef.current;
-                  const x  = e.pageX - el.offsetLeft;
-                  el.scrollLeft = pkgDrag.current.scrollLeft - (x - pkgDrag.current.startX);
+                  pkgSliderRef.current.scrollLeft = pkgDrag.current.scrollLeft - (e.pageX - pkgDrag.current.startX);
                 }}
                 onMouseUp={() => {
                   pkgDrag.current.active = false;
@@ -1465,13 +1377,12 @@ export default function LandingPage() {
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', cursor: 'grab' }}
               onMouseDown={e => {
                 const el = swSliderRef.current;
-                swDrag.current = { active: true, startX: e.pageX - el.offsetLeft, scrollLeft: el.scrollLeft };
+                swDrag.current = { active: true, startX: e.pageX, scrollLeft: el.scrollLeft };
                 el.style.cursor = 'grabbing';
               }}
               onMouseMove={e => {
                 if (!swDrag.current.active) return;
-                const el = swSliderRef.current;
-                el.scrollLeft = swDrag.current.scrollLeft - (e.pageX - el.offsetLeft - swDrag.current.startX);
+                swSliderRef.current.scrollLeft = swDrag.current.scrollLeft - (e.pageX - swDrag.current.startX);
               }}
               onMouseUp={() => { swDrag.current.active = false; swSliderRef.current.style.cursor = 'grab'; }}
               onMouseLeave={() => { if (swDrag.current.active) { swDrag.current.active = false; swSliderRef.current.style.cursor = 'grab'; } }}
@@ -1497,7 +1408,7 @@ export default function LandingPage() {
                     {/* Thumbnail */}
                     <div className="relative border-b-2 border-neu-black h-40 bg-neu-bg overflow-hidden flex items-center justify-center">
                       {sw.thumbnailUrl ? (
-                        <img src={sw.thumbnailUrl} alt={swName} className="w-full h-full object-cover pointer-events-none" loading="lazy" draggable="false" />
+                        <img src={supaImg(sw.thumbnailUrl, { width: 576 })} alt={swName} width="288" height="160" className="w-full h-full object-cover pointer-events-none" loading="lazy" decoding="async" draggable="false" />
                       ) : (
                         <svg className="w-12 h-12 text-neu-black/15" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" draggable="false">
                           <rect x="2" y="3" width="20" height="14" /><line x1="8" y1="21" x2="16" y2="21" /><line x1="12" y1="17" x2="12" y2="21" />
@@ -1569,7 +1480,7 @@ export default function LandingPage() {
                   className="flex-shrink-0 w-72 snap-start border-2 border-neu-black shadow-[4px_4px_0px_#0D0D0D] bg-neu-white overflow-hidden cursor-pointer group hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_#0D0D0D] transition-all duration-150">
                   {b.image && (
                     <div className="relative border-b-2 border-neu-black overflow-hidden">
-                      <img src={b.image} alt={b.title} className="w-full h-36 object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" decoding="async" />
+                      <img src={supaImg(b.image, { width: 576 })} alt={b.title} width="288" height="144" className="w-full h-36 object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" decoding="async" />
                       <div className="absolute inset-0 bg-neu-black/0 group-hover:bg-neu-black/20 transition-all duration-200 flex items-center justify-center">
                         <span className="opacity-0 group-hover:opacity-100 transition-opacity font-mono text-xs text-neu-white bg-neu-black/70 px-3 py-1.5">{t('landing.portfolio.clickView')}</span>
                       </div>
@@ -1619,7 +1530,7 @@ export default function LandingPage() {
                   >
                     <div className={cn('relative bg-neu-bg border-b-2 border-neu-black overflow-hidden', isFeatured ? 'h-64 lg:h-72' : 'h-48')}>
                       {imgs[0]
-                        ? <img src={imgs[0]} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" loading="lazy" decoding="async" />
+                        ? <img src={supaImg(imgs[0], { width: isFeatured ? 900 : 500 })} alt={item.title} width={isFeatured ? 800 : 400} height={isFeatured ? 288 : 192} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" loading="lazy" decoding="async" />
                         : <div className="w-full h-full flex items-center justify-center"><span className="font-display font-bold text-5xl text-neu-black/15">{item.title?.charAt(0)}</span></div>}
                       {item.category && <span className="absolute top-2 left-2 bg-neu-black text-neu-white font-mono font-bold text-[10px] uppercase px-2 py-0.5">{item.category.replace(/_/g,' ')}</span>}
                       {/* Index number */}
@@ -1790,12 +1701,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 items-center min-h-[480px]">
             {/* 3D Side */}
             <div className="h-64 lg:h-full border-b-2 lg:border-b-0 lg:border-r-2 border-neu-black relative overflow-hidden">
-              <Canvas camera={{ position: [0, 0, 4], fov: 55 }} style={{ background: '#FFD000' }}>
-                <ambientLight intensity={0.8} />
-                <pointLight position={[3, 3, 3]} intensity={2} color="#ffffff" />
-                <pointLight position={[-2, -2, 2]} intensity={1} color="#FF5C5C" />
-                <CtaScene />
-              </Canvas>
+              <Lazy3DSlot Canvas3D={CtaCanvas} bg="#FFD000" ring="#0D0D0D" />
             </div>
             {/* Text Side */}
             <motion.div className="py-16 px-8 lg:px-12" {...fadeUp()}>
