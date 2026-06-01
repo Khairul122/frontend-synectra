@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
@@ -15,12 +15,7 @@ import { getPlatform } from '../constants/platforms';
 import { API_BASE_URL } from '../constants/api';
 import { LanguageSwitcher } from '../components/ui/LanguageSwitcher';
 import { useIsDesktop } from '../hooks/useIsDesktop';
-import { useInView } from '../hooks/useInView';
 import { supaImg } from '../utils/imageUrl';
-
-// 3D di-lazy: vendor-three keluar dari bundle awal & hanya di-load di desktop
-const AboutCanvas = lazy(() => import('../components/3d/LandingScenes').then(m => ({ default: m.AboutCanvas })));
-const CtaCanvas   = lazy(() => import('../components/3d/LandingScenes').then(m => ({ default: m.CtaCanvas })));
 
 const BASE = API_BASE_URL || '';
 
@@ -104,45 +99,6 @@ function usePageTransition() {
     navigate(path);
   };
   return { pageRef, transitionTo };
-}
-
-/* ─── Static fallback untuk slot 3D (mobile / reduced-motion / loading) ── */
-function Scene3DStatic({ bg = '#0D0D0D', ring = '#FFD000' }) {
-  return (
-    <div className="w-full h-full relative overflow-hidden" style={{ background: bg }} aria-hidden="true">
-      <div className="absolute inset-0"
-           style={{ backgroundImage: `radial-gradient(circle at 50% 50%, ${ring}22, transparent 60%)` }} />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 border-2 rotate-12"
-           style={{ borderColor: ring + '55' }} />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 border-2 -rotate-12"
-           style={{ borderColor: ring + '88' }} />
-    </div>
-  );
-}
-
-/**
- * Slot 3D yang sadar-perangkat: desktop → lazy Canvas (mount saat in-view,
- * frameloop pause saat offscreen). Mobile / reduced-motion → visual statis.
- */
-function Lazy3DSlot({ Canvas3D, bg, ring }) {
-  const isDesktop = useIsDesktop();
-  const [ref, inView] = useInView({ rootMargin: '300px' });
-  const mountedRef = useRef(false);
-  if (inView) mountedRef.current = true;
-
-  if (!isDesktop) return <Scene3DStatic bg={bg} ring={ring} />;
-
-  return (
-    <div ref={ref} className="w-full h-full">
-      {mountedRef.current ? (
-        <Suspense fallback={<Scene3DStatic bg={bg} ring={ring} />}>
-          <Canvas3D active={inView} />
-        </Suspense>
-      ) : (
-        <Scene3DStatic bg={bg} ring={ring} />
-      )}
-    </div>
-  );
 }
 
 /* ─── Hero text reveal — overflow-hidden + GSAP translateY ──────────── */
@@ -1242,14 +1198,18 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── SPLINE 3D SECTION ── */}
+      {/* ── ABOUT SECTION ── */}
       <section className="border-b-2 border-neu-black bg-neu-black py-20 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+
+            {/* Left — text + features */}
             <motion.div {...fadeUp()} className="border-l-4 border-neu-primary pl-6">
               <span className="font-mono text-[10px] text-neu-white/40 uppercase tracking-widest block mb-2">{t('landing.about.tag')}</span>
               <div className="h-px w-8 bg-neu-primary mb-4" />
-              <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-white mb-4 leading-tight">{t('landing.about.title').split('\n').map((l,i)=><span key={i} className="block">{l}</span>)}</h2>
+              <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-white mb-4 leading-tight">
+                {t('landing.about.title').split('\n').map((l, i) => <span key={i} className="block">{l}</span>)}
+              </h2>
               <p className="font-body text-sm text-neu-white/55 leading-relaxed mb-8">
                 {t('landing.about.subtitle')}
               </p>
@@ -1264,18 +1224,31 @@ export default function LandingPage() {
                 ))}
               </div>
             </motion.div>
-            {/* ── About 3D (Spline jika URL diisi, else R3F) ── */}
-            <div className="h-80 lg:h-[420px] border-2 border-neu-white/20 relative overflow-hidden"
-                 style={{ boxShadow: '8px 8px 0px #FFD000' }}>
 
-              {/* Badge */}
-              <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5 px-2.5 py-1 bg-neu-primary border border-neu-black">
-                <span className="w-1.5 h-1.5 rounded-full bg-neu-black animate-pulse" />
-                <span className="font-mono font-bold text-[9px] text-neu-black uppercase tracking-widest">3D Scene</span>
+            {/* Right — stats panel */}
+            <motion.div {...fadeUp(0.15)} className="border-2 border-neu-white/20" style={{ boxShadow: '8px 8px 0px #FFD000' }}>
+              {/* Stats row */}
+              <div className="grid grid-cols-3 divide-x divide-neu-white/15">
+                {[
+                  { value: '5+',   label: t('landing.stats.experience') },
+                  { value: '100+', label: t('landing.stats.projects')   },
+                  { value: '4.9★', label: t('landing.stats.satisfaction') },
+                ].map((s, i) => (
+                  <div key={i} className="px-5 py-8 text-center">
+                    <p className="font-display font-black text-3xl lg:text-4xl text-neu-primary leading-none mb-2">{s.value}</p>
+                    <p className="font-mono text-[10px] text-neu-white/45 uppercase tracking-wider leading-snug">{s.label}</p>
+                  </div>
+                ))}
               </div>
+              {/* Quote */}
+              <div className="border-t border-neu-white/15 px-6 py-7">
+                <p className="font-display font-bold text-lg lg:text-xl text-neu-white leading-snug mb-2">
+                  &ldquo;{t('landing.about.quote', 'Kualitas bukan pilihan,')}&rdquo;
+                </p>
+                <p className="font-mono text-[10px] text-neu-white/35 uppercase tracking-widest">— Synectra Team</p>
+              </div>
+            </motion.div>
 
-              <Lazy3DSlot Canvas3D={AboutCanvas} bg="#0D0D0D" ring="#FFD000" />
-            </div>
           </div>
         </div>
       </section>
@@ -1695,24 +1668,30 @@ export default function LandingPage() {
       {/* ── RATING & ULASAN ── */}
       <FeedbackSection feedbacks={feedbacks} onSubmitted={fb => setFeedbacks(prev => [fb, ...prev])} />
 
-      {/* ── CTA FINAL + 3D ── */}
+      {/* ── CTA FINAL ── */}
       <section className="border-b-2 border-neu-black bg-neu-primary overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 items-center min-h-[480px]">
-            {/* 3D Side */}
-            <div className="h-64 lg:h-full border-b-2 lg:border-b-0 lg:border-r-2 border-neu-black relative overflow-hidden">
-              <Lazy3DSlot Canvas3D={CtaCanvas} bg="#FFD000" ring="#0D0D0D" />
+          <motion.div className="py-24 flex flex-col items-center text-center" {...fadeUp()}>
+            <div className="h-px w-12 bg-neu-black/30 mb-8" />
+            <h2 className="font-display font-black text-5xl lg:text-6xl text-neu-black mb-5 leading-[0.95] max-w-2xl">
+              {t('landing.cta.title').split('\n').map((l, i) => <span key={i} className="block">{l}</span>)}
+            </h2>
+            <p className="font-body text-base text-neu-black/65 mb-10 max-w-md leading-relaxed">
+              {t('landing.cta.subtitle')}
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={() => transitionTo('/register')}
+                className="px-10 py-4 bg-neu-black border-2 border-neu-black text-neu-white font-display font-bold text-sm uppercase shadow-[6px_6px_0px_#0D0D0D] hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none transition-all duration-150">
+                {t('landing.cta.primary')}
+              </button>
+              <button
+                onClick={() => transitionTo('/login')}
+                className="px-10 py-4 bg-transparent border-2 border-neu-black text-neu-black font-display font-bold text-sm uppercase hover:bg-neu-black/10 transition-all duration-150">
+                {t('landing.cta.secondary')}
+              </button>
             </div>
-            {/* Text Side */}
-            <motion.div className="py-16 px-8 lg:px-12" {...fadeUp()}>
-              <h2 className="font-display font-bold text-4xl lg:text-5xl text-neu-black mb-4">{t('landing.cta.title').split('\n').map((l,i)=><span key={i}>{l}{i===0&&<br/>}</span>)}</h2>
-              <p className="font-body text-base text-neu-black/70 mb-8 max-w-md">{t('landing.cta.subtitle')}</p>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <button onClick={() => transitionTo('/register')} className="px-8 py-4 bg-neu-black border-2 border-neu-black text-neu-white font-display font-bold text-sm uppercase shadow-[6px_6px_0px_#0D0D0D] hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none transition-all duration-150">{t('landing.cta.primary')}</button>
-                <button onClick={() => transitionTo('/login')} className="px-8 py-4 bg-neu-white border-2 border-neu-black text-neu-black font-display font-bold text-sm uppercase shadow-[6px_6px_0px_#0D0D0D] hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-none transition-all duration-150">{t('landing.cta.secondary')}</button>
-              </div>
-            </motion.div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
