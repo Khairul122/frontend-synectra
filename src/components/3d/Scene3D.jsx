@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback } from 'react';
+import { useRef, useState, useCallback, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Float } from '@react-three/drei';
 import * as THREE from 'three';
@@ -20,6 +20,8 @@ function NeuBox({ position, color, size = 1, speed = 1, rotationAxis = [1, 1, 0]
   const [clicked, setClicked] = useState(false);
   const [hovered, setHovered] = useState(false);
   const scaleTarget = useRef(1);
+  // Pre-alokasi Vector3 di luar useFrame untuk menghindari GC pressure 60x/detik
+  const _scaleVec  = useRef(new THREE.Vector3(1, 1, 1));
 
   useFrame((_, delta) => {
     if (!mesh.current) return;
@@ -30,10 +32,8 @@ function NeuBox({ position, color, size = 1, speed = 1, rotationAxis = [1, 1, 0]
 
     // Skala target: 1.3 jika diklik, 1.15 jika hover, 1 normal
     scaleTarget.current = clicked ? 1.35 : hovered ? 1.15 : 1;
-    mesh.current.scale.lerp(
-      new THREE.Vector3(scaleTarget.current, scaleTarget.current, scaleTarget.current),
-      0.12,
-    );
+    _scaleVec.current.setScalar(scaleTarget.current);
+    mesh.current.scale.lerp(_scaleVec.current, 0.12);
 
     // Emissive berkilau saat diklik
     if (mesh.current.children[0]?.material) {
@@ -79,6 +79,7 @@ function NeuSphere({ position, color, radius = 0.6, speed = 1 }) {
   const [clicked, setClicked] = useState(false);
   const [hovered, setHovered] = useState(false);
   const scaleTarget = useRef(1);
+  const _scaleVec   = useRef(new THREE.Vector3(1, 1, 1));
 
   useFrame(() => {
     if (!mesh.current) return;
@@ -86,10 +87,8 @@ function NeuSphere({ position, color, radius = 0.6, speed = 1 }) {
     mesh.current.rotation.z += 0.003 * speed;
 
     scaleTarget.current = clicked ? 1.4 : hovered ? 1.15 : 1;
-    mesh.current.scale.lerp(
-      new THREE.Vector3(scaleTarget.current, scaleTarget.current, scaleTarget.current),
-      0.12,
-    );
+    _scaleVec.current.setScalar(scaleTarget.current);
+    mesh.current.scale.lerp(_scaleVec.current, 0.12);
   });
 
   const handleClick = useCallback(() => {
@@ -124,6 +123,7 @@ function NeuTorus({ position, color, speed = 1 }) {
   const [clicked, setClicked] = useState(false);
   const [hovered, setHovered] = useState(false);
   const scaleTarget = useRef(1);
+  const _scaleVec   = useRef(new THREE.Vector3(1, 1, 1));
 
   useFrame(() => {
     if (!mesh.current) return;
@@ -131,10 +131,8 @@ function NeuTorus({ position, color, speed = 1 }) {
     mesh.current.rotation.y += 0.005 * speed;
 
     scaleTarget.current = clicked ? 1.4 : hovered ? 1.15 : 1;
-    mesh.current.scale.lerp(
-      new THREE.Vector3(scaleTarget.current, scaleTarget.current, scaleTarget.current),
-      0.12,
-    );
+    _scaleVec.current.setScalar(scaleTarget.current);
+    mesh.current.scale.lerp(_scaleVec.current, 0.12);
   });
 
   const handleClick = useCallback(() => {
@@ -165,7 +163,20 @@ function NeuTorus({ position, color, speed = 1 }) {
 }
 
 export function Scene3D() {
-  const mouse = useRef([0, 0]);
+  const mouse      = useRef([0, 0]);
+  const containerRef = useRef(null);
+  const [visible, setVisible] = useState(true);
+
+  // Pause rendering saat Canvas tidak terlihat di viewport
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setVisible(entry.isIntersecting),
+      { threshold: 0 },
+    );
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   const handleMouseMove = useCallback((e) => {
     // Normalisasi ke range -1..1
@@ -177,6 +188,7 @@ export function Scene3D() {
 
   return (
     <div
+      ref={containerRef}
       className="fixed inset-0 z-0"
       onMouseMove={handleMouseMove}
     >
@@ -184,7 +196,7 @@ export function Scene3D() {
         camera={{ position: [0, 0, 8], fov: 50 }}
         gl={{ antialias: true, alpha: true }}
         style={{ background: 'transparent' }}
-        frameloop="always"
+        frameloop={visible ? 'always' : 'never'}
       >
         <ambientLight intensity={0.6} />
         <directionalLight position={[5, 5, 5]} intensity={1.2} color="#ffffff" />

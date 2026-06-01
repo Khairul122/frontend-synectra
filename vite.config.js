@@ -10,6 +10,7 @@ export default defineConfig({
     },
   },
   build: {
+    target: ['es2020', 'chrome87', 'safari14', 'firefox78'],
     rollupOptions: {
       output: {
         manualChunks(id) {
@@ -28,9 +29,12 @@ export default defineConfig({
           if (id.includes('node_modules/@splinetool')) {
             return 'vendor-spline';
           }
+          if (id.includes('node_modules/framer-motion')) {
+            return 'vendor-framer';
+          }
         },
       },
     },
-    chunkSizeWarningLimit: 600,
+    chunkSizeWarningLimit: 250,
   },
 })

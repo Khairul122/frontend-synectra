@@ -301,8 +301,11 @@ export function Sidebar({ user, isOpen, onClose }) {
         {/* Brand */}
         <div className="px-5 py-5 border-b-2 border-neu-black flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src="/logo-synectra.jpeg" alt="Synectra"
-              className="h-10 w-auto max-w-[110px] border-2 border-neu-black object-contain shadow-neu-sm flex-shrink-0" />
+            <picture>
+              <source srcSet="/logo-synectra.webp" type="image/webp" />
+              <img src="/logo-synectra.jpeg" alt="Synectra" width="110" height="40"
+                className="h-10 w-auto max-w-[110px] border-2 border-neu-black object-contain shadow-neu-sm flex-shrink-0" />
+            </picture>
             <h2 className="font-display font-bold text-sm text-neu-black/60 uppercase tracking-widest leading-tight">{t('admin.panel')}</h2>
           </div>
           <button onClick={onClose} className="lg:hidden w-8 h-8 flex items-center justify-center border-2 border-neu-black hover:bg-neu-bg">

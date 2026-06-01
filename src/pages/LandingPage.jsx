@@ -13,7 +13,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { Float, MeshDistortMaterial, Sphere, Torus, MeshWobbleMaterial, Icosahedron, Octahedron } from '@react-three/drei';
 import Lenis from 'lenis';
 import axios from 'axios';
-import Spline from '@splinetool/react-spline';
+const Spline = lazy(() => import('@splinetool/react-spline'));
 import { cn } from '../utils/cn';
 import { getPlatform } from '../constants/platforms';
 import { API_BASE_URL } from '../constants/api';
@@ -882,7 +882,7 @@ export default function LandingPage() {
                 </div>
                 {bannerAd.image ? (
                   <div className="relative overflow-hidden bg-neu-black">
-                    <img src={bannerAd.image} alt={bannerAd.title} className="w-full max-h-[80vh] object-contain block mx-auto" />
+                    <img src={bannerAd.image} alt={bannerAd.title} className="w-full max-h-[80vh] object-contain block mx-auto" loading="lazy" decoding="async" />
                     <div className="absolute inset-0 bg-neu-black/0 group-hover:bg-neu-black/40 transition-all duration-300 flex items-end">
                       <div className="w-full px-5 py-4 bg-gradient-to-t from-neu-black/80 to-transparent translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
                         <p className="font-display font-bold text-lg text-neu-white">{bannerAd.title}</p>
@@ -902,7 +902,7 @@ export default function LandingPage() {
               <div className="flex flex-col sm:flex-row max-h-[85vh] overflow-hidden">
                 {bannerAd.image && (
                   <div className="sm:w-1/2 flex-shrink-0 border-b-2 sm:border-b-0 sm:border-r-2 border-neu-black bg-neu-black flex items-center justify-center min-h-[200px]">
-                    <img src={bannerAd.image} alt={bannerAd.title} className="w-full h-full object-contain" />
+                    <img src={bannerAd.image} alt={bannerAd.title} className="w-full h-full object-contain" loading="lazy" decoding="async" />
                   </div>
                 )}
                 <div className={cn('bg-neu-white flex flex-col overflow-y-auto', bannerAd.image ? 'sm:w-1/2' : 'w-full')}>
@@ -1020,8 +1020,11 @@ export default function LandingPage() {
       <nav className="sticky top-0 z-40 bg-neu-white border-b-2 border-neu-black">
         <div className="max-w-7xl mx-auto px-4 lg:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-5">
-            <img src="/logo-synectra.jpeg" alt="Synectra"
-              className="h-9 w-auto max-w-[120px] border-2 border-neu-black object-contain shadow-neu-sm" />
+            <picture>
+              <source srcSet="/logo-synectra.webp" type="image/webp" />
+              <img src="/logo-synectra.jpeg" alt="Synectra" width="120" height="36"
+                className="h-9 w-auto max-w-[120px] border-2 border-neu-black object-contain shadow-neu-sm" />
+            </picture>
             <div className="hidden md:flex items-center gap-6">
               {[
                 { tKey: 'nav.services',    id: 'layanan'   },
@@ -1773,8 +1776,11 @@ export default function LandingPage() {
             {/* Brand col — 2/5 */}
             <div className="lg:col-span-2">
               <div className="flex items-center gap-3 mb-5">
-                <img src="/logo-synectra.jpeg" alt="Synectra"
-                  className="h-9 w-auto max-w-[130px] border-2 border-neu-white/30 object-contain brightness-0 invert" />
+                <picture>
+                  <source srcSet="/logo-synectra.webp" type="image/webp" />
+                  <img src="/logo-synectra.jpeg" alt="Synectra" width="130" height="36" loading="lazy" decoding="async"
+                    className="h-9 w-auto max-w-[130px] border-2 border-neu-white/30 object-contain brightness-0 invert" />
+                </picture>
               </div>
               <p className="font-body text-sm text-neu-white/50 leading-relaxed mb-6 max-w-sm">
                 {t('landing.footer.desc')}
