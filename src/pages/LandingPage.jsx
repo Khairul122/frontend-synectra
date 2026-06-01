@@ -439,16 +439,20 @@ function PackageCard({ pkg, onOrder }) {
   const fmt = (val) => `Rp ${Number(val).toLocaleString('id-ID')}`;
 
   return (
-    <div className="relative border-2 border-neu-black shadow-neu bg-neu-white flex flex-col h-full">
+    <div className="relative border-2 border-neu-black shadow-neu bg-neu-white flex flex-col h-full overflow-hidden">
       {/* Badge */}
       {pkg.badge && (
-        <span className="absolute -top-3 left-4 px-3 py-0.5 bg-neu-primary border-2 border-neu-black font-mono font-bold text-[10px] uppercase z-10">
+        <span className="absolute -top-3 left-4 px-3 py-0.5 bg-neu-primary border-2 border-neu-black font-mono font-bold text-[10px] uppercase z-10 rotate-[1.5deg]">
           {pkg.badge}
         </span>
       )}
 
       {/* Header */}
-      <div className="border-b-2 border-neu-black p-5 bg-neu-black">
+      <div className="border-b-2 border-neu-black p-5 bg-neu-black relative">
+        {/* Decorative number */}
+        <span className="absolute top-3 right-4 font-mono font-black text-4xl text-neu-white/10 leading-none select-none pointer-events-none">
+          {String(pkg._idx ?? 1).padStart(2, '0')}
+        </span>
         <div className="flex items-center gap-3 mb-3">
           {pkg.iconUrl ? (
             <div className="w-10 h-10 border-2 border-neu-white/30 overflow-hidden flex-shrink-0">
@@ -468,7 +472,7 @@ function PackageCard({ pkg, onOrder }) {
             )}
           </div>
         </div>
-        <p className="font-display font-bold text-2xl text-neu-primary">{fmt(pkg.price)}</p>
+        <p className="font-mono font-bold text-2xl text-neu-primary tracking-tight">{fmt(pkg.price)}</p>
         {pkg.duration && (
           <p className="font-mono text-xs text-neu-white/50 mt-1">{t('landing.packages.duration')}: {lang(pkg.duration, pkg.durationEn)}</p>
         )}
@@ -1143,16 +1147,26 @@ export default function LandingPage() {
         <div className="absolute inset-0 z-[3] pointer-events-none"
              style={{ background: 'linear-gradient(to right, #0D0D0D 30%, rgba(13,13,13,0.85) 50%, rgba(13,13,13,0.35) 70%, transparent 100%)' }} />
 
+        {/* Layer 3b — Background monumental text */}
+        <div className="absolute inset-0 z-[4] pointer-events-none flex items-center justify-end overflow-hidden">
+          <span className="font-display font-black text-[18vw] leading-none text-neu-white/[0.025] select-none tracking-tighter pr-4 lg:pr-8">
+            SYNECTRA
+          </span>
+        </div>
+
         {/* Layer 4 — Content */}
         <div className="relative z-20 max-w-7xl mx-auto px-4 lg:px-6 min-h-[95vh] flex flex-col justify-center py-24">
           <div className="max-w-2xl">
 
-            {/* Badge */}
-            <div className="hero-badge inline-flex items-center gap-2 bg-white/[0.06] border border-white/[0.12] text-neu-white px-4 py-1.5 font-mono font-bold text-xs uppercase tracking-widest mb-8"
+            {/* Badge — rotated for editorial feel */}
+            <div className="hero-badge inline-flex items-center gap-2 bg-white/[0.06] border border-white/[0.12] text-neu-white px-4 py-1.5 font-mono font-bold text-xs uppercase tracking-widest mb-6 rotate-[-1deg]"
                  style={{ opacity: 0 }}>
-              <span className="w-1.5 h-1.5 rounded-full bg-neu-green animate-pulse" />
-              {t('landing.hero.badge')}
+              <span className="w-1.5 h-1.5 bg-neu-green animate-pulse" />
+              {t('landing.hero.badge').replace('✦ ', '').replace('✦', '')}
             </div>
+
+            {/* Horizontal rule separator */}
+            <div className="w-16 h-px bg-neu-white/20 mb-6 ml-1" />
 
             {/* Title — clip reveal per baris */}
             <h1 className="font-display font-bold text-6xl sm:text-7xl lg:text-8xl text-neu-white leading-[0.95] mb-6">
@@ -1194,6 +1208,12 @@ export default function LandingPage() {
           </div>
         </div>
 
+        {/* "Est." label — bottom right */}
+        <div className="absolute bottom-10 right-6 z-20 text-right hidden sm:block">
+          <p className="font-mono text-[9px] text-neu-white/20 uppercase tracking-[0.25em]">Est.</p>
+          <p className="font-mono font-bold text-[11px] text-neu-white/25 tracking-widest">2020</p>
+        </div>
+
         {/* Scroll indicator */}
         <div className="hero-scroll absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2"
              style={{ opacity: 0 }}>
@@ -1209,60 +1229,126 @@ export default function LandingPage() {
       </section>
 
       {/* ── MARQUEE — Tech Stack scrolling strip ── */}
-      <section className="border-b-2 border-neu-black bg-neu-black overflow-hidden py-3.5">
-        <div className="flex gap-10 animate-marquee whitespace-nowrap">
-          {[...techStack, ...techStack, ...techStack].map((tech, i) => (
-            <span key={i} className="inline-flex items-center gap-3 font-mono text-[11px] text-neu-white/40 uppercase tracking-widest flex-shrink-0">
-              <span className="w-1 h-1 bg-neu-primary inline-block flex-shrink-0" />
-              {tech}
-            </span>
-          ))}
+      <section className="border-b-2 border-t-4 border-neu-black border-t-neu-primary bg-neu-black overflow-hidden">
+        <div className="flex items-stretch">
+          {/* Fixed label */}
+          <div className="flex-shrink-0 border-r-2 border-neu-white/10 px-4 flex items-center">
+            <span className="font-mono font-bold text-[9px] text-neu-white/30 uppercase tracking-[0.2em] whitespace-nowrap">STACK</span>
+          </div>
+          {/* Scrolling */}
+          <div className="overflow-hidden py-3 flex-1">
+            <div className="flex gap-10 animate-marquee whitespace-nowrap">
+              {[...techStack, ...techStack, ...techStack].map((tech, i) => (
+                <span key={i} className="inline-flex items-center gap-3 font-mono text-[11px] text-neu-white/40 uppercase tracking-widest flex-shrink-0">
+                  <span className="w-1 h-1 bg-neu-primary inline-block flex-shrink-0" />
+                  {tech}
+                </span>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* ── STATS — Anime.js ── */}
-      <section id="statistik" className="border-b-2 border-neu-black bg-neu-black py-14">
+      {/* ── STATS — Oversized numbers ── */}
+      <section id="statistik" className="border-b-2 border-neu-black bg-neu-black py-16 lg:py-20">
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
-          <div className="grid grid-cols-2 lg:grid-cols-4 divide-x-0 lg:divide-x-2 divide-neu-white/10">
+          <div className="grid grid-cols-2 lg:grid-cols-4 divide-neu-white/10 divide-x-0 lg:divide-x-2">
             {stats.map((s, i) => (
-              <motion.div key={s.labelKey} {...scaleUp(i * 0.06)} className={cn('p-8 text-center', i > 0 && 'border-t-2 lg:border-t-0 border-neu-white/10')}>
-                <p className="font-display font-bold text-4xl lg:text-5xl text-neu-primary mb-2"><AnimatedCounter key={s.value} target={s.value} suffix={s.suffix} /></p>
-                <p className="font-body text-sm text-neu-white/60">{t(s.labelKey)}</p>
+              <motion.div
+                key={s.labelKey}
+                {...scaleUp(i * 0.06)}
+                className={cn('px-6 lg:px-10 py-8 flex flex-col justify-center', i > 0 && 'border-t-2 lg:border-t-0 border-neu-white/10')}
+              >
+                <p className={cn(
+                  'font-display font-black leading-none tracking-tighter',
+                  'text-[3.5rem] sm:text-[4.5rem] lg:text-[5.5rem]',
+                  i === 3 ? 'text-neu-primary' : 'text-neu-white',
+                )}>
+                  <AnimatedCounter key={s.value} target={s.value} suffix={s.suffix} />
+                </p>
+                <p className="font-mono text-[10px] text-neu-white/40 uppercase tracking-[0.2em] mt-3">{t(s.labelKey)}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── SERVICES ── */}
-      <section id="layanan" className="border-b-2 border-neu-black py-20">
+      {/* ── SERVICES — Editorial grid ── */}
+      <section id="layanan" className="border-b-2 border-neu-black py-16 lg:py-20">
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
-          <motion.div className="max-w-2xl mb-12" {...fadeLeft()}>
-            <div className="flex items-center gap-3 mb-2"><div className="h-1 w-10 bg-neu-accent" /><span className="font-mono text-xs text-neu-black/50 uppercase tracking-widest">{t('landing.services.tag')}</span></div>
-            <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-black">{t('landing.services.title').split('\n').map((line, i) => <span key={i}>{line}{i === 0 && <br />}</span>)}</h2>
-          </motion.div>
+          <div className="flex items-start justify-between gap-6 mb-12 flex-wrap">
+            <motion.div {...fadeLeft()}>
+              <span className="inline-block font-mono text-[10px] text-neu-black border-2 border-neu-black px-2 py-0.5 uppercase tracking-widest mb-3 bg-neu-black text-neu-white">{t('landing.services.tag')}</span>
+              <h2 className="font-display font-bold text-2xl lg:text-3xl text-neu-black max-w-sm">{t('landing.services.title').split('\n').map((line, i) => <span key={i}>{line}{i === 0 && <br />}</span>)}</h2>
+            </motion.div>
+            <motion.p {...fadeUp(0.1)} className="font-mono text-[10px] text-neu-black/30 uppercase tracking-widest self-end hidden lg:block">
+              — {services.length} {t('landing.services.tag').toLowerCase()}
+            </motion.p>
+          </div>
+
           {(() => {
             const svcIcons = [
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="0"/><path d="M9 9h6M9 13h4"/></svg>,
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="0"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>,
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>,
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>,
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg>,
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>,
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="0"/><path d="M9 9h6M9 13h4"/></svg>,
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="0"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>,
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>,
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>,
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg>,
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>,
             ];
             return (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {services.map((svc, i) => (
-              <motion.div key={svc.title} {...fadeUp(i * 0.07)} className="border-2 border-neu-black bg-neu-white shadow-neu p-6 group hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-neu-lg transition-all duration-150">
-                <div className="w-12 h-12 border-2 border-neu-black bg-neu-primary flex items-center justify-center mb-4">
-                  {svcIcons[i % svcIcons.length]}
-                </div>
-                <h3 className="font-display font-bold text-lg text-neu-black mb-2">{svc.title}</h3>
-                <p className="font-body text-sm text-neu-black/60 leading-relaxed">{svc.desc}</p>
-                <div className="mt-4 h-0.5 w-0 bg-neu-primary group-hover:w-full transition-all duration-300" />
-              </motion.div>
-            ))}
-          </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 border-2 border-neu-black">
+                {services.map((svc, i) => {
+                  const isLast = i === services.length - 1;
+                  const isFeatured = i === 0;
+                  return (
+                    <motion.div
+                      key={svc.title}
+                      {...fadeUp(i * 0.06)}
+                      className={cn(
+                        'relative p-7 lg:p-8 group border-b-2 border-r-0 sm:border-r-2 border-neu-black transition-colors duration-150',
+                        'hover:bg-neu-bg',
+                        // Last item: full-width accent strip on small, normal on large
+                        isLast ? 'sm:col-span-2 lg:col-span-1 bg-neu-primary border-b-0 hover:bg-neu-primary/90' : '',
+                        // Remove right border on every 3rd item (last in row)
+                        (i + 1) % 3 === 0 ? 'lg:border-r-0' : '',
+                        (i + 1) % 2 === 0 ? 'sm:border-r-0 lg:border-r-2' : '',
+                      )}
+                    >
+                      {/* Index number */}
+                      <span className={cn(
+                        'absolute top-5 right-5 font-mono text-xs font-bold opacity-25',
+                        isLast ? 'text-neu-black' : 'text-neu-black',
+                      )}>
+                        {String(i + 1).padStart(2, '0')}
+                      </span>
+
+                      <div className={cn(
+                        'w-10 h-10 border-2 flex items-center justify-center mb-5',
+                        isLast ? 'border-neu-black bg-neu-black text-neu-primary' : 'border-neu-black bg-neu-primary text-neu-black',
+                      )}>
+                        {svcIcons[i % svcIcons.length]}
+                      </div>
+
+                      <h3 className={cn(
+                        'font-display font-bold mb-2',
+                        isFeatured ? 'text-xl' : 'text-base',
+                        isLast ? 'text-neu-black' : 'text-neu-black',
+                      )}>
+                        {svc.title}
+                      </h3>
+                      <p className={cn(
+                        'font-body text-sm leading-relaxed',
+                        isLast ? 'text-neu-black/70' : 'text-neu-black/55',
+                      )}>{svc.desc}</p>
+
+                      <div className={cn(
+                        'mt-5 h-px w-0 group-hover:w-full transition-all duration-300',
+                        isLast ? 'bg-neu-black' : 'bg-neu-primary',
+                      )} />
+                    </motion.div>
+                  );
+                })}
+              </div>
             );
           })()}
         </div>
@@ -1272,19 +1358,19 @@ export default function LandingPage() {
       <section className="border-b-2 border-neu-black bg-neu-black py-20 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <motion.div {...fadeUp()}>
-              <div className="flex items-center gap-3 mb-4"><div className="h-1 w-10 bg-neu-blue" /><span className="font-mono text-xs text-neu-white/50 uppercase tracking-widest">{t('landing.about.tag')}</span></div>
-              <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-white mb-4">{t('landing.about.title').split('\n').map((l,i)=><span key={i}>{l}{i===0&&<br/>}</span>)}</h2>
-              <p className="font-body text-sm text-neu-white/60 leading-relaxed mb-6">
+            <motion.div {...fadeUp()} className="border-l-4 border-neu-primary pl-6">
+              <span className="font-mono text-[10px] text-neu-white/35 uppercase tracking-[0.2em] block mb-4">{t('landing.about.tag')}</span>
+              <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-white mb-4 leading-tight">{t('landing.about.title').split('\n').map((l,i)=><span key={i} className="block">{l}</span>)}</h2>
+              <p className="font-body text-sm text-neu-white/55 leading-relaxed mb-8">
                 {t('landing.about.subtitle')}
               </p>
-              <div className="flex flex-col gap-3">
-                {(t('landing.about.features', { returnObjects: true })).map(f => (
-                  <div key={f} className="flex items-center gap-3">
-                    <div className="w-5 h-5 border-2 border-neu-primary bg-neu-primary flex items-center justify-center flex-shrink-0">
-                      <svg className="w-3 h-3 text-neu-black" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" /></svg>
-                    </div>
-                    <p className="font-body text-sm text-neu-white/70">{f}</p>
+              <div className="flex flex-col gap-4 border-t border-neu-white/10 pt-6">
+                {(t('landing.about.features', { returnObjects: true })).map((f, fi) => (
+                  <div key={f} className="flex items-start gap-4">
+                    <span className="font-mono font-bold text-xs text-neu-primary/70 flex-shrink-0 mt-0.5">
+                      {String(fi + 1).padStart(2, '0')}.
+                    </span>
+                    <p className="font-body text-sm text-neu-white/65 leading-relaxed">{f}</p>
                   </div>
                 ))}
               </div>
@@ -1384,9 +1470,9 @@ export default function LandingPage() {
                 }}
                 onTouchEnd={() => { pkgDrag.current.active = false; }}
               >
-                {packages.map(pkg => (
+                {packages.map((pkg, pi) => (
                   <div key={pkg.id} className="flex-shrink-0 w-72 snap-start">
-                    <PackageCard pkg={pkg} onOrder={() => navigateProtected('/my-orders/new')} />
+                    <PackageCard pkg={{ ...pkg, _idx: pi + 1 }} onOrder={() => navigateProtected('/my-orders/new')} />
                   </div>
                 ))}
               </div>
@@ -1404,13 +1490,12 @@ export default function LandingPage() {
           <div className="max-w-7xl mx-auto px-4 lg:px-6">
 
             {/* Header */}
-            <motion.div className="flex items-center gap-3 mb-10" {...fadeLeft()}>
-              <div className="h-1 w-8 bg-neu-primary" />
+            <motion.div className="flex items-start justify-between gap-4 mb-10" {...fadeLeft()}>
               <div>
-                <h2 className="font-display font-bold text-2xl uppercase tracking-wide text-neu-white">
-                  {t('landing.software.title')}
+                <span className="inline-block font-mono text-[10px] border-2 border-neu-accent bg-neu-accent text-neu-white px-2 py-0.5 uppercase tracking-widest mb-3">{t('landing.software.title')}</span>
+                <h2 className="font-display font-bold text-2xl lg:text-3xl uppercase tracking-wide text-neu-white leading-tight">
+                  {t('landing.software.subtitle')}
                 </h2>
-                <p className="font-body text-sm text-neu-white/50 mt-0.5">{t('landing.software.subtitle')}</p>
               </div>
             </motion.div>
 
@@ -1481,7 +1566,7 @@ export default function LandingPage() {
                       {sw.techStack && (
                         <div className="flex flex-wrap gap-1 mt-auto pt-1">
                           {sw.techStack.split('\n').filter(s => s.trim()).slice(0, 3).map(s => (
-                            <span key={s} className="font-mono text-[10px] bg-neu-black text-neu-white px-2 py-0.5">{s.trim()}</span>
+                            <span key={s} className="font-mono text-[10px] border border-neu-black text-neu-black bg-transparent px-2 py-0.5">{s.trim()}</span>
                           ))}
                         </div>
                       )}
@@ -1489,7 +1574,7 @@ export default function LandingPage() {
 
                     {/* Footer */}
                     <div className="px-4 pb-4 border-t-2 border-neu-black pt-3 flex items-center justify-between gap-2">
-                      <span className="font-display font-bold text-base text-neu-black whitespace-nowrap">{fmt(sw.price)}</span>
+                      <span className="font-mono font-bold text-sm text-neu-black whitespace-nowrap">{fmt(sw.price)}</span>
                       <div className="flex gap-1.5">
                         {sw.demoUrl && (
                           <a href={sw.demoUrl} target="_blank" rel="noopener noreferrer"
@@ -1553,9 +1638,9 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
           <div className="flex items-end justify-between mb-10 flex-wrap gap-4">
             <motion.div {...fadeUp()}>
-              <div className="flex items-center gap-3 mb-2"><div className="h-1 w-10 bg-neu-blue" /><span className="font-mono text-xs text-neu-black/50 uppercase tracking-widest">{t('landing.portfolio.tag')}</span></div>
+              <span className="inline-block font-mono text-[10px] border-2 border-neu-blue bg-neu-blue text-neu-white px-2 py-0.5 uppercase tracking-widest mb-3">{t('landing.portfolio.tag')}</span>
               <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-black">{t('landing.portfolio.title')}</h2>
-              <p className="font-body text-sm text-neu-black/60 mt-1 max-w-md">{t('landing.portfolio.subtitle')}</p>
+              <p className="font-body text-sm text-neu-black/55 mt-2 max-w-md">{t('landing.portfolio.subtitle')}</p>
             </motion.div>
             <motion.button {...fadeUp()} onClick={() => transitionTo('/register')} className="px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-black hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-150">{t('landing.portfolio.cta')}</motion.button>
           </div>
@@ -1567,20 +1652,31 @@ export default function LandingPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {portfolios.map((item, i) => {
                 const imgs = item.images?.length ? item.images : (item.image ? [item.image] : []);
+                const isFeatured = i === 0 && portfolios.length >= 3;
                 return (
-                  <motion.div key={item.id} {...cardAnim(i * 0.07)} className="border-2 border-neu-black shadow-neu bg-neu-white overflow-hidden group cursor-pointer" onClick={() => setActivePortfolio(item)}>
-                    <div className="relative h-48 bg-neu-bg border-b-2 border-neu-black overflow-hidden">
+                  <motion.div
+                    key={item.id}
+                    {...cardAnim(i * 0.07)}
+                    className={cn(
+                      'border-2 border-neu-black shadow-neu bg-neu-white overflow-hidden group cursor-pointer',
+                      isFeatured && 'sm:col-span-2 lg:col-span-2',
+                    )}
+                    onClick={() => setActivePortfolio(item)}
+                  >
+                    <div className={cn('relative bg-neu-bg border-b-2 border-neu-black overflow-hidden', isFeatured ? 'h-64 lg:h-72' : 'h-48')}>
                       {imgs[0]
                         ? <img src={imgs[0]} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-400" loading="lazy" decoding="async" />
                         : <div className="w-full h-full flex items-center justify-center"><span className="font-display font-bold text-5xl text-neu-black/15">{item.title?.charAt(0)}</span></div>}
                       {item.category && <span className="absolute top-2 left-2 bg-neu-black text-neu-white font-mono font-bold text-[10px] uppercase px-2 py-0.5">{item.category.replace(/_/g,' ')}</span>}
-                      <div className="absolute inset-0 bg-neu-black/0 group-hover:bg-neu-black/20 transition-all duration-300 flex items-center justify-center">
-                        <span className="opacity-0 group-hover:opacity-100 transition-opacity font-display font-bold text-sm text-neu-white bg-neu-black/80 px-4 py-2 border border-neu-white/30">{t('landing.portfolio.viewDetailHover')}</span>
+                      {/* Index number */}
+                      <span className="absolute bottom-2 right-3 font-mono font-bold text-xs text-neu-white/40">/{String(i + 1).padStart(2, '0')}</span>
+                      <div className="absolute inset-0 bg-neu-black/0 group-hover:bg-neu-black/30 transition-all duration-300 flex items-center justify-center">
+                        <span className="opacity-0 group-hover:opacity-100 transition-opacity font-display font-bold text-sm text-neu-white px-4 py-2 border border-neu-white/30 bg-neu-black/70">{item.title}</span>
                       </div>
                     </div>
-                    <div className="p-4">
-                      <h3 className="font-display font-bold text-base text-neu-black leading-tight mb-3">{item.title}</h3>
-                      <button className="w-full py-2 bg-neu-primary border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-black transition-all duration-150 group-hover:translate-x-[2px] group-hover:translate-y-[2px] group-hover:shadow-none">{t('landing.portfolio.viewDetail')}</button>
+                    <div className="p-4 flex items-center justify-between gap-3">
+                      <h3 className="font-display font-bold text-sm text-neu-black leading-tight">{item.title}</h3>
+                      <button className="flex-shrink-0 px-4 py-2 bg-neu-primary border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-black transition-all duration-150 group-hover:translate-x-[2px] group-hover:translate-y-[2px] group-hover:shadow-none">{t('landing.portfolio.viewDetail')}</button>
                     </div>
                   </motion.div>
                 );
@@ -1590,60 +1686,77 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── WHY CHOOSE US ── */}
-      <section className="border-b-2 border-neu-black bg-neu-bg py-20">
-        <div className="max-w-7xl mx-auto px-4 lg:px-6">
-          <motion.div className="text-center mb-12" {...fadeLeft()}>
-            <div className="flex items-center justify-center gap-3 mb-2"><div className="h-1 w-8 bg-neu-green" /><span className="font-mono text-xs text-neu-black/50 uppercase tracking-widest">{t('landing.why.tag')}</span><div className="h-1 w-8 bg-neu-green" /></div>
-            <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-black">{t('landing.why.title')}</h2>
+      {/* ── WHY CHOOSE US — Statement section ── */}
+      <section className="border-b-2 border-t-4 border-neu-black bg-neu-white overflow-hidden">
+        {/* Marquee benefit strip */}
+        <div className="bg-neu-primary border-b-2 border-neu-black overflow-hidden py-2.5">
+          <div className="flex gap-8 animate-marquee whitespace-nowrap">
+            {[...Array(4)].flatMap(() =>
+              (t('landing.why.items', { returnObjects: true })).map((w, i) => (
+                <span key={`${i}-${Math.random()}`} className="inline-flex items-center gap-3 font-mono font-bold text-[11px] uppercase tracking-widest text-neu-black flex-shrink-0">
+                  <span className="text-neu-black/40">◆</span>
+                  {w.title}
+                </span>
+              ))
+            )}
+          </div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 lg:px-6 py-16 lg:py-20">
+          {/* Header — left-aligned, large */}
+          <motion.div className="mb-12" {...fadeLeft()}>
+            <h2 className="font-display font-black text-4xl sm:text-5xl lg:text-7xl text-neu-black leading-[0.9] tracking-tight">
+              {t('landing.why.title')}
+            </h2>
           </motion.div>
-          {/* SVG icon presets for Why Choose Us — index-based mapping */}
-          {(() => {
-            const whyIcons = [
-              /* 0 */ <svg className="w-6 h-6 text-neu-black" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>,
-              /* 1 */ <svg className="w-6 h-6 text-neu-black" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
-              /* 2 */ <svg className="w-6 h-6 text-neu-black" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>,
-              /* 3 */ <svg className="w-6 h-6 text-neu-black" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>,
-              /* 4 */ <svg className="w-6 h-6 text-neu-black" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>,
-              /* 5 */ <svg className="w-6 h-6 text-neu-black" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>,
-            ];
-            return (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+          {/* Items — numbered, no icon box */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0 border-l-2 border-neu-black">
             {(t('landing.why.items', { returnObjects: true })).map((w, i) => (
-              <motion.div key={w.title} {...fadeUp(i * 0.08)} className="border-2 border-neu-black bg-neu-white shadow-neu p-6 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-neu-lg transition-all duration-150">
-                <div className="w-12 h-12 border-2 border-neu-black bg-neu-primary flex items-center justify-center mb-3">
-                  {whyIcons[i % whyIcons.length]}
-                </div>
+              <motion.div
+                key={w.title}
+                {...fadeUp(i * 0.06)}
+                className="border-r-2 border-b-2 border-neu-black p-6 lg:p-8 hover:bg-neu-bg transition-colors duration-150"
+              >
+                <p className="font-mono font-black text-5xl text-neu-black/10 leading-none mb-4 tracking-tighter">
+                  {String(i + 1).padStart(2, '0')}
+                </p>
                 <h3 className="font-display font-bold text-base text-neu-black mb-2">{w.title}</h3>
-                <p className="font-body text-sm text-neu-black/60 leading-relaxed">{w.desc}</p>
+                <p className="font-body text-sm text-neu-black/55 leading-relaxed">{w.desc}</p>
               </motion.div>
             ))}
           </div>
-            );
-          })()}
         </div>
       </section>
 
-      {/* ── HOW IT WORKS ── */}
-      <section id="cara-kerja" className="border-b-2 border-neu-black bg-neu-black py-20">
+      {/* ── HOW IT WORKS — Horizontal timeline ── */}
+      <section id="cara-kerja" className="border-b-2 border-neu-black bg-neu-black py-16 lg:py-20">
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
-          <motion.div className="text-center mb-12" {...fadeUp()}>
-            <span className="font-mono text-xs text-neu-white/40 uppercase tracking-widest">{t('landing.howItWorks.tag')}</span>
-            <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-white mt-1">{t('landing.howItWorks.title')}</h2>
+          <motion.div className="flex items-baseline gap-4 mb-14" {...fadeUp()}>
+            <span className="font-mono text-[10px] text-neu-white/30 uppercase tracking-[0.2em] rotate-[-0.5deg] inline-block">{t('landing.howItWorks.tag')}</span>
+            <div className="flex-1 h-px bg-neu-white/10" />
+            <h2 className="font-display font-bold text-2xl lg:text-3xl text-neu-white">{t('landing.howItWorks.title')}</h2>
           </motion.div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {(t('landing.howItWorks.steps', { returnObjects: true })).map((step, si) => {
-              const colors = ['bg-neu-primary','bg-neu-blue','bg-neu-green','bg-neu-accent'];
-              const shadows = ['4px 4px 0px #FFD000','4px 4px 0px #4D61FF','4px 4px 0px #00C48C','4px 4px 0px #FF5C5C'];
-              return { ...step, color: colors[si], shadow: shadows[si], idx: si };
-            }).map(step => (
-              <motion.div key={step.no} {...fadeUp(step.idx * 0.1)} className="border-2 border-neu-white/20 bg-neu-white/5 p-6" style={{ boxShadow: step.shadow }}>
-                <div className={cn('w-12 h-12 border-2 border-neu-white/20 flex items-center justify-center mb-4', step.color)}>
-                  <span className="font-display font-bold text-xl text-neu-black">{step.no.charAt(1)}</span>
-                </div>
-                <p className="font-mono font-bold text-xs text-neu-white/40 uppercase mb-1">{step.no}</p>
+
+          {/* Steps */}
+          <div className="relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+            {/* Connector line (desktop only) */}
+            <div className="hidden lg:block absolute top-[3.2rem] left-[12.5%] right-[12.5%] h-px border-t-2 border-dashed border-neu-white/15 z-0" />
+
+            {(t('landing.howItWorks.steps', { returnObjects: true })).map((step, si) => (
+              <motion.div
+                key={step.no}
+                {...{ initial: { opacity: 0, y: 20 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true }, transition: { duration: 0.5, delay: si * 0.12 } }}
+                className="relative z-10 border-b-2 border-r-0 sm:border-r-2 border-neu-white/10 last:border-r-0 lg:border-b-0 px-6 pb-10 lg:pb-0 pt-4 lg:pt-0 first:pl-0"
+              >
+                {/* Big number */}
+                <p className="font-mono font-black text-[5rem] lg:text-[6rem] leading-none text-neu-white/[0.12] mb-4 tracking-tighter select-none">
+                  {step.no}
+                </p>
+                {/* Step dot */}
+                <div className="w-2.5 h-2.5 bg-neu-primary border-2 border-neu-primary mb-5 hidden lg:block" />
                 <h3 className="font-display font-bold text-lg text-neu-white mb-2">{step.title}</h3>
-                <p className="font-body text-xs text-neu-white/60 leading-relaxed">{step.desc}</p>
+                <p className="font-body text-xs text-neu-white/50 leading-relaxed">{step.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -1677,9 +1790,12 @@ export default function LandingPage() {
           <div className="max-w-7xl mx-auto px-4 lg:px-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
               <motion.div {...fadeUp()}>
-                <div className="flex items-center gap-3 mb-2"><div className="h-1 w-10 bg-neu-green" /><span className="font-mono text-xs text-neu-black/50 uppercase tracking-widest">{t('landing.contact.tag')}</span></div>
-                <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-black mb-3">{t('landing.contact.title').split('\n').map((l,i)=><span key={i}>{l}{i===0&&<br/>}</span>)}</h2>
-                <p className="font-body text-sm text-neu-black/60 mb-6 leading-relaxed">{t('landing.contact.subtitle')}</p>
+                <span className="font-mono text-[10px] text-neu-black/35 uppercase tracking-[0.2em] block mb-4">{t('landing.contact.tag')}</span>
+                <h2 className="font-display font-black text-4xl sm:text-5xl lg:text-6xl text-neu-black mb-4 leading-[0.9] tracking-tight">
+                  {t('landing.contact.title').split('\n').map((l, i) => <span key={i} className="block">{l}</span>)}
+                </h2>
+                <div className="w-12 h-1 bg-neu-black mb-5" />
+                <p className="font-body text-sm text-neu-black/55 mb-6 leading-relaxed max-w-sm">{t('landing.contact.subtitle')}</p>
                 {contacts.length > 0 && (
                   <div className="space-y-3">
                     {contacts.map(ct => {
@@ -1701,8 +1817,8 @@ export default function LandingPage() {
                               } catch (err) {}
                             }
                           }}
-                          className="flex items-center gap-4 p-4 bg-neu-white border-2 border-neu-black shadow-neu-sm hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-neu transition-all duration-150">
-                          <div className="w-10 h-10 border-2 border-neu-black flex items-center justify-center flex-shrink-0" style={{ backgroundColor: color + '18' }}>
+                          className="flex items-center gap-4 p-4 bg-neu-white border-2 border-neu-black border-l-4 shadow-neu-sm hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-neu transition-all duration-150" style={{ borderLeftColor: color }}>
+                          <div className="w-9 h-9 flex items-center justify-center flex-shrink-0">
                             <Icon style={{ color }} className="w-5 h-5" />
                           </div>
                           <div><p className="font-display font-bold text-sm text-neu-black">{ct.nama}</p><p className="font-mono text-xs text-neu-black/50">{ct.contactInfo}</p></div>
@@ -1767,7 +1883,13 @@ export default function LandingPage() {
       {/* ══════════════════════════════════════════
           FOOTER — Modern 2025
       ══════════════════════════════════════════ */}
-      <motion.footer className="bg-neu-black" {...fadeUp()}>
+      <motion.footer className="bg-neu-black relative overflow-hidden" {...fadeUp()}>
+        {/* Background monumental text */}
+        <div className="absolute bottom-0 left-0 right-0 pointer-events-none overflow-hidden leading-none">
+          <span className="font-display font-black text-[18vw] text-neu-white/[0.025] select-none tracking-tighter whitespace-nowrap">
+            SYNECTRA
+          </span>
+        </div>
 
         {/* Top strip */}
         <div className="border-b border-neu-white/10">
