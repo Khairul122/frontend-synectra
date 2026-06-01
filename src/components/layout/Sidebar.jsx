@@ -213,6 +213,11 @@ const NAV_GROUPS = [
 
   /* ── CLIENT / STAFF ────────────────────────────────── */
   {
+    type: 'label',
+    tKey: 'sidebar.myMenu',
+    roles: ['client', 'staff'],
+  },
+  {
     type: 'item',
     tKey: 'sidebar.myOrders',
     path: '/my-orders',
@@ -234,6 +239,18 @@ const NAV_GROUPS = [
         <rect x="2" y="3" width="20" height="14" /><polyline points="8 21 12 17 16 21" />
         <line x1="7" y1="8" x2="7" y2="8" strokeWidth="3" strokeLinecap="round" />
         <line x1="11" y1="8" x2="17" y2="8" /><line x1="11" y1="11" x2="17" y2="11" />
+      </svg>
+    ),
+  },
+  {
+    type: 'item',
+    tKey: 'sidebar.profile',
+    path: '/profile',
+    roles: ['client', 'staff'],
+    icon: (
+      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+        <circle cx="12" cy="7" r="4" />
       </svg>
     ),
   },
@@ -300,6 +317,16 @@ export function Sidebar({ user, isOpen, onClose }) {
           {NAV_GROUPS
             .filter(entry => !entry.roles || entry.roles.some(r => r === user?.role))
             .map(entry => {
+              if (entry.type === 'label') {
+                return (
+                  <div key={entry.tKey} className="px-4 pt-4 pb-1">
+                    <span className="font-mono font-bold text-[9px] text-neu-black/35 uppercase tracking-[0.18em]">
+                      {t(entry.tKey)}
+                    </span>
+                  </div>
+                );
+              }
+
               if (entry.type === 'item') {
                 const active = location.pathname === entry.path || location.pathname.startsWith(entry.path + '/');
                 return (
@@ -366,6 +393,19 @@ export function Sidebar({ user, isOpen, onClose }) {
               );
             })}
         </nav>
+
+        {/* CTA Buat Pesanan — khusus client/staff */}
+        {(user?.role === 'client' || user?.role === 'staff') && (
+          <div className="px-3 py-3 border-t-2 border-neu-black">
+            <Link to="/my-orders/new" onClick={handleNavClick}
+              className="flex items-center justify-center gap-2 w-full py-3 bg-neu-primary border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-black hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-150">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+              </svg>
+              {t('sidebar.createOrder')}
+            </Link>
+          </div>
+        )}
 
         {/* Language switcher */}
         <div className="px-5 py-4 border-t-2 border-neu-black flex items-center justify-between">

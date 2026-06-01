@@ -146,32 +146,91 @@ function ClientDashboard({ user, orders, navigate }) {
   const fmtDate = (val) => val ? new Date(val).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
   const fmt     = (val) => val ? `Rp ${Number(val).toLocaleString('id-ID')}` : '—';
 
+  const stepDefs = [
+    { key: 'pending',     label: 'Menunggu',  icon: <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> },
+    { key: 'in_progress', label: 'Dikerjakan',icon: <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> },
+    { key: 'testing',     label: 'Testing',   icon: <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/></svg> },
+    { key: 'revision',    label: 'Revisi',    icon: <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> },
+    { key: 'completed',   label: 'Selesai',   icon: <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> },
+  ];
+  const latestActiveOrder = orders.find(o => !['completed','canceled'].includes(o.status));
+  const currentStepIdx = latestActiveOrder ? stepDefs.findIndex(s => s.key === latestActiveOrder.status) : -1;
+
   return (
     <>
+      {/* ── Header greeting + quick actions ── */}
       <div className="mb-6 p-6 bg-neu-white border-2 border-neu-black shadow-neu" style={{ borderLeftWidth: '6px', borderLeftColor: '#00C48C' }}>
-        <div className="flex items-start justify-between gap-4 flex-wrap">
-          <div>
-            <span className="inline-block px-3 py-1 border-2 border-neu-black mb-3 font-mono font-bold text-xs uppercase tracking-widest bg-neu-green text-neu-white">
-              {t('dashboard.clientBadge')}
-            </span>
-            <h2 className="font-display font-bold text-2xl lg:text-3xl text-neu-black">
-              {t('dashboard.clientGreeting', { name: user?.fullName })}
-            </h2>
-            <p className="font-body text-sm text-neu-black/60 mt-1">{t('dashboard.clientSubtitle')}</p>
-          </div>
+        <span className="inline-block px-3 py-1 border-2 border-neu-black mb-3 font-mono font-bold text-xs uppercase tracking-widest bg-neu-green text-neu-white">
+          {t('dashboard.clientBadge')}
+        </span>
+        <h2 className="font-display font-bold text-2xl lg:text-3xl text-neu-black">
+          {t('dashboard.clientGreeting', { name: user?.fullName })}
+        </h2>
+        <p className="font-body text-sm text-neu-black/60 mt-1 mb-4">{t('dashboard.clientSubtitle')}</p>
+        <div className="flex flex-wrap gap-2">
           <button onClick={() => navigate('/my-orders/new')}
-            className="px-4 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase tracking-wide text-neu-black hover:shadow-neu-sm">
+            className="flex items-center gap-2 px-4 py-2 bg-neu-primary border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-black hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-150">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4"/></svg>
             {t('dashboard.createOrder')}
+          </button>
+          <button onClick={() => navigate('/my-orders')}
+            className="flex items-center gap-2 px-4 py-2 bg-neu-white border-2 border-neu-black font-display font-bold text-xs uppercase text-neu-black/70 hover:text-neu-black transition-colors">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+            {t('dashboard.myOrders')}
           </button>
         </div>
       </div>
 
+      {/* ── Stats ── */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         <StatCard label={t('dashboard.totalOrders')}    value={totalOrders}          valueColor="text-neu-black"  barColor="#0D0D0D" onClick={() => navigate('/my-orders')} />
         <StatCard label={t('dashboard.activeOrders')}   value={activeOrders}         valueColor="text-neu-blue"   barColor="#4D61FF" onClick={() => navigate('/my-orders')} />
         <StatCard label={t('dashboard.latestProgress')} value={`${latestProgress}%`} valueColor={latestProgress === 100 ? 'text-neu-green' : 'text-neu-blue'} barColor="#00C48C" />
       </div>
 
+      {/* ── Order Status Workflow Stepper (jika ada pesanan aktif) ── */}
+      {activeOrders > 0 && (
+        <div className="border-2 border-neu-black bg-neu-white p-5 mb-6">
+          <p className="font-mono font-bold text-[10px] text-neu-black/40 uppercase tracking-widest mb-4">
+            Alur Pesanan Aktif
+            {latestActiveOrder && (
+              <span className="ml-2 text-neu-black/60 normal-case">— {latestActiveOrder.title}</span>
+            )}
+          </p>
+          <div className="flex items-start">
+            {stepDefs.map((step, idx) => {
+              const isDone    = idx < currentStepIdx;
+              const isCurrent = idx === currentStepIdx;
+              return (
+                <div key={step.key} className="flex items-center flex-1 min-w-0">
+                  <div className="flex flex-col items-center min-w-0">
+                    <div className={cn(
+                      'w-9 h-9 border-2 border-neu-black flex items-center justify-center flex-shrink-0',
+                      isDone ? 'bg-neu-green' : isCurrent ? 'bg-neu-primary shadow-neu-sm' : 'bg-neu-bg',
+                    )}>
+                      {isDone
+                        ? <svg className="w-4 h-4 text-neu-white" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                        : <span className={cn('', isCurrent ? 'text-neu-black' : 'text-neu-black/30')}>{step.icon}</span>
+                      }
+                    </div>
+                    <p className={cn(
+                      'font-mono text-[8px] uppercase tracking-wide mt-1.5 text-center leading-tight px-0.5',
+                      isCurrent ? 'text-neu-black font-bold' : isDone ? 'text-neu-green font-bold' : 'text-neu-black/30',
+                    )}>
+                      {step.label}
+                    </p>
+                  </div>
+                  {idx < stepDefs.length - 1 && (
+                    <div className={cn('flex-1 h-0.5 mx-1 mb-5 flex-shrink', isDone ? 'bg-neu-green' : 'bg-neu-black/15')} />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* ── Order cards ── */}
       <div>
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-display font-bold text-sm text-neu-black uppercase tracking-wide">{t('dashboard.myOrders')}</h3>
@@ -182,21 +241,29 @@ function ClientDashboard({ user, orders, navigate }) {
           <div className="bg-neu-white border-2 border-dashed border-neu-black p-12 text-center">
             <p className="font-display font-bold text-lg text-neu-black/40 mb-3">{t('dashboard.noOrdersClient')}</p>
             <button onClick={() => navigate('/my-orders/new')}
-              className="px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase text-neu-black hover:shadow-neu-sm">
+              className="px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase text-neu-black hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm transition-all duration-150">
               {t('dashboard.createFirstOrder')}
             </button>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {orders.slice(0, 6).map(o => {
-              const cfg = STATUS_BG[o.status] ?? { bg: 'bg-neu-black/20', text: 'text-neu-black' };
               const lastPct = o.progressReports?.length ? o.progressReports[o.progressReports.length - 1].progressPercentage : null;
+              const daysLeft = o.deadline ? Math.ceil((new Date(o.deadline) - new Date()) / (1000 * 60 * 60 * 24)) : null;
+              const isUrgent  = daysLeft !== null && daysLeft <= 3 && !['completed','canceled'].includes(o.status);
+              const isWarning = daysLeft !== null && daysLeft <= 7 && daysLeft > 3 && !['completed','canceled'].includes(o.status);
               return (
                 <div key={o.id} onClick={() => navigate(`/my-orders/${o.id}`)}
-                  className="bg-neu-white border-2 border-neu-black shadow-neu hover:shadow-neu-lg cursor-pointer p-5">
-                  <div className="flex items-center justify-between mb-2">
-                    <StatusBadge status={o.status} />
-                    <span className="font-mono text-xs text-neu-black/40">{fmtDate(o.deadline)}</span>
+                  className="bg-neu-white border-2 border-neu-black shadow-neu hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-neu-lg cursor-pointer p-5 transition-all duration-150">
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <StatusBadge status={o.status} />
+                      {isUrgent  && <span className="inline-block px-2 py-0.5 border-2 border-neu-accent bg-neu-accent text-neu-white font-mono font-bold text-[9px] uppercase">⚠ Mendesak</span>}
+                      {isWarning && <span className="inline-block px-2 py-0.5 border-2 border-[#F97316] bg-[#F97316] text-neu-white font-mono font-bold text-[9px] uppercase">Segera</span>}
+                    </div>
+                    <span className={cn('font-mono text-xs whitespace-nowrap flex-shrink-0', isUrgent ? 'text-neu-accent font-bold' : isWarning ? 'text-[#F97316] font-bold' : 'text-neu-black/40')}>
+                      {fmtDate(o.deadline)}
+                    </span>
                   </div>
                   <p className="font-display font-bold text-sm text-neu-black leading-tight mb-1">{o.title}</p>
                   {o.totalPrice && <p className="font-mono text-xs text-neu-black/50 mb-2">{fmt(o.totalPrice)}</p>}
