@@ -442,15 +442,15 @@ function PackageCard({ pkg, onOrder }) {
     <div className="relative border-2 border-neu-black shadow-neu bg-neu-white flex flex-col h-full overflow-hidden">
       {/* Badge */}
       {pkg.badge && (
-        <span className="absolute -top-3 left-4 px-3 py-0.5 bg-neu-primary border-2 border-neu-black font-mono font-bold text-[10px] uppercase z-10 rotate-[1.5deg]">
+        <span className="absolute -top-3 left-4 px-3 py-0.5 bg-neu-primary border-2 border-neu-black font-mono font-bold text-[10px] uppercase z-10">
           {pkg.badge}
         </span>
       )}
 
       {/* Header */}
       <div className="border-b-2 border-neu-black p-5 bg-neu-black relative">
-        {/* Decorative number */}
-        <span className="absolute top-3 right-4 font-mono font-black text-4xl text-neu-white/10 leading-none select-none pointer-events-none">
+        {/* Index label */}
+        <span className="absolute top-4 right-4 font-mono text-[10px] text-neu-white/30 select-none pointer-events-none">
           {String(pkg._idx ?? 1).padStart(2, '0')}
         </span>
         <div className="flex items-center gap-3 mb-3">
@@ -578,7 +578,7 @@ function FeedbackSection({ feedbacks, onSubmitted }) {
         {/* Header */}
         <div className="flex items-start justify-between mb-8 reveal-left">
           <div className="flex items-center gap-3">
-            <div className="h-1 w-8 bg-neu-accent" />
+            <div className="h-1 w-8 bg-neu-primary" />
             <div>
               <h2 className="font-display font-bold text-2xl uppercase tracking-wide text-neu-black">{t('landing.feedback.sectionTitle')}</h2>
               {avg && (
@@ -1102,9 +1102,9 @@ export default function LandingPage() {
       <section className="relative min-h-[95vh] border-b-2 border-neu-black overflow-hidden bg-[#0D0D0D]">
 
         {/* Layer 0 — Ambient color gradient */}
-        <div className="absolute inset-0 z-0 pointer-events-none bg-gradient-to-br from-neu-primary/[0.04] via-transparent to-neu-blue/[0.05]" />
+        <div className="absolute inset-0 z-0 pointer-events-none bg-gradient-to-br from-neu-primary/[0.04] via-transparent to-white/[0.03]" />
 
-        {/* Layer 1 — Floating geometric shapes */}
+        {/* Layer 1 — Floating geometric shapes (monokrom: kuning + putih) */}
         <div className="absolute inset-0 z-[1] overflow-hidden pointer-events-none">
           <ElegantShape
             delay={0.3} width={600} height={140} rotate={12}
@@ -1112,36 +1112,20 @@ export default function LandingPage() {
             className="left-[-8%] md:left-[-3%] top-[15%] md:top-[18%]"
           />
           <ElegantShape
-            delay={0.5} width={480} height={115} rotate={-14}
-            gradient="from-neu-blue/[0.12]"
-            className="right-[-4%] md:right-[2%] top-[65%] md:top-[72%]"
+            delay={0.5} width={420} height={100} rotate={-12}
+            gradient="from-white/[0.05]"
+            className="right-[-4%] md:right-[2%] top-[64%] md:top-[70%]"
           />
           <ElegantShape
-            delay={0.4} width={280} height={75} rotate={-8}
-            gradient="from-neu-purple/[0.12]"
-            className="left-[5%] md:left-[8%] bottom-[8%] md:bottom-[12%]"
-          />
-          <ElegantShape
-            delay={0.6} width={190} height={55} rotate={20}
-            gradient="from-neu-accent/[0.10]"
-            className="right-[12%] md:right-[18%] top-[8%] md:top-[12%]"
-          />
-          <ElegantShape
-            delay={0.7} width={140} height={38} rotate={-24}
-            gradient="from-neu-green/[0.10]"
-            className="left-[22%] md:left-[28%] top-[4%] md:top-[8%]"
-          />
-          {/* Extra large shape — far right, mid height */}
-          <ElegantShape
-            delay={0.2} width={360} height={90} rotate={5}
-            gradient="from-white/[0.04]"
-            className="right-[-5%] top-[30%]"
+            delay={0.4} width={220} height={60} rotate={-8}
+            gradient="from-neu-primary/[0.08]"
+            className="left-[6%] md:left-[10%] bottom-[10%] md:bottom-[14%]"
           />
         </div>
 
         {/* Layer 2 — Dot grid pattern */}
         <div className="absolute inset-0 z-[2] pointer-events-none"
-             style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
+             style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.035) 1px, transparent 1px)', backgroundSize: '34px 34px' }} />
 
         {/* Layer 3 — Left-side dark vignette so text stays readable */}
         <div className="absolute inset-0 z-[3] pointer-events-none"
@@ -1158,10 +1142,10 @@ export default function LandingPage() {
         <div className="relative z-20 max-w-7xl mx-auto px-4 lg:px-6 min-h-[95vh] flex flex-col justify-center py-24">
           <div className="max-w-2xl">
 
-            {/* Badge — rotated for editorial feel */}
-            <div className="hero-badge inline-flex items-center gap-2 bg-white/[0.06] border border-white/[0.12] text-neu-white px-4 py-1.5 font-mono font-bold text-xs uppercase tracking-widest mb-6 rotate-[-1deg]"
+            {/* Badge */}
+            <div className="hero-badge inline-flex items-center gap-2 bg-white/[0.06] border border-white/[0.12] text-neu-white px-4 py-1.5 font-mono font-bold text-xs uppercase tracking-widest mb-6"
                  style={{ opacity: 0 }}>
-              <span className="w-1.5 h-1.5 bg-neu-green animate-pulse" />
+              <span className="w-1.5 h-1.5 bg-neu-primary animate-pulse" />
               {t('landing.hero.badge').replace('✦ ', '').replace('✦', '')}
             </div>
 
@@ -1169,7 +1153,7 @@ export default function LandingPage() {
             <div className="w-16 h-px bg-neu-white/20 mb-6 ml-1" />
 
             {/* Title — clip reveal per baris */}
-            <h1 className="font-display font-bold text-6xl sm:text-7xl lg:text-8xl text-neu-white leading-[0.95] mb-6">
+            <h1 className="font-display font-black text-6xl sm:text-7xl lg:text-8xl text-neu-white leading-[0.95] mb-6">
               <HeroReveal delay={0.1}>
                 <span className="block">{t('landing.hero.title1')}</span>
               </HeroReveal>
@@ -1206,12 +1190,6 @@ export default function LandingPage() {
             </div>
 
           </div>
-        </div>
-
-        {/* "Est." label — bottom right */}
-        <div className="absolute bottom-10 right-6 z-20 text-right hidden sm:block">
-          <p className="font-mono text-[9px] text-neu-white/20 uppercase tracking-[0.25em]">Est.</p>
-          <p className="font-mono font-bold text-[11px] text-neu-white/25 tracking-widest">2020</p>
         </div>
 
         {/* Scroll indicator */}
@@ -1278,8 +1256,9 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
           <div className="flex items-start justify-between gap-6 mb-12 flex-wrap">
             <motion.div {...fadeLeft()}>
-              <span className="inline-block font-mono text-[10px] text-neu-black border-2 border-neu-black px-2 py-0.5 uppercase tracking-widest mb-3 bg-neu-black text-neu-white">{t('landing.services.tag')}</span>
-              <h2 className="font-display font-bold text-2xl lg:text-3xl text-neu-black max-w-sm">{t('landing.services.title').split('\n').map((line, i) => <span key={i}>{line}{i === 0 && <br />}</span>)}</h2>
+              <span className="font-mono text-[10px] text-neu-black/50 uppercase tracking-widest block mb-2">{t('landing.services.tag')}</span>
+              <div className="h-px w-8 bg-neu-primary mb-4" />
+              <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-black max-w-md leading-tight">{t('landing.services.title').split('\n').map((line, i) => <span key={i}>{line}{i === 0 && <br />}</span>)}</h2>
             </motion.div>
             <motion.p {...fadeUp(0.1)} className="font-mono text-[10px] text-neu-black/30 uppercase tracking-widest self-end hidden lg:block">
               — {services.length} {t('landing.services.tag').toLowerCase()}
@@ -1297,57 +1276,34 @@ export default function LandingPage() {
             ];
             return (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 border-2 border-neu-black">
-                {services.map((svc, i) => {
-                  const isLast = i === services.length - 1;
-                  const isFeatured = i === 0;
-                  return (
-                    <motion.div
-                      key={svc.title}
-                      {...fadeUp(i * 0.06)}
-                      className={cn(
-                        'relative p-7 lg:p-8 group border-b-2 border-r-0 sm:border-r-2 border-neu-black transition-colors duration-150',
-                        'hover:bg-neu-bg',
-                        // Last item: full-width accent strip on small, normal on large
-                        isLast ? 'sm:col-span-2 lg:col-span-1 bg-neu-primary border-b-0 hover:bg-neu-primary/90' : '',
-                        // Remove right border on every 3rd item (last in row)
-                        (i + 1) % 3 === 0 ? 'lg:border-r-0' : '',
-                        (i + 1) % 2 === 0 ? 'sm:border-r-0 lg:border-r-2' : '',
-                      )}
-                    >
-                      {/* Index number */}
-                      <span className={cn(
-                        'absolute top-5 right-5 font-mono text-xs font-bold opacity-25',
-                        isLast ? 'text-neu-black' : 'text-neu-black',
-                      )}>
-                        {String(i + 1).padStart(2, '0')}
-                      </span>
+                {services.map((svc, i) => (
+                  <motion.div
+                    key={svc.title}
+                    {...fadeUp(i * 0.06)}
+                    className={cn(
+                      'relative p-7 lg:p-8 group border-b-2 border-r-0 sm:border-r-2 border-neu-black transition-colors duration-150 hover:bg-neu-bg',
+                      // Remove right border on last item of each row
+                      (i + 1) % 3 === 0 ? 'lg:border-r-0' : '',
+                      (i + 1) % 2 === 0 ? 'sm:border-r-0 lg:border-r-2' : '',
+                      // Last two rows: drop bottom border so the wrapper border closes cleanly
+                      i >= services.length - (services.length % 3 === 0 ? 3 : services.length % 3) ? 'lg:border-b-0' : '',
+                    )}
+                  >
+                    {/* Index number */}
+                    <span className="absolute top-5 right-5 font-mono text-xs font-bold text-neu-black/20">
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
 
-                      <div className={cn(
-                        'w-10 h-10 border-2 flex items-center justify-center mb-5',
-                        isLast ? 'border-neu-black bg-neu-black text-neu-primary' : 'border-neu-black bg-neu-primary text-neu-black',
-                      )}>
-                        {svcIcons[i % svcIcons.length]}
-                      </div>
+                    <div className="w-10 h-10 border-2 border-neu-black bg-neu-primary text-neu-black flex items-center justify-center mb-5">
+                      {svcIcons[i % svcIcons.length]}
+                    </div>
 
-                      <h3 className={cn(
-                        'font-display font-bold mb-2',
-                        isFeatured ? 'text-xl' : 'text-base',
-                        isLast ? 'text-neu-black' : 'text-neu-black',
-                      )}>
-                        {svc.title}
-                      </h3>
-                      <p className={cn(
-                        'font-body text-sm leading-relaxed',
-                        isLast ? 'text-neu-black/70' : 'text-neu-black/55',
-                      )}>{svc.desc}</p>
+                    <h3 className="font-display font-bold text-base text-neu-black mb-2">{svc.title}</h3>
+                    <p className="font-body text-sm leading-relaxed text-neu-black/55">{svc.desc}</p>
 
-                      <div className={cn(
-                        'mt-5 h-px w-0 group-hover:w-full transition-all duration-300',
-                        isLast ? 'bg-neu-black' : 'bg-neu-primary',
-                      )} />
-                    </motion.div>
-                  );
-                })}
+                    <div className="mt-5 h-px w-0 group-hover:w-full bg-neu-primary transition-all duration-300" />
+                  </motion.div>
+                ))}
               </div>
             );
           })()}
@@ -1359,7 +1315,8 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <motion.div {...fadeUp()} className="border-l-4 border-neu-primary pl-6">
-              <span className="font-mono text-[10px] text-neu-white/35 uppercase tracking-[0.2em] block mb-4">{t('landing.about.tag')}</span>
+              <span className="font-mono text-[10px] text-neu-white/40 uppercase tracking-widest block mb-2">{t('landing.about.tag')}</span>
+              <div className="h-px w-8 bg-neu-primary mb-4" />
               <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-white mb-4 leading-tight">{t('landing.about.title').split('\n').map((l,i)=><span key={i} className="block">{l}</span>)}</h2>
               <p className="font-body text-sm text-neu-white/55 leading-relaxed mb-8">
                 {t('landing.about.subtitle')}
@@ -1385,9 +1342,6 @@ export default function LandingPage() {
                 <span className="font-mono font-bold text-[9px] text-neu-black uppercase tracking-widest">3D Scene</span>
               </div>
 
-              {/* Accent corner */}
-              <div className="absolute bottom-0 right-0 w-12 h-12 bg-neu-blue border-t-2 border-l-2 border-neu-white/30 z-10 pointer-events-none" />
-
               <SplineOrR3F
                 scene={SPLINE_ABOUT}
                 bg="#0D0D0D"
@@ -1398,7 +1352,7 @@ export default function LandingPage() {
                     <Float speed={3} floatIntensity={2}>
                       <mesh rotation={[0.5, 0.5, 0]}>
                         <octahedronGeometry args={[1.2, 0]} />
-                        <meshStandardMaterial color="#4D61FF" wireframe />
+                        <meshStandardMaterial color="#FAFAFA" wireframe />
                       </mesh>
                     </Float>
                     <Float speed={2} floatIntensity={1}>
@@ -1418,9 +1372,9 @@ export default function LandingPage() {
           <div className="max-w-7xl mx-auto px-4 lg:px-6">
 
             {/* Section header */}
-            <motion.div className="flex items-center gap-3 mb-8" {...fadeUp()}>
-              <div className="h-1 w-8 bg-neu-black" />
-              <h2 className="font-display font-bold text-2xl uppercase tracking-wide text-neu-black">{t('landing.packages.title')}</h2>
+            <motion.div className="mb-8" {...fadeUp()}>
+              <div className="h-px w-8 bg-neu-primary mb-4" />
+              <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-black leading-tight">{t('landing.packages.title')}</h2>
             </motion.div>
 
             {/* Drag-to-scroll slider */}
@@ -1490,13 +1444,12 @@ export default function LandingPage() {
           <div className="max-w-7xl mx-auto px-4 lg:px-6">
 
             {/* Header */}
-            <motion.div className="flex items-start justify-between gap-4 mb-10" {...fadeLeft()}>
-              <div>
-                <span className="inline-block font-mono text-[10px] border-2 border-neu-accent bg-neu-accent text-neu-white px-2 py-0.5 uppercase tracking-widest mb-3">{t('landing.software.title')}</span>
-                <h2 className="font-display font-bold text-2xl lg:text-3xl uppercase tracking-wide text-neu-white leading-tight">
-                  {t('landing.software.subtitle')}
-                </h2>
-              </div>
+            <motion.div className="mb-10" {...fadeLeft()}>
+              <span className="font-mono text-[10px] text-neu-white/40 uppercase tracking-widest block mb-2">{t('landing.software.title')}</span>
+              <div className="h-px w-8 bg-neu-primary mb-4" />
+              <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-white leading-tight">
+                {t('landing.software.subtitle')}
+              </h2>
             </motion.div>
 
             {/* Drag-to-scroll slider — no scrollbar UI */}
@@ -1638,8 +1591,9 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
           <div className="flex items-end justify-between mb-10 flex-wrap gap-4">
             <motion.div {...fadeUp()}>
-              <span className="inline-block font-mono text-[10px] border-2 border-neu-blue bg-neu-blue text-neu-white px-2 py-0.5 uppercase tracking-widest mb-3">{t('landing.portfolio.tag')}</span>
-              <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-black">{t('landing.portfolio.title')}</h2>
+              <span className="font-mono text-[10px] text-neu-black/50 uppercase tracking-widest block mb-2">{t('landing.portfolio.tag')}</span>
+              <div className="h-px w-8 bg-neu-primary mb-4" />
+              <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-black leading-tight">{t('landing.portfolio.title')}</h2>
               <p className="font-body text-sm text-neu-black/55 mt-2 max-w-md">{t('landing.portfolio.subtitle')}</p>
             </motion.div>
             <motion.button {...fadeUp()} onClick={() => transitionTo('/register')} className="px-5 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-black hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-150">{t('landing.portfolio.cta')}</motion.button>
@@ -1688,39 +1642,38 @@ export default function LandingPage() {
 
       {/* ── WHY CHOOSE US — Statement section ── */}
       <section className="border-b-2 border-t-4 border-neu-black bg-neu-white overflow-hidden">
-        {/* Marquee benefit strip */}
-        <div className="bg-neu-primary border-b-2 border-neu-black overflow-hidden py-2.5">
-          <div className="flex gap-8 animate-marquee whitespace-nowrap">
-            {[...Array(4)].flatMap(() =>
-              (t('landing.why.items', { returnObjects: true })).map((w, i) => (
-                <span key={`${i}-${Math.random()}`} className="inline-flex items-center gap-3 font-mono font-bold text-[11px] uppercase tracking-widest text-neu-black flex-shrink-0">
-                  <span className="text-neu-black/40">◆</span>
-                  {w.title}
-                </span>
-              ))
-            )}
+        {/* Static value-prop band */}
+        <div className="bg-neu-primary border-b-2 border-neu-black py-3 px-4 lg:px-6">
+          <div className="max-w-7xl mx-auto flex flex-wrap items-center gap-x-6 gap-y-2">
+            {(t('landing.why.items', { returnObjects: true })).map((w, i) => (
+              <span key={w.title} className="inline-flex items-center gap-6 font-mono font-bold text-[11px] uppercase tracking-widest text-neu-black">
+                {i > 0 && <span className="text-neu-black/30">/</span>}
+                {w.title}
+              </span>
+            ))}
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 lg:px-6 py-16 lg:py-20">
-          {/* Header — left-aligned, large */}
+        <div className="max-w-7xl mx-auto px-4 lg:px-6 py-20 lg:py-28">
+          {/* Header */}
           <motion.div className="mb-12" {...fadeLeft()}>
-            <h2 className="font-display font-black text-4xl sm:text-5xl lg:text-7xl text-neu-black leading-[0.9] tracking-tight">
+            <div className="h-px w-8 bg-neu-primary mb-4" />
+            <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-black leading-tight max-w-lg">
               {t('landing.why.title')}
             </h2>
           </motion.div>
 
-          {/* Items — numbered, no icon box */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0 border-l-2 border-neu-black">
+          {/* Items — sharp small numeral, no icon box */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0 border-l-2 border-t-2 border-neu-black">
             {(t('landing.why.items', { returnObjects: true })).map((w, i) => (
               <motion.div
                 key={w.title}
                 {...fadeUp(i * 0.06)}
                 className="border-r-2 border-b-2 border-neu-black p-6 lg:p-8 hover:bg-neu-bg transition-colors duration-150"
               >
-                <p className="font-mono font-black text-5xl text-neu-black/10 leading-none mb-4 tracking-tighter">
-                  {String(i + 1).padStart(2, '0')}
-                </p>
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="font-mono font-bold text-xs text-neu-primary bg-neu-black px-1.5 py-0.5">{String(i + 1).padStart(2, '0')}</span>
+                </div>
                 <h3 className="font-display font-bold text-base text-neu-black mb-2">{w.title}</h3>
                 <p className="font-body text-sm text-neu-black/55 leading-relaxed">{w.desc}</p>
               </motion.div>
@@ -1730,31 +1683,29 @@ export default function LandingPage() {
       </section>
 
       {/* ── HOW IT WORKS — Horizontal timeline ── */}
-      <section id="cara-kerja" className="border-b-2 border-neu-black bg-neu-black py-16 lg:py-20">
+      <section id="cara-kerja" className="border-b-2 border-neu-black bg-neu-black py-20 lg:py-28">
         <div className="max-w-7xl mx-auto px-4 lg:px-6">
-          <motion.div className="flex items-baseline gap-4 mb-14" {...fadeUp()}>
-            <span className="font-mono text-[10px] text-neu-white/30 uppercase tracking-[0.2em] rotate-[-0.5deg] inline-block">{t('landing.howItWorks.tag')}</span>
-            <div className="flex-1 h-px bg-neu-white/10" />
-            <h2 className="font-display font-bold text-2xl lg:text-3xl text-neu-white">{t('landing.howItWorks.title')}</h2>
+          <motion.div className="mb-14" {...fadeUp()}>
+            <span className="font-mono text-[10px] text-neu-white/40 uppercase tracking-widest block mb-2">{t('landing.howItWorks.tag')}</span>
+            <div className="h-px w-8 bg-neu-primary mb-4" />
+            <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-white leading-tight">{t('landing.howItWorks.title')}</h2>
           </motion.div>
 
           {/* Steps */}
           <div className="relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
             {/* Connector line (desktop only) */}
-            <div className="hidden lg:block absolute top-[3.2rem] left-[12.5%] right-[12.5%] h-px border-t-2 border-dashed border-neu-white/15 z-0" />
+            <div className="hidden lg:block absolute top-[1.4rem] left-[12.5%] right-[12.5%] h-px border-t-2 border-dashed border-neu-white/15 z-0" />
 
             {(t('landing.howItWorks.steps', { returnObjects: true })).map((step, si) => (
               <motion.div
                 key={step.no}
                 {...{ initial: { opacity: 0, y: 20 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true }, transition: { duration: 0.5, delay: si * 0.12 } }}
-                className="relative z-10 border-b-2 border-r-0 sm:border-r-2 border-neu-white/10 last:border-r-0 lg:border-b-0 px-6 pb-10 lg:pb-0 pt-4 lg:pt-0 first:pl-0"
+                className="relative z-10 border-b-2 border-r-0 sm:border-r-2 border-neu-white/10 last:border-r-0 lg:border-b-0 px-6 pb-10 lg:pb-0 pt-4 lg:pt-0 first:pl-0 lg:first:pl-0"
               >
-                {/* Big number */}
-                <p className="font-mono font-black text-[5rem] lg:text-[6rem] leading-none text-neu-white/[0.12] mb-4 tracking-tighter select-none">
-                  {step.no}
-                </p>
-                {/* Step dot */}
-                <div className="w-2.5 h-2.5 bg-neu-primary border-2 border-neu-primary mb-5 hidden lg:block" />
+                {/* Step numeral — sharp, on-brand */}
+                <div className="inline-flex items-center justify-center w-11 h-11 bg-neu-primary border-2 border-neu-primary mb-5 relative">
+                  <span className="font-mono font-bold text-base text-neu-black">{step.no}</span>
+                </div>
                 <h3 className="font-display font-bold text-lg text-neu-white mb-2">{step.title}</h3>
                 <p className="font-body text-xs text-neu-white/50 leading-relaxed">{step.desc}</p>
               </motion.div>
@@ -1763,38 +1714,17 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── TECH STACK — Double marquee running text ── */}
-      <section className="border-b-2 border-neu-black bg-neu-bg py-8 overflow-hidden">
-        {/* Label */}
-        <p className="font-mono text-[10px] text-neu-black/35 uppercase tracking-widest text-center mb-5">
-          {t('landing.tech.label')}
-        </p>
-
-        {/* Row 1 — kiri ke kanan */}
-        <div className="relative overflow-hidden">
-          <div className="flex gap-4 animate-marquee whitespace-nowrap">
-            {[...techStack, ...techStack, ...techStack].map((tech, i) => (
-              <div key={i} className="inline-flex items-center gap-3 flex-shrink-0 px-4 py-2 bg-neu-white border-2 border-neu-black shadow-neu-sm font-mono font-bold text-xs text-neu-black uppercase">
-                <span className="w-1.5 h-1.5 bg-neu-primary flex-shrink-0" />
-                {tech}
-              </div>
-            ))}
-          </div>
-        </div>
-
-      </section>
-
       {/* ── CONTACT ── */}
       {(contacts.length > 0 || socialMedia.length > 0) && (
         <section id="kontak" className="border-b-2 border-neu-black py-20">
           <div className="max-w-7xl mx-auto px-4 lg:px-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
               <motion.div {...fadeUp()}>
-                <span className="font-mono text-[10px] text-neu-black/35 uppercase tracking-[0.2em] block mb-4">{t('landing.contact.tag')}</span>
-                <h2 className="font-display font-black text-4xl sm:text-5xl lg:text-6xl text-neu-black mb-4 leading-[0.9] tracking-tight">
+                <span className="font-mono text-[10px] text-neu-black/50 uppercase tracking-widest block mb-2">{t('landing.contact.tag')}</span>
+                <div className="h-px w-8 bg-neu-primary mb-4" />
+                <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-black mb-4 leading-tight">
                   {t('landing.contact.title').split('\n').map((l, i) => <span key={i} className="block">{l}</span>)}
                 </h2>
-                <div className="w-12 h-1 bg-neu-black mb-5" />
                 <p className="font-body text-sm text-neu-black/55 mb-6 leading-relaxed max-w-sm">{t('landing.contact.subtitle')}</p>
                 {contacts.length > 0 && (
                   <div className="space-y-3">
@@ -1884,13 +1814,6 @@ export default function LandingPage() {
           FOOTER — Modern 2025
       ══════════════════════════════════════════ */}
       <motion.footer className="bg-neu-black relative overflow-hidden" {...fadeUp()}>
-        {/* Background monumental text */}
-        <div className="absolute bottom-0 left-0 right-0 pointer-events-none overflow-hidden leading-none">
-          <span className="font-display font-black text-[18vw] text-neu-white/[0.025] select-none tracking-tighter whitespace-nowrap">
-            SYNECTRA
-          </span>
-        </div>
-
         {/* Top strip */}
         <div className="border-b border-neu-white/10">
           <div className="max-w-7xl mx-auto px-4 lg:px-6 py-10 grid grid-cols-1 lg:grid-cols-4 gap-10">
