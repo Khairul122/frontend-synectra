@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
@@ -37,6 +37,29 @@ async function uploadReceipt(file) {
   return data.publicUrl;
 }
 
+/* ─── Link renderer helper ────────────────────────────────────────────────── */
+function renderDescriptionWithLinks(text) {
+  if (!text) return null;
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  const parts = text.split(urlRegex);
+  return parts.map((part, index) => {
+    if (part.match(urlRegex)) {
+      return (
+        <a
+          key={index}
+          href={part}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-neu-blue hover:underline break-all"
+        >
+          {part}
+        </a>
+      );
+    }
+    return part;
+  });
+}
+
 function ProgressDetailModal({ report, onClose, onViewImage }) {
   const { t }       = useTranslation();
 
@@ -53,8 +76,8 @@ function ProgressDetailModal({ report, onClose, onViewImage }) {
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/70"
       onClick={(e) => { if (e.target === e.currentTarget) handleClose(); }}>
-      <div className="w-full max-w-lg bg-neu-white border-2 border-neu-black shadow-neu-xl">
-        <div className="flex items-center justify-between px-5 py-3 border-b-2 border-neu-black bg-neu-blue">
+      <div className="w-full max-w-lg bg-neu-white border-2 border-neu-black shadow-neu-xl flex flex-col max-h-[90vh]">
+        <div className="flex items-center justify-between px-5 py-3 border-b-2 border-neu-black bg-neu-blue flex-shrink-0">
           <div className="flex items-center gap-2">
             <svg className="w-4 h-4 text-neu-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
@@ -63,7 +86,7 @@ function ProgressDetailModal({ report, onClose, onViewImage }) {
           </div>
           <button onClick={handleClose} className="text-neu-white/60 hover:text-neu-white font-mono text-2xl leading-none">×</button>
         </div>
-        <div className="px-5 py-5 space-y-4">
+        <div className="px-5 py-5 space-y-4 overflow-y-auto flex-1">
           <div>
             <div className="flex items-center justify-between mb-2">
               <span className="font-mono text-xs text-neu-black/50 uppercase">{t('orderDetail.progressPct')}</span>
@@ -80,8 +103,10 @@ function ProgressDetailModal({ report, onClose, onViewImage }) {
           {report.description ? (
             <div>
               <p className="font-mono text-xs text-neu-black/40 uppercase mb-1">{t('orderDetail.description')}</p>
-              <div className="bg-neu-bg border-2 border-neu-black p-3">
-                <p className="font-body text-sm text-neu-black whitespace-pre-wrap leading-relaxed">{report.description}</p>
+              <div className="bg-neu-bg border-2 border-neu-black p-3 max-h-40 overflow-y-auto">
+                <p className="font-body text-sm text-neu-black whitespace-pre-wrap leading-relaxed break-words">
+                  {renderDescriptionWithLinks(report.description)}
+                </p>
               </div>
             </div>
           ) : <p className="font-body text-xs text-neu-black/40 italic">{t('common.noDescription')}</p>}
