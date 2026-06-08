@@ -12,6 +12,7 @@ import { ConfirmModal } from '../components/ui/ConfirmModal';
 import { useAlert } from '../hooks/useAlert';
 import { PROGRESS_ATTACH_BUCKET, PAYMENT_RECEIPT_BUCKET } from '../constants/api';
 import supabase from '../lib/supabase';
+import { RichTextEditor } from '../components/ui/RichTextEditor';
 
 const STATUS_CONFIG = {
   pending:     { label: 'Pending',     bg: 'bg-neu-primary',  text: 'text-neu-black' },
@@ -126,9 +127,10 @@ function ProgressDetailModal({ report, onClose, onViewImage }) {
             <div>
               <p className="font-mono text-xs text-neu-black/40 uppercase mb-1">Deskripsi</p>
               <div className="bg-neu-bg border-2 border-neu-black p-3 max-h-60 overflow-y-auto">
-                <p className="font-body text-sm text-neu-black whitespace-pre-wrap leading-relaxed break-words">
-                  {renderDescriptionWithLinks(report.description)}
-                </p>
+                <div
+                  className="tiptap font-body text-sm text-neu-black leading-relaxed break-words"
+                  dangerouslySetInnerHTML={{ __html: report.description }}
+                />
               </div>
             </div>
           ) : (
@@ -382,12 +384,12 @@ function ProgressModal({ orderId, onClose, onAdded }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/60" onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
-      <div className="w-full max-w-lg bg-neu-white border-2 border-neu-black shadow-neu-xl">
-        <div className="flex items-center justify-between px-5 py-3 border-b-2 border-neu-black bg-neu-blue">
+      <div className="w-full max-w-2xl bg-neu-white border-2 border-neu-black shadow-neu-xl flex flex-col max-h-[90vh]">
+        <div className="flex items-center justify-between px-5 py-3 border-b-2 border-neu-black bg-neu-blue flex-shrink-0">
           <h3 className="font-display font-bold text-sm text-neu-white uppercase tracking-wide">Update Progress</h3>
           <button onClick={onClose} className="text-neu-white/60 hover:text-neu-white font-mono text-2xl leading-none">×</button>
         </div>
-        <div className="px-5 py-5 space-y-4">
+        <div className="px-5 py-5 space-y-4 overflow-y-auto flex-1">
           <div className="flex flex-col gap-1.5">
             <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wide">Judul Update *</label>
             <input type="text" value={form.title} onChange={e => setForm(p => ({ ...p, title: e.target.value }))}
@@ -396,9 +398,11 @@ function ProgressModal({ orderId, onClose, onAdded }) {
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wide">Deskripsi</label>
-            <textarea value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))}
-              rows={3} placeholder="Detail progress..."
-              className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu resize-none" />
+            <RichTextEditor
+              value={form.description}
+              onChange={val => setForm(p => ({ ...p, description: val }))}
+              placeholder="Detail progress..."
+            />
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wide">
@@ -435,7 +439,7 @@ function ProgressModal({ orderId, onClose, onAdded }) {
             </p>
           </div>
         </div>
-        <div className="px-5 pb-5 flex gap-3">
+        <div className="px-5 py-4 border-t-2 border-neu-black flex gap-3 flex-shrink-0 bg-neu-bg/5">
           <button onClick={handleSubmit} disabled={isSaving || !form.title.trim()} className={cn(
             'flex-1 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black',
             'hover:shadow-neu-sm',

@@ -104,9 +104,10 @@ function ProgressDetailModal({ report, onClose, onViewImage }) {
             <div>
               <p className="font-mono text-xs text-neu-black/40 uppercase mb-1">{t('orderDetail.description')}</p>
               <div className="bg-neu-bg border-2 border-neu-black p-3 max-h-60 overflow-y-auto">
-                <p className="font-body text-sm text-neu-black whitespace-pre-wrap leading-relaxed break-words">
-                  {renderDescriptionWithLinks(report.description)}
-                </p>
+                <div
+                  className="tiptap font-body text-sm text-neu-black leading-relaxed break-words"
+                  dangerouslySetInnerHTML={{ __html: report.description }}
+                />
               </div>
             </div>
           ) : <p className="font-body text-xs text-neu-black/40 italic">{t('common.noDescription')}</p>}
