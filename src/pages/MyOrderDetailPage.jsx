@@ -76,7 +76,7 @@ function ProgressDetailModal({ report, onClose, onViewImage }) {
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/70"
       onClick={(e) => { if (e.target === e.currentTarget) handleClose(); }}>
-      <div className="w-full max-w-lg bg-neu-white border-2 border-neu-black shadow-neu-xl flex flex-col max-h-[90vh]">
+      <div className="w-full max-w-2xl bg-neu-white border-2 border-neu-black shadow-neu-xl flex flex-col max-h-[90vh]">
         <div className="flex items-center justify-between px-5 py-3 border-b-2 border-neu-black bg-neu-blue flex-shrink-0">
           <div className="flex items-center gap-2">
             <svg className="w-4 h-4 text-neu-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -103,7 +103,7 @@ function ProgressDetailModal({ report, onClose, onViewImage }) {
           {report.description ? (
             <div>
               <p className="font-mono text-xs text-neu-black/40 uppercase mb-1">{t('orderDetail.description')}</p>
-              <div className="bg-neu-bg border-2 border-neu-black p-3 max-h-40 overflow-y-auto">
+              <div className="bg-neu-bg border-2 border-neu-black p-3 max-h-60 overflow-y-auto">
                 <p className="font-body text-sm text-neu-black whitespace-pre-wrap leading-relaxed break-words">
                   {renderDescriptionWithLinks(report.description)}
                 </p>
@@ -115,7 +115,7 @@ function ProgressDetailModal({ report, onClose, onViewImage }) {
               <p className="font-mono text-xs text-neu-black/40 uppercase mb-2">{t('orderDetail.screenshot')}</p>
               <button type="button" onClick={() => { handleClose(); setTimeout(() => onViewImage(report.attachmentUrl, report.title), 300); }}
                 className="relative w-full border-2 border-neu-black overflow-hidden group">
-                <img src={report.attachmentUrl} alt="screenshot" className="w-full max-h-48 object-cover" />
+                <img src={report.attachmentUrl} alt="screenshot" className="w-full max-h-80 object-cover" />
                 <div className="absolute inset-0 bg-neu-black/0 group-hover:bg-neu-black/30 flex items-center justify-center">
                   <span className="opacity-0 group-hover:opacity-100 font-display font-bold text-xs text-neu-white bg-neu-black/80 px-3 py-1.5 border border-neu-white/30">{t('orderDetail.zoomIn')}</span>
                 </div>
