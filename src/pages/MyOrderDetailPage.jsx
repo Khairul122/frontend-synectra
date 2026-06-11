@@ -479,6 +479,31 @@ function RevisionDetailModal({ batch, batchIndex, onClose, onViewImage }) {
               )}
             </div>
           ))}
+
+          {batch.adminResponse && (
+            <div className="px-5 py-4 space-y-2 bg-neu-blue/5">
+              <p className="font-mono text-[10px] text-neu-blue font-bold uppercase tracking-widest">
+                Balasan Admin
+              </p>
+              <p className="font-body text-sm text-neu-black leading-relaxed whitespace-pre-wrap">{batch.adminResponse.notes}</p>
+              {batch.adminResponse.images?.length > 0 && (
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {batch.adminResponse.images.map((url, imgIdx) => (
+                    <button key={imgIdx} type="button"
+                      onClick={() => { handleClose(); setTimeout(() => onViewImage(url, `Balasan Admin #${batchIndex + 1}`), 300); }}
+                      className="relative w-20 h-16 border-2 border-neu-black overflow-hidden group hover:border-neu-blue hover:shadow-neu-sm">
+                      <img src={url} alt="" className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-neu-black/0 group-hover:bg-neu-black/25 flex items-center justify-center">
+                        <span className="opacity-0 group-hover:opacity-100 font-mono text-[9px] text-neu-white bg-neu-black/70 px-1.5 py-0.5">
+                          Perbesar
+                        </span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Footer */}
@@ -932,9 +957,21 @@ export default function MyOrderDetailPage() {
                       <span className="font-display font-bold text-base text-[#F97316] leading-none">#{batchIdx + 1}</span>
                     </div>
                     <div>
-                      <p className="font-display font-bold text-sm text-neu-black">
-                        {batch.items.length} {batch.items.length === 1 ? 'poin' : 'poin'} revisi
-                      </p>
+                      <div className="flex items-center gap-2 flex-wrap mb-0.5">
+                        <p className="font-display font-bold text-sm text-neu-black">
+                          {batch.items.length} {batch.items.length === 1 ? 'poin' : 'poin'} revisi
+                        </p>
+                        {batch.source === 'admin' && (
+                          <span className="inline-flex items-center px-2 py-0.5 border border-neu-black bg-neu-blue text-neu-white font-mono text-[10px] font-bold uppercase">
+                            Dari Admin
+                          </span>
+                        )}
+                        {batch.adminResponse && (
+                          <span className="inline-flex items-center px-2 py-0.5 border border-neu-black bg-neu-green text-neu-white font-mono text-[10px] font-bold uppercase">
+                            Sudah Dibalas
+                          </span>
+                        )}
+                      </div>
                       <p className="font-mono text-xs text-neu-black/40 mt-0.5">
                         {new Date(batch.createdAt).toLocaleString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                       </p>

@@ -10,7 +10,7 @@ import { progressReportService } from '../services/progressReport.service';
 import { PageLayout } from '../components/layout/PageLayout';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
 import { useAlert } from '../hooks/useAlert';
-import { PROGRESS_ATTACH_BUCKET, PAYMENT_RECEIPT_BUCKET } from '../constants/api';
+import { PROGRESS_ATTACH_BUCKET, PAYMENT_RECEIPT_BUCKET, REVISION_IMAGE_BUCKET } from '../constants/api';
 import supabase from '../lib/supabase';
 import { RichTextEditor } from '../components/ui/RichTextEditor';
 
@@ -664,8 +664,161 @@ function AddPaymentModal({ orderId, onClose, onAdded, alert }) {
   );
 }
 
+/* ─── Admin Revision Modal (admin membuat permintaan revisi baru) ─────────── */
+function AdminRevisionModal({ onClose, onSubmit }) {
+  const alert = useAlert();
+  const [items, setItems] = useState([{ id: crypto.randomUUID(), notes: '', images: [] }]);
+  const [uploadingIdx, setUploadingIdx] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const addItem = () =>
+    setItems(prev => [...prev, { id: crypto.randomUUID(), notes: '', images: [] }]);
+
+  const removeItem = (idx) =>
+    setItems(prev => prev.filter((_, i) => i !== idx));
+
+  const updateNotes = (idx, val) =>
+    setItems(prev => prev.map((it, i) => i === idx ? { ...it, notes: val } : it));
+
+  const handleImageFiles = async (idx, files) => {
+    if (!files?.length) return;
+    setUploadingIdx(idx);
+    try {
+      const urls = await Promise.all(
+        Array.from(files).filter(f => f.type.startsWith('image/')).map(f => uploadFile(f, REVISION_IMAGE_BUCKET))
+      );
+      setItems(prev => prev.map((it, i) => i === idx ? { ...it, images: [...it.images, ...urls] } : it));
+    } catch { alert.error('Gagal upload gambar.'); }
+    finally { setUploadingIdx(null); }
+  };
+
+  const removeImage = (itemIdx, imgIdx) =>
+    setItems(prev => prev.map((it, i) =>
+      i === itemIdx ? { ...it, images: it.images.filter((_, j) => j !== imgIdx) } : it
+    ));
+
+  const canSubmit = items.every(it => it.notes.trim()) && uploadingIdx === null && !isSaving;
+
+  const handleSubmit = async () => {
+    if (!canSubmit) return;
+    setIsSaving(true);
+    try {
+      await onSubmit(items.map(it => ({ notes: it.notes.trim(), images: it.images })));
+      onClose();
+    } catch { alert.error('Gagal menambah revisi.'); }
+    finally { setIsSaving(false); }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/70"
+      onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className="w-full max-w-lg bg-neu-white border-2 border-neu-black shadow-neu-xl flex flex-col max-h-[90vh]">
+
+        <div className="flex items-center justify-between px-5 py-4 border-b-2 border-neu-black bg-[#F97316] flex-shrink-0">
+          <div className="flex items-center gap-2">
+            <svg className="w-4 h-4 text-neu-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            <h3 className="font-display font-bold text-sm text-neu-white uppercase tracking-wide">
+              Tambah Permintaan Revisi
+            </h3>
+          </div>
+          <button onClick={onClose} className="text-neu-white/70 hover:text-neu-white font-mono text-2xl leading-none">×</button>
+        </div>
+
+        <div className="overflow-y-auto flex-1 px-5 py-4 space-y-4">
+          {items.map((item, idx) => (
+            <div key={item.id} className="border-2 border-neu-black bg-neu-bg p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="font-display font-bold text-xs text-[#F97316] uppercase tracking-wide">
+                  Revisi {idx + 1}
+                </span>
+                {items.length > 1 && (
+                  <button type="button" onClick={() => removeItem(idx)}
+                    className="w-6 h-6 flex items-center justify-center bg-neu-accent border-2 border-neu-black text-neu-white font-bold text-xs">
+                    ✕
+                  </button>
+                )}
+              </div>
+
+              <div>
+                <label className="font-mono text-[10px] text-neu-black/50 uppercase tracking-widest block mb-1">
+                  Keterangan *
+                </label>
+                <textarea
+                  value={item.notes} onChange={e => updateNotes(idx, e.target.value)} rows={3}
+                  placeholder="Contoh: Tambahkan validasi nomor telepon di form pendaftaran."
+                  className="w-full px-3 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu resize-none" />
+              </div>
+
+              <div>
+                <label className="font-mono text-[10px] text-neu-black/50 uppercase tracking-widest block mb-1">
+                  Gambar Pendukung (opsional)
+                </label>
+
+                {item.images.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {item.images.map((url, imgIdx) => (
+                      <div key={imgIdx} className="relative group">
+                        <img src={url} alt="" className="w-16 h-14 object-cover border-2 border-neu-black" />
+                        <button type="button" onClick={() => removeImage(idx, imgIdx)}
+                          className="absolute -top-1.5 -right-1.5 w-5 h-5 flex items-center justify-center bg-neu-accent border border-neu-black text-neu-white text-[10px] font-bold opacity-0 group-hover:opacity-100">
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <label className={cn('flex items-center justify-center gap-2 border-2 border-dashed border-neu-black px-4 py-3 cursor-pointer',
+                  uploadingIdx === idx ? 'opacity-60 cursor-not-allowed bg-neu-black/5' : 'hover:bg-neu-white')}>
+                  <input type="file" accept="image/*" multiple className="hidden"
+                    disabled={uploadingIdx !== null}
+                    onChange={e => { if (e.target.files) handleImageFiles(idx, e.target.files); e.target.value = ''; }} />
+                  {uploadingIdx === idx ? (
+                    <span className="font-display font-bold text-xs text-neu-black">Mengupload...</span>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4 text-neu-black/40" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                      </svg>
+                      <span className="font-display font-bold text-xs text-neu-black/50">Klik atau drag gambar ke sini</span>
+                    </>
+                  )}
+                </label>
+              </div>
+            </div>
+          ))}
+
+          <button type="button" onClick={addItem}
+            className="w-full py-2.5 border-2 border-dashed border-[#F97316] bg-[#F97316]/5 font-display font-bold text-xs uppercase text-[#F97316] hover:bg-[#F97316]/10">
+            + Tambah Poin Revisi
+          </button>
+        </div>
+
+        <div className="px-5 py-4 border-t-2 border-neu-black flex gap-3 flex-shrink-0">
+          <button onClick={handleSubmit} disabled={!canSubmit}
+            className={cn('flex-1 py-2.5 bg-[#F97316] border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-white hover:shadow-neu-sm',
+              !canSubmit && 'opacity-50 cursor-not-allowed')}>
+            {isSaving ? 'Mengirim...' : 'Kirim Permintaan Revisi'}
+          </button>
+          <button onClick={onClose}
+            className="flex-1 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black hover:shadow-neu-sm">
+            Batal
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ─── Revision Detail Modal ──────────────────────────────────────────────── */
-function RevisionDetailModal({ batch, batchIndex, onClose, onViewImage }) {
+function RevisionDetailModal({ batch, batchIndex, onClose, onViewImage, onRespond }) {
+  const alert = useAlert();
+  const [responseNotes, setResponseNotes] = useState('');
+  const [responseImages, setResponseImages] = useState([]);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     const onKey = (e) => { if (e.key === 'Escape') handleClose(); };
@@ -676,6 +829,33 @@ function RevisionDetailModal({ batch, batchIndex, onClose, onViewImage }) {
   const handleClose = onClose;
 
   const fmtDT = (val) => new Date(val).toLocaleString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+  const handleResponseImages = async (files) => {
+    if (!files?.length) return;
+    setIsUploading(true);
+    try {
+      const urls = await Promise.all(
+        Array.from(files).filter(f => f.type.startsWith('image/')).map(f => uploadFile(f, REVISION_IMAGE_BUCKET))
+      );
+      setResponseImages(prev => [...prev, ...urls]);
+    } catch { alert.error('Gagal upload gambar.'); }
+    finally { setIsUploading(false); }
+  };
+
+  const removeResponseImage = (idx) =>
+    setResponseImages(prev => prev.filter((_, i) => i !== idx));
+
+  const canSubmitResponse = responseNotes.trim() && !isUploading && !isSaving;
+
+  const handleSubmitResponse = async () => {
+    if (!canSubmitResponse) return;
+    setIsSaving(true);
+    try {
+      await onRespond(batch.id, { notes: responseNotes.trim(), images: responseImages });
+      handleClose();
+    } catch { alert.error('Gagal mengirim balasan revisi.'); }
+    finally { setIsSaving(false); }
+  };
 
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/70"
@@ -689,7 +869,7 @@ function RevisionDetailModal({ batch, batchIndex, onClose, onViewImage }) {
             </svg>
             <div>
               <h3 className="font-display font-bold text-sm text-neu-white uppercase tracking-wide">
-                Revisi Client #{batchIndex + 1}
+                Revisi {batch.source === 'admin' ? 'Admin' : 'Client'} #{batchIndex + 1}
               </h3>
               <p className="font-mono text-[10px] text-neu-white/70 mt-0.5">{fmtDT(batch.createdAt)}</p>
             </div>
@@ -722,6 +902,74 @@ function RevisionDetailModal({ batch, batchIndex, onClose, onViewImage }) {
               )}
             </div>
           ))}
+
+          {/* ─ Balasan Admin ─ */}
+          {batch.adminResponse ? (
+            <div className="px-5 py-4 space-y-2 bg-neu-blue/5">
+              <p className="font-mono text-[10px] text-neu-blue font-bold uppercase tracking-widest">
+                Balasan Admin
+              </p>
+              <div className="bg-neu-bg border-2 border-neu-black/20 p-3">
+                <p className="font-body text-sm text-neu-black leading-relaxed whitespace-pre-wrap">{batch.adminResponse.notes}</p>
+              </div>
+              {batch.adminResponse.images?.length > 0 && (
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {batch.adminResponse.images.map((url, imgIdx) => (
+                    <button key={imgIdx} type="button"
+                      onClick={() => { handleClose(); setTimeout(() => onViewImage(url, `Balasan Admin #${batchIndex + 1}`), 300); }}
+                      className="relative w-20 h-16 border-2 border-neu-black overflow-hidden group hover:border-neu-blue hover:shadow-neu-sm">
+                      <img src={url} alt="" className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-neu-black/0 group-hover:bg-neu-black/25 flex items-center justify-center">
+                        <span className="opacity-0 group-hover:opacity-100 font-mono text-[9px] text-neu-white bg-neu-black/70 px-1.5 py-0.5">Perbesar</span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="px-5 py-4 space-y-3 bg-neu-blue/5">
+              <p className="font-mono text-[10px] text-neu-blue font-bold uppercase tracking-widest">
+                Kirim Balasan
+              </p>
+              <textarea
+                value={responseNotes} onChange={e => setResponseNotes(e.target.value)} rows={3}
+                placeholder="Tulis catatan balasan untuk client..."
+                className="w-full px-3 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu-sm font-body text-sm text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu resize-none" />
+
+              {responseImages.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {responseImages.map((url, imgIdx) => (
+                    <div key={imgIdx} className="relative group">
+                      <img src={url} alt="" className="w-16 h-14 object-cover border-2 border-neu-black" />
+                      <button type="button" onClick={() => removeResponseImage(imgIdx)}
+                        className="absolute -top-1.5 -right-1.5 w-5 h-5 flex items-center justify-center bg-neu-accent border border-neu-black text-neu-white text-[10px] font-bold opacity-0 group-hover:opacity-100">
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <label className={cn('flex items-center justify-center gap-2 border-2 border-dashed border-neu-black px-4 py-3 cursor-pointer',
+                isUploading ? 'opacity-60 cursor-not-allowed bg-neu-black/5' : 'hover:bg-neu-white')}>
+                <input type="file" accept="image/*" multiple className="hidden"
+                  disabled={isUploading}
+                  onChange={e => { if (e.target.files) handleResponseImages(e.target.files); e.target.value = ''; }} />
+                {isUploading ? (
+                  <span className="font-display font-bold text-xs text-neu-black">Mengupload...</span>
+                ) : (
+                  <span className="font-display font-bold text-xs text-neu-black/50">+ Lampirkan Bukti Gambar</span>
+                )}
+              </label>
+
+              <button onClick={handleSubmitResponse} disabled={!canSubmitResponse}
+                className={cn('w-full py-2.5 bg-neu-blue border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-white hover:shadow-none',
+                  !canSubmitResponse && 'opacity-50 cursor-not-allowed')}>
+                {isSaving ? 'Mengirim...' : 'Kirim Balasan'}
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="px-5 py-4 border-t-2 border-neu-black flex-shrink-0">
@@ -755,6 +1003,7 @@ export default function OrderDetailPage() {
   const [previewAttachment,    setPreviewAttachment]    = useState(null);
   const [detailProgress,       setDetailProgress]       = useState(null);
   const [revisionDetailTarget, setRevisionDetailTarget] = useState(null);
+  const [showAdminRevision,    setShowAdminRevision]    = useState(false);
 
   // Penetapan harga & deadline
   const [showPriceForm, setShowPriceForm] = useState(false);
@@ -852,6 +1101,19 @@ export default function OrderDetailPage() {
           batchIndex={revisionDetailTarget.index}
           onClose={() => setRevisionDetailTarget(null)}
           onViewImage={(src, caption) => setPreviewAttachment({ src, caption })}
+          onRespond={async (revisionId, payload) => {
+            await orderService.respondRevision(id, revisionId, payload);
+            await loadOrder();
+          }}
+        />
+      )}
+      {showAdminRevision && (
+        <AdminRevisionModal
+          onClose={() => setShowAdminRevision(false)}
+          onSubmit={async (items) => {
+            await orderService.createAdminRevision(id, items);
+            await loadOrder();
+          }}
         />
       )}
       {showProgress && <ProgressModal orderId={id} onClose={() => setShowProgress(false)} onAdded={loadOrder} />}
@@ -1137,46 +1399,69 @@ export default function OrderDetailPage() {
           )}
         </div>
 
-        {/* ─── Section D: Revisi Client ───────────────────────────── */}
-        {order.revisions?.length > 0 && (
+        {/* ─── Section D: Revisi ───────────────────────────── */}
+        {order.status !== 'completed' && order.status !== 'canceled' && (
           <div className="bg-neu-white border-2 border-neu-black shadow-neu">
-            <div className="flex items-center gap-3 px-6 py-4 border-b-2 border-neu-black">
-              <svg className="w-4 h-4 text-[#F97316]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-              </svg>
-              <h3 className="font-display font-bold text-base text-neu-black uppercase tracking-wide">
-                Revisi Client ({order.revisions.length})
-              </h3>
+            <div className="flex items-center justify-between gap-3 px-6 py-4 border-b-2 border-neu-black">
+              <div className="flex items-center gap-3">
+                <svg className="w-4 h-4 text-[#F97316]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+                <h3 className="font-display font-bold text-base text-neu-black uppercase tracking-wide">
+                  Revisi ({order.revisions?.length ?? 0})
+                </h3>
+              </div>
+              <button onClick={() => setShowAdminRevision(true)}
+                className="px-3 py-1.5 bg-[#F97316] border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-white hover:shadow-none whitespace-nowrap">
+                + Tambah Revisi
+              </button>
             </div>
-            <div className="divide-y-2 divide-neu-black">
-              {order.revisions.map((batch, batchIdx) => (
-                <div key={batch.id} className="px-6 py-4 flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-4">
-                    <div className="flex-shrink-0 w-10 h-10 border-2 border-[#F97316] bg-[#F97316]/10 flex items-center justify-center">
-                      <span className="font-display font-bold text-base text-[#F97316] leading-none">#{batchIdx + 1}</span>
-                    </div>
-                    <div>
-                      <p className="font-display font-bold text-sm text-neu-black">
-                        {batch.items.length} poin revisi
-                      </p>
-                      <p className="font-mono text-xs text-neu-black/40 mt-0.5">
-                        {fmtDateTime(batch.createdAt)}
-                      </p>
-                      {/* Preview catatan pertama */}
-                      {batch.items[0]?.notes && (
-                        <p className="font-body text-xs text-neu-black/60 mt-0.5 line-clamp-1 max-w-xs">
-                          {batch.items[0].notes}
+            {!order.revisions?.length ? (
+              <p className="px-6 py-8 text-center font-body text-sm text-neu-black/40">
+                Belum ada permintaan revisi.
+              </p>
+            ) : (
+              <div className="divide-y-2 divide-neu-black">
+                {order.revisions.map((batch, batchIdx) => (
+                  <div key={batch.id} className="px-6 py-4 flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      <div className="flex-shrink-0 w-10 h-10 border-2 border-[#F97316] bg-[#F97316]/10 flex items-center justify-center">
+                        <span className="font-display font-bold text-base text-[#F97316] leading-none">#{batchIdx + 1}</span>
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2 flex-wrap mb-0.5">
+                          <p className="font-display font-bold text-sm text-neu-black">
+                            {batch.items.length} poin revisi
+                          </p>
+                          <span className={cn('inline-flex items-center px-2 py-0.5 border border-neu-black font-mono text-[10px] font-bold uppercase',
+                            batch.source === 'admin' ? 'bg-neu-blue text-neu-white' : 'bg-neu-primary text-neu-black')}>
+                            {batch.source === 'admin' ? 'Admin' : 'Client'}
+                          </span>
+                          {batch.adminResponse && (
+                            <span className="inline-flex items-center px-2 py-0.5 border border-neu-black bg-neu-green text-neu-white font-mono text-[10px] font-bold uppercase">
+                              Sudah Dibalas
+                            </span>
+                          )}
+                        </div>
+                        <p className="font-mono text-xs text-neu-black/40 mt-0.5">
+                          {fmtDateTime(batch.createdAt)}
                         </p>
-                      )}
+                        {/* Preview catatan pertama */}
+                        {batch.items[0]?.notes && (
+                          <p className="font-body text-xs text-neu-black/60 mt-0.5 line-clamp-1 max-w-xs">
+                            {batch.items[0].notes}
+                          </p>
+                        )}
+                      </div>
                     </div>
+                    <button onClick={() => setRevisionDetailTarget({ batch, index: batchIdx })}
+                      className="px-3 py-1.5 bg-[#F97316] border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-white hover:shadow-none whitespace-nowrap flex-shrink-0">
+                      Lihat Detail
+                    </button>
                   </div>
-                  <button onClick={() => setRevisionDetailTarget({ batch, index: batchIdx })}
-                    className="px-3 py-1.5 bg-[#F97316] border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-white hover:shadow-none whitespace-nowrap flex-shrink-0">
-                    Lihat Detail
-                  </button>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 

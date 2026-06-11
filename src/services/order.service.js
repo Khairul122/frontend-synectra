@@ -23,6 +23,12 @@ export const orderService = {
   requestRevision(id, items) {
     return apiClient.patch(`${API_ENDPOINTS.ORDERS}/${id}/request-revision`, { items }).then(r => r.data);
   },
+  createAdminRevision(id, items) {
+    return apiClient.post(`${API_ENDPOINTS.ORDERS}/${id}/revisions`, { items }).then(r => r.data);
+  },
+  respondRevision(id, revisionId, payload) {
+    return apiClient.patch(`${API_ENDPOINTS.ORDERS}/${id}/revisions/${revisionId}/respond`, payload).then(r => r.data);
+  },
   delete(id) {
     return apiClient.delete(`${API_ENDPOINTS.ORDERS}/${id}`).then(r => r.data);
   },
