@@ -8,4 +8,7 @@ export const progressReportService = {
   getByOrder(orderId) {
     return apiClient.get(`${API_ENDPOINTS.PROGRESS_REPORTS}/order/${orderId}`).then(r => r.data);
   },
+  update(id, payload) {
+    return apiClient.patch(`${API_ENDPOINTS.PROGRESS_REPORTS}/${id}`, payload).then(r => r.data);
+  },
 };

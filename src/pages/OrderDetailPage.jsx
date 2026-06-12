@@ -355,8 +355,14 @@ function ScreenshotUploader({ value, isUploading, onFile, onClear }) {
 }
 
 /* ─── Progress Form Modal ────────────────────────────────────────────────── */
-function ProgressModal({ orderId, onClose, onAdded }) {
-  const [form, setForm] = useState({ title: '', description: '', progressPercentage: 0, attachmentUrl: '', isLocked: false });
+function ProgressModal({ orderId, editingReport, onClose, onAdded }) {
+  const [form, setForm] = useState(() => editingReport ? {
+    title: editingReport.title ?? '',
+    description: editingReport.description ?? '',
+    progressPercentage: editingReport.progressPercentage ?? 0,
+    attachmentUrl: editingReport.attachmentUrl ?? '',
+    isLocked: editingReport.isLocked ?? false,
+  } : { title: '', description: '', progressPercentage: 0, attachmentUrl: '', isLocked: false });
   const [isUploading, setIsUploading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const alert = useAlert();
@@ -375,10 +381,14 @@ function ProgressModal({ orderId, onClose, onAdded }) {
     if (!form.title.trim()) return;
     setIsSaving(true);
     try {
-      await progressReportService.create({ orderId, ...form, progressPercentage: Number(form.progressPercentage) });
+      if (editingReport) {
+        await progressReportService.update(editingReport.id, { ...form, progressPercentage: Number(form.progressPercentage) });
+      } else {
+        await progressReportService.create({ orderId, ...form, progressPercentage: Number(form.progressPercentage) });
+      }
       onAdded();
       onClose();
-    } catch { alert.error('Gagal menambah progress.'); }
+    } catch { alert.error('Gagal menyimpan progress.'); }
     finally { setIsSaving(false); }
   };
 
@@ -386,7 +396,7 @@ function ProgressModal({ orderId, onClose, onAdded }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neu-black/60" onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
       <div className="w-full max-w-2xl bg-neu-white border-2 border-neu-black shadow-neu-xl flex flex-col max-h-[90vh]">
         <div className="flex items-center justify-between px-5 py-3 border-b-2 border-neu-black bg-neu-blue flex-shrink-0">
-          <h3 className="font-display font-bold text-sm text-neu-white uppercase tracking-wide">Update Progress</h3>
+          <h3 className="font-display font-bold text-sm text-neu-white uppercase tracking-wide">{editingReport ? 'Edit Progress' : 'Update Progress'}</h3>
           <button onClick={onClose} className="text-neu-white/60 hover:text-neu-white font-mono text-2xl leading-none">×</button>
         </div>
         <div className="px-5 py-5 space-y-4 overflow-y-auto flex-1">
@@ -444,7 +454,7 @@ function ProgressModal({ orderId, onClose, onAdded }) {
             'flex-1 py-2.5 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black',
             'hover:shadow-neu-sm',
             (isSaving || !form.title.trim()) && 'opacity-50 cursor-not-allowed',
-          )}>{isSaving ? 'Menyimpan...' : 'Simpan Progress'}</button>
+          )}>{isSaving ? 'Menyimpan...' : (editingReport ? 'Simpan Perubahan' : 'Simpan Progress')}</button>
           <button onClick={onClose} className="flex-1 py-2.5 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-sm uppercase text-neu-black hover:shadow-neu-sm">Batal</button>
         </div>
       </div>
@@ -995,6 +1005,7 @@ export default function OrderDetailPage() {
   const [order,           setOrder]           = useState(null);
   const [isLoading,       setIsLoading]       = useState(true);
   const [showProgress,    setShowProgress]    = useState(false);
+  const [editingProgress, setEditingProgress] = useState(null);
   const [showAddPayment,  setShowAddPayment]  = useState(false);
   const [rejectPaymentId, setRejectPaymentId] = useState(null);
   const [verifyTarget,    setVerifyTarget]    = useState(null);
@@ -1116,7 +1127,14 @@ export default function OrderDetailPage() {
           }}
         />
       )}
-      {showProgress && <ProgressModal orderId={id} onClose={() => setShowProgress(false)} onAdded={loadOrder} />}
+      {(showProgress || editingProgress) && (
+        <ProgressModal
+          orderId={id}
+          editingReport={editingProgress}
+          onClose={() => { setShowProgress(false); setEditingProgress(null); }}
+          onAdded={loadOrder}
+        />
+      )}
       {showAddPayment && <AddPaymentModal orderId={id} onClose={() => setShowAddPayment(false)} onAdded={loadOrder} alert={alert} />}
       {rejectPaymentId && <RejectModal paymentId={rejectPaymentId} onClose={() => setRejectPaymentId(null)} onRejected={loadOrder} />}
       <ConfirmModal
@@ -1391,6 +1409,17 @@ export default function OrderDetailPage() {
                       )}
                     >
                       Lihat Detail
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setEditingProgress(r)}
+                      className={cn(
+                        'px-3 py-1.5 bg-neu-white border-2 border-neu-black shadow-neu-sm',
+                        'font-display font-bold text-xs uppercase tracking-wide text-neu-black whitespace-nowrap',
+                        'hover:shadow-none',
+                      )}
+                    >
+                      Edit
                     </button>
                   </div>
                 </div>
