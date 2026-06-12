@@ -9,6 +9,7 @@ import { paymentService } from '../services/payment.service';
 import { progressReportService } from '../services/progressReport.service';
 import { PageLayout } from '../components/layout/PageLayout';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
+import { Badge } from '../components/ui/Badge';
 import { useAlert } from '../hooks/useAlert';
 import { PROGRESS_ATTACH_BUCKET, PAYMENT_RECEIPT_BUCKET, REVISION_IMAGE_BUCKET } from '../constants/api';
 import supabase from '../lib/supabase';
@@ -1166,6 +1167,7 @@ export default function OrderDetailPage() {
                 {order.serviceCategory && (
                   <span className="font-mono text-xs text-neu-black/50 uppercase bg-neu-bg border border-neu-black/20 px-2 py-0.5">{order.serviceCategory.replace(/_/g,' ')}</span>
                 )}
+                {order.isVip && <Badge variant="purple">VIP</Badge>}
               </div>
               <h2 className="font-display font-bold text-2xl text-neu-black">{order.title}</h2>
               <p className="font-body text-sm text-neu-black/60 mt-1">

@@ -6,6 +6,7 @@ import { authService } from '../services/auth.service';
 import { orderService } from '../services/order.service';
 import { PageLayout } from '../components/layout/PageLayout';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
+import { Badge } from '../components/ui/Badge';
 import { useAlert } from '../hooks/useAlert';
 
 const STATUS_BG = {
@@ -32,14 +33,20 @@ function OrderRow({ order, index, onOpen, onEdit, onDelete }) {
   const fmt     = (val) => val ? `Rp ${Number(val).toLocaleString('id-ID')}` : '—';
   const fmtDate = (val) => val ? new Date(val).toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' }) : '—';
   return (
-    <tr className="border-b-2 border-neu-black bg-neu-white hover:bg-neu-bg cursor-pointer" onClick={() => onOpen(order.id)}>
+    <tr className={cn(
+      'border-b-2 border-neu-black bg-neu-white hover:bg-neu-bg cursor-pointer',
+      order.isVip && 'border-l-4 border-l-neu-purple',
+    )} onClick={() => onOpen(order.id)}>
       <td className="px-4 py-3 border-r-2 border-neu-black font-mono text-xs text-neu-black/50 text-center w-10">{index + 1}</td>
       <td className="px-4 py-3 border-r-2 border-neu-black">
         <p className="font-display font-bold text-sm text-neu-black">{order.title}</p>
         {order.serviceCategory && <p className="font-mono text-xs text-neu-black/40">{order.serviceCategory}</p>}
       </td>
       <td className="px-4 py-3 border-r-2 border-neu-black w-40">
-        <p className="font-body text-sm text-neu-black">{order.clientName ?? '—'}</p>
+        <div className="flex items-center gap-1.5">
+          <p className="font-body text-sm text-neu-black">{order.clientName ?? '—'}</p>
+          {order.isVip && <Badge variant="purple">VIP</Badge>}
+        </div>
         <p className="font-mono text-xs text-neu-black/40 truncate max-w-36">{order.clientEmail ?? ''}</p>
       </td>
       <td className="px-4 py-3 border-r-2 border-neu-black font-mono text-sm text-neu-black w-36">{fmt(order.totalPrice)}</td>
@@ -102,11 +109,13 @@ export default function OrderPage() {
   }, [navigate]);
 
 
-  const filtered = orders.filter(o => {
-    const matchStatus = filter === 'all' || o.status === filter;
-    const matchSearch = !search || o.title.toLowerCase().includes(search.toLowerCase()) || (o.clientName ?? '').toLowerCase().includes(search.toLowerCase());
-    return matchStatus && matchSearch;
-  });
+  const filtered = orders
+    .filter(o => {
+      const matchStatus = filter === 'all' || o.status === filter;
+      const matchSearch = !search || o.title.toLowerCase().includes(search.toLowerCase()) || (o.clientName ?? '').toLowerCase().includes(search.toLowerCase());
+      return matchStatus && matchSearch;
+    })
+    .sort((a, b) => (b.isVip === true) - (a.isVip === true));
 
   const handleDelete = async () => {
     if (!deleteTarget) return;

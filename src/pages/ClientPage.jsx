@@ -8,6 +8,7 @@ import { clientService } from '../services/client.service';
 import { userService } from '../services/user.service';
 import { PageLayout } from '../components/layout/PageLayout';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
+import { Badge } from '../components/ui/Badge';
 import { useAlert } from '../hooks/useAlert';
 
 /* ─── Edit Modal ─────────────────────────────────────────────────────────── */
@@ -15,6 +16,7 @@ function EditClientModal({ client, onClose, onSaved }) {
   const [form, setForm] = useState({
     companyName: client.companyName ?? '',
     email:       client.email       ?? '',
+    isVip:       client.isVip       ?? false,
   });
   const [pwForm,     setPwForm]     = useState({ newPassword: '', confirmPassword: '' });
   const [isSaving,   setIsSaving]   = useState(false);
@@ -36,6 +38,7 @@ function EditClientModal({ client, onClose, onSaved }) {
       await clientService.update(client.id, {
         companyName: form.companyName || null,
         email:       form.email       || null,
+        isVip:       form.isVip,
       });
       onSaved();
       handleClose();
@@ -107,6 +110,12 @@ function EditClientModal({ client, onClose, onSaved }) {
               placeholder="email@example.com"
               className={inputCls} />
           </div>
+          <label className="flex items-center gap-2 cursor-pointer select-none">
+            <input type="checkbox" checked={form.isVip}
+              onChange={e => setForm(p => ({ ...p, isVip: e.target.checked }))}
+              className="w-4 h-4 accent-neu-purple" />
+            <span className="font-display font-bold text-xs text-neu-black uppercase tracking-wide">Tandai sebagai Client VIP</span>
+          </label>
           <div className="flex gap-3 pt-1">
             <button onClick={handleSave} disabled={isSaving}
               className={cn(
@@ -182,6 +191,11 @@ function ClientRow({ client, index, onEdit, onDelete }) {
       {/* Nama/Perusahaan */}
       <td className="px-4 py-3 border-r-2 border-neu-black w-44">
         <p className="font-body text-sm text-neu-black">{client.companyName ?? <span className="text-neu-black/30 italic">—</span>}</p>
+      </td>
+
+      {/* VIP */}
+      <td className="px-4 py-3 border-r-2 border-neu-black w-20 text-center">
+        {client.isVip ? <Badge variant="purple">VIP</Badge> : <span className="text-neu-black/20 font-mono text-xs">—</span>}
       </td>
 
       {/* Email kontak */}
@@ -306,6 +320,7 @@ export default function ClientPage() {
                   <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase w-10 text-center">No</th>
                   <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase text-left">Nama Pengguna</th>
                   <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase text-left w-44">Nama / Perusahaan</th>
+                  <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase text-center w-20">VIP</th>
                   <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase text-left">Email Kontak</th>
                   <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase text-left w-32">Terdaftar</th>
                   <th className="px-4 py-3 font-display font-bold text-xs uppercase text-left w-36">Aksi</th>
