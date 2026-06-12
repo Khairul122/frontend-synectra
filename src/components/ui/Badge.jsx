@@ -6,6 +6,7 @@ const VARIANT_STYLES = {
   blue:    'bg-neu-blue text-neu-white',
   green:   'bg-neu-green text-neu-black',
   purple:  'bg-neu-purple text-neu-white',
+  gray:    'bg-neu-black/10 text-neu-black',
 };
 
 export function Badge({ children, variant = 'primary', className }) {

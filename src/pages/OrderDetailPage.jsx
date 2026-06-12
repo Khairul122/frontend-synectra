@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
 import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
-import { orderService } from '../services/order.service';
+import { orderService, triggerBlobDownload } from '../services/order.service';
 import { paymentService } from '../services/payment.service';
 import { progressReportService } from '../services/progressReport.service';
 import { PageLayout } from '../components/layout/PageLayout';
@@ -37,6 +37,12 @@ const STATUS_CONFIG = {
   canceled:    { label: 'Dibatalkan',  bg: 'bg-neu-accent',   text: 'text-neu-white' },
 };
 const STATUS_TRANSITIONS = ['pending','in_progress','testing','revision','completed','canceled'];
+
+const PRIORITY_CONFIG = {
+  low:    { label: 'Low',    variant: 'gray' },
+  normal: { label: 'Normal', variant: 'blue' },
+  high:   { label: 'High',   variant: 'accent' },
+};
 
 const PAYMENT_STATUS = {
   pending_verification: { label: 'Menunggu Verifikasi', bg: 'bg-neu-primary', text: 'text-neu-black' },
@@ -1034,11 +1040,22 @@ export default function OrderDetailPage() {
   const [showPriceForm, setShowPriceForm] = useState(false);
   const [priceForm,     setPriceForm]     = useState({ totalPrice: '', deadline: '' });
   const [isSavingPrice, setIsSavingPrice] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
 
 
   const loadOrder = async () => {
     const res = await orderService.getDetail(id);
     setOrder(res.data);
+  };
+
+  const handleDownloadInvoice = async () => {
+    setIsDownloading(true);
+    try {
+      const blob = await orderService.downloadInvoice(id);
+      triggerBlobDownload(blob, `invoice-${id}.pdf`);
+    } catch {
+      alert.error('Gagal mengunduh invoice.');
+    } finally { setIsDownloading(false); }
   };
 
   useEffect(() => {
@@ -1061,6 +1078,14 @@ export default function OrderDetailPage() {
       setOrder(prev => ({ ...prev, status }));
       alert.success('Status pesanan diperbarui.');
     } catch { alert.error('Gagal update status.'); }
+  };
+
+  const handlePriorityChange = async (priority) => {
+    try {
+      await orderService.updatePriority(id, priority);
+      setOrder(prev => ({ ...prev, priority }));
+      alert.success('Prioritas pesanan diperbarui.');
+    } catch { alert.error('Gagal update prioritas.'); }
   };
 
   const openPriceForm = () => {
@@ -1181,6 +1206,9 @@ export default function OrderDetailPage() {
                   <span className="font-mono text-xs text-neu-black/50 uppercase bg-neu-bg border border-neu-black/20 px-2 py-0.5">{order.serviceCategory.replace(/_/g,' ')}</span>
                 )}
                 {order.isVip && <Badge variant="purple">VIP</Badge>}
+                {order.priority && order.priority !== 'normal' && (
+                  <Badge variant={PRIORITY_CONFIG[order.priority]?.variant}>{PRIORITY_CONFIG[order.priority]?.label} Priority</Badge>
+                )}
               </div>
               <h2 className="font-display font-bold text-2xl text-neu-black">{order.title}</h2>
               <p className="font-body text-sm text-neu-black/60 mt-1">
@@ -1196,6 +1224,10 @@ export default function OrderDetailPage() {
               )}
             </div>
             <div className="flex items-center gap-2 flex-wrap">
+              <button onClick={handleDownloadInvoice} disabled={isDownloading}
+                className="px-3 py-2 bg-neu-white border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-black hover:shadow-none disabled:opacity-60">
+                {isDownloading ? 'Mengunduh...' : 'Unduh Invoice'}
+              </button>
               <button onClick={openPriceForm}
                 className={cn(
                   'px-3 py-2 bg-neu-primary border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-black',
@@ -1207,6 +1239,12 @@ export default function OrderDetailPage() {
                 className="px-3 py-2 border-2 border-neu-black bg-neu-white font-display font-bold text-xs uppercase shadow-neu-sm outline-none cursor-pointer">
                 {STATUS_TRANSITIONS.map(s => (
                   <option key={s} value={s}>{STATUS_CONFIG[s]?.label ?? s}</option>
+                ))}
+              </select>
+              <select onChange={e => handlePriorityChange(e.target.value)} value={order.priority ?? 'normal'}
+                className="px-3 py-2 border-2 border-neu-black bg-neu-white font-display font-bold text-xs uppercase shadow-neu-sm outline-none cursor-pointer">
+                {Object.entries(PRIORITY_CONFIG).map(([key, cfg]) => (
+                  <option key={key} value={key}>{cfg.label} Priority</option>
                 ))}
               </select>
             </div>

@@ -19,6 +19,13 @@ const STATUS_BG = {
 };
 const STATUS_KEYS = Object.keys(STATUS_BG);
 
+const PRIORITY_CONFIG = {
+  low:    { label: 'Low',    variant: 'gray' },
+  normal: { label: 'Normal', variant: 'blue' },
+  high:   { label: 'High',   variant: 'accent' },
+};
+const PRIORITY_ORDER = { high: 0, normal: 1, low: 2 };
+
 function StatusBadge({ status }) {
   const { t } = useTranslation();
   const cfg = STATUS_BG[status] ?? { bg: 'bg-neu-black/20', text: 'text-neu-black' };
@@ -29,7 +36,7 @@ function StatusBadge({ status }) {
   );
 }
 
-function OrderRow({ order, index, onOpen, onEdit, onDelete }) {
+function OrderRow({ order, index, onOpen, onEdit, onDelete, onPriorityChange }) {
   const fmt     = (val) => val ? `Rp ${Number(val).toLocaleString('id-ID')}` : '—';
   const fmtDate = (val) => val ? new Date(val).toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' }) : '—';
   return (
@@ -46,6 +53,9 @@ function OrderRow({ order, index, onOpen, onEdit, onDelete }) {
         <div className="flex items-center gap-1.5">
           <p className="font-body text-sm text-neu-black">{order.clientName ?? '—'}</p>
           {order.isVip && <Badge variant="purple">VIP</Badge>}
+          {order.priority && order.priority !== 'normal' && (
+            <Badge variant={PRIORITY_CONFIG[order.priority]?.variant}>{PRIORITY_CONFIG[order.priority]?.label}</Badge>
+          )}
         </div>
         <p className="font-mono text-xs text-neu-black/40 truncate max-w-36">{order.clientEmail ?? ''}</p>
       </td>
@@ -53,6 +63,14 @@ function OrderRow({ order, index, onOpen, onEdit, onDelete }) {
       <td className="px-4 py-3 border-r-2 border-neu-black font-mono text-xs text-neu-black/60 w-32">{fmtDate(order.deadline)}</td>
       <td className="px-4 py-3 border-r-2 border-neu-black w-32"><StatusBadge status={order.status} /></td>
       <td className="px-4 py-3 border-r-2 border-neu-black font-mono text-xs text-neu-black/40 w-32">{fmtDate(order.createdAt)}</td>
+      <td className="px-4 py-3 border-r-2 border-neu-black w-32" onClick={e => e.stopPropagation()}>
+        <select value={order.priority ?? 'normal'} onChange={e => onPriorityChange(order.id, e.target.value)}
+          className="px-2 py-1 border-2 border-neu-black bg-neu-white font-display font-bold text-xs uppercase shadow-neu-sm outline-none cursor-pointer">
+          {Object.entries(PRIORITY_CONFIG).map(([key, cfg]) => (
+            <option key={key} value={key}>{cfg.label}</option>
+          ))}
+        </select>
+      </td>
       <td className="px-4 py-3 w-28" onClick={e => e.stopPropagation()}>
         <div className="flex items-center gap-1.5">
           <button
@@ -115,7 +133,20 @@ export default function OrderPage() {
       const matchSearch = !search || o.title.toLowerCase().includes(search.toLowerCase()) || (o.clientName ?? '').toLowerCase().includes(search.toLowerCase());
       return matchStatus && matchSearch;
     })
-    .sort((a, b) => (b.isVip === true) - (a.isVip === true));
+    .sort((a, b) => {
+      const priorityDiff = (PRIORITY_ORDER[a.priority] ?? 1) - (PRIORITY_ORDER[b.priority] ?? 1);
+      if (priorityDiff !== 0) return priorityDiff;
+      return (b.isVip === true) - (a.isVip === true);
+    });
+
+  const handlePriorityChange = async (id, priority) => {
+    try {
+      await orderService.updatePriority(id, priority);
+      setOrders(prev => prev.map(o => o.id === id ? { ...o, priority } : o));
+    } catch {
+      alert.error('Gagal mengubah prioritas order.');
+    }
+  };
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
@@ -202,6 +233,7 @@ export default function OrderPage() {
                   <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase text-left w-36">{t('orders.cols.total')}</th>
                   <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase text-left w-32">{t('orders.cols.deadline')}</th>
                   <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase text-left w-32">{t('orders.cols.status')}</th>
+                  <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase text-left w-32">Prioritas</th>
                   <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase text-left w-32">{t('orders.cols.createdAt')}</th>
                   <th className="px-4 py-3 font-display font-bold text-xs uppercase text-center w-28">Aksi</th>
                 </tr>
@@ -215,6 +247,7 @@ export default function OrderPage() {
                     onOpen={id => navigate(`/orders/${id}`)}
                     onEdit={id => navigate(`/orders/${id}`)}
                     onDelete={order => setDeleteTarget(order)}
+                    onPriorityChange={handlePriorityChange}
                   />
                 ))}
               </tbody>
