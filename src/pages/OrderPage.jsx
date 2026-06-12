@@ -19,12 +19,9 @@ const STATUS_BG = {
 };
 const STATUS_KEYS = Object.keys(STATUS_BG);
 
-const PRIORITY_CONFIG = {
-  low:    { label: 'Low',    variant: 'gray' },
-  normal: { label: 'Normal', variant: 'blue' },
-  high:   { label: 'High',   variant: 'accent' },
-};
+const PRIORITY_VARIANT = { low: 'gray', normal: 'blue', high: 'accent' };
 const PRIORITY_ORDER = { high: 0, normal: 1, low: 2 };
+const PRIORITY_KEYS = Object.keys(PRIORITY_VARIANT);
 
 function StatusBadge({ status }) {
   const { t } = useTranslation();
@@ -37,6 +34,7 @@ function StatusBadge({ status }) {
 }
 
 function OrderRow({ order, index, onOpen, onEdit, onDelete, onPriorityChange }) {
+  const { t } = useTranslation();
   const fmt     = (val) => val ? `Rp ${Number(val).toLocaleString('id-ID')}` : '—';
   const fmtDate = (val) => val ? new Date(val).toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' }) : '—';
   return (
@@ -54,7 +52,9 @@ function OrderRow({ order, index, onOpen, onEdit, onDelete, onPriorityChange }) 
           <p className="font-body text-sm text-neu-black">{order.clientName ?? '—'}</p>
           {order.isVip && <Badge variant="purple">VIP</Badge>}
           {order.priority && order.priority !== 'normal' && (
-            <Badge variant={PRIORITY_CONFIG[order.priority]?.variant}>{PRIORITY_CONFIG[order.priority]?.label}</Badge>
+            <Badge variant={PRIORITY_VARIANT[order.priority]}>
+              {t('orders.priority.badge', { level: t(`orders.priority.${order.priority}`) })}
+            </Badge>
           )}
         </div>
         <p className="font-mono text-xs text-neu-black/40 truncate max-w-36">{order.clientEmail ?? ''}</p>
@@ -66,8 +66,8 @@ function OrderRow({ order, index, onOpen, onEdit, onDelete, onPriorityChange }) 
       <td className="px-4 py-3 border-r-2 border-neu-black w-32" onClick={e => e.stopPropagation()}>
         <select value={order.priority ?? 'normal'} onChange={e => onPriorityChange(order.id, e.target.value)}
           className="px-2 py-1 border-2 border-neu-black bg-neu-white font-display font-bold text-xs uppercase shadow-neu-sm outline-none cursor-pointer">
-          {Object.entries(PRIORITY_CONFIG).map(([key, cfg]) => (
-            <option key={key} value={key}>{cfg.label}</option>
+          {PRIORITY_KEYS.map((key) => (
+            <option key={key} value={key}>{t(`orders.priority.${key}`)}</option>
           ))}
         </select>
       </td>
@@ -233,7 +233,7 @@ export default function OrderPage() {
                   <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase text-left w-36">{t('orders.cols.total')}</th>
                   <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase text-left w-32">{t('orders.cols.deadline')}</th>
                   <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase text-left w-32">{t('orders.cols.status')}</th>
-                  <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase text-left w-32">Prioritas</th>
+                  <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase text-left w-32">{t('orders.cols.priority')}</th>
                   <th className="px-4 py-3 border-r-2 border-neu-white/20 font-display font-bold text-xs uppercase text-left w-32">{t('orders.cols.createdAt')}</th>
                   <th className="px-4 py-3 font-display font-bold text-xs uppercase text-center w-28">Aksi</th>
                 </tr>

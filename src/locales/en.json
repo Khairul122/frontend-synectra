@@ -357,7 +357,14 @@
       "total": "Total",
       "deadline": "Deadline",
       "status": "Status",
+      "priority": "Priority",
       "createdAt": "Created"
+    },
+    "priority": {
+      "low": "Low",
+      "normal": "Normal",
+      "high": "High",
+      "badge": "{{level}} Priority"
     }
   },
   "orderDetail": {

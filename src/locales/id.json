@@ -357,7 +357,14 @@
       "total": "Total",
       "deadline": "Deadline",
       "status": "Status",
+      "priority": "Prioritas",
       "createdAt": "Dibuat"
+    },
+    "priority": {
+      "low": "Rendah",
+      "normal": "Normal",
+      "high": "Tinggi",
+      "badge": "Prioritas {{level}}"
     }
   },
   "orderDetail": {

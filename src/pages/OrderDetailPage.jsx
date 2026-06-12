@@ -38,11 +38,8 @@ const STATUS_CONFIG = {
 };
 const STATUS_TRANSITIONS = ['pending','in_progress','testing','revision','completed','canceled'];
 
-const PRIORITY_CONFIG = {
-  low:    { label: 'Low',    variant: 'gray' },
-  normal: { label: 'Normal', variant: 'blue' },
-  high:   { label: 'High',   variant: 'accent' },
-};
+const PRIORITY_VARIANT = { low: 'gray', normal: 'blue', high: 'accent' };
+const PRIORITY_KEYS = Object.keys(PRIORITY_VARIANT);
 
 const PAYMENT_STATUS = {
   pending_verification: { label: 'Menunggu Verifikasi', bg: 'bg-neu-primary', text: 'text-neu-black' },
@@ -1207,7 +1204,9 @@ export default function OrderDetailPage() {
                 )}
                 {order.isVip && <Badge variant="purple">VIP</Badge>}
                 {order.priority && order.priority !== 'normal' && (
-                  <Badge variant={PRIORITY_CONFIG[order.priority]?.variant}>{PRIORITY_CONFIG[order.priority]?.label} Priority</Badge>
+                  <Badge variant={PRIORITY_VARIANT[order.priority]}>
+                    {t('orders.priority.badge', { level: t(`orders.priority.${order.priority}`) })}
+                  </Badge>
                 )}
               </div>
               <h2 className="font-display font-bold text-2xl text-neu-black">{order.title}</h2>
@@ -1243,8 +1242,8 @@ export default function OrderDetailPage() {
               </select>
               <select onChange={e => handlePriorityChange(e.target.value)} value={order.priority ?? 'normal'}
                 className="px-3 py-2 border-2 border-neu-black bg-neu-white font-display font-bold text-xs uppercase shadow-neu-sm outline-none cursor-pointer">
-                {Object.entries(PRIORITY_CONFIG).map(([key, cfg]) => (
-                  <option key={key} value={key}>{cfg.label} Priority</option>
+                {PRIORITY_KEYS.map((key) => (
+                  <option key={key} value={key}>{t('orders.priority.badge', { level: t(`orders.priority.${key}`) })}</option>
                 ))}
               </select>
             </div>
