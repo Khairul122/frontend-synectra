@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
 import { PageLayout } from '../components/layout/PageLayout';
+import { SignatureCanvas } from '../components/ui/SignatureCanvas';
 import { useAlert } from '../hooks/useAlert';
 
 export default function ProfilePage() {
@@ -191,6 +192,19 @@ export default function ProfilePage() {
             </form>
           )}
         </div>
+
+        {/* Tanda Tangan Perusahaan (Admin only) */}
+        {user?.role === 'admin' && (
+          <div className="bg-neu-white border-2 border-neu-black shadow-neu">
+            <div className="px-6 py-4 border-b-2 border-neu-black">
+              <h3 className="font-display font-bold text-base text-neu-black uppercase tracking-wide">Tanda Tangan Perusahaan</h3>
+              <p className="font-body text-xs text-neu-black/50 mt-1">Tanda tangan ini akan muncul di footer setiap invoice PDF.</p>
+            </div>
+            <div className="px-6 py-5">
+              <SignatureCanvas />
+            </div>
+          </div>
+        )}
       </div>
     </PageLayout>
   );

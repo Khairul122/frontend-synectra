@@ -22,6 +22,7 @@ export const API_ENDPOINTS = {
   SOFTWARE_PRODUCTS:  `${API_BASE_URL}/api/software-products`,
   SOFTWARE_PURCHASES: `${API_BASE_URL}/api/software-purchases`,
   TODOS:              `${API_BASE_URL}/api/todos`,
+  SETTINGS_SIGNATURE: `${API_BASE_URL}/api/settings/signature`,
 };
 
 export const SUPABASE_URL  = 'https://ddgspjgrslhlphhaltkf.supabase.co';
@@ -36,4 +37,5 @@ export const PACKAGE_ICON_BUCKET      = 'package-icons';
 export const SOFTWARE_THUMBNAIL_BUCKET = 'software-thumbnails';
 export const REVISION_IMAGE_BUCKET     = 'revision-images';
 export const QRIS_IMAGE_BUCKET         = 'qris-images';
+export const COMPANY_SIGNATURE_BUCKET  = 'company-signature';
 export const FEEDBACKS_ENDPOINT        = `${API_BASE_URL}/api/feedbacks`;
