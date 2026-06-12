@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
 import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
-import { orderService } from '../services/order.service';
+import { orderService, triggerBlobDownload } from '../services/order.service';
 import { paymentService } from '../services/payment.service';
 import { bankAccountService } from '../services/bankAccount.service';
 import { PageLayout } from '../components/layout/PageLayout';
@@ -36,6 +36,19 @@ async function uploadReceipt(file) {
   const { data } = supabase.storage.from(PAYMENT_RECEIPT_BUCKET).getPublicUrl(filename);
   return data.publicUrl;
 }
+
+const stripHtml = (html) => {
+  if (!html) return '';
+  return html
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/\s+/g, ' ')
+    .trim();
+};
 
 /* ─── Link renderer helper ────────────────────────────────────────────────── */
 function renderDescriptionWithLinks(text) {
@@ -701,6 +714,7 @@ export default function MyOrderDetailPage() {
   const [showPayment,    setShowPayment]    = useState(false);
   const [showComplete,   setShowComplete]   = useState(false);
   const [isCompleting,   setIsCompleting]   = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
   const [showRevision,         setShowRevision]         = useState(false);
   const [revisionDetailTarget, setRevisionDetailTarget] = useState(null);
   const [previewImage,         setPreviewImage]         = useState(null);
@@ -723,6 +737,16 @@ export default function MyOrderDetailPage() {
       const msg = err?.response?.data?.message ?? 'Gagal menyelesaikan pesanan.';
       alert.error(Array.isArray(msg) ? msg.join(', ') : msg);
     } finally { setIsCompleting(false); }
+  };
+
+  const handleDownloadInvoice = async () => {
+    setIsDownloading(true);
+    try {
+      const blob = await orderService.downloadInvoice(id);
+      triggerBlobDownload(blob, `invoice-${id}.pdf`);
+    } catch {
+      alert.error('Gagal mengunduh invoice.');
+    } finally { setIsDownloading(false); }
   };
 
   const handleRequestRevision = async (items) => {
@@ -795,6 +819,10 @@ export default function MyOrderDetailPage() {
               {t(`status.${order.status}`, { defaultValue: order.status })}
             </span>
             <div className="flex flex-wrap gap-2">
+              <button onClick={handleDownloadInvoice} disabled={isDownloading}
+                className="px-4 py-2 bg-neu-white border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase text-neu-black hover:shadow-neu-sm disabled:opacity-60">
+                {isDownloading ? 'Mengunduh...' : 'Unduh Invoice'}
+              </button>
               {!['completed', 'canceled'].includes(order.status) && (
                 <button onClick={() => setShowPayment(true)}
                   className="px-4 py-2 bg-neu-primary border-2 border-neu-black shadow-neu font-display font-bold text-xs uppercase text-neu-black hover:shadow-neu-sm">
@@ -909,7 +937,7 @@ export default function MyOrderDetailPage() {
                     <>
                       <div className="flex-1 min-w-0">
                         <p className="font-display font-bold text-sm text-neu-black">{r.title}</p>
-                        {r.description && <p className="font-body text-xs text-neu-black/60 mt-0.5 line-clamp-2">{r.description}</p>}
+                        {r.description && <p className="font-body text-xs text-neu-black/60 mt-0.5 line-clamp-2">{stripHtml(r.description)}</p>}
                         <p className="font-mono text-xs text-neu-black/40 mt-1">{fmtDateTime(r.reportedAt)}</p>
                         <div className="h-1.5 border border-neu-black bg-neu-bg mt-2">
                           <div className="h-full bg-neu-blue" style={{ width: `${r.progressPercentage}%` }} />

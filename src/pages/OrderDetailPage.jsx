@@ -15,6 +15,19 @@ import { PROGRESS_ATTACH_BUCKET, PAYMENT_RECEIPT_BUCKET, REVISION_IMAGE_BUCKET }
 import supabase from '../lib/supabase';
 import { RichTextEditor } from '../components/ui/RichTextEditor';
 
+const stripHtml = (html) => {
+  if (!html) return '';
+  return html
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/\s+/g, ' ')
+    .trim();
+};
+
 const STATUS_CONFIG = {
   pending:     { label: 'Pending',     bg: 'bg-neu-primary',  text: 'text-neu-black' },
   in_progress: { label: 'In Progress', bg: 'bg-neu-blue',     text: 'text-neu-white' },
@@ -1388,7 +1401,7 @@ export default function OrderDetailPage() {
                       )}
                     </div>
                     {r.description && (
-                      <p className="font-body text-xs text-neu-black/60 mt-0.5 line-clamp-2">{r.description}</p>
+                      <p className="font-body text-xs text-neu-black/60 mt-0.5 line-clamp-2">{stripHtml(r.description)}</p>
                     )}
                     <p className="font-mono text-xs text-neu-black/40 mt-1">{fmtDateTime(r.reportedAt)}</p>
                     <div className="h-1.5 border border-neu-black bg-neu-bg mt-2">

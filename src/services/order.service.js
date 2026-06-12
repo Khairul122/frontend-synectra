@@ -32,4 +32,18 @@ export const orderService = {
   delete(id) {
     return apiClient.delete(`${API_ENDPOINTS.ORDERS}/${id}`).then(r => r.data);
   },
+  downloadInvoice(id) {
+    return apiClient.get(`${API_ENDPOINTS.ORDERS}/${id}/invoice`, { responseType: 'blob' }).then(r => r.data);
+  },
 };
+
+export function triggerBlobDownload(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
