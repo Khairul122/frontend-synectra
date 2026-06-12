@@ -1,5 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { Analytics } from '@vercel/analytics/react'
 // Self-hosted fonts (di-bundle Vite ke /assets, cache 1 tahun) — ganti Google Fonts CDN
 import '@fontsource/space-grotesk/400.css'
 import '@fontsource/space-grotesk/700.css'
@@ -20,5 +21,6 @@ console.warn = (...args) => {
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <App />
+    <Analytics />
   </StrictMode>,
 )
