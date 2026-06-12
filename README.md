@@ -12,4 +12,3 @@ Built with React, Vite, Tailwind CSS, GSAP, and Barba.js, featuring a modern Neu
 - **Order Management**: Pelacakan status pesanan dan laporan progres.
 - **UI & Animasi**: Visual 3D interaktif, GSAP animations, dan page transition yang mulus.
 
-> **Note:** Untuk panduan pengembangan lengkap, arsitektur, dan referensi komponen, silakan merujuk ke file [`CLAUDE.md`](./CLAUDE.md).

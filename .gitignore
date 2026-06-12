@@ -24,3 +24,7 @@ dist-ssr
 *.sw?
 
 .vercel
+
+# Agent/Assistant directories
+.claude
+.gemini
