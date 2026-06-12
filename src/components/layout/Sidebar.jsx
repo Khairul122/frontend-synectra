@@ -397,18 +397,6 @@ export function Sidebar({ user, isOpen, onClose }) {
             })}
         </nav>
 
-        {/* CTA Buat Pesanan — khusus client/staff */}
-        {(user?.role === 'client' || user?.role === 'staff') && (
-          <div className="px-3 py-3 border-t-2 border-neu-black">
-            <Link to="/my-orders/new" onClick={handleNavClick}
-              className="flex items-center justify-center gap-2 w-full py-3 bg-neu-primary border-2 border-neu-black shadow-neu-sm font-display font-bold text-xs uppercase text-neu-black hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-150">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-              </svg>
-              {t('sidebar.createOrder')}
-            </Link>
-          </div>
-        )}
 
         {/* Language switcher */}
         <div className="px-5 py-4 border-t-2 border-neu-black flex items-center justify-between">
