@@ -155,7 +155,7 @@ export default function OrderFormPage() {
               <option value="">-- Pilih Paket Layanan --</option>
               {servicePackages.map(pkg => (
                 <option key={pkg.id} value={pkg.name}>
-                  {pkg.name}{pkg.category ? ` — ${pkg.category}` : ''}
+                  {pkg.name}
                 </option>
               ))}
             </select>
