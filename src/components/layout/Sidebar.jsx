@@ -208,6 +208,16 @@ const NAV_GROUPS = [
           </svg>
         ),
       },
+      {
+        tKey: 'sidebar.signature',
+        path: '/profile',
+        icon: (
+          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M3 17s2-1 4-1 3 1 5 1 3-1 5-1 4 1 4 1" />
+            <path d="M4 14L14 4a2 2 0 0 1 3 3L7 17l-4 1 1-4z" />
+          </svg>
+        ),
+      },
     ],
   },
 
