@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
@@ -8,7 +8,7 @@ import { useAlert } from '../hooks/useAlert';
 import { PACKAGE_ICON_BUCKET } from '../constants/api';
 import supabase from '../lib/supabase';
 
-const CATEGORIES = ['Web', 'Mobile', 'UI/UX', 'Tugas', 'Lainnya'];
+const CATEGORIES = ['Paket Landing Page', 'Paket Website Company Profile', 'Paket Aplikasi Mobile', 'Paket Joki Tugas Akhir'];
 
 async function uploadIcon(file) {
   const ext      = file.name.split('.').pop();
