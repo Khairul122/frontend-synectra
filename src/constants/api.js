@@ -1,4 +1,6 @@
-export const API_BASE_URL = import.meta.env.DEV ? 'https://backend-synectra.vercel.app' : '';
+// Selalu arahkan langsung ke domain backend agar request tidak melewati
+// rewrite proxy frontend (yang menghitung Edge Request ganda di kedua project)
+export const API_BASE_URL = 'https://backend-synectra.vercel.app';
 
 export const API_ENDPOINTS = {
   REGISTER:    `${API_BASE_URL}/api/auth/register`,

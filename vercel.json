@@ -21,11 +21,7 @@
   ],
   "rewrites": [
     {
-      "source": "/api/:path*",
-      "destination": "https://backend-synectra.vercel.app/api/:path*"
-    },
-    {
-      "source": "/((?!api).*)",
+      "source": "/(.*)",
       "destination": "/index.html"
     }
   ]
