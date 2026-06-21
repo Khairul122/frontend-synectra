@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
 import { cn } from '../utils/cn';
+import { extractLinksFromDescription } from '../utils/parseLinks';
 import { authService } from '../services/auth.service';
 import { orderService, triggerBlobDownload } from '../services/order.service';
 import { paymentService } from '../services/payment.service';
@@ -49,29 +50,6 @@ const stripHtml = (html) => {
     .replace(/\s+/g, ' ')
     .trim();
 };
-
-/* ─── Link renderer helper ────────────────────────────────────────────────── */
-function renderDescriptionWithLinks(text) {
-  if (!text) return null;
-  const urlRegex = /(https?:\/\/[^\s]+)/g;
-  const parts = text.split(urlRegex);
-  return parts.map((part, index) => {
-    if (part.match(urlRegex)) {
-      return (
-        <a
-          key={index}
-          href={part}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-neu-blue hover:underline break-all"
-        >
-          {part}
-        </a>
-      );
-    }
-    return part;
-  });
-}
 
 function ProgressDetailModal({ report, onClose, onViewImage }) {
   const { t }       = useTranslation();
@@ -720,6 +698,7 @@ export default function MyOrderDetailPage() {
   const [previewImage,         setPreviewImage]         = useState(null);
   const [detailProgress, setDetailProgress] = useState(null);
 
+  const linkItems = useMemo(() => extractLinksFromDescription(order?.description), [order?.description]);
 
   const loadOrder = async () => {
     const res = await orderService.getDetail(id);
@@ -845,6 +824,20 @@ export default function MyOrderDetailPage() {
           </div>
           <h2 className="font-display font-bold text-xl text-neu-black mb-2">{order.title}</h2>
           {order.description && <p className="font-body text-sm text-neu-black/60 mb-4">{order.description}</p>}
+          {linkItems.length > 0 && (
+            <div className="mb-4 border-t-2 border-neu-black pt-4">
+              <p className="font-mono text-xs text-neu-black/40 uppercase mb-2">Link & File dari Admin</p>
+              <div className="flex flex-col gap-2">
+                {linkItems.map((item, i) => (
+                  <a key={i} href={item.url} target="_blank" rel="noopener noreferrer"
+                    className="flex items-center justify-between gap-2 px-3 py-2 bg-neu-white border-2 border-neu-black shadow-neu-sm hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+                    <span className="font-body text-sm font-bold text-neu-black truncate">{item.name}</span>
+                    <span className="font-mono text-xs text-neu-blue underline shrink-0">Buka ↗</span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t-2 border-neu-black pt-4">
             <div>
               <p className="font-mono text-xs text-neu-black/40 uppercase">{t('myOrderDetail.totalPrice')}</p>
