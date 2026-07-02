@@ -28,3 +28,6 @@ dist-ssr
 # Agent/Assistant directories
 .claude
 .gemini
+
+.vercel
+.env*.local
