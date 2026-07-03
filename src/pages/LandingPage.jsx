@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useSpring } from 'framer-motion';
 import {
   Dialog, DialogClose, DialogContent, DialogFooter,
   DialogHeader, DialogTitle, DialogDescription,
@@ -620,10 +620,241 @@ function FeedbackSection({ feedbacks, onSubmitted }) {
   );
 }
 
+/* ─── Robust Mock Fallback Datasets for Neobrutalist UI ──────────────── */
+const MOCK_PORTFOLIOS = [
+  {
+    id: 'mock-p1',
+    title: 'Synectra POS (Cloud SaaS)',
+    category: 'web_development',
+    image: '',
+    description: 'Sistem kasir digital berbasis cloud (SaaS) untuk bisnis retail dan F&B dengan laporan realtime, multi-outlet, dan integrasi pembayaran QRIS.',
+    techStack: 'React\nTailwindCSS\nNode.js\nPostgreSQL\nDocker',
+  },
+  {
+    id: 'mock-p2',
+    title: 'RekanTernak Mobile App',
+    category: 'mobile_development',
+    image: '',
+    description: 'Aplikasi manajemen peternakan IoT & mobile untuk monitoring kesehatan ternak, jadwal pakan otomatis, dan marketplace terintegrasi.',
+    techStack: 'Flutter\nNestJS\nSupabase\nMQTT\nGoogle Maps API',
+  },
+  {
+    id: 'mock-p3',
+    title: 'EduLearn LMS Dashboard',
+    category: 'ui_ux_design',
+    image: '',
+    description: 'Perancangan desain UI/UX platform Learning Management System sekolah menengah dengan fokus pada aksesibilitas dan gamifikasi.',
+    techStack: 'Figma\nUser Research\nWireframing\nPrototyping',
+  }
+];
+
+const MOCK_PACKAGES = [
+  {
+    id: 'mock-pkg1',
+    name: 'Website Starter',
+    nameEn: 'Website Starter',
+    price: 1500000,
+    duration: '7 - 10 Hari',
+    durationEn: '7 - 10 Days',
+    badge: 'Populer',
+    category: 'Web',
+    description: 'Solusi cepat dan hemat untuk landing page bisnis, portofolio online, atau profil perusahaan.',
+    descriptionEn: 'Quick and cost-effective solution for business landing pages, online portfolios, or company profiles.',
+    features: 'Desain Neobrutalism Modern\nResponsive Mobile Friendly\nOptimasi SEO Basic\nIntegrasi WhatsApp & Kontak\nFree Hosting 1 Tahun\nRevisi 3x',
+    featuresEn: 'Modern Neobrutalism Design\nResponsive Mobile Friendly\nBasic SEO Optimization\nWhatsApp & Contact Integration\nFree 1-Year Hosting\n3x Revisions',
+  },
+  {
+    id: 'mock-pkg2',
+    name: 'Custom Web Application',
+    nameEn: 'Custom Web Application',
+    price: 4500000,
+    duration: '2 - 3 Minggu',
+    durationEn: '2 - 3 Weeks',
+    badge: 'Terbaik',
+    category: 'SaaS / App',
+    description: 'Pengembangan web app dengan database, dashboard admin terintegrasi, dan arsitektur tangguh.',
+    descriptionEn: 'Development of web apps with databases, integrated admin dashboard, and robust architecture.',
+    features: 'Frontend React/Next.js\nBackend Node.js / Laravel\nDashboard Admin & Panel Kontrol\nAutentikasi Multi-role\nIntegrasi API Pihak Ketiga\nRevisi 5x & Garansi Bug 3 Bulan',
+    featuresEn: 'React/Next.js Frontend\nNode.js / Laravel Backend\nAdmin Dashboard & Control Panel\nMulti-role Authentication\nThird-Party API Integration\n5x Revisions & 3-Month Bug Warranty',
+  },
+  {
+    id: 'mock-pkg3',
+    name: 'Premium SaaS Platform',
+    nameEn: 'Premium SaaS Platform',
+    price: 9500000,
+    duration: '4 - 6 Minggu',
+    durationEn: '4 - 6 Weeks',
+    badge: 'Enterprise',
+    category: 'Custom Complex',
+    description: 'Platform skala industri dengan dukungan integrasi payment gateway, multi-tenant SaaS, dan skalabilitas tinggi.',
+    descriptionEn: 'Industrial scale platform supporting payment gateway integration, multi-tenant SaaS, and high scalability.',
+    features: 'Arsitektur Cloud Skalabel\nMulti-Tenant SaaS System\nIntegrasi Midtrans / Xendit\nNotifikasi Email & WhatsApp OTP\nLaporan & Analisis Statistik Lengkap\nPremium Support 6 Bulan',
+    featuresEn: 'Scalable Cloud Architecture\nMulti-Tenant SaaS System\nMidtrans / Xendit Integration\nEmail & WhatsApp OTP Alerts\nComprehensive Statistical Reports\n6-Month Premium Support',
+  }
+];
+
+const MOCK_SOFTWARE = [
+  {
+    id: 'mock-sw1',
+    name: 'Synectra POS Cloud',
+    nameEn: 'Synectra POS Cloud',
+    price: 750000,
+    category: 'SaaS POS',
+    description: 'Aplikasi kasir online siap pakai dengan manajemen inventori stok, pencetakan struk, laporan laba rugi otomatis, dan dashboard owner.',
+    descriptionEn: 'Ready-to-use online cashier app with stock inventory management, receipt printing, automatic profit/loss reports, and owner dashboard.',
+    features: 'Transaksi Kasir Offline/Online\nPencatatan Stok & Alarm Stok Tipis\nLaporan Keuangan Realtime\nMulti-Outlet / Multi-Cabang\nImport/Export Excel',
+    featuresEn: 'Offline/Online Cashier Transaction\nStock Tracking & Low Stock Alert\nRealtime Financial Reports\nMulti-Outlet / Multi-Branch Support\nImport/Export Excel',
+    techStack: 'React\nNode.js\nSQLite\nTailwindCSS',
+    demoUrl: 'https://demo-pos.synectra.com',
+  },
+  {
+    id: 'mock-sw2',
+    name: 'Smart School LMS',
+    nameEn: 'Smart School LMS',
+    price: 1200000,
+    category: 'Pendidikan',
+    description: 'Learning Management System sekolah untuk pembelajaran online, ujian CBT online, pembagian raport digital, dan forum diskusi kelas.',
+    descriptionEn: 'School Learning Management System for online learning, online CBT exams, digital report cards, and classroom discussion forums.',
+    features: 'Ujian CBT dengan Anti-Cheat\nNilai Raport & Absensi Digital\nUpload Tugas & Materi Video\nForum Diskusi & Chat Guru-Siswa\nNotifikasi WhatsApp Wali Murid',
+    featuresEn: 'CBT Exam with Anti-Cheat\nDigital Grades & Attendance\nAssignment Upload & Video Materials\nTeacher-Student Forum & Chat\nParent WhatsApp Notification',
+    techStack: 'Next.js\nNestJS\nPostgreSQL\nSocket.io',
+    demoUrl: 'https://demo-lms.synectra.com',
+  },
+  {
+    id: 'mock-sw3',
+    name: 'Multi-Vendor E-Commerce',
+    nameEn: 'Multi-Vendor E-Commerce',
+    price: 2500000,
+    category: 'Marketplace',
+    description: 'Source code marketplace mirip Tokopedia/Shopee lengkap dengan hitung ongkir otomatis rajaongkir, pembayaran QRIS/E-Wallet, dan chat pembeli-penjual.',
+    descriptionEn: 'Marketplace source code like Tokopedia/Shopee with automatic rajaongkir shipping fee calculation, QRIS/E-Wallet payment, and buyer-seller chat.',
+    features: 'Hitung Ongkir Multi-Kurir\nPembayaran QRIS Otomatis\nSystem Bagi Hasil Admin-Penjual\nLive Chat Terintegrasi\nSEO Optimized & SSR Ready',
+    featuresEn: 'Multi-Courier Shipping Calc\nAutomatic QRIS Payment\nAdmin-Seller Profit Split System\nIntegrated Live Chat\nSEO Optimized & SSR Ready',
+    techStack: 'Next.js\nLaravel\nMySQL\nTailwindCSS',
+    demoUrl: 'https://demo-shop.synectra.com',
+  }
+];
+
+const MOCK_FEEDBACKS = [
+  {
+    id: 'mock-fb1',
+    name: 'Budi Santoso',
+    rating: 5,
+    message: 'Sangat puas dengan pembuatan website POS toko kami. Projek selesai tepat waktu dan tim Synectra sangat responsif jika ada kendala. Sangat direkomendasikan!',
+    createdAt: '2026-06-15T08:00:00.000Z',
+  },
+  {
+    id: 'mock-fb2',
+    name: 'Clara Wijaya',
+    rating: 5,
+    message: 'Desain UI/UX yang dibuat sangat fresh, neobrutalism keren banget dan modern! Feedback dari tim developer kami juga lancar karena aset Figma-nya sangat rapi.',
+    createdAt: '2026-06-20T09:30:00.000Z',
+  },
+  {
+    id: 'mock-fb3',
+    name: 'Rian Hidayat',
+    rating: 4,
+    message: 'Tugas kuliah pemrograman web terbantu sekali, penjelasannya detail saat serah terima sehingga saya paham alur kodenya saat presentasi di depan dosen.',
+    createdAt: '2026-06-28T14:15:00.000Z',
+  },
+  {
+    id: 'mock-fb4',
+    name: 'Amanda Lestari',
+    rating: 5,
+    message: 'Jasa pembuatan web app SaaS kami dikerjakan dengan sangat profesional. Arsitekturnya bagus dan payment gateway integrasi berjalan lancar.',
+    createdAt: '2026-07-01T10:00:00.000Z',
+  }
+];
+
+/* ─── Brand Icons & Tech Info for Dual-Direction Marquee ─────────────── */
+const TECH_PILLS = [
+  { name: 'React', border: 'border-cyan-500/30', text: 'text-cyan-400', logo: (
+    <svg className="w-3.5 h-3.5 text-cyan-400" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="8">
+      <ellipse cx="50" cy="50" rx="15" ry="42" transform="rotate(30 50 50)" />
+      <ellipse cx="50" cy="50" rx="15" ry="42" transform="rotate(90 50 50)" />
+      <ellipse cx="50" cy="50" rx="15" ry="42" transform="rotate(150 50 50)" />
+      <circle cx="50" cy="50" r="7" fill="currentColor" />
+    </svg>
+  )},
+  { name: 'Next.js', border: 'border-white/30', text: 'text-white', logo: (
+    <svg className="w-3.5 h-3.5 text-white" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="8">
+      <circle cx="50" cy="50" r="42" />
+      <path d="M68,32 L40,70 L52,70 L72,40 Z" fill="currentColor" />
+    </svg>
+  )},
+  { name: 'TypeScript', border: 'border-blue-500/30', text: 'text-blue-400', logo: (
+    <svg className="w-3.5 h-3.5 text-blue-400" viewBox="0 0 100 100" fill="currentColor">
+      <rect width="100" height="100" rx="15" />
+      <text x="50" y="80" fontStyle="normal" fontWeight="bold" fontSize="70" fontFamily="sans-serif" textAnchor="middle" fill="#0D0D0D">TS</text>
+    </svg>
+  )},
+  { name: 'Node.js', border: 'border-green-500/30', text: 'text-green-400', logo: (
+    <svg className="w-3.5 h-3.5 text-green-400" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="8">
+      <path d="M50,15 L80,32 L80,68 L50,85 L20,68 L20,32 Z" />
+      <circle cx="50" cy="50" r="9" fill="currentColor" />
+    </svg>
+  )},
+  { name: 'Figma', border: 'border-purple-500/30', text: 'text-purple-400', logo: (
+    <svg className="w-3.5 h-3.5 text-purple-400" viewBox="0 0 100 100" fill="currentColor">
+      <circle cx="35" cy="25" r="20" />
+      <circle cx="65" cy="25" r="20" />
+      <circle cx="35" cy="55" r="20" />
+      <circle cx="65" cy="55" r="20" />
+    </svg>
+  )},
+  { name: 'Docker', border: 'border-sky-500/30', text: 'text-sky-400', logo: (
+    <svg className="w-3.5 h-3.5 text-sky-400" viewBox="0 0 100 100" fill="currentColor">
+      <path d="M10,60 H90 V70 H10 Z M20,48 H30 V58 H20 Z M35,48 H45 V58 H35 Z M50,48 H60 V58 H50 Z" />
+    </svg>
+  )},
+  { name: 'TailwindCSS', border: 'border-teal-500/30', text: 'text-teal-400', logo: (
+    <svg className="w-3.5 h-3.5 text-teal-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+      <path d="M12 3c-1.2 0-2.4.6-3.2 1.5C7.2 3.6 5.6 3 4 3c-2.2 0-4 1.8-4 4 0 2.2 1.8 4 4 4h8c2.2 0 4-1.8 4-4 0-2.2-1.8-4-4-4z" />
+      <path d="M12 21c1.2 0 2.4-.6 3.2-1.5 1.6.9 3.2 1.5 4.8 1.5 2.2 0 4-1.8 4-4 0-2.2-1.8-4-4-4H8c-2.2 0-4 1.8-4 4 0 2.2 1.8 4 4 4z" />
+    </svg>
+  )},
+  { name: 'NestJS', border: 'border-red-500/30', text: 'text-red-500', logo: (
+    <svg className="w-3.5 h-3.5 text-red-500" viewBox="0 0 100 100" fill="currentColor">
+      <polygon points="50,10 90,40 75,85 25,85 10,40" />
+    </svg>
+  )},
+  { name: 'PostgreSQL', border: 'border-blue-600/30', text: 'text-blue-300', logo: (
+    <svg className="w-3.5 h-3.5 text-blue-300" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="8">
+      <path d="M30,30 Q50,15 70,30 T50,85 Z" />
+    </svg>
+  )},
+];
+
 export default function LandingPage() {
   const isDesktop = useIsDesktop();
   useLenis(isDesktop);
   const { t, i18n } = useTranslation();
+  
+  // Smooth scroll progress hook
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
+
+  // Interactive mouse tracking state for Hero background
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [isHoveredHero, setIsHoveredHero] = useState(false);
+  const handleHeroMouseMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setMousePos({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    });
+  };
+
+  // Slider programmatic scroller
+  const scrollSlider = (ref, direction) => {
+    if (ref.current) {
+      const amt = 320;
+      ref.current.scrollBy({
+        left: direction === 'left' ? -amt : amt,
+        behavior: 'smooth'
+      });
+    }
+  };
   const { pageRef, transitionTo } = usePageTransition();
   const lang = (id, en) => i18n.language === 'en' && en ? en : id;
   const [portfolios,        setPortfolios]        = useState([]);
@@ -729,20 +960,23 @@ export default function LandingPage() {
 
   const scrollTo = (ref) => ref.current?.scrollIntoView({ behavior: 'smooth' });
 
+  const activePortfolios = portfolios.length > 0 ? portfolios : MOCK_PORTFOLIOS;
+  const activePackages = packages.length > 0 ? packages : MOCK_PACKAGES;
+  const activeSoftwareProducts = softwareProducts.length > 0 ? softwareProducts : MOCK_SOFTWARE;
+  const activeFeedbacks = feedbacks.length > 0 ? feedbacks : MOCK_FEEDBACKS;
+
   const services = t('landing.services.items', { returnObjects: true });
 
-  const avgRating = feedbacks.length > 0
-    ? Math.round((feedbacks.reduce((s, f) => s + f.rating, 0) / feedbacks.length) / 5 * 100)
-    : 0;
+  const avgRating = activeFeedbacks.length > 0
+    ? Math.round((activeFeedbacks.reduce((s, f) => s + f.rating, 0) / activeFeedbacks.length) / 5 * 100)
+    : 98; // Fallback to 98% if no reviews yet
 
   const stats = [
-    { labelKey: 'landing.stats.projects',    value: portfolios.length, suffix: '+' },
-    { labelKey: 'landing.stats.clients',     value: feedbacks.length,  suffix: '+' },
+    { labelKey: 'landing.stats.projects',    value: activePortfolios.length, suffix: '+' },
+    { labelKey: 'landing.stats.clients',     value: activeFeedbacks.length,  suffix: '+' },
     { labelKey: 'landing.stats.experience',  value: 5,                 suffix: '+' },
     { labelKey: 'landing.stats.satisfaction',value: avgRating,         suffix: '%' },
   ];
-
-  const techStack = ['React', 'Next.js', 'Node.js', 'NestJS', 'Flutter', 'Laravel', 'Python', 'PostgreSQL', 'MongoDB', 'Docker', 'AWS', 'Figma'];
 
 
   return (
@@ -933,6 +1167,10 @@ export default function LandingPage() {
       </Dialog>
 
       {/* ── NAVBAR ── */}
+      <motion.div 
+        className="fixed top-0 left-0 right-0 h-[3.5px] bg-neu-accent z-[99] origin-left"
+        style={{ scaleX }}
+      />
       <nav className="sticky top-0 z-40 bg-neu-white border-b-2 border-neu-black">
         <div className="max-w-7xl mx-auto px-4 lg:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-5">
@@ -1278,15 +1516,34 @@ export default function LandingPage() {
       </section>
 
       {/* ── PAKET LAYANAN ── */}
-      {packages.length > 0 && (
+      {activePackages.length > 0 && (
         <section id="paket" className="border-b-2 border-neu-black bg-neu-bg py-16">
           <div className="max-w-7xl mx-auto px-4 lg:px-6">
 
             {/* Section header */}
-            <motion.div className="mb-8" {...fadeUp()}>
-              <div className="h-px w-8 bg-neu-primary mb-4" />
-              <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-black leading-tight">{t('landing.packages.title')}</h2>
-            </motion.div>
+            <div className="flex items-end justify-between mb-8">
+              <motion.div {...fadeUp()}>
+                <div className="h-px w-8 bg-neu-primary mb-4" />
+                <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-black leading-tight">{t('landing.packages.title')}</h2>
+              </motion.div>
+              {/* Navigation arrows */}
+              <div className="flex gap-2">
+                <button 
+                  onClick={() => scrollSlider(pkgSliderRef, 'left')} 
+                  aria-label="Scroll left"
+                  className="w-10 h-10 border-2 border-neu-black bg-neu-white shadow-neu-sm flex items-center justify-center font-bold hover:bg-neu-primary active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+                >
+                  ←
+                </button>
+                <button 
+                  onClick={() => scrollSlider(pkgSliderRef, 'right')} 
+                  aria-label="Scroll right"
+                  className="w-10 h-10 border-2 border-neu-black bg-neu-primary shadow-neu-sm flex items-center justify-center font-bold hover:bg-neu-white active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+                >
+                  →
+                </button>
+              </div>
+            </div>
 
             {/* Drag-to-scroll slider */}
             <div className="relative">
@@ -1333,7 +1590,7 @@ export default function LandingPage() {
                 }}
                 onTouchEnd={() => { pkgDrag.current.active = false; }}
               >
-                {packages.map((pkg, pi) => (
+                {activePackages.map((pkg, pi) => (
                   <div key={pkg.id} className="flex-shrink-0 w-72 snap-start">
                     <PackageCard pkg={{ ...pkg, _idx: pi + 1 }} onOrder={() => navigateProtected('/my-orders/new')} />
                   </div>
@@ -1348,18 +1605,37 @@ export default function LandingPage() {
       )}
 
       {/* ── SOFTWARE SIAP PAKAI ── */}
-      {softwareProducts.length > 0 && (
+      {activeSoftwareProducts.length > 0 && (
         <section id="software" className="border-b-2 border-neu-black bg-neu-black py-16">
           <div className="max-w-7xl mx-auto px-4 lg:px-6">
 
             {/* Header */}
-            <motion.div className="mb-10" {...fadeLeft()}>
-              <span className="font-mono text-[10px] text-neu-white/40 uppercase tracking-widest block mb-2">{t('landing.software.title')}</span>
-              <div className="h-px w-8 bg-neu-primary mb-4" />
-              <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-white leading-tight">
-                {t('landing.software.subtitle')}
-              </h2>
-            </motion.div>
+            <div className="flex items-end justify-between mb-10">
+              <motion.div {...fadeLeft()}>
+                <span className="font-mono text-[10px] text-neu-white/40 uppercase tracking-widest block mb-2">{t('landing.software.title')}</span>
+                <div className="h-px w-8 bg-neu-primary mb-4" />
+                <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-white leading-tight">
+                  {t('landing.software.subtitle')}
+                </h2>
+              </motion.div>
+              {/* Navigation arrows */}
+              <div className="flex gap-2">
+                <button 
+                  onClick={() => scrollSlider(swSliderRef, 'left')} 
+                  aria-label="Scroll left"
+                  className="w-10 h-10 border-2 border-neu-black bg-neu-white shadow-neu-sm flex items-center justify-center font-bold hover:bg-neu-primary active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+                >
+                  ←
+                </button>
+                <button 
+                  onClick={() => scrollSlider(swSliderRef, 'right')} 
+                  aria-label="Scroll right"
+                  className="w-10 h-10 border-2 border-neu-primary bg-neu-primary shadow-neu-sm flex items-center justify-center font-bold hover:bg-neu-white active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+                >
+                  →
+                </button>
+              </div>
+            </div>
 
             {/* Drag-to-scroll slider — no scrollbar UI */}
             <div className="relative">
@@ -1394,17 +1670,40 @@ export default function LandingPage() {
               }}
               onTouchEnd={() => { swDrag.current.active = false; }}
             >
-              {softwareProducts.map(sw => {
+              {activeSoftwareProducts.map(sw => {
                 const isEn   = i18n.language === 'en';
                 const swName = (isEn && sw.nameEn)        ? sw.nameEn        : sw.name;
                 const swDesc = (isEn && sw.descriptionEn) ? sw.descriptionEn : sw.description;
                 const fmt    = (v) => `Rp ${Number(v).toLocaleString('id-ID')}`;
                 return (
-                  <motion.div key={sw.id} onClick={() => setActiveSoftware(sw)} {...cardAnim(0)} className="flex-shrink-0 w-72 flex flex-col bg-neu-white border-2 border-neu-black shadow-neu transition-all duration-200 hover:translate-x-[-3px] hover:translate-y-[-3px] hover:shadow-neu-lg cursor-pointer">
+                  <motion.div key={sw.id} onClick={() => setActiveSoftware(sw)} {...cardAnim(0)} className="flex-shrink-0 w-72 flex flex-col bg-neu-white border-2 border-neu-black shadow-neu transition-all duration-200 hover:-translate-x-2 hover:-translate-y-2 hover:shadow-neu-lg hover:rotate-[-0.5deg] cursor-pointer select-none">
 
-                    {/* Thumbnail */}
+                    {/* Thumbnail / Flat Graphic */}
                     <div className="relative border-b-2 border-neu-black h-40 bg-neu-bg overflow-hidden flex items-center justify-center">
-                      {sw.thumbnailUrl ? (
+                      {sw.id.startsWith('mock-') ? (
+                        <div className={cn(
+                          "w-full h-full flex items-center justify-center p-6 text-neu-black",
+                          sw.id === 'mock-sw1' ? 'bg-neu-primary' : sw.id === 'mock-sw2' ? 'bg-neu-purple' : 'bg-neu-accent'
+                        )}>
+                          {sw.id === 'mock-sw1' && (
+                            <svg className="w-16 h-16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                              <rect x="2" y="4" width="20" height="12" rx="0" />
+                              <path d="M12 20h.01M6 20h.01M18 20h.01 M2 8h20 M5 12h2 M17 12h2" />
+                            </svg>
+                          )}
+                          {sw.id === 'mock-sw2' && (
+                            <svg className="w-16 h-16 text-neu-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                            </svg>
+                          )}
+                          {sw.id === 'mock-sw3' && (
+                            <svg className="w-16 h-16 text-neu-white" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                              <circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" />
+                              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+                            </svg>
+                          )}
+                        </div>
+                      ) : sw.thumbnailUrl ? (
                         <img src={supaImg(sw.thumbnailUrl, { width: 576 })} alt={swName} width="288" height="160" className="w-full h-full object-cover pointer-events-none" loading="lazy" decoding="async" draggable="false" />
                       ) : (
                         <svg className="w-12 h-12 text-neu-black/15" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" draggable="false">
@@ -1412,7 +1711,7 @@ export default function LandingPage() {
                         </svg>
                       )}
                       {sw.category && (
-                        <span className="absolute top-2 right-2 font-mono text-[10px] font-bold uppercase px-2 py-0.5 bg-neu-primary border border-neu-black text-neu-black">
+                        <span className="absolute top-2 right-2 font-mono text-[9px] font-bold uppercase px-2 py-0.5 bg-neu-white border border-neu-black text-neu-black">
                           {sw.category}
                         </span>
                       )}
@@ -1427,7 +1726,7 @@ export default function LandingPage() {
                       {sw.techStack && (
                         <div className="flex flex-wrap gap-1 mt-auto pt-1">
                           {sw.techStack.split('\n').filter(s => s.trim()).slice(0, 3).map(s => (
-                            <span key={s} className="font-mono text-[10px] border border-neu-black text-neu-black bg-transparent px-2 py-0.5">{s.trim()}</span>
+                            <span key={s} className="font-mono text-[9px] border border-neu-black text-neu-black bg-transparent px-2 py-0.5">{s.trim()}</span>
                           ))}
                         </div>
                       )}
