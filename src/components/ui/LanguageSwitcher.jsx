@@ -13,7 +13,7 @@ export function LanguageSwitcher({ variant = 'light' }) {
   const isLight = variant === 'light';
 
   return (
-    <div className="flex items-center border-2 border-neu-black overflow-hidden">
+    <div className="flex items-center border-2 border-neu-black rounded-neu-sm overflow-hidden">
       {['id', 'en'].map(lang => (
         <button
           key={lang}
