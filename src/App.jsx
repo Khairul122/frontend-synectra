@@ -49,31 +49,31 @@ function PageLoader() {
   );
 }
 
-// Tangkap ?_token= dari Google OAuth redirect dan simpan ke localStorage
+// Tangkap #_token= dari Google OAuth redirect dan simpan ke localStorage.
+// Fragment (#), bukan query string (?) — fragment tidak pernah dikirim ke server
+// (tidak masuk access log / header Referer), hanya bisa dibaca oleh JS di browser.
 function OAuthTokenCapture() {
   const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const params = new URLSearchParams(location.search);
+    const params = new URLSearchParams(location.hash.replace(/^#/, ''));
     const token = params.get('_token');
     if (token) {
       tokenStorage.set(token);
-      // Hapus token dari URL agar tidak terekspos di history
-      params.delete('_token');
-      const newSearch = params.toString();
-      navigate(location.pathname + (newSearch ? `?${newSearch}` : ''), { replace: true });
+      // Hapus fragment dari URL agar tidak terekspos di history
+      navigate(location.pathname + location.search, { replace: true });
     }
-  }, [location.search]);
+  }, [location.hash]);
 
   return null;
 }
 
 // Cek token secara synchronous sebelum halaman protected dirender
-// Jika ada ?_token= di URL (OAuth callback), biarkan lewat — OAuthTokenCapture yang handle
+// Jika ada #_token= di URL (OAuth callback), biarkan lewat — OAuthTokenCapture yang handle
 function ProtectedRoute() {
   const location = useLocation();
-  const params = new URLSearchParams(location.search);
+  const params = new URLSearchParams(location.hash.replace(/^#/, ''));
   if (params.get('_token')) return <Outlet />;
 
   const token = tokenStorage.get();
