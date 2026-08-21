@@ -4,19 +4,19 @@
 
 ---
 
-## Arah Desain — Modular Card Layout (redesign Stitch "Modern Interactive 3D Landing Page")
+## Arah Desain — Full-Width Neubrutalism (redesign Stitch "Modern Interactive 3D Landing Page")
 
-Landing page (`src/pages/LandingPage.jsx` + `src/components/landing/*`) mengikuti Stitch mock **"Modular Card Layout"**: setiap section adalah satu **kartu mengambang** (`.module-card` di `src/index.css`) — border hitam 4px, radius besar, shadow offset keras 12px (bukan blur), berdiri di atas background dotted-grid krem (`.bg-brutalist-grid`). Warna latar tiap kartu berselang-seling (putih/kuning/hitam/krem) mengikuti urutan section, bukan seragam — itu yang menciptakan ritme visual dari mock.
+Landing page (`src/pages/LandingPage.jsx` + `src/components/landing/*`) memakai bahasa visual Stitch (border tebal, warna solid berselang-seling, shadow offset keras, pill mono-label header) tapi **section-nya full-bleed edge-to-edge** — bukan kartu mengambang. Tiap `<section>` selebar viewport penuh dengan `border-b-4 border-neu-black` sebagai pemisah, kontennya di-center lewat div `max-w-7xl mx-auto px-4 lg:px-6` di dalamnya. Ini sempat dicoba sebagai kartu terpisah bermargin (`.module-card`, sudah dihapus) tapi diputuskan kembali ke full-width.
 
 | Elemen | Halaman lain (dashboard/login/dll) | Landing page |
 |---|---|---|
-| Shadow | `shadow-neu-*` — offset pendek + blur ambient halus (2 layer) | `shadow-neu-module`/`-sm` — offset keras 12px/6px, 0 blur, ala sticker |
+| Shadow (elemen di dalam section — card, badge, tombol) | `shadow-neu-*` — offset pendek + blur ambient halus (2 layer) | `shadow-neu-solid-*`/`shadow-neu-module-sm` — offset keras, 0 blur, ala sticker |
 | Border | `border-2` | `border-4` |
-| Radius section | `rounded-neu` (6px) | `rounded-neu-xl` (16px) via `.module-card` |
-| Background halaman | flat `neu-bg` | `.bg-brutalist-grid` — garis grid 60px |
-| Jarak antar section | `py-16`/`py-20` di dalam satu `<section>` full-bleed | `margin-bottom: 4rem` bawaan `.module-card` (kartu berdiri sendiri-sendiri) |
+| Radius elemen dalam | `rounded-neu` (6px) | `rounded-neu-lg`/`rounded-neu-xl` (10–16px) |
+| Section itu sendiri | card dengan radius | **full-bleed, tanpa radius**, dipisahkan `border-b-4` |
+| Jarak antar section | `py-16`/`py-20` per section | sama — `py-16 lg:py-20` (konten biasa) / `py-20 lg:py-24` (showcase), TIDAK ada gap/margin antar section |
 
-**Yang sengaja TIDAK dipakai:** gradient sebagai elemen dekoratif, glassmorphism, `rounded-full`/`rounded-2xl`/`rounded-3xl` default Tailwind pada elemen brand, shadow blur ala "modern SaaS" generik. Halaman-halaman non-landing (dashboard, login, dll) TIDAK ikut berubah — tetap pakai token `shadow-neu-*`/`border-2`/`rounded-neu` yang lama, hanya `src/pages/LandingPage.jsx` & `src/components/landing/*` yang pakai sistem module-card ini.
+**Yang sengaja TIDAK dipakai:** gradient sebagai elemen dekoratif, glassmorphism, `rounded-full`/`rounded-2xl`/`rounded-3xl` default Tailwind pada elemen brand, shadow blur ala "modern SaaS" generik, dan — khusus landing page — **jangan bungkus `<section>` dengan radius/shadow/margin sendiri**; itu balik ke pola "kartu" yang sudah sengaja dilepas. Halaman non-landing (dashboard, login, dll) tidak terpengaruh sama sekali oleh perubahan ini.
 
 ---
 
@@ -53,7 +53,7 @@ Font di-self-host via `@fontsource/*` (bukan Google Fonts CDN). Heading pakai `f
 --radius-neu-sm: 4px   /* tombol, badge/chip, input, nav pills */
 --radius-neu:    6px   /* card standar, gambar, modal content */
 --radius-neu-lg: 10px  /* thumbnail besar, card outer (package/software/portfolio) */
---radius-neu-xl: 16px  /* window/panel besar (MockIDE), modal dialog */
+--radius-neu-xl: 16px  /* window/panel besar, modal dialog */
 ```
 Class: `rounded-neu-sm`, `rounded-neu`, `rounded-neu-lg`, `rounded-neu-xl`. **Jangan** pakai `rounded-full`/`rounded-2xl`/`rounded-3xl` Tailwind default di elemen brand — kecuali elemen yang memang harus lingkaran (avatar, dot indicator).
 
@@ -76,30 +76,33 @@ Class: `shadow-neu-sm` → `shadow-neu-xl`. Dipakai di halaman non-landing. Untu
 --shadow-neu-solid:     4px 4px 0px #0D0D0D
 --shadow-neu-solid-lg:  6px 6px 0px #0D0D0D
 --shadow-neu-solid-xl:  8px 8px 0px #0D0D0D
---shadow-neu-module-sm: 6px 6px 0px #0D0D0D   /* badge, pill header, tombol besar */
---shadow-neu-module:    12px 12px 0px #0D0D0D /* shadow luar .module-card */
+--shadow-neu-module-sm: 6px 6px 0px #0D0D0D   /* badge, pill header (SectionTag), tombol besar */
 ```
-Class: `shadow-neu-solid-sm` → `shadow-neu-solid-xl`, `shadow-neu-module-sm`, `shadow-neu-module`.
+Class: `shadow-neu-solid-sm` → `shadow-neu-solid-xl`, `shadow-neu-module-sm`.
 
-### Module Card — kartu section landing page
+### Struktur tiap `<section>` landing page
 
-Class utilitas `.module-card` (`src/index.css`) = `border: 4px solid #0D0D0D` + `border-radius: var(--radius-neu-xl)` + `box-shadow: var(--shadow-neu-module)` + `margin-bottom: 4rem` + `overflow: hidden`. Setiap `<section>` di `src/components/landing/*` memakainya begini:
+Full-bleed, dipisah garis, konten di-center manual — bukan card wrapper:
 ```jsx
-<section id="..." className="module-card max-w-7xl mx-auto w-full bg-neu-{warna} p-6 sm:p-8 lg:p-12">
+<section id="..." className="border-b-4 border-neu-black bg-neu-{warna} py-16 lg:py-20">
+  <div className="max-w-7xl mx-auto px-4 lg:px-6">
+    ...konten...
+  </div>
+</section>
 ```
-`bg-neu-{warna}` berselang-seling per section mengikuti urutan mock Stitch — lihat tabel section di bawah. Header tiap kartu yang berbentuk pill mono ("SERVICES // WHAT_WE_DO") pakai komponen bersama `<SectionTag>` (`helpers.jsx`), bukan ditulis ulang per section.
+`bg-neu-{warna}` berselang-seling per section — lihat urutan di bawah. Header pill mono ("SERVICES // WHAT_WE_DO") pakai komponen bersama `<SectionTag>` (`helpers.jsx`), bukan ditulis ulang per section. Slider horizontal (Packages/Software/Feedback) tetap pakai pola bleed-ke-tepi mobile: `-mx-4 px-4 lg:mx-0 lg:px-0` di dalam div konten.
 
-Background halaman (`LandingPage.jsx` root div) pakai `.bg-brutalist-grid` (garis grid 60px, warna `neu-bg`) — bukan `.bg-paper-grid` (grid halus 8px, dipakai halaman lain / komponen non-section seperti modal).
+Background halaman (`LandingPage.jsx` root div) pakai `.bg-brutalist-grid` (garis grid 60px, warna `neu-bg`) — praktis tidak terlihat karena section-section full-bleed menutupinya, tapi tetap jadi fallback yang aman.
 
 ### Spacing / ritme section
 
-- Jarak *antar* module-card: otomatis dari `margin-bottom: 4rem` di `.module-card` — jangan tambah `mb-*` manual di `<section>`.
-- Padding *di dalam* kartu: `p-6 sm:p-8 lg:p-12` (seragam di semua section landing, termasuk Marquee/Stats yang dulunya kompak).
-- Section terakhir sebelum `FloatingCTA` (`Footer`) otomatis `margin-bottom: 0` lewat selector `.module-card:last-of-type`.
+- Section konten biasa (Navbar, Hero, TechMarquee, Stats, Services, About, Packages, Banners, Software, FeedbackSection): `py-16 lg:py-20`
+- Section "showcase" (Portfolio, WhyChooseUs, HowItWorks, Contact, CTAFinal): `py-20 lg:py-24`
+- Tidak ada gap/margin antar section — pemisah hanya `border-b-4 border-neu-black`, section terakhir (`Footer`) tanpa border bawah.
 
 ### Urutan & warna latar section (mengikuti mock Stitch)
 
-`Navbar`(putih, floating sticky) → `Hero`(putih) → `TechMarquee`(kuning) → `Stats`(hitam) → `Services`(krem) → `About`(putih) → `Packages`(kuning) → `Banners`(putih) → `Software`(krem) → `Portfolio`(putih) → `WhyChooseUs`(hitam) → `HowItWorks`(krem) → `Contact`(putih) → `FeedbackSection`(hitam) → `CTAFinal`(kuning) → `Footer`(hitam). Saat menambah section baru, pilih warna yang berselang-seling dengan tetangganya — jangan dua section solid-color yang sama bersisian.
+`Navbar`(putih) → `Hero`(putih) → `TechMarquee`(kuning) → `Stats`(hitam) → `Services`(krem) → `About`(putih) → `Packages`(kuning) → `Banners`(putih) → `Software`(krem) → `Portfolio`(putih) → `WhyChooseUs`(hitam) → `HowItWorks`(krem) → `Contact`(putih) → `FeedbackSection`(hitam) → `CTAFinal`(kuning) → `Footer`(hitam). Saat menambah section baru, pilih warna yang berselang-seling dengan tetangganya — jangan dua section solid-color yang sama bersisian.
 
 ---
 
