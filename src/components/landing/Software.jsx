@@ -12,7 +12,8 @@ export function Software({ softwareProducts, isLoading, error, swSliderRef, swDr
   if (!isLoading && !error && softwareProducts.length === 0) return null;
 
   return (
-    <section id="software" className="module-card max-w-7xl mx-auto w-full bg-neu-bg p-6 sm:p-8 lg:p-12">
+    <section id="software" className="border-b-4 border-neu-black bg-neu-bg py-16 lg:py-20">
+      <div className="max-w-7xl mx-auto px-4 lg:px-6">
 
       {/* Header */}
       <div className="flex items-end justify-between mb-10 flex-wrap gap-4">
@@ -54,7 +55,7 @@ export function Software({ softwareProducts, isLoading, error, swSliderRef, swDr
       ) : (
       <div
         ref={swSliderRef}
-        className="flex gap-5 overflow-x-auto pt-5 pb-3 select-none"
+        className="flex gap-5 overflow-x-auto pt-5 pb-3 -mx-4 px-4 lg:mx-0 lg:px-0 select-none"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', cursor: 'grab' }}
         onMouseDown={e => {
           const el = swSliderRef.current;
@@ -148,6 +149,7 @@ export function Software({ softwareProducts, isLoading, error, swSliderRef, swDr
       <div className="absolute right-0 top-0 bottom-3 w-16 bg-gradient-to-l from-neu-bg to-transparent pointer-events-none" />
       </div>
       )}
+      </div>
     </section>
   );
 }

@@ -12,11 +12,12 @@ export function Banners({ banners, setBannerModal, setBannerModalExp }) {
   if (banners.length === 0) return null;
 
   return (
-    <section className="module-card max-w-7xl mx-auto w-full bg-neu-white p-6 sm:p-8 lg:p-12">
+    <section className="border-b-4 border-neu-black bg-neu-white py-16 lg:py-20">
+      <div className="max-w-7xl mx-auto px-4 lg:px-6">
       <motion.div {...fadeUp()} className="flex justify-center mb-8">
         <SectionTag rotate="rotate-1">{t('landing.banner.title')} // RECENT_UPDATES</SectionTag>
       </motion.div>
-      <div className="flex gap-5 overflow-x-auto pb-2 snap-x">
+      <div className="flex gap-5 overflow-x-auto pb-2 snap-x -mx-4 px-4 lg:mx-0 lg:px-0">
         {banners.map((b, bi) => (
           <motion.div key={b.id} {...cardAnim(Math.min(bi * STAGGER, 0.42))}
             onClick={() => { setBannerModal(b); setBannerModalExp(false); }}
@@ -35,6 +36,7 @@ export function Banners({ banners, setBannerModal, setBannerModalExp }) {
             </div>
           </motion.div>
         ))}
+      </div>
       </div>
     </section>
   );

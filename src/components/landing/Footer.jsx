@@ -9,10 +9,10 @@ export function Footer({ socialMedia, services, transitionTo }) {
   const lang = useLang();
 
   return (
-    <motion.footer className="module-card max-w-7xl mx-auto w-full bg-neu-black relative overflow-hidden mb-0" {...fadeUp()}>
+    <motion.footer className="bg-neu-black relative overflow-hidden" {...fadeUp()}>
       {/* Top strip */}
       <div className="border-b-4 border-neu-white/10">
-        <div className="px-6 lg:px-12 py-12 grid grid-cols-1 lg:grid-cols-4 gap-10">
+        <div className="max-w-7xl mx-auto px-4 lg:px-6 py-12 grid grid-cols-1 lg:grid-cols-4 gap-10">
 
           {/* Brand col — 2/4 */}
           <div className="lg:col-span-2">
@@ -85,7 +85,7 @@ export function Footer({ socialMedia, services, transitionTo }) {
       </div>
 
       {/* Bottom bar */}
-      <div className="px-6 lg:px-12 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div className="max-w-7xl mx-auto px-4 lg:px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
         <p className="font-mono text-[11px] text-neu-white/25">
           © {new Date().getFullYear()} Synectra. {t('landing.footer.rights')}
         </p>

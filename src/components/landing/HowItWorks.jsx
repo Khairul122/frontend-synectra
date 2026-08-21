@@ -10,7 +10,8 @@ export function HowItWorks() {
   const steps = t('landing.howItWorks.steps', { returnObjects: true });
 
   return (
-    <section id="cara-kerja" className="module-card max-w-7xl mx-auto w-full bg-neu-bg p-6 sm:p-8 lg:p-12">
+    <section id="cara-kerja" className="border-b-4 border-neu-black bg-neu-bg py-20 lg:py-24">
+      <div className="max-w-7xl mx-auto px-4 lg:px-6">
       <motion.div className="flex justify-center mb-14" {...fadeUp()}>
         <SectionTag rotate="-rotate-1">{t('landing.howItWorks.tag')} // {t('landing.howItWorks.title')}</SectionTag>
       </motion.div>
@@ -29,6 +30,7 @@ export function HowItWorks() {
             <p className="font-body text-sm text-neu-black/60 leading-relaxed font-medium">{step.desc}</p>
           </motion.div>
         ))}
+      </div>
       </div>
     </section>
   );

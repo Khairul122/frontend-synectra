@@ -18,10 +18,10 @@ export function WhyChooseUs() {
   const items = t('landing.why.items', { returnObjects: true });
 
   return (
-    <section className="module-card max-w-7xl mx-auto w-full bg-neu-black">
+    <section className="border-b-4 border-neu-black bg-neu-black overflow-hidden">
       {/* Static value-prop strip */}
-      <div className="bg-neu-primary border-b-4 border-neu-black py-3 px-6 lg:px-12">
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+      <div className="bg-neu-primary border-b-4 border-neu-black py-3 px-4 lg:px-6">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center gap-x-6 gap-y-2">
           {items.map((w, i) => (
             <span key={w.title} className="inline-flex items-center gap-6 font-mono font-black text-[11px] uppercase tracking-widest text-neu-black">
               {i > 0 && <span className="text-neu-black/30">/</span>}
@@ -31,7 +31,7 @@ export function WhyChooseUs() {
         </div>
       </div>
 
-      <div className="p-6 sm:p-8 lg:p-12">
+      <div className="max-w-7xl mx-auto px-4 lg:px-6 py-20 lg:py-24">
         <motion.div className="flex justify-center mb-12" {...fadeUp()}>
           <SectionTag tone="primary" rotate="rotate-1">{t('landing.why.title')}</SectionTag>
         </motion.div>

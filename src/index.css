@@ -37,9 +37,8 @@
   --shadow-neu-solid-lg: 6px 6px 0px #0D0D0D;
   --shadow-neu-solid-xl: 8px 8px 0px #0D0D0D;
 
-  /* ── "Modular Card Layout" (Stitch redesign) — tiap section adalah kartu mengambang ── */
+  /* ── Shadow keras untuk pill/badge landing page (SectionTag, Hero badge) ── */
   --shadow-neu-module-sm: 6px 6px 0px #0D0D0D;
-  --shadow-neu-module:    12px 12px 0px #0D0D0D;
 }
 
 :root {
@@ -81,17 +80,6 @@ body {
     linear-gradient(90deg, rgba(13,13,13,0.08) 2px, transparent 2px);
   background-size: 60px 60px;
 }
-
-/* ── Module card — tiap section landing page = kartu mengambang, border tebal + shadow keras ── */
-.module-card {
-  border: 4px solid #0D0D0D;
-  border-radius: var(--radius-neu-xl);
-  box-shadow: var(--shadow-neu-module);
-  margin-bottom: 4rem;
-  overflow: hidden;
-  position: relative;
-}
-.module-card:last-of-type { margin-bottom: 0; }
 
 @keyframes floatBadge {
   0%   { transform: translateY(0px) rotate(var(--float-rot, -6deg)); }

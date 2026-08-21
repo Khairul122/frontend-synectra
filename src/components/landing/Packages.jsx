@@ -10,7 +10,8 @@ export function Packages({ packages, isLoading, error, pkgSliderRef, pkgDrag, sc
   if (!isLoading && !error && packages.length === 0) return null;
 
   return (
-    <section id="paket" className="module-card max-w-7xl mx-auto w-full bg-neu-primary p-6 sm:p-8 lg:p-12">
+    <section id="paket" className="border-b-4 border-neu-black bg-neu-primary py-16 lg:py-20">
+      <div className="max-w-7xl mx-auto px-4 lg:px-6">
 
       {/* Section header */}
       <div className="flex items-end justify-between mb-8 flex-wrap gap-4">
@@ -49,7 +50,7 @@ export function Packages({ packages, isLoading, error, pkgSliderRef, pkgDrag, sc
         ) : (
         <div
           ref={pkgSliderRef}
-          className="flex gap-5 overflow-x-auto pt-5 pb-3 snap-x snap-mandatory select-none"
+          className="flex gap-5 overflow-x-auto pt-5 pb-3 snap-x snap-mandatory -mx-4 px-4 lg:mx-0 lg:px-0 select-none"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', cursor: 'grab' }}
           onMouseDown={e => {
             const el = pkgSliderRef.current;
@@ -96,6 +97,7 @@ export function Packages({ packages, isLoading, error, pkgSliderRef, pkgDrag, sc
         <div className="absolute right-0 top-0 bottom-3 w-16 bg-gradient-to-l from-neu-primary to-transparent pointer-events-none" />
       </div>
       )}
+      </div>
     </section>
   );
 }

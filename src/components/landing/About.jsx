@@ -21,8 +21,8 @@ export function About({ stats, isLoading }) {
   const features = t('landing.about.features', { returnObjects: true });
 
   return (
-    <section className="module-card max-w-7xl mx-auto w-full bg-neu-white p-6 sm:p-8 lg:p-12">
-      <div className="flex flex-col lg:flex-row gap-10 lg:gap-12 items-center">
+    <section className="border-b-4 border-neu-black bg-neu-white py-16 lg:py-20">
+      <div className="max-w-7xl mx-auto px-4 lg:px-6 flex flex-col lg:flex-row gap-10 lg:gap-12 items-center">
 
         {/* Left — text + features */}
         <motion.div {...fadeUp()} className="flex-1">

@@ -11,8 +11,8 @@ export function Contact({ contacts, socialMedia, showToast }) {
   if (contacts.length === 0 && socialMedia.length === 0) return null;
 
   return (
-    <section id="kontak" className="module-card max-w-7xl mx-auto w-full bg-neu-white p-6 sm:p-8 lg:p-12">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+    <section id="kontak" className="border-b-4 border-neu-black bg-neu-white py-20 lg:py-24">
+      <div className="max-w-7xl mx-auto px-4 lg:px-6 grid grid-cols-1 lg:grid-cols-2 gap-12">
         <motion.div {...fadeUp()}>
           <div className="mb-6"><SectionTag rotate="rotate-1">{t('landing.contact.tag')}</SectionTag></div>
           <h2 className="font-display font-black text-3xl lg:text-4xl text-neu-black mb-4 leading-tight uppercase tracking-tighter">

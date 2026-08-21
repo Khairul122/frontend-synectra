@@ -53,7 +53,8 @@ export function Services({ services, isLoading, error }) {
   const lang = useLang();
 
   return (
-    <section id="layanan" className="module-card max-w-7xl mx-auto w-full bg-neu-bg p-6 sm:p-8 lg:p-12">
+    <section id="layanan" className="border-b-4 border-neu-black bg-neu-bg py-16 lg:py-20">
+      <div className="max-w-7xl mx-auto px-4 lg:px-6">
       <div className="flex justify-center mb-12">
         <motion.div {...fadeUp()}><SectionTag>{t('landing.services.tag')} // WHAT_WE_DO</SectionTag></motion.div>
       </div>
@@ -95,6 +96,7 @@ export function Services({ services, isLoading, error }) {
       {!isLoading && !error && services.length === 0 && (
         <p className="font-body text-sm text-neu-black/40 text-center py-10">Belum ada layanan yang ditambahkan.</p>
       )}
+      </div>
     </section>
   );
 }

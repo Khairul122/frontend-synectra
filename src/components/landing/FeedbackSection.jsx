@@ -66,7 +66,8 @@ export function FeedbackSection({ feedbacks, onSubmitted }) {
   };
 
   return (
-    <section id="ulasan" className="module-card max-w-7xl mx-auto w-full bg-neu-black p-6 sm:p-8 lg:p-12">
+    <section id="ulasan" className="border-b-4 border-neu-black bg-neu-black py-16 lg:py-20">
+      <div className="max-w-7xl mx-auto px-4 lg:px-6">
 
       {/* Header */}
       <motion.div {...fadeLeft()} className="flex justify-center mb-10">
@@ -86,7 +87,7 @@ export function FeedbackSection({ feedbacks, onSubmitted }) {
         <div className="relative mb-10">
         <div
           ref={sliderRef}
-          className="flex gap-5 overflow-x-auto pb-3 select-none"
+          className="flex gap-5 overflow-x-auto pb-3 -mx-4 px-4 lg:mx-0 lg:px-0 select-none"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', cursor: 'grab' }}
           onMouseDown={e => { const el = sliderRef.current; drag.current = { active: true, startX: e.pageX, scrollLeft: el.scrollLeft }; el.style.cursor = 'grabbing'; }}
           onMouseMove={e => { if (!drag.current.active) return; sliderRef.current.scrollLeft = drag.current.scrollLeft - (e.pageX - drag.current.startX); }}
@@ -192,6 +193,7 @@ export function FeedbackSection({ feedbacks, onSubmitted }) {
           </button>
         </form>
       )}
+      </div>
     </section>
   );
 }

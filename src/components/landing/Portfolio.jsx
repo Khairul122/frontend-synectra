@@ -11,7 +11,8 @@ export function Portfolio({ portfolios, isLoading, error, portfolioRef, setActiv
   const { t } = useTranslation();
 
   return (
-    <section id="portofolio" ref={portfolioRef} className="module-card max-w-7xl mx-auto w-full bg-neu-white p-6 sm:p-8 lg:p-12">
+    <section id="portofolio" ref={portfolioRef} className="border-b-4 border-neu-black bg-neu-white py-20 lg:py-24">
+      <div className="max-w-7xl mx-auto px-4 lg:px-6">
       <div className="flex items-end justify-between mb-10 flex-wrap gap-4">
         <motion.div {...fadeUp()}>
           <SectionTag rotate="-rotate-2">{t('landing.portfolio.tag')} // SELECTED_WORKS</SectionTag>
@@ -57,6 +58,7 @@ export function Portfolio({ portfolios, isLoading, error, portfolioRef, setActiv
           })}
         </div>
       )}
+      </div>
     </section>
   );
 }

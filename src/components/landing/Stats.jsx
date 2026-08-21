@@ -11,8 +11,8 @@ export function Stats({ stats, isLoading, error }) {
   const { t } = useTranslation();
 
   return (
-    <section id="statistik" className="module-card max-w-7xl mx-auto w-full bg-neu-black py-10 lg:py-12 px-6 lg:px-10">
-      <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
+    <section id="statistik" className="border-b-4 border-neu-black bg-neu-black py-10 lg:py-12">
+      <div className="max-w-7xl mx-auto px-4 lg:px-6 flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
         <div className="lg:w-1/4 flex-shrink-0">
           <div className="inline-block bg-neu-primary text-neu-black border-4 border-neu-black px-5 py-2.5 shadow-neu-solid-lg -rotate-2 rounded-neu-sm">
             <span className="font-mono font-black tracking-tighter text-sm lg:text-base uppercase">SYNECTRA_METRICS</span>

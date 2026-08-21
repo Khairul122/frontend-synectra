@@ -376,7 +376,7 @@ export default function LandingPage() {
 
       <Navbar activeSection={activeSection} menuOpen={menuOpen} setMenuOpen={setMenuOpen} transitionTo={transitionTo} scaleX={scaleX} />
 
-      <main className="px-4 lg:px-6 pb-4 lg:pb-6">
+      <main>
         <Hero transitionTo={transitionTo} scrollTo={scrollTo} portfolioRef={portfolioRef} />
 
         <TechMarquee />
