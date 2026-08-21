@@ -1,40 +1,34 @@
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { fadeUp, STAGGER } from './animations';
+import { SectionTag } from './helpers';
+
+const STEP_BG = ['bg-neu-primary', 'bg-neu-green', 'bg-neu-purple text-neu-white', 'bg-neu-accent'];
 
 export function HowItWorks() {
   const { t } = useTranslation();
   const steps = t('landing.howItWorks.steps', { returnObjects: true });
 
   return (
-    <section id="cara-kerja" className="border-b-2 border-neu-black bg-neu-black py-20 lg:py-24">
-      <div className="max-w-7xl mx-auto px-4 lg:px-6">
-        <motion.div className="mb-14" {...fadeUp()}>
-          <span className="font-mono text-[10px] text-neu-white/40 uppercase tracking-widest block mb-2">{t('landing.howItWorks.tag')}</span>
-          <div className="h-px w-8 bg-neu-gold mb-4" />
-          <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-white leading-tight">{t('landing.howItWorks.title')}</h2>
-        </motion.div>
+    <section id="cara-kerja" className="module-card max-w-7xl mx-auto w-full bg-neu-bg p-6 sm:p-8 lg:p-12">
+      <motion.div className="flex justify-center mb-14" {...fadeUp()}>
+        <SectionTag rotate="-rotate-1">{t('landing.howItWorks.tag')} // {t('landing.howItWorks.title')}</SectionTag>
+      </motion.div>
 
-        {/* Steps */}
-        <div className="relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-          {/* Connector line (desktop only) */}
-          <div className="hidden lg:block absolute top-[1.4rem] left-[12.5%] right-[12.5%] h-px border-t-2 border-dashed border-neu-white/15 z-0" />
-
-          {steps.map((step, si) => (
-            <motion.div
-              key={step.no}
-              {...fadeUp(Math.min(si * STAGGER, 0.42))}
-              className="relative z-10 border-b-2 border-r-0 sm:border-r-2 border-neu-white/10 last:border-r-0 lg:border-b-0 px-6 pb-10 lg:pb-0 pt-4 lg:pt-0 first:pl-0 lg:first:pl-0"
-            >
-              {/* Step numeral — sharp, on-brand */}
-              <div className="inline-flex items-center justify-center w-11 h-11 bg-neu-gold border-2 border-neu-gold rounded-neu-sm mb-5 relative">
-                <span className="font-mono font-bold text-base text-neu-black">{step.no}</span>
-              </div>
-              <h3 className="font-display font-bold text-lg text-neu-white mb-2">{step.title}</h3>
-              <p className="font-body text-xs text-neu-white/50 leading-relaxed">{step.desc}</p>
-            </motion.div>
-          ))}
-        </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {steps.map((step, si) => (
+          <motion.div
+            key={step.no}
+            {...fadeUp(Math.min(si * STAGGER, 0.42))}
+            className="relative bg-neu-white border-4 border-neu-black rounded-neu-lg p-7 pt-9 text-center shadow-neu-solid-lg mt-5"
+          >
+            <div className={`absolute -top-6 left-1/2 -translate-x-1/2 w-12 h-12 border-4 border-neu-black rounded-neu-lg flex items-center justify-center font-display font-black text-lg shadow-neu-solid-sm ${STEP_BG[si % STEP_BG.length]}`}>
+              {step.no}
+            </div>
+            <h3 className="font-display font-black text-lg text-neu-black mb-2 uppercase">{step.title}</h3>
+            <p className="font-body text-sm text-neu-black/60 leading-relaxed font-medium">{step.desc}</p>
+          </motion.div>
+        ))}
       </div>
     </section>
   );

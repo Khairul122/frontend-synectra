@@ -5,37 +5,40 @@ import { scaleUp, STAGGER } from './animations';
 import { AnimatedCounter } from './helpers';
 import { ErrorState } from './ErrorState';
 
+const ACCENTS = ['bg-neu-primary text-neu-black', 'bg-neu-green text-neu-black', 'bg-neu-purple text-neu-white', 'bg-neu-accent text-neu-black'];
+
 export function Stats({ stats, isLoading, error }) {
   const { t } = useTranslation();
 
   return (
-    <section id="statistik" className="border-b-2 border-neu-black bg-neu-black py-16 lg:py-20">
-      <div className="max-w-7xl mx-auto px-4 lg:px-6">
+    <section id="statistik" className="module-card max-w-7xl mx-auto w-full bg-neu-black py-10 lg:py-12 px-6 lg:px-10">
+      <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
+        <div className="lg:w-1/4 flex-shrink-0">
+          <div className="inline-block bg-neu-primary text-neu-black border-4 border-neu-black px-5 py-2.5 shadow-neu-solid-lg -rotate-2 rounded-neu-sm">
+            <span className="font-mono font-black tracking-tighter text-sm lg:text-base uppercase">SYNECTRA_METRICS</span>
+          </div>
+        </div>
+
         {error ? (
-          <ErrorState message="Gagal memuat statistik." dark />
+          <div className="flex-1 w-full"><ErrorState message="Gagal memuat statistik." dark /></div>
         ) : (
-          <div className="grid grid-cols-2 lg:grid-cols-4 divide-neu-white/10 divide-x-0 lg:divide-x-2">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6 w-full lg:w-3/4">
             {isLoading
               ? Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className={cn('px-6 lg:px-10 py-8', i > 0 && 'border-t-2 lg:border-t-0 border-neu-white/10')}>
-                    <div className="h-14 w-24 bg-neu-white/10 animate-pulse rounded-neu" />
-                    <div className="h-2.5 w-16 bg-neu-white/10 animate-pulse rounded-full mt-4" />
-                  </div>
+                  <div key={i} className="bg-neu-white/5 border-4 border-neu-white/15 rounded-neu-lg p-6 h-28 animate-pulse" />
                 ))
               : stats.map((s, i) => (
                   <motion.div
                     key={s.labelKey}
                     {...scaleUp(Math.min(i * STAGGER, 0.42))}
-                    className={cn('px-6 lg:px-10 py-8 flex flex-col justify-center', i > 0 && 'border-t-2 lg:border-t-0 border-neu-white/10')}
+                    className="relative bg-neu-white border-4 border-neu-black rounded-neu-lg p-5 pt-6 shadow-neu-solid-lg hover:-translate-y-1.5 transition-transform"
                   >
-                    <p className={cn(
-                      'font-display font-black leading-none tracking-tighter',
-                      'text-[3.5rem] sm:text-[4.5rem] lg:text-[4.75rem]',
-                      i === 3 ? 'text-neu-gold' : 'text-neu-white',
-                    )}>
+                    <span className={cn('absolute -top-3.5 left-4 border-4 border-neu-black px-3 py-0.5 font-mono font-black text-[10px] uppercase tracking-wide rounded-neu-sm', ACCENTS[i % ACCENTS.length])}>
+                      {t(s.labelKey)}
+                    </span>
+                    <p className="font-display font-black text-3xl lg:text-4xl text-neu-black tracking-tighter mt-1">
                       <AnimatedCounter key={s.value} target={s.value} suffix={s.suffix} />
                     </p>
-                    <p className="font-mono text-[10px] text-neu-white/40 uppercase tracking-[0.2em] mt-3">{t(s.labelKey)}</p>
                   </motion.div>
                 ))}
           </div>

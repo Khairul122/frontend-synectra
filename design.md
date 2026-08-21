@@ -4,19 +4,19 @@
 
 ---
 
-## Arah Desain — Softened Neubrutalism
+## Arah Desain — Modular Card Layout (redesign Stitch "Modern Interactive 3D Landing Page")
 
-Identitas brand neubrutalist dipertahankan (border hitam tebal, warna kuning bold, motif shadow offset, sistem 3 font) tapi eksekusinya dilembutkan:
+Landing page (`src/pages/LandingPage.jsx` + `src/components/landing/*`) mengikuti Stitch mock **"Modular Card Layout"**: setiap section adalah satu **kartu mengambang** (`.module-card` di `src/index.css`) — border hitam 4px, radius besar, shadow offset keras 12px (bukan blur), berdiri di atas background dotted-grid krem (`.bg-brutalist-grid`). Warna latar tiap kartu berselang-seling (putih/kuning/hitam/krem) mengikuti urutan section, bukan seragam — itu yang menciptakan ritme visual dari mock.
 
-| Elemen | Sebelum | Sekarang |
+| Elemen | Halaman lain (dashboard/login/dll) | Landing page |
 |---|---|---|
-| Shadow | Offset keras, 0 blur | Offset pendek + blur ambient halus (2 layer) |
-| Sudut | Selalu tajam (`rounded-none`) | Radius kecil-sedang (4–16px) |
-| Border | `border-2`/`border-4` hitam | Tidak berubah — tetap ciri khas |
-| Warna | Flat, tanpa gradient | Tidak berubah — tanpa gradient/glassmorphism |
-| Tipografi | Sangat besar, tight | Skala di-trim di titik paling ekstrem (hero, CTA, angka statistik) |
+| Shadow | `shadow-neu-*` — offset pendek + blur ambient halus (2 layer) | `shadow-neu-module`/`-sm` — offset keras 12px/6px, 0 blur, ala sticker |
+| Border | `border-2` | `border-4` |
+| Radius section | `rounded-neu` (6px) | `rounded-neu-xl` (16px) via `.module-card` |
+| Background halaman | flat `neu-bg` | `.bg-brutalist-grid` — garis grid 60px |
+| Jarak antar section | `py-16`/`py-20` di dalam satu `<section>` full-bleed | `margin-bottom: 4rem` bawaan `.module-card` (kartu berdiri sendiri-sendiri) |
 
-**Yang sengaja TIDAK dipakai:** gradient sebagai elemen dekoratif, glassmorphism, `rounded-full`/`rounded-2xl`/`rounded-3xl` default Tailwind pada elemen brand, shadow blur besar ala "modern SaaS" generik. Brutalist "spine" (border tegas + offset shadow + color blocking) harus tetap terbaca.
+**Yang sengaja TIDAK dipakai:** gradient sebagai elemen dekoratif, glassmorphism, `rounded-full`/`rounded-2xl`/`rounded-3xl` default Tailwind pada elemen brand, shadow blur ala "modern SaaS" generik. Halaman-halaman non-landing (dashboard, login, dll) TIDAK ikut berubah — tetap pakai token `shadow-neu-*`/`border-2`/`rounded-neu` yang lama, hanya `src/pages/LandingPage.jsx` & `src/components/landing/*` yang pakai sistem module-card ini.
 
 ---
 
@@ -68,13 +68,38 @@ Dua lapis: offset hitam pendek (kesan "sticker" brutalist) + blur ambient halus 
 --shadow-neu-lg: 4px 4px 0px rgba(13,13,13,.92), 9px 13px 26px -5px rgba(13,13,13,.22)
 --shadow-neu-xl: 6px 6px 0px rgba(13,13,13,.92), 12px 17px 34px -6px rgba(13,13,13,.24)
 ```
-Class: `shadow-neu-sm` → `shadow-neu-xl`. Untuk shadow berwarna non-hitam (mis. tombol kuning), pola manual: offset pendek + blur senada warna, contoh `shadow-[2px_2px_0px_#FFD000,5px_7px_14px_-3px_rgba(255,208,0,.25)]` — lihat CTA button di `Hero.jsx` sebagai referensi. Jangan pakai `shadow-lg`/`shadow-md` Tailwind default (blur murni tanpa offset — hilangkan karakter brutalist-nya).
+Class: `shadow-neu-sm` → `shadow-neu-xl`. Dipakai di halaman non-landing. Untuk shadow berwarna non-hitam (mis. tombol kuning), pola manual: offset pendek + blur senada warna, contoh `shadow-[2px_2px_0px_#FFD000,5px_7px_14px_-3px_rgba(255,208,0,.25)]`. Jangan pakai `shadow-lg`/`shadow-md` Tailwind default (blur murni tanpa offset — hilangkan karakter brutalist-nya).
+
+**Shadow landing page** (offset keras, tanpa blur, ala sticker) — token terpisah, hanya dipakai `src/components/landing/*`:
+```css
+--shadow-neu-solid-sm:  2px 2px 0px #0D0D0D
+--shadow-neu-solid:     4px 4px 0px #0D0D0D
+--shadow-neu-solid-lg:  6px 6px 0px #0D0D0D
+--shadow-neu-solid-xl:  8px 8px 0px #0D0D0D
+--shadow-neu-module-sm: 6px 6px 0px #0D0D0D   /* badge, pill header, tombol besar */
+--shadow-neu-module:    12px 12px 0px #0D0D0D /* shadow luar .module-card */
+```
+Class: `shadow-neu-solid-sm` → `shadow-neu-solid-xl`, `shadow-neu-module-sm`, `shadow-neu-module`.
+
+### Module Card — kartu section landing page
+
+Class utilitas `.module-card` (`src/index.css`) = `border: 4px solid #0D0D0D` + `border-radius: var(--radius-neu-xl)` + `box-shadow: var(--shadow-neu-module)` + `margin-bottom: 4rem` + `overflow: hidden`. Setiap `<section>` di `src/components/landing/*` memakainya begini:
+```jsx
+<section id="..." className="module-card max-w-7xl mx-auto w-full bg-neu-{warna} p-6 sm:p-8 lg:p-12">
+```
+`bg-neu-{warna}` berselang-seling per section mengikuti urutan mock Stitch — lihat tabel section di bawah. Header tiap kartu yang berbentuk pill mono ("SERVICES // WHAT_WE_DO") pakai komponen bersama `<SectionTag>` (`helpers.jsx`), bukan ditulis ulang per section.
+
+Background halaman (`LandingPage.jsx` root div) pakai `.bg-brutalist-grid` (garis grid 60px, warna `neu-bg`) — bukan `.bg-paper-grid` (grid halus 8px, dipakai halaman lain / komponen non-section seperti modal).
 
 ### Spacing / ritme section
 
-- Section konten biasa (Services, Packages, Software): `py-16 lg:py-20`
-- Section "showcase" (About, Portfolio, Why-Choose-Us, How-It-Works, Contact): `py-20 lg:py-24`
-- Marquee, Banners: kompak, `py-3`/`py-10` — tidak ikut ritme di atas (memang dirancang sebagai strip pendek)
+- Jarak *antar* module-card: otomatis dari `margin-bottom: 4rem` di `.module-card` — jangan tambah `mb-*` manual di `<section>`.
+- Padding *di dalam* kartu: `p-6 sm:p-8 lg:p-12` (seragam di semua section landing, termasuk Marquee/Stats yang dulunya kompak).
+- Section terakhir sebelum `FloatingCTA` (`Footer`) otomatis `margin-bottom: 0` lewat selector `.module-card:last-of-type`.
+
+### Urutan & warna latar section (mengikuti mock Stitch)
+
+`Navbar`(putih, floating sticky) → `Hero`(putih) → `TechMarquee`(kuning) → `Stats`(hitam) → `Services`(krem) → `About`(putih) → `Packages`(kuning) → `Banners`(putih) → `Software`(krem) → `Portfolio`(putih) → `WhyChooseUs`(hitam) → `HowItWorks`(krem) → `Contact`(putih) → `FeedbackSection`(hitam) → `CTAFinal`(kuning) → `Footer`(hitam). Saat menambah section baru, pilih warna yang berselang-seling dengan tetangganya — jangan dua section solid-color yang sama bersisian.
 
 ---
 
@@ -115,12 +140,12 @@ Landing page (`src/pages/LandingPage.jsx`) adalah orchestrator tipis: menyimpan 
 **Section (urutan render di halaman):**
 `Navbar` → `Hero` → `TechMarquee` → `Stats` → `Services` → `About` → `Packages` → `Banners` → `Software` → `Portfolio` → `WhyChooseUs` → `HowItWorks` → `Contact` → `FeedbackSection` → `CTAFinal` → `Footer` → `FloatingCTA`
 
-**Sub-komponen pendukung:** `PackageCard`, `PortfolioModal`, `SoftwareDetailModal`, `MockIDE`
+**Sub-komponen pendukung:** `PackageCard`, `PortfolioModal`, `SoftwareDetailModal`
 
 **Modul bersama (bukan komponen):**
 - `animations.js` — variant framer-motion + `EASE`/`STAGGER` (lihat di atas)
 - `hooks.js` — `useLenis`, `usePageTransition`, `useLang`, `fixContactUrl` (murni logic, tanpa JSX)
-- `helpers.jsx` — `HeroReveal`, `AnimatedCounter`, `LetterReveal` (komponen kecil dengan JSX)
+- `helpers.jsx` — `HeroReveal`, `AnimatedCounter`, `LetterReveal`, `SectionTag` (komponen kecil dengan JSX — `SectionTag` = pill mono-label header module-card, mis. "SERVICES // WHAT_WE_DO")
 
 > Catatan: `animations.js`/`hooks.js`/`helpers.jsx` sengaja dipisah per jenis export (bukan campur komponen + non-komponen dalam satu file) — ini syarat agar React Fast Refresh tetap jalan saat dev.
 

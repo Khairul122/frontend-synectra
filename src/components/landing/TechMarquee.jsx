@@ -6,22 +6,15 @@ const techStack = [
 
 export function TechMarquee() {
   return (
-    <section className="border-b-2 border-t-4 border-neu-black border-t-neu-gold bg-neu-black overflow-hidden">
-      <div className="flex items-stretch">
-        {/* Fixed label */}
-        <div className="flex-shrink-0 border-r-2 border-neu-white/10 px-4 flex items-center">
-          <span className="font-mono font-bold text-[9px] text-neu-white/30 uppercase tracking-[0.2em] whitespace-nowrap">STACK</span>
-        </div>
-        {/* Scrolling */}
-        <div className="overflow-hidden py-3 flex-1">
-          <div className="flex gap-10 animate-marquee whitespace-nowrap">
-            {[...techStack, ...techStack, ...techStack].map((tech, i) => (
-              <span key={i} className="inline-flex items-center gap-3 font-mono text-[11px] text-neu-white/40 uppercase tracking-widest flex-shrink-0">
-                <span className="w-1 h-1 bg-neu-gold inline-block flex-shrink-0" />
-                {tech}
-              </span>
-            ))}
-          </div>
+    <section className="module-card max-w-7xl mx-auto w-full bg-neu-primary py-6 lg:py-8 overflow-hidden">
+      <div className="overflow-hidden">
+        <div className="flex gap-6 animate-marquee whitespace-nowrap w-max">
+          {[...techStack, ...techStack, ...techStack].map((tech, i) => (
+            <span key={i} className="inline-flex items-center gap-3 bg-neu-white text-neu-black px-5 py-3 border-4 border-neu-black shadow-neu-solid-lg rounded-neu-lg font-mono font-black text-lg lg:text-xl uppercase tracking-widest flex-shrink-0">
+              <span className="w-3 h-3 bg-neu-primary border-2 border-neu-black rounded-full flex-shrink-0" />
+              {tech}
+            </span>
+          ))}
         </div>
       </div>
     </section>

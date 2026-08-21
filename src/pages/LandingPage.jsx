@@ -42,17 +42,6 @@ export default function LandingPage() {
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
 
-  // Interactive mouse tracking state for Hero background
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [isHoveredHero, setIsHoveredHero] = useState(false);
-  const handleHeroMouseMove = (e) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    setMousePos({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top
-    });
-  };
-
   // Slider programmatic scroller
   const scrollSlider = (ref, direction) => {
     if (ref.current) {
@@ -181,9 +170,7 @@ export default function LandingPage() {
   useEffect(() => {
     const tl = gsap.timeline({ delay: 0.15 });
     tl.to('.hero-badge',    { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }, 0)
-      .to('.hero-subtitle', { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' }, 0.75)
-      .to('.hero-cta',      { opacity: 1, duration: 0.5, ease: 'power2.out' }, 0.95)
-      .to('.hero-scroll',   { opacity: 1, duration: 0.6 }, 1.05)
+      .to('.hero-cta',      { opacity: 1, duration: 0.5, ease: 'power2.out' }, 0.5)
     return () => tl.kill();
   }, []);
 
@@ -201,7 +188,7 @@ export default function LandingPage() {
   ];
 
   return (
-    <div ref={pageRef} className="min-h-screen bg-paper-grid overflow-x-hidden">
+    <div ref={pageRef} className="min-h-screen bg-brutalist-grid overflow-x-hidden">
       <PortfolioModal
         item={activePortfolio}
         open={!!activePortfolio}
@@ -389,68 +376,62 @@ export default function LandingPage() {
 
       <Navbar activeSection={activeSection} menuOpen={menuOpen} setMenuOpen={setMenuOpen} transitionTo={transitionTo} scaleX={scaleX} />
 
-      <Hero
-        transitionTo={transitionTo}
-        scrollTo={scrollTo}
-        portfolioRef={portfolioRef}
-        mousePos={mousePos}
-        isHoveredHero={isHoveredHero}
-        setIsHoveredHero={setIsHoveredHero}
-        handleHeroMouseMove={handleHeroMouseMove}
-      />
+      <main className="px-4 lg:px-6 pb-4 lg:pb-6">
+        <Hero transitionTo={transitionTo} scrollTo={scrollTo} portfolioRef={portfolioRef} />
 
-      <TechMarquee />
+        <TechMarquee />
 
-      <Stats stats={stats} isLoading={isLoading} error={errors.portfolios || errors.feedbacks} />
+        <Stats stats={stats} isLoading={isLoading} error={errors.portfolios || errors.feedbacks} />
 
-      <Services services={services} isLoading={isLoading} error={errors.services} />
+        <Services services={services} isLoading={isLoading} error={errors.services} />
 
-      <About stats={stats} isLoading={isLoading} />
+        <About stats={stats} isLoading={isLoading} />
 
-      <Packages
-        packages={packages}
-        isLoading={isLoading}
-        error={errors.packages}
-        pkgSliderRef={pkgSliderRef}
-        pkgDrag={pkgDrag}
-        scrollSlider={scrollSlider}
-        navigateProtected={navigateProtected}
-      />
+        <Packages
+          packages={packages}
+          isLoading={isLoading}
+          error={errors.packages}
+          pkgSliderRef={pkgSliderRef}
+          pkgDrag={pkgDrag}
+          scrollSlider={scrollSlider}
+          navigateProtected={navigateProtected}
+        />
 
-      <Banners banners={banners} setBannerModal={setBannerModal} setBannerModalExp={setBannerModalExp} />
+        <Banners banners={banners} setBannerModal={setBannerModal} setBannerModalExp={setBannerModalExp} />
 
-      <Software
-        softwareProducts={softwareProducts}
-        isLoading={isLoading}
-        error={errors.softwareProducts}
-        swSliderRef={swSliderRef}
-        swDrag={swDrag}
-        scrollSlider={scrollSlider}
-        setActiveSoftware={setActiveSoftware}
-        navigateProtected={navigateProtected}
-      />
+        <Software
+          softwareProducts={softwareProducts}
+          isLoading={isLoading}
+          error={errors.softwareProducts}
+          swSliderRef={swSliderRef}
+          swDrag={swDrag}
+          scrollSlider={scrollSlider}
+          setActiveSoftware={setActiveSoftware}
+          navigateProtected={navigateProtected}
+        />
 
-      <Portfolio
-        portfolios={portfolios}
-        isLoading={isLoading}
-        error={errors.portfolios}
-        portfolioRef={portfolioRef}
-        setActivePortfolio={setActivePortfolio}
-        transitionTo={transitionTo}
-      />
+        <Portfolio
+          portfolios={portfolios}
+          isLoading={isLoading}
+          error={errors.portfolios}
+          portfolioRef={portfolioRef}
+          setActivePortfolio={setActivePortfolio}
+          transitionTo={transitionTo}
+        />
 
-      <WhyChooseUs />
+        <WhyChooseUs />
 
-      <HowItWorks />
+        <HowItWorks />
 
-      <Contact contacts={contacts} socialMedia={socialMedia} showToast={showToast} />
+        <Contact contacts={contacts} socialMedia={socialMedia} showToast={showToast} />
 
-      {/* ── RATING & ULASAN ── */}
-      <FeedbackSection feedbacks={feedbacks} onSubmitted={fb => setFeedbacks(prev => [fb, ...prev])} />
+        {/* ── RATING & ULASAN ── */}
+        <FeedbackSection feedbacks={feedbacks} onSubmitted={fb => setFeedbacks(prev => [fb, ...prev])} />
 
-      <CTAFinal transitionTo={transitionTo} />
+        <CTAFinal transitionTo={transitionTo} />
 
-      <Footer socialMedia={socialMedia} services={services} transitionTo={transitionTo} />
+        <Footer socialMedia={socialMedia} services={services} transitionTo={transitionTo} />
+      </main>
 
       <FloatingCTA showScrollTop={showScrollTop} transitionTo={transitionTo} />
     </div>

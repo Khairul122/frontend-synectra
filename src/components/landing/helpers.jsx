@@ -1,5 +1,22 @@
 import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
+import { cn } from '../../utils/cn';
+
+/* ─── Label pill "sticker" — header tiap module-card (mis. "SERVICES // WHAT_WE_DO") ── */
+export function SectionTag({ children, tone = 'black', rotate = '-rotate-1', className = '' }) {
+  const TONES = {
+    black: 'bg-neu-black text-neu-white',
+    primary: 'bg-neu-primary text-neu-black',
+  };
+  return (
+    <div className={cn(
+      'inline-block font-mono font-bold text-lg px-6 py-2.5 border-4 border-neu-black rounded-neu-sm shadow-neu-module-sm uppercase tracking-wide',
+      TONES[tone], rotate, className,
+    )}>
+      {children}
+    </div>
+  );
+}
 
 /* ─── Hero text reveal — overflow-hidden + GSAP translateY ──────────── */
 export function HeroReveal({ children, delay = 0, className = '' }) {

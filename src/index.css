@@ -36,6 +36,10 @@
   --shadow-neu-solid:    4px 4px 0px #0D0D0D;
   --shadow-neu-solid-lg: 6px 6px 0px #0D0D0D;
   --shadow-neu-solid-xl: 8px 8px 0px #0D0D0D;
+
+  /* ── "Modular Card Layout" (Stitch redesign) — tiap section adalah kartu mengambang ── */
+  --shadow-neu-module-sm: 6px 6px 0px #0D0D0D;
+  --shadow-neu-module:    12px 12px 0px #0D0D0D;
 }
 
 :root {
@@ -67,6 +71,35 @@ body {
     linear-gradient(rgba(13,13,13,0.09) 1px, transparent 1px),
     linear-gradient(90deg, rgba(13,13,13,0.09) 1px, transparent 1px);
   background-size: 8px 8px, 8px 8px, 40px 40px, 40px 40px;
+}
+
+/* ── Brutalist grid — background halaman landing "Modular Card Layout" ── */
+.bg-brutalist-grid {
+  background-color: #F5F0E8;
+  background-image:
+    linear-gradient(rgba(13,13,13,0.08) 2px, transparent 2px),
+    linear-gradient(90deg, rgba(13,13,13,0.08) 2px, transparent 2px);
+  background-size: 60px 60px;
+}
+
+/* ── Module card — tiap section landing page = kartu mengambang, border tebal + shadow keras ── */
+.module-card {
+  border: 4px solid #0D0D0D;
+  border-radius: var(--radius-neu-xl);
+  box-shadow: var(--shadow-neu-module);
+  margin-bottom: 4rem;
+  overflow: hidden;
+  position: relative;
+}
+.module-card:last-of-type { margin-bottom: 0; }
+
+@keyframes floatBadge {
+  0%   { transform: translateY(0px) rotate(var(--float-rot, -6deg)); }
+  50%  { transform: translateY(-14px) rotate(calc(var(--float-rot, -6deg) * -1)); }
+  100% { transform: translateY(0px) rotate(var(--float-rot, -6deg)); }
+}
+.animate-float-badge {
+  animation: floatBadge 5s ease-in-out infinite;
 }
 
 /* ── Image fade-in (portfolio modal navigation) ── */
