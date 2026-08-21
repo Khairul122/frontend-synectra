@@ -6,7 +6,7 @@ const techStack = [
 
 export function TechMarquee() {
   return (
-    <section className="module-card max-w-7xl mx-auto w-full bg-neu-primary py-6 lg:py-8 overflow-hidden">
+    <section className="border-b-4 border-neu-black bg-neu-primary py-6 lg:py-8 overflow-hidden">
       <div className="overflow-hidden">
         <div className="flex gap-6 animate-marquee whitespace-nowrap w-max">
           {[...techStack, ...techStack, ...techStack].map((tech, i) => (
