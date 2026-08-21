@@ -6,7 +6,8 @@ export function Hero({ transitionTo, scrollTo, portfolioRef }) {
   const { t } = useTranslation();
 
   return (
-    <section className="module-card max-w-7xl mx-auto w-full bg-neu-white pt-16 lg:pt-24 pb-16 lg:pb-20 px-6 lg:px-12 flex flex-col items-center">
+    <section className="relative border-b-4 border-neu-black bg-neu-white overflow-hidden">
+    <div className="relative max-w-7xl mx-auto px-4 lg:px-6 pt-16 lg:pt-24 pb-16 lg:pb-20 flex flex-col items-center">
 
       {/* Badge mono-label */}
       <div className="hero-badge font-mono text-xs sm:text-sm uppercase tracking-widest border-4 border-neu-black px-5 sm:px-6 py-2.5 sm:py-3 bg-neu-primary mb-10 lg:mb-14 font-black rounded-neu-sm shadow-neu-module-sm"
