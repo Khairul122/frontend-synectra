@@ -62,6 +62,7 @@ export function Hero({ transitionTo, scrollTo, portfolioRef }) {
           UI/UX
         </div>
       </div>
+    </div>
     </section>
   );
 }
