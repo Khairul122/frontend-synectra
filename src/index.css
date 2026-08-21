@@ -24,6 +24,18 @@
   --radius-neu:    6px;
   --radius-neu-lg: 10px;
   --radius-neu-xl: 16px;
+
+  /* ── Landing page redesign — "Modern Interactive 3D" palette + solid shadow ──
+     Token baru, TIDAK menimpa neu-bg/neu-primary/shadow-neu-* di atas — token itu
+     dipakai dashboard/login/komponen shared lain dan harus tetap seperti semula.
+     Hanya dipakai di src/pages/LandingPage.jsx & src/components/landing/*. */
+  --color-neu-cream: #FDFBF7;
+  --color-neu-gold:  #FFCC00;
+
+  --shadow-neu-solid-sm: 2px 2px 0px #0D0D0D;
+  --shadow-neu-solid:    4px 4px 0px #0D0D0D;
+  --shadow-neu-solid-lg: 6px 6px 0px #0D0D0D;
+  --shadow-neu-solid-xl: 8px 8px 0px #0D0D0D;
 }
 
 :root {
@@ -44,6 +56,17 @@ h1, h2, h3, h4, h5, h6 {
 
 body {
   margin: 0;
+}
+
+/* ── Paper millimeter grid — background landing page baru ── */
+.bg-paper-grid {
+  background-color: #FDFBF7;
+  background-image:
+    linear-gradient(rgba(13,13,13,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(13,13,13,0.05) 1px, transparent 1px),
+    linear-gradient(rgba(13,13,13,0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(13,13,13,0.09) 1px, transparent 1px);
+  background-size: 8px 8px, 8px 8px, 40px 40px, 40px 40px;
 }
 
 /* ── Image fade-in (portfolio modal navigation) ── */

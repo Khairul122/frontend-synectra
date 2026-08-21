@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { ElegantShape } from '../ui/shape-landing-hero';
 import { MockIDE } from './MockIDE';
 import { HeroReveal } from './helpers';
+import { TactileButton } from './TactileButton';
 
 export function Hero({ transitionTo, scrollTo, portfolioRef, mousePos, isHoveredHero, setIsHoveredHero, handleHeroMouseMove }) {
   const { t } = useTranslation();
@@ -15,23 +16,23 @@ export function Hero({ transitionTo, scrollTo, portfolioRef, mousePos, isHovered
     >
 
       {/* Layer 0 — Ambient color gradient */}
-      <div className="absolute inset-0 z-0 pointer-events-none bg-gradient-to-br from-neu-primary/[0.04] via-transparent to-white/[0.03]" />
+      <div className="absolute inset-0 z-0 pointer-events-none bg-gradient-to-br from-neu-gold/[0.05] via-transparent to-neu-blue/[0.04]" />
 
       {/* Layer 0.5 — Cursor glow spotlight */}
       {isHoveredHero && (
         <div
           className="absolute inset-0 pointer-events-none z-[1] transition-opacity duration-300"
           style={{
-            background: `radial-gradient(600px circle at ${mousePos.x}px ${mousePos.y}px, rgba(255, 208, 0, 0.08), transparent 80%)`,
+            background: `radial-gradient(600px circle at ${mousePos.x}px ${mousePos.y}px, rgba(255, 204, 0, 0.09), transparent 80%)`,
           }}
         />
       )}
 
-      {/* Layer 1 — Floating geometric shapes (monokrom: kuning + putih) */}
+      {/* Layer 1 — Floating geometric shapes */}
       <div className="absolute inset-0 z-[1] overflow-hidden pointer-events-none">
         <ElegantShape
           delay={0.3} width={600} height={140} rotate={12}
-          gradient="from-neu-primary/[0.12]"
+          gradient="from-neu-gold/[0.13]"
           className="left-[-8%] md:left-[-3%] top-[15%] md:top-[18%]"
         />
         <ElegantShape
@@ -41,7 +42,7 @@ export function Hero({ transitionTo, scrollTo, portfolioRef, mousePos, isHovered
         />
         <ElegantShape
           delay={0.4} width={220} height={60} rotate={-8}
-          gradient="from-neu-primary/[0.08]"
+          gradient="from-neu-blue/[0.10]"
           className="left-[6%] md:left-[10%] bottom-[10%] md:bottom-[14%]"
         />
       </div>
@@ -68,16 +69,16 @@ export function Hero({ transitionTo, scrollTo, portfolioRef, mousePos, isHovered
           {/* Left Column — Text & CTAs */}
           <div className="lg:col-span-7 flex flex-col justify-center text-left">
             {/* Badge */}
-            <div className="hero-badge inline-flex self-start items-center gap-2 bg-white/[0.06] border border-white/[0.12] rounded-neu-sm text-neu-white px-4 py-1.5 font-mono font-bold text-xs uppercase tracking-widest mb-6"
+            <div className="hero-badge inline-flex self-start items-center gap-2 bg-white/[0.06] border border-white/[0.12] rounded-neu text-neu-white px-4 py-1.5 font-mono font-bold text-xs uppercase tracking-widest mb-6"
                  style={{ opacity: 0 }}>
-              <span className="w-1.5 h-1.5 bg-neu-primary animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-neu-gold animate-pulse" />
               {t('landing.hero.badge').replace('✦ ', '').replace('✦', '')}
             </div>
 
             {/* Horizontal rule separator */}
             <div className="w-16 h-px bg-neu-white/20 mb-6 ml-1" />
 
-            {/* Title — clip reveal per baris */}
+            {/* Title — clip reveal per baris, warna-warni */}
             <h1 className="font-display font-black text-4xl sm:text-5xl lg:text-6xl xl:text-7xl text-neu-white leading-[0.95] mb-6">
               <HeroReveal delay={0.1}>
                 <span className="block">{t('landing.hero.title1')}</span>
@@ -85,12 +86,12 @@ export function Hero({ transitionTo, scrollTo, portfolioRef, mousePos, isHovered
               <HeroReveal delay={0.3}>
                 <span className="block">
                   <span className="relative inline-block">
-                    <span className="relative z-10 text-neu-primary">{t('landing.hero.title2')}</span>
+                    <span className="relative z-10 text-neu-gold">{t('landing.hero.title2')}</span>
                   </span>
                 </span>
               </HeroReveal>
               <HeroReveal delay={0.5}>
-                <span className="block">{t('landing.hero.title3')}</span>
+                <span className="block text-neu-blue">{t('landing.hero.title3')}</span>
               </HeroReveal>
             </h1>
 
@@ -101,17 +102,13 @@ export function Hero({ transitionTo, scrollTo, portfolioRef, mousePos, isHovered
             </p>
 
             {/* CTA Buttons */}
-            <div className="hero-cta flex flex-wrap gap-3 mb-0" style={{ opacity: 0 }}>
-              <button
-                onClick={() => transitionTo('/register')}
-                className="px-8 py-3.5 bg-neu-primary border-2 border-neu-primary rounded-neu-sm shadow-[2px_2px_0px_#FFD000,5px_7px_14px_-3px_rgba(255,208,0,0.25)] font-display font-bold text-sm uppercase tracking-wide text-neu-black transition-all duration-150 hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-[1px_1px_0px_#FFD000] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none">
+            <div className="hero-cta flex flex-wrap gap-4 mb-0" style={{ opacity: 0 }}>
+              <TactileButton variant="gold" onClick={() => transitionTo('/register')}>
                 {t('landing.hero.cta')}
-              </button>
-              <button
-                onClick={() => scrollTo(portfolioRef)}
-                className="px-8 py-3.5 bg-transparent border-2 border-neu-white/40 rounded-neu-sm font-display font-bold text-sm uppercase tracking-wide text-neu-white/80 transition-all duration-150 hover:border-neu-white hover:text-neu-white hover:translate-x-[3px] hover:translate-y-[3px] active:translate-x-[4px] active:translate-y-[4px]">
+              </TactileButton>
+              <TactileButton variant="ghost" className="!border-neu-white/40 !text-neu-white/80 hover:!border-neu-white hover:!text-neu-white" onClick={() => scrollTo(portfolioRef)}>
                 {t('landing.hero.ctaSecondary')}
-              </button>
+              </TactileButton>
             </div>
           </div>
 
@@ -127,8 +124,8 @@ export function Hero({ transitionTo, scrollTo, portfolioRef, mousePos, isHovered
       <div className="hero-scroll absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2"
            style={{ opacity: 0 }}>
         <span className="font-mono text-[9px] text-neu-white/30 uppercase tracking-widest">Scroll</span>
-        <div className="w-5 h-8 border-2 border-neu-white/20 flex items-start justify-center pt-1.5">
-          <div className="w-1 h-2 bg-neu-white/30 animate-bounce" />
+        <div className="w-5 h-8 border-2 border-neu-white/20 rounded-full flex items-start justify-center pt-1.5">
+          <div className="w-1 h-2 rounded-full bg-neu-white/30 animate-bounce" />
         </div>
       </div>
 

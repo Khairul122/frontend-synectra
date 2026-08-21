@@ -13,7 +13,7 @@ function StarDisplay({ rating, size = 'sm' }) {
   return (
     <div className="flex gap-0.5">
       {[1,2,3,4,5].map(s => (
-        <svg key={s} className={cn(sz, s <= rating ? 'text-neu-primary' : 'text-neu-black/20')} fill="currentColor" viewBox="0 0 20 20">
+        <svg key={s} className={cn(sz, s <= rating ? 'text-neu-gold' : 'text-neu-black/20')} fill="currentColor" viewBox="0 0 20 20">
           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
         </svg>
       ))}
@@ -65,13 +65,13 @@ export function FeedbackSection({ feedbacks, onSubmitted }) {
   };
 
   return (
-    <section id="ulasan" className="border-b-2 border-neu-black bg-neu-white py-16">
+    <section id="ulasan" className="border-b-2 border-neu-black bg-paper-grid py-16">
       <div className="max-w-7xl mx-auto px-4 lg:px-6">
 
         {/* Header */}
         <motion.div {...fadeLeft()} className="flex items-start justify-between mb-8">
           <div className="flex items-center gap-3">
-            <div className="h-1 w-8 bg-neu-primary" />
+            <div className="h-1 w-8 bg-neu-gold" />
             <div>
               <h2 className="font-display font-bold text-2xl uppercase tracking-wide text-neu-black">{t('landing.feedback.sectionTitle')}</h2>
               {avg && (
@@ -102,7 +102,7 @@ export function FeedbackSection({ feedbacks, onSubmitted }) {
             onTouchEnd={() => { drag.current.active = false; }}
           >
             {feedbacks.map(fb => (
-              <div key={fb.id} className="flex-shrink-0 w-64 border-2 border-neu-black rounded-neu bg-neu-bg p-4 shadow-neu flex flex-col gap-2">
+              <div key={fb.id} className="flex-shrink-0 w-64 border-2 border-neu-black rounded-neu bg-neu-cream p-4 shadow-neu-solid flex flex-col gap-2">
                 <StarDisplay rating={fb.rating} />
                 {fb.message && <p className="font-body text-sm text-neu-black/80 leading-relaxed line-clamp-4">"{fb.message}"</p>}
                 <div className="mt-auto pt-2 border-t border-neu-black/10">
@@ -113,7 +113,7 @@ export function FeedbackSection({ feedbacks, onSubmitted }) {
             ))}
           </div>
           {/* Fade overlay kanan — menandakan ada konten lebih */}
-          <div className="absolute right-0 top-0 bottom-3 w-16 bg-gradient-to-l from-neu-white to-transparent pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-3 w-16 bg-gradient-to-l from-neu-cream to-transparent pointer-events-none" />
           </div>
         )}
 
@@ -145,7 +145,7 @@ export function FeedbackSection({ feedbacks, onSubmitted }) {
                 <input type="text" value={form.name} onChange={e => { setForm(p => ({...p, name: e.target.value})); setFormErrors(p => ({...p, name: ''})); }}
                   placeholder="Nama Anda"
                   required aria-required="true"
-                  className={cn('w-full px-4 py-2.5 bg-neu-white border-2 rounded-neu-sm shadow-neu-sm font-body text-sm text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu transition-all duration-150', formErrors.name ? 'border-neu-accent' : 'border-neu-black')} />
+                  className={cn('w-full px-4 py-2.5 bg-neu-white border-2 rounded-neu-sm shadow-neu-solid-sm font-body text-sm text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu-solid transition-all duration-150', formErrors.name ? 'border-neu-accent' : 'border-neu-black')} />
                 {formErrors.name && <span className="font-body text-xs text-neu-accent">{formErrors.name}</span>}
               </div>
               <div className="flex flex-col gap-1.5">
@@ -155,7 +155,7 @@ export function FeedbackSection({ feedbacks, onSubmitted }) {
                 <input type="email" value={form.email} onChange={e => { setForm(p => ({...p, email: e.target.value})); setFormErrors(p => ({...p, email: ''})); }}
                   placeholder="email@contoh.com"
                   required aria-required="true"
-                  className={cn('w-full px-4 py-2.5 bg-neu-white border-2 rounded-neu-sm shadow-neu-sm font-body text-sm text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu transition-all duration-150', formErrors.email ? 'border-neu-accent' : 'border-neu-black')} />
+                  className={cn('w-full px-4 py-2.5 bg-neu-white border-2 rounded-neu-sm shadow-neu-solid-sm font-body text-sm text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu-solid transition-all duration-150', formErrors.email ? 'border-neu-accent' : 'border-neu-black')} />
                 {formErrors.email && <span className="font-body text-xs text-neu-accent">{formErrors.email}</span>}
               </div>
             </div>
@@ -172,7 +172,7 @@ export function FeedbackSection({ feedbacks, onSubmitted }) {
                     onMouseEnter={() => setHovered(s)} onMouseLeave={() => setHovered(0)}
                     onClick={() => { setForm(p => ({...p, rating: s})); setFormErrors(p => ({...p, rating: ''})); }}
                     className="w-11 h-11 flex items-center justify-center transition-transform duration-100 hover:scale-110 active:scale-95">
-                    <svg className={cn('w-8 h-8 transition-colors duration-100', (hovered || form.rating) >= s ? 'text-neu-primary' : 'text-neu-black/20')} fill="currentColor" viewBox="0 0 20 20">
+                    <svg className={cn('w-8 h-8 transition-colors duration-100', (hovered || form.rating) >= s ? 'text-neu-gold' : 'text-neu-black/20')} fill="currentColor" viewBox="0 0 20 20">
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                     </svg>
                   </button>
@@ -186,13 +186,13 @@ export function FeedbackSection({ feedbacks, onSubmitted }) {
               <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wide">{t('landing.feedback.messageLabel')}</label>
               <textarea value={form.message} onChange={e => setForm(p => ({...p, message: e.target.value}))} rows={3}
                 placeholder={t('landing.feedback.messagePlaceholder')}
-                className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black rounded-neu-sm shadow-neu-sm font-body text-sm text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu transition-all duration-150 resize-none" />
+                className="w-full px-4 py-2.5 bg-neu-white border-2 border-neu-black rounded-neu-sm shadow-neu-solid-sm font-body text-sm text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu-solid transition-all duration-150 resize-none" />
             </div>
 
             {error && <p className="font-body text-xs text-neu-accent">{error}</p>}
 
             <button type="submit" disabled={isSubmitting}
-              className={cn('w-full py-3 bg-neu-primary border-2 border-neu-black rounded-neu-sm shadow-neu font-display font-bold text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm', isSubmitting && 'opacity-60 cursor-not-allowed')}>
+              className={cn('w-full py-3 bg-neu-gold border-2 border-neu-black rounded-neu-sm shadow-neu-solid font-display font-bold text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-solid-sm', isSubmitting && 'opacity-60 cursor-not-allowed')}>
               {isSubmitting ? t('landing.feedback.submitting') : t('landing.feedback.submit')}
             </button>
           </form>

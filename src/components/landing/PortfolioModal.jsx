@@ -45,20 +45,20 @@ export function PortfolioModal({ item, open, onClose, transitionTo }) {
                 {imgs.length > 1 && (
                   <>
                     <button onClick={() => setImgIdx(i => (i - 1 + imgs.length) % imgs.length)}
-                      className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-neu-white/90 border-2 border-neu-black rounded-neu-sm font-mono text-sm flex items-center justify-center hover:bg-neu-primary transition-colors">←</button>
+                      className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-neu-white/90 border-2 border-neu-black rounded-neu-sm font-mono text-sm flex items-center justify-center hover:bg-neu-gold transition-colors">←</button>
                     <button onClick={() => setImgIdx(i => (i + 1) % imgs.length)}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-neu-white/90 border-2 border-neu-black rounded-neu-sm font-mono text-sm flex items-center justify-center hover:bg-neu-primary transition-colors">→</button>
+                      className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-neu-white/90 border-2 border-neu-black rounded-neu-sm font-mono text-sm flex items-center justify-center hover:bg-neu-gold transition-colors">→</button>
                   </>
                 )}
               </div>
               {/* Dot indicators */}
               {imgs.length > 1 && (
-                <div className="flex justify-center gap-1.5 py-2.5 bg-neu-bg border-t border-neu-black/10">
+                <div className="flex justify-center gap-1.5 py-2.5 bg-neu-cream border-t border-neu-black/10">
                   {imgs.map((_, idx) => (
                     <button
                       key={idx}
                       onClick={() => setImgIdx(idx)}
-                      className={cn('w-2 h-2 rounded-full border border-neu-black transition-all duration-150', idx === imgIdx ? 'bg-neu-primary' : 'bg-neu-black/20')}
+                      className={cn('w-2 h-2 rounded-full border border-neu-black transition-all duration-150', idx === imgIdx ? 'bg-neu-gold' : 'bg-neu-black/20')}
                       aria-label={`Foto ${idx + 1}`}
                     />
                   ))}
@@ -76,10 +76,10 @@ export function PortfolioModal({ item, open, onClose, transitionTo }) {
         <DialogFooter className="gap-3 flex-wrap sm:flex-wrap">
           <button
             onClick={() => { onClose(); setTimeout(() => transitionTo('/register'), 350); }}
-            className="flex-1 py-2.5 bg-neu-primary border-2 border-neu-black rounded-neu shadow-neu font-display font-bold text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">
+            className="flex-1 py-2.5 bg-neu-gold border-2 border-neu-black rounded-neu shadow-neu-solid font-display font-bold text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-solid-sm">
             {t('landing.order')}
           </button>
-          <DialogClose className="px-5 py-2.5 bg-neu-white border-2 border-neu-black rounded-neu shadow-neu font-display font-bold text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">
+          <DialogClose className="px-5 py-2.5 bg-neu-white border-2 border-neu-black rounded-neu shadow-neu-solid font-display font-bold text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-solid-sm">
             Tutup
           </DialogClose>
         </DialogFooter>

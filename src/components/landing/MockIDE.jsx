@@ -33,12 +33,12 @@ export function MockIDE() {
   const THEMES = {
     brutalist: {
       name: 'Brutalist Gold',
-      primary: '#FFD000',
+      primary: '#FFCC00',
       accent: '#FF5C5C',
       bgClass: 'bg-[#121214]',
-      textClass: 'text-[#FFD000]',
-      glowColor: 'from-[#FFD000]/20 via-[#FF5C5C]/15 to-transparent',
-      borderColor: 'border-[#FFD000]/20'
+      textClass: 'text-[#FFCC00]',
+      glowColor: 'from-[#FFCC00]/20 via-[#FF5C5C]/15 to-transparent',
+      borderColor: 'border-[#FFCC00]/20'
     },
     cyberpunk: {
       name: 'Neon Cyber',
@@ -111,7 +111,7 @@ export function MockIDE() {
   const files = [
     { name: 'App.jsx', type: 'code', icon: <Code className="w-3 h-3 text-[#4D61FF]" /> },
     { name: 'dashboard.jsx', type: 'preview', icon: <LayoutGrid className="w-3 h-3 text-[#00C48C]" /> },
-    { name: 'synectra.css', type: 'style', icon: <Sparkles className="w-3 h-3 text-[#FFD000]" /> }
+    { name: 'synectra.css', type: 'style', icon: <Sparkles className="w-3 h-3 text-[#FFCC00]" /> }
   ];
 
   if (buildStatus !== 'idle') {
@@ -127,10 +127,10 @@ export function MockIDE() {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsClosed(false)}
-        className="cursor-pointer group relative flex items-center gap-3 px-5 py-3.5 bg-[#0d0d0f]/95 border-2 border-neu-black rounded-xl shadow-neu hover:translate-x-[-2px] hover:translate-y-[-2px] transition-transform select-none z-30"
+        className="cursor-pointer group relative flex items-center gap-3 px-5 py-3.5 bg-[#0d0d0f]/95 border-2 border-neu-black rounded-xl shadow-neu-solid hover:translate-x-[-2px] hover:translate-y-[-2px] transition-transform select-none z-30"
         style={{ borderColor: currentTheme.primary }}
       >
-        <div className="absolute -inset-2 rounded-xl blur-lg opacity-40 transition-all duration-300 bg-gradient-to-r from-neu-primary to-neu-accent animate-pulse" />
+        <div className="absolute -inset-2 rounded-xl blur-lg opacity-40 transition-all duration-300 bg-gradient-to-r from-neu-gold to-neu-accent animate-pulse" />
         <div className="w-6 h-6 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
           <Terminal className="w-3.5 h-3.5 text-white/70 animate-pulse" />
         </div>
@@ -207,11 +207,11 @@ export function MockIDE() {
               disabled={buildStatus === 'compiling'}
               className={cn(
                 "flex items-center gap-1 px-2.5 py-0.5 rounded bg-white/5 hover:bg-white/10 text-white/80 hover:text-white transition-all text-[9.5px] font-mono border border-white/10 font-bold cursor-pointer",
-                buildStatus === 'compiling' && "opacity-50 cursor-not-allowed bg-[#FFD000]/10 border-[#FFD000]/20 text-[#FFD000]"
+                buildStatus === 'compiling' && "opacity-50 cursor-not-allowed bg-[#FFCC00]/10 border-[#FFCC00]/20 text-[#FFCC00]"
               )}
             >
               {buildStatus === 'compiling' ? (
-                <Loader2 className="w-2.5 h-2.5 animate-spin text-[#FFD000]" />
+                <Loader2 className="w-2.5 h-2.5 animate-spin text-[#FFCC00]" />
               ) : (
                 <Play className="w-2.5 h-2.5 fill-current text-[#00C48C]" />
               )}
@@ -224,7 +224,7 @@ export function MockIDE() {
         {isMinimized && (
           <div className="px-4 py-2 bg-[#0d0d0f] text-[9.5px] font-mono text-white/40 flex justify-between border-t border-white/5 items-center">
             <span>Editor minimized. Workstation active.</span>
-            <span className="text-[#FFD000] cursor-pointer hover:underline font-bold" onClick={() => setIsMinimized(false)}>Expand Workspace</span>
+            <span className="text-[#FFCC00] cursor-pointer hover:underline font-bold" onClick={() => setIsMinimized(false)}>Expand Workspace</span>
           </div>
         )}
 
@@ -306,7 +306,7 @@ export function MockIDE() {
                     >
                       {tab.name === 'App.jsx' && <Code className="w-2.5 h-2.5 text-[#4D61FF]" />}
                       {tab.name === 'dashboard.jsx' && <LayoutGrid className="w-2.5 h-2.5 text-[#00C48C]" />}
-                      {tab.name === 'synectra.css' && <Sparkles className="w-2.5 h-2.5 text-[#FFD000]" />}
+                      {tab.name === 'synectra.css' && <Sparkles className="w-2.5 h-2.5 text-[#FFCC00]" />}
                       {tab.name === 'terminal.log' && <Terminal className="w-2.5 h-2.5 text-white/40" />}
 
                       {tab.name}
@@ -391,7 +391,7 @@ export function MockIDE() {
                     <div>&#125;</div>
 
                     <div className="mt-3 pt-2.5 border-t border-white/5 text-[8.5px] text-white/30 flex items-center gap-1.5 select-none">
-                      <span className="flex w-1.5 h-1.5 rounded-full bg-neu-primary animate-pulse" />
+                      <span className="flex w-1.5 h-1.5 rounded-full bg-neu-gold animate-pulse" />
                       <span>Interactive: Click the <code className="bg-white/5 px-1 py-0.5 rounded text-white/60 font-mono">true/false</code> button above to toggle compilation state!</span>
                     </div>
                   </div>
@@ -441,7 +441,7 @@ export function MockIDE() {
                         <p className="text-[7px] text-white/40 uppercase font-bold tracking-wider leading-tight">Client Rating</p>
                         <div className="flex items-center gap-1 mt-1">
                           <p className="text-xs font-bold text-white font-display">4.9</p>
-                          <span className="text-[8px] text-[#FFD000]">★</span>
+                          <span className="text-[8px] text-[#FFCC00]">★</span>
                           <span className="text-[6.5px] text-white/30 font-mono">(118)</span>
                         </div>
                       </div>
@@ -548,7 +548,7 @@ export function MockIDE() {
                         )}
                       >
                         {(log.includes('⠋') || log.includes('⠙')) ? (
-                          <Loader2 className="w-2.5 h-2.5 text-neu-primary animate-spin inline-shrink-0 mt-0.5" />
+                          <Loader2 className="w-2.5 h-2.5 text-neu-gold animate-spin inline-shrink-0 mt-0.5" />
                         ) : null}
                         <span>{(log.includes('⠋') || log.includes('⠙')) ? log.substring(1) : log}</span>
                       </div>
@@ -589,7 +589,7 @@ export function MockIDE() {
         <motion.div
           animate={{ y: [-3, 3, -3] }}
           transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-          className="text-neu-black border-2 border-neu-black px-2.5 py-1 text-[8.5px] font-mono font-black uppercase tracking-wider rotate-[6deg] shadow-neu-sm transition-colors duration-300"
+          className="text-neu-black border-2 border-neu-black px-2.5 py-1 text-[8.5px] font-mono font-black uppercase tracking-wider rotate-[6deg] shadow-neu-solid-sm transition-colors duration-300"
           style={{ backgroundColor: currentTheme.primary }}
         >
           ✦ TECH-PARTNER
@@ -600,7 +600,7 @@ export function MockIDE() {
         <motion.div
           animate={{ y: [3, -3, 3] }}
           transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
-          className="text-neu-white border-2 border-neu-black px-2.5 py-1 text-[8.5px] font-mono font-black uppercase tracking-wider rotate-[-4deg] shadow-neu-sm transition-colors duration-300"
+          className="text-neu-white border-2 border-neu-black px-2.5 py-1 text-[8.5px] font-mono font-black uppercase tracking-wider rotate-[-4deg] shadow-neu-solid-sm transition-colors duration-300"
           style={{ backgroundColor: currentTheme.accent }}
         >
           ✦ 100% SATISFACTION

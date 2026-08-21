@@ -10,12 +10,12 @@ export function Contact({ contacts, socialMedia, showToast }) {
   if (contacts.length === 0 && socialMedia.length === 0) return null;
 
   return (
-    <section id="kontak" className="border-b-2 border-neu-black py-20 lg:py-24">
+    <section id="kontak" className="border-b-2 border-neu-black py-20 lg:py-24 bg-paper-grid">
       <div className="max-w-7xl mx-auto px-4 lg:px-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           <motion.div {...fadeUp()}>
             <span className="font-mono text-[10px] text-neu-black/50 uppercase tracking-widest block mb-2">{t('landing.contact.tag')}</span>
-            <div className="h-px w-8 bg-neu-primary mb-4" />
+            <div className="h-1.5 w-10 bg-neu-gold rounded-full mb-4" />
             <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-black mb-4 leading-tight">
               {t('landing.contact.title').split('\n').map((l, i) => <span key={i} className="block">{l}</span>)}
             </h2>
@@ -41,7 +41,7 @@ export function Contact({ contacts, socialMedia, showToast }) {
                           } catch (err) {}
                         }
                       }}
-                      className="flex items-center gap-4 p-4 bg-neu-white border-2 border-neu-black rounded-neu border-l-4 shadow-neu-sm hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-neu transition-all duration-150" style={{ borderLeftColor: color }}>
+                      className="flex items-center gap-4 p-4 bg-neu-white border-2 border-neu-black rounded-neu border-l-4 shadow-neu-solid-sm hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-neu-solid transition-all duration-150" style={{ borderLeftColor: color }}>
                       <div className="w-9 h-9 flex items-center justify-center flex-shrink-0">
                         <Icon style={{ color }} className="w-5 h-5" />
                       </div>
@@ -61,7 +61,7 @@ export function Contact({ contacts, socialMedia, showToast }) {
                   const { Icon, color } = getPlatform(s.icon ?? s.platformName?.toLowerCase());
                   return (
                     <a key={s.id} href={s.url} target="_blank" rel="noopener noreferrer"
-                      className="flex items-center gap-3 p-3 bg-neu-white border-2 border-neu-black rounded-neu shadow-neu-sm hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-neu transition-all duration-150">
+                      className="flex items-center gap-3 p-3 bg-neu-white border-2 border-neu-black rounded-neu shadow-neu-solid-sm hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-neu-solid transition-all duration-150">
                       <Icon style={{ color }} className="w-5 h-5 flex-shrink-0" />
                       <div className="min-w-0"><p className="font-display font-bold text-xs text-neu-black truncate">{s.platformName}</p><p className="font-mono text-[10px] text-neu-black/40 truncate">{s.accountName}</p></div>
                     </a>

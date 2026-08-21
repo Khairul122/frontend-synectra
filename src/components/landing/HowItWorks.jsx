@@ -11,7 +11,7 @@ export function HowItWorks() {
       <div className="max-w-7xl mx-auto px-4 lg:px-6">
         <motion.div className="mb-14" {...fadeUp()}>
           <span className="font-mono text-[10px] text-neu-white/40 uppercase tracking-widest block mb-2">{t('landing.howItWorks.tag')}</span>
-          <div className="h-px w-8 bg-neu-primary mb-4" />
+          <div className="h-px w-8 bg-neu-gold mb-4" />
           <h2 className="font-display font-bold text-3xl lg:text-4xl text-neu-white leading-tight">{t('landing.howItWorks.title')}</h2>
         </motion.div>
 
@@ -27,7 +27,7 @@ export function HowItWorks() {
               className="relative z-10 border-b-2 border-r-0 sm:border-r-2 border-neu-white/10 last:border-r-0 lg:border-b-0 px-6 pb-10 lg:pb-0 pt-4 lg:pt-0 first:pl-0 lg:first:pl-0"
             >
               {/* Step numeral — sharp, on-brand */}
-              <div className="inline-flex items-center justify-center w-11 h-11 bg-neu-primary border-2 border-neu-primary rounded-neu-sm mb-5 relative">
+              <div className="inline-flex items-center justify-center w-11 h-11 bg-neu-gold border-2 border-neu-gold rounded-neu-sm mb-5 relative">
                 <span className="font-mono font-bold text-base text-neu-black">{step.no}</span>
               </div>
               <h3 className="font-display font-bold text-lg text-neu-white mb-2">{step.title}</h3>

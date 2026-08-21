@@ -25,7 +25,7 @@ export function SoftwareDetailModal({ sw, open, onClose, transitionTo }) {
         </DialogHeader>
 
         {sw?.thumbnailUrl && (
-          <div className="border-b-2 border-neu-black bg-neu-bg flex-shrink-0">
+          <div className="border-b-2 border-neu-black bg-neu-cream flex-shrink-0">
             <img src={supaImg(sw.thumbnailUrl, { width: 800 })} alt={swName} width="800" height="208" className="w-full h-52 object-cover" loading="lazy" decoding="async" />
           </div>
         )}
@@ -49,7 +49,7 @@ export function SoftwareDetailModal({ sw, open, onClose, transitionTo }) {
               <ul className="space-y-2">
                 {swFeatures.split('\n').filter(f => f.trim()).map((f, i) => (
                   <li key={i} className="flex items-start gap-2.5">
-                    <span className="mt-0.5 w-4 h-4 flex-shrink-0 flex items-center justify-center bg-neu-primary border-2 border-neu-black rounded-neu-sm">
+                    <span className="mt-0.5 w-4 h-4 flex-shrink-0 flex items-center justify-center bg-neu-gold border-2 border-neu-black rounded-neu-sm">
                       <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                       </svg>
@@ -76,16 +76,16 @@ export function SoftwareDetailModal({ sw, open, onClose, transitionTo }) {
         <DialogFooter className="gap-2 sm:flex-row">
           {sw?.demoUrl && (
             <a href={sw.demoUrl} target="_blank" rel="noopener noreferrer"
-              className="flex-1 py-2.5 border-2 border-neu-black rounded-neu bg-neu-white font-display font-bold text-xs uppercase text-neu-black text-center transition-all duration-150 hover:bg-neu-bg hover:translate-x-[2px] hover:translate-y-[2px]">
+              className="flex-1 py-2.5 border-2 border-neu-black rounded-neu bg-neu-white font-display font-bold text-xs uppercase text-neu-black text-center transition-all duration-150 hover:bg-neu-cream hover:translate-x-[2px] hover:translate-y-[2px]">
               {t('landing.software.demo')}
             </a>
           )}
           <button
             onClick={() => { onClose(); setTimeout(() => transitionTo('/my-software'), 300); }}
-            className="flex-1 py-2.5 bg-neu-primary border-2 border-neu-black rounded-neu shadow-neu font-display font-bold text-xs uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">
+            className="flex-1 py-2.5 bg-neu-gold border-2 border-neu-black rounded-neu shadow-neu-solid font-display font-bold text-xs uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-solid-sm">
             {t('landing.software.buyNow')}
           </button>
-          <DialogClose className="px-5 py-2.5 bg-neu-white border-2 border-neu-black rounded-neu shadow-neu font-display font-bold text-xs uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm">
+          <DialogClose className="px-5 py-2.5 bg-neu-white border-2 border-neu-black rounded-neu shadow-neu-solid font-display font-bold text-xs uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-solid-sm">
             Tutup
           </DialogClose>
         </DialogFooter>

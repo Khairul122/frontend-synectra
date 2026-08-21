@@ -65,6 +65,7 @@ export default function LandingPage() {
   };
   const { pageRef, transitionTo } = usePageTransition();
   const [portfolios,        setPortfolios]        = useState([]);
+  const [services,          setServices]          = useState([]);
   const [packages,          setPackages]          = useState([]);
   const [softwareProducts,  setSoftwareProducts]  = useState([]);
   const [feedbacks,         setFeedbacks]         = useState([]);
@@ -73,6 +74,7 @@ export default function LandingPage() {
   const [socialMedia,  setSocialMedia]  = useState([]);
   const [bankAccounts, setBankAccounts] = useState([]);
   const [isLoading,    setIsLoading]    = useState(true);
+  const [errors,       setErrors]       = useState({}); // { [resource]: true } untuk yang gagal fetch
   const [activePortfolio, setActivePortfolio] = useState(null);
   const [activeSoftware,  setActiveSoftware]  = useState(null);
   const [menuOpen,      setMenuOpen]      = useState(false);
@@ -95,26 +97,46 @@ export default function LandingPage() {
   const swDrag        = useRef({ active: false, startX: 0, scrollLeft: 0 });
 
   useEffect(() => {
-    Promise.all([
-      axios.get(`${BASE}/api/portfolio`).catch(() => ({ data: { data: [] } })),
-      axios.get(`${BASE}/api/banners`).catch(() => ({ data: { data: [] } })),
-      axios.get(`${BASE}/api/contacts`).catch(() => ({ data: { data: [] } })),
-      axios.get(`${BASE}/api/social-media`).catch(() => ({ data: { data: [] } })),
-      axios.get(`${BASE}/api/bank-accounts`).catch(() => ({ data: { data: [] } })),
-      axios.get(`${BASE}/api/service-packages/public`).catch(() => ({ data: { data: [] } })),
-      axios.get(`${BASE}/api/software-products/public`).catch(() => ({ data: { data: [] } })),
-      axios.get(`${BASE}/api/feedbacks/public`).catch(() => ({ data: { data: [] } })),
-    ]).then(([p, b, c, s, ba, pkg, sw, fb]) => {
-      setPortfolios(p.data?.data ?? []);
-      const activeBanners = (b.data?.data ?? []).filter(x => x.isActive);
+    // Setiap resource dilacak sukses/gagalnya sendiri-sendiri (bukan digenapkan
+    // jadi array kosong secara diam-diam) supaya tiap section bisa membedakan
+    // "memang belum ada data" vs "API gagal dihubungi".
+    const resources = [
+      ['portfolios',       `${BASE}/api/portfolio`],
+      ['services',         `${BASE}/api/services/public`],
+      ['banners',          `${BASE}/api/banners`],
+      ['contacts',         `${BASE}/api/contacts`],
+      ['socialMedia',      `${BASE}/api/social-media`],
+      ['bankAccounts',     `${BASE}/api/bank-accounts`],
+      ['packages',         `${BASE}/api/service-packages/public`],
+      ['softwareProducts', `${BASE}/api/software-products/public`],
+      ['feedbacks',        `${BASE}/api/feedbacks/public`],
+    ];
+
+    Promise.allSettled(resources.map(([, url]) => axios.get(url))).then((results) => {
+      const data = {};
+      const nextErrors = {};
+      results.forEach((result, i) => {
+        const [key] = resources[i];
+        if (result.status === 'fulfilled') {
+          data[key] = result.value.data?.data ?? [];
+        } else {
+          data[key] = [];
+          nextErrors[key] = true;
+        }
+      });
+
+      setPortfolios(data.portfolios);
+      setServices(data.services);
+      const activeBanners = data.banners.filter(x => x.isActive);
       setBanners(activeBanners);
       if (activeBanners.length > 0) setBannerAd(activeBanners[0]); // tampilkan banner pertama sebagai popup
-      setContacts((c.data?.data ?? []).filter(x => x.isActive));
-      setSocialMedia((s.data?.data ?? []).filter(x => x.isActive));
-      setBankAccounts((ba.data?.data ?? []).filter(x => x.isActive));
-      setPackages(pkg.data?.data ?? []);
-      setSoftwareProducts(sw.data?.data ?? []);
-      setFeedbacks(fb.data?.data ?? []);
+      setContacts(data.contacts.filter(x => x.isActive));
+      setSocialMedia(data.socialMedia.filter(x => x.isActive));
+      setBankAccounts(data.bankAccounts.filter(x => x.isActive));
+      setPackages(data.packages);
+      setSoftwareProducts(data.softwareProducts);
+      setFeedbacks(data.feedbacks);
+      setErrors(nextErrors);
     }).finally(() => setIsLoading(false));
   }, []);
 
@@ -167,8 +189,6 @@ export default function LandingPage() {
 
   const scrollTo = (ref) => ref.current?.scrollIntoView({ behavior: 'smooth' });
 
-  const services = t('landing.services.items', { returnObjects: true });
-
   const avgRating = feedbacks.length > 0
     ? Math.round((feedbacks.reduce((s, f) => s + f.rating, 0) / feedbacks.length) / 5 * 100)
     : 98; // Fallback to 98% if no reviews yet
@@ -181,7 +201,7 @@ export default function LandingPage() {
   ];
 
   return (
-    <div ref={pageRef} className="min-h-screen bg-neu-bg overflow-x-hidden">
+    <div ref={pageRef} className="min-h-screen bg-paper-grid overflow-x-hidden">
       <PortfolioModal
         item={activePortfolio}
         open={!!activePortfolio}
@@ -198,7 +218,7 @@ export default function LandingPage() {
       {/* ── Custom Toast Notification ── */}
       {toast && createPortal(
         <div className={cn(
-          'fixed bottom-6 right-6 z-[9999] flex items-start gap-3 px-4 py-3 border-2 border-neu-black rounded-neu shadow-neu max-w-sm',
+          'fixed bottom-6 right-6 z-[9999] flex items-start gap-3 px-4 py-3 border-2 border-neu-black rounded-neu shadow-neu-solid max-w-sm',
           toast.type === 'success' ? 'bg-neu-green text-neu-white' : 'bg-neu-accent text-neu-white',
         )}>
           <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -274,7 +294,7 @@ export default function LandingPage() {
                   </div>
                   <div className="px-5 py-4 border-t-2 border-neu-black flex gap-3 flex-shrink-0">
                     <button onClick={() => transitionTo('/register')}
-                      className="flex-1 py-2.5 bg-neu-primary border-2 border-neu-black rounded-neu-sm shadow-neu-sm font-display font-bold text-xs uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none">
+                      className="flex-1 py-2.5 bg-neu-gold border-2 border-neu-black rounded-neu shadow-neu-solid-sm font-display font-bold text-xs uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none">
                       {t('landing.banner.learnMore')}
                     </button>
                     <DialogClose className="px-4 py-2.5 bg-neu-white border-2 border-neu-black rounded-neu-sm font-display font-bold text-xs uppercase text-neu-black/60 hover:text-neu-black transition-colors">
@@ -353,7 +373,7 @@ export default function LandingPage() {
                   </div>
                   <div className="px-5 py-4 border-t-2 border-neu-black flex gap-3 flex-shrink-0">
                     <button onClick={() => transitionTo('/register')}
-                      className="flex-1 py-2.5 bg-neu-primary border-2 border-neu-black rounded-neu-sm shadow-neu-sm font-display font-bold text-xs uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none">
+                      className="flex-1 py-2.5 bg-neu-gold border-2 border-neu-black rounded-neu shadow-neu-solid-sm font-display font-bold text-xs uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none">
                       Pelajari Lebih Lanjut
                     </button>
                     <DialogClose className="px-4 py-2.5 bg-neu-white border-2 border-neu-black rounded-neu-sm font-display font-bold text-xs uppercase text-neu-black/60 hover:text-neu-black transition-colors">
@@ -381,15 +401,16 @@ export default function LandingPage() {
 
       <TechMarquee />
 
-      <Stats stats={stats} />
+      <Stats stats={stats} isLoading={isLoading} error={errors.portfolios || errors.feedbacks} />
 
-      <Services services={services} />
+      <Services services={services} isLoading={isLoading} error={errors.services} />
 
-      <About />
+      <About stats={stats} isLoading={isLoading} />
 
       <Packages
         packages={packages}
         isLoading={isLoading}
+        error={errors.packages}
         pkgSliderRef={pkgSliderRef}
         pkgDrag={pkgDrag}
         scrollSlider={scrollSlider}
@@ -401,6 +422,7 @@ export default function LandingPage() {
       <Software
         softwareProducts={softwareProducts}
         isLoading={isLoading}
+        error={errors.softwareProducts}
         swSliderRef={swSliderRef}
         swDrag={swDrag}
         scrollSlider={scrollSlider}
@@ -411,6 +433,7 @@ export default function LandingPage() {
       <Portfolio
         portfolios={portfolios}
         isLoading={isLoading}
+        error={errors.portfolios}
         portfolioRef={portfolioRef}
         setActivePortfolio={setActivePortfolio}
         transitionTo={transitionTo}
@@ -427,7 +450,7 @@ export default function LandingPage() {
 
       <CTAFinal transitionTo={transitionTo} />
 
-      <Footer socialMedia={socialMedia} transitionTo={transitionTo} />
+      <Footer socialMedia={socialMedia} services={services} transitionTo={transitionTo} />
 
       <FloatingCTA showScrollTop={showScrollTop} transitionTo={transitionTo} />
     </div>
