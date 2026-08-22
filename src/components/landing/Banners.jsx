@@ -1,228 +1,350 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useLang } from './hooks';
 import { supaImg } from '../../utils/imageUrl';
 
-const DEFAULT_BANNERS = [
+const THEME_PRESETS = [
   {
-    id: 'b-1',
-    title: 'Jasa Pembuatan Alat IoT & Android',
-    titleEn: 'IoT & Android Hardware-Software Development',
-    badge: '🚀 HARDWARE + SOFTWARE',
-    badgeEn: '🚀 HARDWARE + SOFTWARE',
-    theme: 'bg-primary-container text-neu-black',
-    accentColor: '#FFD000',
+    badge: 'NEW',
+    badgeBg: 'bg-neu-green text-neu-black rotate-2',
     icon: 'memory',
-    iconBg: 'bg-neu-white text-neu-black',
-    btnTheme: 'bg-neu-black text-primary-container hover:bg-neu-white hover:text-neu-black',
-    description: 'Solusi hardware & software terintegrasi untuk otomasi industri, smart home, dan proyek akademik dengan monitoring realtime.',
-    descriptionEn: 'Integrated hardware & software solutions for industrial automation, smart homes, and academic projects with realtime monitoring.',
+    leftBg: 'bg-surface-dim',
+    rightBg: 'bg-primary-container text-neu-black',
+    titleColor: 'text-neu-black',
+    descColor: 'text-neu-black',
+    btnText: 'Detail',
+    btnStyle: 'bg-neu-black text-primary-container shadow-[6px_6px_0px_0px_#FAFAFA] hover:shadow-none hover:translate-x-1 hover:translate-y-1',
+    boxRotation: '-rotate-2',
   },
   {
-    id: 'b-2',
-    title: 'Diskon 20% Paket Website & Company Profile',
-    titleEn: '20% OFF Website & Company Profile Packages',
-    badge: '🔥 PROMO SPESIAL',
-    badgeEn: '🔥 SPECIAL DEAL',
-    theme: 'bg-secondary-container text-neu-black',
-    accentColor: '#FE5B5B',
-    icon: 'local_offer',
-    iconBg: 'bg-neu-white text-neu-black',
-    btnTheme: 'bg-neu-black text-secondary-container hover:bg-neu-white hover:text-neu-black',
-    description: 'Tingkatkan kredibilitas bisnis Anda dengan website modern berkecepatan tinggi, SEO-friendly, dan gratis domain + hosting.',
-    descriptionEn: 'Boost your business credibility with modern high-speed, SEO-friendly websites including free domain and hosting.',
+    badge: 'PROMO',
+    badgeBg: 'bg-secondary-container text-neu-black -rotate-2',
+    icon: 'campaign',
+    leftBg: 'bg-neu-purple',
+    rightBg: 'bg-primary-container text-neu-black',
+    titleColor: 'text-neu-white',
+    descColor: 'text-neu-white',
+    btnText: 'KLAIM PROMO',
+    btnStyle: 'bg-neu-white text-neu-black shadow-[6px_6px_0px_0px_#0D0D0D] hover:shadow-none hover:translate-x-1 hover:translate-y-1',
+    boxRotation: 'rotate-2',
   },
   {
-    id: 'b-3',
-    title: 'Joki Skripsi & Tugas Akhir Fast Track',
-    titleEn: 'Fast-Track Thesis & Academic Project Support',
-    badge: '⚡ GARANSI HINGGA ACC',
-    badgeEn: '⚡ 100% ACC GUARANTEE',
-    theme: 'bg-neu-purple text-neu-white',
-    accentColor: '#A855F7',
-    icon: 'school',
-    iconBg: 'bg-neu-white text-neu-black',
-    btnTheme: 'bg-primary-container text-neu-black hover:bg-neu-white hover:text-neu-black',
-    description: 'Pengerjaan kode bersih, laporan komprehensif, bimbingan privat via Google Meet/WA, dan garansi plagiasi rendah Turnitin.',
-    descriptionEn: 'Clean code delivery, comprehensive documentation, private guidance via Meet/WA, and Turnitin-verified low similarity.',
+    badge: 'UPDATE',
+    badgeBg: 'bg-neu-white text-neu-black rotate-3',
+    icon: 'update',
+    leftBg: 'bg-neu-green',
+    rightBg: 'bg-primary-container text-neu-black',
+    titleColor: 'text-neu-black',
+    descColor: 'text-neu-black',
+    btnText: 'PELAJARI LEBIH LANJUT',
+    btnStyle: 'bg-neu-black text-primary-container shadow-[6px_6px_0px_0px_#FAFAFA] hover:shadow-none hover:translate-x-1 hover:translate-y-1',
+    boxRotation: '-rotate-1',
+  },
+  {
+    badge: 'SPECIAL',
+    badgeBg: 'bg-primary-container text-neu-black -rotate-1',
+    icon: 'star',
+    leftBg: 'bg-secondary-container',
+    rightBg: 'bg-primary-container text-neu-black',
+    titleColor: 'text-neu-black',
+    descColor: 'text-neu-black',
+    btnText: 'KONSULTASI SEKARANG',
+    btnStyle: 'bg-neu-white text-neu-black shadow-[6px_6px_0px_0px_#0D0D0D] hover:shadow-none hover:translate-x-1 hover:translate-y-1',
+    boxRotation: 'rotate-1',
+  },
+  {
+    badge: 'FEATURED',
+    badgeBg: 'bg-neu-purple text-neu-white rotate-2',
+    icon: 'bolt',
+    leftBg: 'bg-surface-dim',
+    rightBg: 'bg-primary-container text-neu-black',
+    titleColor: 'text-neu-black',
+    descColor: 'text-neu-black',
+    btnText: 'LIHAT DETAIL',
+    btnStyle: 'bg-neu-black text-primary-container shadow-[6px_6px_0px_0px_#FAFAFA] hover:shadow-none hover:translate-x-1 hover:translate-y-1',
+    boxRotation: '-rotate-2',
   },
 ];
 
-export function Banners({ banners, setBannerModal, setBannerModalExp }) {
+const DEFAULT_BANNERS = [
+  {
+    id: 'banner-1',
+    badge: 'NEW',
+    title: 'Jasa Pembuatan Alat IoT & Android',
+    titleEn: 'IoT & Android Hardware-Software Development',
+    desc: 'Solusi hardware & software terintegrasi untuk otomasi industri dan personal.',
+    descEn: 'Integrated hardware & software solutions for industrial automation and personal use.',
+    btnText: 'Detail',
+  },
+  {
+    id: 'banner-2',
+    badge: 'PROMO',
+    title: 'Diskon 20% Website Company Profile',
+    titleEn: '20% OFF Company Profile Website',
+    desc: 'Bangun citra profesional bisnismu bulan ini dengan harga spesial. Terbatas!',
+    descEn: 'Build your professional business brand this month with special discount. Limited offer!',
+    btnText: 'KLAIM PROMO',
+  },
+  {
+    id: 'banner-3',
+    badge: 'UPDATE',
+    title: 'Layanan Maintenance 24/7',
+    titleEn: '24/7 Maintenance Service',
+    desc: 'Kini Synectra menyediakan dukungan penuh untuk menjaga sistem Anda tetap optimal tanpa henti.',
+    descEn: 'Synectra now provides 24/7 full maintenance support to keep your systems running smoothly.',
+    btnText: 'PELAJARI LEBIH LANJUT',
+  },
+];
+
+export function Banners({ banners, onOpenModal }) {
   const { t } = useTranslation();
   const lang = useLang();
   const [currentIdx, setCurrentIdx] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
 
+  // Dynamically map any number of banners (1 to N) with rotating theme presets
   const bannerList = (banners && banners.length > 0)
-    ? banners.map((b, i) => ({
-        id: b.id,
-        title: lang(b.title, b.titleEn),
-        titleEn: b.titleEn || b.title,
-        badge: b.promoCode ? `KODE: ${b.promoCode}` : '🔥 ANNOUNCEMENT',
-        badgeEn: b.promoCode ? `CODE: ${b.promoCode}` : '🔥 ANNOUNCEMENT',
-        theme: ['bg-primary-container text-neu-black', 'bg-secondary-container text-neu-black', 'bg-neu-purple text-neu-white'][i % 3],
-        icon: b.icon || 'campaign',
-        iconBg: 'bg-neu-white text-neu-black',
-        btnTheme: 'bg-neu-black text-primary-container hover:bg-neu-white hover:text-neu-black',
-        image: b.image,
-        description: b.description ? b.description.replace(/<[^>]*>/g, ' ') : 'Dapatkan penawaran istimewa dan update terbaru dari Synectra.',
-        descriptionEn: b.descriptionEn || b.description,
-        rawBanner: b,
-      }))
-    : DEFAULT_BANNERS;
+    ? banners.map((b, i) => {
+        const theme = THEME_PRESETS[i % THEME_PRESETS.length];
+        return {
+          id: b.id || `banner-${i}`,
+          badge: b.promoCode ? `KODE: ${b.promoCode}` : (b.badge || theme.badge),
+          badgeBg: theme.badgeBg,
+          icon: b.icon || theme.icon,
+          image: b.image,
+          leftBg: theme.leftBg,
+          rightBg: theme.rightBg,
+          title: lang(b.title, b.titleEn) || 'PENGUMUMAN TERBARU',
+          titleColor: theme.titleColor,
+          desc: b.description
+            ? b.description.replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').trim()
+            : (lang(b.title, b.titleEn) ? `Informasi promo dan pengumuman terbaru mengenai ${lang(b.title, b.titleEn)}.` : 'Solusi digital terintegrasi untuk kebutuhan bisnis dan akademik Anda.'),
+          descColor: theme.descColor,
+          btnText: theme.btnText,
+          btnStyle: theme.btnStyle,
+          boxRotation: theme.boxRotation,
+          rawBanner: b,
+        };
+      })
+    : DEFAULT_BANNERS.map((b, i) => {
+        const theme = THEME_PRESETS[i % THEME_PRESETS.length];
+        return {
+          ...b,
+          ...theme,
+          title: lang(b.title, b.titleEn),
+          desc: lang(b.desc, b.descEn),
+          btnText: b.btnText || theme.btnText,
+        };
+      });
 
-  // Auto-slide every 6 seconds if not paused
+  const totalBanners = bannerList.length;
+
+  // Auto-slide every 6s if not hovered and there are 2 or more banners
   useEffect(() => {
-    if (isPaused || bannerList.length <= 1) return;
+    if (isPaused || totalBanners <= 1) return;
     const timer = setInterval(() => {
-      setCurrentIdx((prev) => (prev + 1) % bannerList.length);
+      setCurrentIdx((prev) => (prev + 1) % totalBanners);
     }, 6000);
     return () => clearInterval(timer);
-  }, [isPaused, bannerList.length]);
-
-  const active = bannerList[currentIdx] || bannerList[0];
-
-  const handlePrev = () => {
-    setCurrentIdx((prev) => (prev - 1 + bannerList.length) % bannerList.length);
-  };
+  }, [isPaused, totalBanners]);
 
   const handleNext = () => {
-    setCurrentIdx((prev) => (prev + 1) % bannerList.length);
+    setCurrentIdx((prev) => (prev + 1) % totalBanners);
   };
 
-  const handleOpenDetail = () => {
-    if (active.rawBanner) {
-      setBannerModal(active.rawBanner);
-      setBannerModalExp(true);
+  const handlePrev = () => {
+    setCurrentIdx((prev) => (prev - 1 + totalBanners) % totalBanners);
+  };
+
+  // Touch Swipe handlers
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.targetTouches[0].clientX;
+  };
+
+  const handleTouchMove = (e) => {
+    touchEndX.current = e.targetTouches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStartX.current || !touchEndX.current) return;
+    const diff = touchStartX.current - touchEndX.current;
+    if (diff > 50) handleNext(); // swipe left -> next
+    if (diff < -50) handlePrev(); // swipe right -> prev
+    touchStartX.current = 0;
+    touchEndX.current = 0;
+  };
+
+  const handleButtonClick = (item) => {
+    if (onOpenModal) {
+      onOpenModal(item.rawBanner || item);
     } else {
-      const contactEl = document.getElementById('kontak');
-      if (contactEl) contactEl.scrollIntoView({ behavior: 'smooth' });
+      const el = document.getElementById('kontak');
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
   return (
-    <section className="w-full bg-neu-white overflow-hidden border-b-4 border-neu-black select-none">
+    <section className="w-full bg-neu-white py-14 md:py-20 px-4 md:px-8 border-b-4 border-neu-black relative select-none">
       <div
-        className="w-full"
+        className="max-w-7xl mx-auto w-full relative"
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
       >
-        <div className="w-full max-w-7xl mx-auto md:border-x-4 border-neu-black">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={active.id || currentIdx}
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.35, ease: 'easeOut' }}
-              className={`${active.theme} p-6 sm:p-8 md:p-12 relative flex flex-col md:flex-row items-center gap-6 md:gap-10 min-h-[340px] md:min-h-[300px] transition-colors duration-500`}
-            >
-              {/* Left Visual Icon / Image Box */}
-              <div className="relative shrink-0">
-                {active.image ? (
-                  <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 bg-neu-white border-4 border-neu-black rounded-2xl overflow-hidden shadow-[6px_6px_0px_0px_#0D0D0D]">
-                    <img
-                      src={supaImg(active.image, { width: 300 })}
-                      alt={active.title}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                ) : (
-                  <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 bg-neu-white border-4 border-neu-black rounded-2xl flex items-center justify-center shadow-[6px_6px_0px_0px_#0D0D0D] transform -rotate-3 hover:rotate-0 transition-transform">
-                    <span className="material-symbols-outlined text-4xl sm:text-5xl md:text-6xl text-neu-black font-black">
-                      {active.icon}
-                    </span>
-                  </div>
-                )}
-                {/* Floating pill badge on icon */}
-                <div className="absolute -bottom-2.5 -right-2 bg-neu-black text-neu-white border-2 border-neu-black px-2 py-0.5 rounded-md font-mono text-[10px] md:text-xs font-black tracking-wider uppercase shadow-[3px_3px_0px_0px_#FAFAFA] max-w-[150px] truncate">
-                  {active.badge}
-                </div>
+        {/* Header Row */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-6 md:mb-8">
+          <div className="bg-neu-black text-neu-white font-mono text-base md:text-xl font-bold px-6 md:px-8 py-3 border-4 border-neu-black rounded-lg shadow-[8px_8px_0px_0px_#FFD000] transform -rotate-1 uppercase tracking-wide">
+            {t('landing.banner.title', 'ANNOUNCEMENTS')} // RECENT_UPDATES
+          </div>
+
+          {/* Desktop Controls (Slide Counter & Navigation Buttons) */}
+          {totalBanners > 1 && (
+            <div className="hidden md:flex items-center gap-4">
+              {/* Numerical Slide Counter */}
+              <div className="bg-surface-dim text-neu-black border-2 border-neu-black px-3.5 py-1.5 rounded-md font-mono text-xs font-black shadow-[2px_2px_0px_0px_#0D0D0D]">
+                {String(currentIdx + 1).padStart(2, '0')} / {String(totalBanners).padStart(2, '0')}
               </div>
 
-              {/* Center Content with Line Clamping & Overflow Safety */}
-              <div className="flex-1 min-w-0 text-center md:text-left z-10">
-                <div className="bg-neu-black text-neu-white font-mono text-xs md:text-sm font-bold px-3.5 py-1.5 border-4 border-neu-black rounded-lg shadow-[4px_4px_0px_0px_#FAFAFA] inline-block mb-3 uppercase transform -rotate-1">
-                  {t('landing.banner.title', 'ANNOUNCEMENTS')} // RECENT_UPDATES
-                </div>
-
-                <h3
-                  title={active.title}
-                  className="font-display text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black uppercase tracking-tight mb-2 md:mb-3 leading-tight break-words line-clamp-2"
-                >
-                  {active.title}
-                </h3>
-
-                <p
-                  title={active.description}
-                  className="font-body font-bold mb-5 md:mb-6 text-sm sm:text-base md:text-lg leading-relaxed opacity-95 max-w-3xl break-words line-clamp-2 sm:line-clamp-3"
-                >
-                  {active.description}
-                </p>
-
-                <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 md:gap-4">
+              {/* Indicator dots (auto wrapped if > 6) */}
+              <div className="flex items-center gap-1.5 max-w-[200px] overflow-hidden">
+                {bannerList.map((_, dotIdx) => (
                   <button
-                    onClick={handleOpenDetail}
-                    className={`${active.btnTheme} font-display font-black text-sm md:text-base px-6 md:px-8 py-3 md:py-3.5 border-4 border-neu-black shadow-[4px_4px_0px_0px_#0D0D0D] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all uppercase rounded-xl btn-press cursor-pointer flex items-center gap-2`}
-                  >
-                    <span>{t('landing.banner.consultNow', 'Konsultasi Sekarang')}</span>
-                    <span className="material-symbols-outlined text-lg font-bold">arrow_forward</span>
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      const pkgEl = document.getElementById('paket');
-                      if (pkgEl) pkgEl.scrollIntoView({ behavior: 'smooth' });
-                    }}
-                    className="bg-neu-white text-neu-black font-display font-black text-xs md:text-sm px-5 md:px-6 py-3 md:py-3.5 border-4 border-neu-black shadow-[4px_4px_0px_0px_#0D0D0D] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all uppercase rounded-xl btn-press cursor-pointer"
-                  >
-                    {t('landing.packages.tag', 'LIHAT PAKET')}
-                  </button>
-                </div>
+                    key={dotIdx}
+                    onClick={() => setCurrentIdx(dotIdx)}
+                    aria-label={`Slide ${dotIdx + 1}`}
+                    className={`h-2.5 rounded-full border-2 border-neu-black transition-all cursor-pointer ${
+                      dotIdx === currentIdx
+                        ? 'w-6 bg-neu-black'
+                        : 'w-2.5 bg-neu-white hover:bg-neu-white/80'
+                    }`}
+                  />
+                ))}
               </div>
 
-              {/* Slider Controls (Arrow Buttons & Dots) */}
-              {bannerList.length > 1 && (
-                <div className="flex flex-col items-center md:items-end gap-2.5 z-10 shrink-0">
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={handlePrev}
-                      aria-label="Previous banner"
-                      className="w-9 h-9 md:w-11 md:h-11 bg-neu-white text-neu-black border-4 border-neu-black rounded-lg flex items-center justify-center shadow-[3px_3px_0px_0px_#0D0D0D] hover:bg-primary-container transition-all active:translate-x-0.5 active:translate-y-0.5 cursor-pointer"
-                    >
-                      <span className="material-symbols-outlined text-xl md:text-2xl font-bold">arrow_back</span>
-                    </button>
-                    <button
-                      onClick={handleNext}
-                      aria-label="Next banner"
-                      className="w-9 h-9 md:w-11 md:h-11 bg-neu-white text-neu-black border-4 border-neu-black rounded-lg flex items-center justify-center shadow-[3px_3px_0px_0px_#0D0D0D] hover:bg-primary-container transition-all active:translate-x-0.5 active:translate-y-0.5 cursor-pointer"
-                    >
-                      <span className="material-symbols-outlined text-xl md:text-2xl font-bold">arrow_forward</span>
-                    </button>
-                  </div>
-
-                  {/* Indicator dots */}
-                  <div className="flex gap-1.5 mt-1">
-                    {bannerList.map((_, dotIdx) => (
-                      <button
-                        key={dotIdx}
-                        onClick={() => setCurrentIdx(dotIdx)}
-                        aria-label={`Slide ${dotIdx + 1}`}
-                        className={`h-2.5 rounded-full border-2 border-neu-black transition-all cursor-pointer ${
-                          dotIdx === currentIdx
-                            ? 'w-7 bg-neu-black'
-                            : 'w-2.5 bg-neu-white hover:bg-neu-white/80'
-                        }`}
-                      />
-                    ))}
-                  </div>
-                </div>
-              )}
-            </motion.div>
-          </AnimatePresence>
+              <div className="flex gap-2">
+                <button
+                  onClick={handlePrev}
+                  aria-label="Previous banner"
+                  className="w-11 h-11 bg-neu-white border-4 border-neu-black flex items-center justify-center shadow-[4px_4px_0px_0px_#0D0D0D] hover:shadow-[2px_2px_0px_0px_#0D0D0D] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-lg btn-press cursor-pointer"
+                >
+                  <span className="material-symbols-outlined font-black text-2xl">arrow_back</span>
+                </button>
+                <button
+                  onClick={handleNext}
+                  aria-label="Next banner"
+                  className="w-11 h-11 bg-neu-white border-4 border-neu-black flex items-center justify-center shadow-[4px_4px_0px_0px_#0D0D0D] hover:shadow-[2px_2px_0px_0px_#0D0D0D] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-lg btn-press cursor-pointer"
+                >
+                  <span className="material-symbols-outlined font-black text-2xl">arrow_forward</span>
+                </button>
+              </div>
+            </div>
+          )}
         </div>
+
+        {/* Carousel Container (Calculated dynamically for N slides) */}
+        <div className="overflow-hidden border-4 border-neu-black rounded-xl shadow-[12px_12px_0px_0px_#0D0D0D] bg-primary-container relative">
+          <div
+            className="flex transition-transform duration-500 ease-in-out"
+            style={{
+              width: `${totalBanners * 100}%`,
+              transform: `translateX(-${(currentIdx * 100) / totalBanners}%)`,
+            }}
+          >
+            {bannerList.map((banner, index) => (
+              <div
+                key={banner.id || index}
+                style={{ width: `${100 / totalBanners}%` }}
+                className="flex flex-col md:flex-row shrink-0 items-stretch"
+              >
+                {/* Left Graphic / Image Box (clickable to open modal) */}
+                <div
+                  onClick={() => handleButtonClick(banner)}
+                  className={`w-full md:w-2/5 p-6 sm:p-8 md:p-10 border-b-4 md:border-b-0 md:border-r-4 border-neu-black ${banner.leftBg} flex items-center justify-center cursor-pointer group`}
+                  title="Klik untuk lihat detail"
+                >
+                  <div
+                    className={`w-full max-w-[280px] sm:max-w-[340px] md:max-w-[380px] h-48 sm:h-56 md:h-64 border-4 border-neu-black bg-neu-white rounded-xl shadow-[6px_6px_0px_0px_#0D0D0D] flex items-center justify-center transform ${banner.boxRotation} group-hover:scale-105 transition-transform duration-300 overflow-hidden relative`}
+                  >
+                    {banner.image ? (
+                      <img
+                        src={supaImg(banner.image, { width: 800 })}
+                        alt={banner.title}
+                        className="w-full h-full object-cover object-center"
+                      />
+                    ) : (
+                      <span className="material-symbols-outlined text-6xl md:text-7xl text-neu-black opacity-50">
+                        {banner.icon}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Right Content Box */}
+                <div className="w-full md:w-3/5 p-6 sm:p-8 md:p-12 flex flex-col justify-center items-start">
+                  <span
+                    className={`${banner.badgeBg} border-4 border-neu-black px-3.5 py-1.5 rounded-md font-mono font-black text-xs uppercase mb-3 md:mb-4 shadow-[4px_4px_0px_0px_#0D0D0D]`}
+                  >
+                    {banner.badge}
+                  </span>
+
+                  <h3
+                    onClick={() => handleButtonClick(banner)}
+                    className={`font-display text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black uppercase tracking-tighter mb-3 md:mb-4 leading-tight break-words max-w-2xl cursor-pointer hover:underline ${banner.titleColor}`}
+                  >
+                    {banner.title}
+                  </h3>
+
+                  {/* 2-line description snippet */}
+                  {banner.desc && (
+                    <p
+                      title={banner.desc}
+                      className={`font-body font-bold mb-6 md:mb-8 text-sm sm:text-base md:text-lg opacity-90 leading-relaxed max-w-2xl break-words line-clamp-2 ${banner.descColor}`}
+                    >
+                      {banner.desc}
+                    </p>
+                  )}
+
+                  <button
+                    onClick={() => handleButtonClick(banner)}
+                    className={`font-display font-black text-base md:text-lg px-8 py-4 border-4 border-neu-black rounded-lg transition-all uppercase btn-press cursor-pointer ${banner.btnStyle}`}
+                  >
+                    {banner.btnText}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Mobile Controls (Counter + Navigation Buttons) */}
+        {totalBanners > 1 && (
+          <div className="flex md:hidden justify-between items-center gap-4 mt-6">
+            <div className="bg-surface-dim text-neu-black border-2 border-neu-black px-3 py-1 rounded-md font-mono text-xs font-black shadow-[2px_2px_0px_0px_#0D0D0D]">
+              {String(currentIdx + 1).padStart(2, '0')} / {String(totalBanners).padStart(2, '0')}
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={handlePrev}
+                aria-label="Previous banner"
+                className="w-11 h-11 bg-neu-white border-4 border-neu-black flex items-center justify-center shadow-[4px_4px_0px_0px_#0D0D0D] hover:shadow-[2px_2px_0px_0px_#0D0D0D] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-lg btn-press cursor-pointer"
+              >
+                <span className="material-symbols-outlined font-black text-2xl">arrow_back</span>
+              </button>
+              <button
+                onClick={handleNext}
+                aria-label="Next banner"
+                className="w-11 h-11 bg-neu-white border-4 border-neu-black flex items-center justify-center shadow-[4px_4px_0px_0px_#0D0D0D] hover:shadow-[2px_2px_0px_0px_#0D0D0D] hover:translate-x-[2px] hover:translate-y-[2px] transition-all rounded-lg btn-press cursor-pointer"
+              >
+                <span className="material-symbols-outlined font-black text-2xl">arrow_forward</span>
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );
