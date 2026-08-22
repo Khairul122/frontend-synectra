@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PageLayout } from '../components/layout/PageLayout';
+import { Skeleton } from '../components/ui/Skeleton';
 import { useAlert } from '../hooks/useAlert';
 import { authService } from '../services/auth.service';
 import { todoService } from '../services/todo.service';
@@ -242,12 +243,9 @@ export default function TodoPage() {
         {/* Todo List */}
         <div className="mt-4 flex flex-col gap-2">
           {isLoading ? (
-            <div className="border-2 border-neu-black bg-neu-white p-8 text-center shadow-neu-sm">
-              <div className="flex items-center justify-center gap-2">
-                <div className="w-4 h-4 border-2 border-neu-black border-t-neu-primary animate-spin" />
-                <span className="font-mono text-sm font-bold text-neu-black/50 uppercase tracking-widest">Memuat...</span>
-              </div>
-            </div>
+            Array.from({ length: 4 }).map((_, i) => (
+              <Skeleton key={i} className="h-14 w-full" />
+            ))
           ) : todos.length === 0 ? (
             <div className="border-2 border-dashed border-neu-black/30 p-12 text-center">
               <div className="text-5xl mb-3 text-neu-black/20">✓</div>

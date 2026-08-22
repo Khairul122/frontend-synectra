@@ -2,6 +2,7 @@
 import { Sidebar } from './Sidebar';
 import { Navbar } from './Navbar';
 import { AlertContainer } from '../ui/Alert';
+import { PageSkeleton } from '../ui/Skeleton';
 import { useAlert } from '../../hooks/useAlert';
 import apiClient from '../../services/apiClient';
 import { API_ENDPOINTS } from '../../constants/api';
@@ -36,14 +37,7 @@ export function PageLayout({ user, title, children, alert: externalAlert, isLoad
   }, []);
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-neu-bg flex items-center justify-center">
-        <div className="border-2 border-neu-black shadow-neu px-8 py-5 bg-neu-white flex items-center gap-3">
-          <div className="w-4 h-4 border-2 border-neu-black border-t-neu-primary animate-spin" />
-          <span className="font-mono text-sm font-bold text-neu-black uppercase tracking-widest">Memuat...</span>
-        </div>
-      </div>
-    );
+    return <PageSkeleton />;
   }
 
   return (
