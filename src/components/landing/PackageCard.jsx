@@ -107,7 +107,7 @@ export function PackageCard({ pkg, onOrder }) {
             {icon}
           </span>
         </div>
-        <h3 className={`font-display text-xl md:text-2xl font-black uppercase tracking-tight mb-2 ${isFeatured ? 'text-neu-white' : 'text-neu-black'}`}>
+        <h3 title={name} className={`font-display text-xl md:text-2xl font-black uppercase tracking-tight mb-2 break-words line-clamp-2 ${isFeatured ? 'text-neu-white' : 'text-neu-black'}`}>
           {name}
         </h3>
         <p className={`${theme.catColor} text-xs md:text-sm font-bold uppercase tracking-widest mb-4 font-mono`}>
@@ -117,7 +117,7 @@ export function PackageCard({ pkg, onOrder }) {
           {fmt(pkg.price)}
         </div>
         {duration && (
-          <p className={`${theme.durColor} text-xs md:text-sm font-bold mt-2`}>
+          <p className={`${theme.durColor} text-xs md:text-sm font-bold mt-2 truncate`}>
             {t('landing.packages.duration', 'Durasi')}: {duration}
           </p>
         )}
@@ -126,7 +126,7 @@ export function PackageCard({ pkg, onOrder }) {
       {/* Body Features */}
       <div className={`p-6 md:p-8 flex-1 ${theme.bodyBg}`}>
         {description && (
-          <p className={`font-body text-sm ${isFeatured ? 'opacity-90' : 'text-neu-black'} font-medium mb-6 leading-relaxed`}>
+          <p title={description} className={`font-body text-sm ${isFeatured ? 'opacity-90' : 'text-neu-black'} font-medium mb-6 leading-relaxed break-words line-clamp-3`}>
             {description}
           </p>
         )}
@@ -137,7 +137,7 @@ export function PackageCard({ pkg, onOrder }) {
                 <span className={`material-symbols-outlined ${theme.checkColor} font-black text-xl shrink-0 mt-0.5`}>
                   check_box
                 </span>
-                <span className="font-body text-xs md:text-sm font-bold leading-snug">
+                <span className="font-body text-xs md:text-sm font-bold leading-snug break-words">
                   {f}
                 </span>
               </li>

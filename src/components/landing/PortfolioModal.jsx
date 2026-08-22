@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Dialog, DialogClose, DialogContent, DialogFooter,
+  Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter,
   DialogHeader, DialogTitle,
 } from '../ui/dialog';
 import { supaImg } from '../../utils/imageUrl';
@@ -20,7 +20,8 @@ export function PortfolioModal({ item, open, onClose, transitionTo }) {
     <Dialog open={open} onOpenChange={(o) => { if (!o) onClose(); }}>
       <DialogContent className="sm:max-w-2xl p-0 flex flex-col max-h-[90vh]">
         <DialogHeader>
-          <DialogTitle>{item?.title}</DialogTitle>
+          <DialogTitle>{item?.title || 'Detail Portofolio'}</DialogTitle>
+          <DialogDescription className="sr-only">{item?.title || 'Detail portofolio project'}</DialogDescription>
           {item?.category && (
             <span className="font-mono text-xs text-neu-white/60 uppercase">
               {item.category.replace(/_/g, ' ')}

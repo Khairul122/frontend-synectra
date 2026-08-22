@@ -82,10 +82,10 @@ export function Services({ services, isLoading, error }) {
               <span className="material-symbols-outlined text-4xl md:text-5xl mb-4 text-neu-black font-medium">
                 {item.icon}
               </span>
-              <h3 className="font-display text-xl md:text-2xl font-black mb-3 md:mb-4 uppercase text-neu-black">
+              <h3 title={item.title} className="font-display text-lg md:text-2xl font-black mb-3 md:mb-4 uppercase text-neu-black break-words line-clamp-2">
                 {item.title}
               </h3>
-              <p className="font-body text-sm md:text-base text-neu-black leading-relaxed font-medium">
+              <p title={item.desc} className="font-body text-sm md:text-base text-neu-black leading-relaxed font-medium break-words line-clamp-4">
                 {item.desc}
               </p>
             </div>

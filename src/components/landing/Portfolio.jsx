@@ -123,10 +123,10 @@ export function Portfolio({ portfolios, isLoading, error, portfolioRef, setActiv
                         </span>
                       ))}
                     </div>
-                    <h3 className="font-display text-xl md:text-2xl font-black mb-3 md:mb-4 uppercase text-neu-black">
+                    <h3 title={title} className="font-display text-xl md:text-2xl font-black mb-3 md:mb-4 uppercase text-neu-black break-words line-clamp-2">
                       {title}
                     </h3>
-                    <p className="font-body text-sm md:text-base text-neu-black mb-6 md:mb-8 flex-1 font-medium leading-relaxed">
+                    <p title={desc} className="font-body text-sm md:text-base text-neu-black mb-6 md:mb-8 flex-1 font-medium leading-relaxed break-words line-clamp-3">
                       {desc}
                     </p>
                     <button

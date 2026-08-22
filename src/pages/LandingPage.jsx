@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useScroll, useSpring } from 'framer-motion';
-import { Dialog, DialogClose, DialogContent, DialogTitle } from '../components/ui/dialog';
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from '../components/ui/dialog';
 import { gsap } from 'gsap';
 import axios from 'axios';
 import { cn } from '../utils/cn';
@@ -217,7 +217,8 @@ export default function LandingPage() {
         onOpenChange={(o) => { if (!o) { setBannerAd(null); setBannerExpanded(false); } }}
       >
         <DialogContent className={cn('p-0 transition-all duration-300', bannerExpanded ? 'sm:max-w-3xl' : 'sm:max-w-xl')}>
-          <DialogTitle className="sr-only">{bannerAd?.title}</DialogTitle>
+          <DialogTitle className="sr-only">{bannerAd?.title || 'Banner Iklan'}</DialogTitle>
+          <DialogDescription className="sr-only">{bannerAd?.title || 'Detail banner iklan promo'}</DialogDescription>
           {bannerAd && (
             !bannerExpanded ? (
               /* ── State 1: Gambar penuh, klik untuk expand ── */
@@ -293,7 +294,8 @@ export default function LandingPage() {
         onOpenChange={(o) => { if (!o) { setBannerModal(null); setBannerModalExp(false); } }}
       >
         <DialogContent className={cn('p-0 transition-all duration-300', bannerModalExp ? 'sm:max-w-3xl' : 'sm:max-w-xl')}>
-          <DialogTitle className="sr-only">{bannerModal?.title}</DialogTitle>
+          <DialogTitle className="sr-only">{bannerModal?.title || 'Banner Promo'}</DialogTitle>
+          <DialogDescription className="sr-only">{bannerModal?.title || 'Detail banner promo'}</DialogDescription>
           {bannerModal && (
             !bannerModalExp ? (
               /* State 1: Gambar penuh */

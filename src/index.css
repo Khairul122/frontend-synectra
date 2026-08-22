@@ -99,15 +99,7 @@
   100% { transform: translateY(-30px) rotate(15deg); }
 }
 
-.marquee-container {
-  overflow: hidden;
-  white-space: nowrap;
-}
 
-.marquee-content {
-  display: inline-block;
-  animation: marquee 20s linear infinite;
-}
 
 :root {
   --animate-duration: 0.4s;
@@ -166,24 +158,24 @@ body {
 
 /* ── Marquee animation ── */
 @keyframes marquee {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
+  0%   { transform: translateX(0%); }
+  100% { transform: translateX(-100%); }
 }
 @keyframes marquee-reverse {
-  from { transform: translateX(-50%); }
-  to   { transform: translateX(0); }
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(0%); }
 }
 .animate-marquee {
-  animation: marquee 28s linear infinite;
+  animation: marquee 24s linear infinite;
   will-change: transform;
 }
 .animate-marquee-reverse {
-  animation: marquee-reverse 28s linear infinite;
+  animation: marquee-reverse 24s linear infinite;
   will-change: transform;
 }
-.animate-marquee-slow {
-  animation: marquee 40s linear infinite;
-  will-change: transform;
+.animate-marquee:hover,
+.animate-marquee-reverse:hover {
+  animation-play-state: paused;
 }
 
 /* ── Custom visual animations ── */

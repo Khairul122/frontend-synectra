@@ -78,10 +78,10 @@ export function Software({ softwareProducts, isLoading, error, setActiveSoftware
                   <div className="bg-neu-purple text-neu-white border-4 border-neu-black px-3 py-1 rounded-md font-mono font-bold text-xs uppercase mb-6 self-start">
                     {category}
                   </div>
-                  <h4 className="font-display text-xl font-black mb-3 md:mb-4 uppercase text-neu-black">
+                  <h4 title={swName} className="font-display text-lg md:text-xl font-black mb-3 md:mb-4 uppercase text-neu-black break-words line-clamp-2">
                     {swName}
                   </h4>
-                  <p className="font-body text-sm md:text-base text-neu-black mb-6 md:mb-8 flex-1 font-medium leading-relaxed">
+                  <p title={swDesc} className="font-body text-sm md:text-base text-neu-black mb-6 md:mb-8 flex-1 font-medium leading-relaxed break-words line-clamp-3">
                     {swDesc}
                   </p>
                   <div className="text-2xl md:text-3xl font-display font-black text-neu-black mb-6">

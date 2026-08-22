@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import {
-  Dialog, DialogClose, DialogContent, DialogFooter,
+  Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter,
   DialogHeader, DialogTitle,
 } from '../ui/dialog';
 import { supaImg } from '../../utils/imageUrl';
@@ -18,7 +18,8 @@ export function SoftwareDetailModal({ sw, open, onClose, transitionTo }) {
     <Dialog open={open} onOpenChange={(o) => { if (!o) onClose(); }}>
       <DialogContent className="sm:max-w-lg p-0 flex flex-col max-h-[90vh]">
         <DialogHeader>
-          <DialogTitle>{swName}</DialogTitle>
+          <DialogTitle>{swName || 'Detail Software'}</DialogTitle>
+          <DialogDescription className="sr-only">{swName || 'Detail produk software aplikasi'}</DialogDescription>
           {sw?.category && (
             <span className="font-mono text-xs text-neu-white/50 uppercase">{sw.category}</span>
           )}

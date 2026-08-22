@@ -98,21 +98,21 @@ export function FeedbackSection({ feedbacks, onSubmitted }) {
                     </span>
                   ))}
                 </div>
-                <p className="font-body font-bold mb-6 md:mb-8 italic text-base md:text-lg leading-relaxed text-neu-black">
+                <p title={item.message} className="font-body font-bold mb-6 md:mb-8 italic text-base md:text-lg leading-relaxed text-neu-black break-words line-clamp-4">
                   "{item.message}"
                 </p>
               </div>
-              <div className="flex items-center gap-4 pt-4 border-t-2 border-neu-black/10">
+              <div className="flex items-center gap-4 pt-4 border-t-2 border-neu-black/10 min-w-0">
                 <div className={`w-12 h-12 md:w-16 md:h-16 ${item.avatarBg} border-4 border-neu-black rounded-xl flex items-center justify-center shrink-0`}>
                   <span className="material-symbols-outlined text-neu-black text-2xl font-bold">
                     person
                   </span>
                 </div>
-                <div>
-                  <h5 className="font-display text-base md:text-lg font-black uppercase text-neu-black">
+                <div className="min-w-0 flex-1">
+                  <h5 title={item.name} className="font-display text-base md:text-lg font-black uppercase text-neu-black truncate">
                     {item.name}
                   </h5>
-                  <p className="font-mono text-xs md:text-sm font-bold text-neu-black/70">
+                  <p title={item.role} className="font-mono text-xs md:text-sm font-bold text-neu-black/70 truncate">
                     {item.role}
                   </p>
                 </div>
