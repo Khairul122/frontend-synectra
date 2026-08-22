@@ -12,16 +12,18 @@ export function Hero({ transitionTo, scrollTo, portfolioRef }) {
       {/* Badge mono-label */}
       <div className="hero-badge font-mono text-xs sm:text-sm uppercase tracking-widest border-4 border-neu-black px-5 sm:px-6 py-2.5 sm:py-3 bg-neu-primary mb-6 lg:mb-8 font-black rounded-neu-sm shadow-neu-module-sm"
            style={{ opacity: 0 }}>
-        [ {t('landing.hero.badge').replace('✦ ', '').replace('✦', '')} ]
+        <span className="inline-block transition-transform duration-300 hover:-translate-y-1">
+          [ {t('landing.hero.badge').replace('✦ ', '').replace('✦', '')} ]
+        </span>
       </div>
 
       {/* Headline raksasa, breaking grid */}
       <h1 className="font-display text-[clamp(2.5rem,7.5vw,5.75rem)] leading-[0.95] font-black text-center uppercase tracking-tighter w-full max-w-4xl relative z-20 mb-8 lg:mb-10">
         <HeroReveal delay={0.1}>
-          <span className="block drop-shadow-[4px_4px_0px_rgba(13,13,13,0.15)] text-neu-black">{t('landing.hero.title1')}</span>
+          <span className="block drop-shadow-[4px_4px_0px_rgba(13,13,13,0.15)] text-neu-black transition-transform duration-300 hover:-translate-y-2">{t('landing.hero.title1')}</span>
         </HeroReveal>
         <HeroReveal delay={0.3}>
-          <span className="block text-neu-green drop-shadow-[4px_4px_0px_#0D0D0D]">{t('landing.hero.title2')}</span>
+          <span className="block text-neu-green drop-shadow-[4px_4px_0px_#0D0D0D] transition-transform duration-300 hover:-translate-y-2">{t('landing.hero.title2')}</span>
         </HeroReveal>
         <HeroReveal delay={0.5}>
           <span className="relative inline-block mt-1">
@@ -35,15 +37,15 @@ export function Hero({ transitionTo, scrollTo, portfolioRef }) {
 
       {/* Paragraf + CTA */}
       <div className="hero-cta flex flex-col md:flex-row justify-center items-center w-full max-w-4xl gap-6 lg:gap-10" style={{ opacity: 0 }}>
-        <div className="hero-subtitle bg-neu-bg p-6 lg:p-7 border-4 border-neu-black shadow-neu-solid-lg rounded-neu-lg max-w-xl">
+        <div className="hero-subtitle bg-neu-bg p-6 lg:p-7 border-4 border-neu-black shadow-neu-solid-lg rounded-neu-lg max-w-xl transform -rotate-1 hover:rotate-1 transition-transform duration-300">
           <p className="font-mono text-sm sm:text-base text-neu-black leading-relaxed font-bold">
             {t('landing.hero.subtitle')}
           </p>
         </div>
         <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0">
-          <TactileButton variant="gold" className="!px-8 !py-4 !text-base whitespace-nowrap" onClick={() => transitionTo('/register')}>
+          <TactileButton variant="gold" className="!px-8 !py-4 !text-base whitespace-nowrap group" onClick={() => transitionTo('/register')}>
             {t('landing.hero.cta')}
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M13 5l7 7-7 7" /></svg>
+            <svg className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M13 5l7 7-7 7" /></svg>
           </TactileButton>
           <TactileButton variant="ghost" className="!px-6 !py-4 whitespace-nowrap" onClick={() => scrollTo(portfolioRef)}>
             {t('landing.hero.ctaSecondary')}
@@ -52,13 +54,13 @@ export function Hero({ transitionTo, scrollTo, portfolioRef }) {
       </div>
 
       {/* Badge sticker mengambang */}
-      <div className="hidden lg:block absolute top-[14%] left-[4%] z-30 -rotate-6 animate-float-badge" style={{ '--float-rot': '-6deg' }}>
-        <div className="bg-neu-purple text-neu-white border-4 border-neu-black px-5 py-3 rounded-neu-lg font-mono text-base uppercase font-black shadow-neu-module-sm">
+      <div className="hidden lg:block absolute top-[14%] left-[4%] z-30 -rotate-6 animate-float-badge cursor-pointer" style={{ '--float-rot': '-6deg' }}>
+        <div className="bg-neu-purple text-neu-white border-4 border-neu-black px-5 py-3 rounded-neu-lg font-mono text-base uppercase font-black shadow-neu-module-sm transition-transform duration-300 hover:scale-110">
           WEB.DEV
         </div>
       </div>
-      <div className="hidden lg:block absolute bottom-[10%] right-[4%] z-30 rotate-6 animate-float-badge" style={{ '--float-rot': '8deg', animationDelay: '-2.5s' }}>
-        <div className="bg-neu-accent text-neu-black border-4 border-neu-black px-5 py-3 rounded-neu-lg font-mono text-base uppercase font-black shadow-neu-module-sm">
+      <div className="hidden lg:block absolute bottom-[10%] right-[4%] z-30 rotate-6 animate-float-badge cursor-pointer" style={{ '--float-rot': '8deg', animationDelay: '-2.5s' }}>
+        <div className="bg-neu-accent text-neu-black border-4 border-neu-black px-5 py-3 rounded-neu-lg font-mono text-base uppercase font-black shadow-neu-module-sm transition-transform duration-300 hover:scale-110">
           UI/UX
         </div>
       </div>

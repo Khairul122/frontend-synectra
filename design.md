@@ -94,7 +94,7 @@ Full-bleed, dipisah garis, konten di-center manual — bukan card wrapper:
 
 Background halaman (`LandingPage.jsx` root div) pakai `.bg-brutalist-grid` (garis grid 60px, warna `neu-bg`) — praktis tidak terlihat karena section-section full-bleed menutupinya, tapi tetap jadi fallback yang aman.
 
-**Pengecualian: `Navbar`.** Berbeda dari section konten (full-bleed, tanpa radius), `Navbar` mempertahankan tampilan "floating pill card" persis mock Stitch: `sticky top-3 lg:top-4` dengan padding horizontal, isinya bar `border-4 border-neu-black rounded-neu-lg shadow-neu-solid-lg` yang mengambang dengan jarak dari tepi viewport — bukan `border-b-4` full-width seperti section lain. Nav-link & tombol Masuk/Daftar di dalamnya juga pill individual (`border-2 shadow-neu-solid-sm`, hover `-translate-y-1 rotate-1`), bukan link polos.
+`Navbar` mengikuti pola full-bleed yang sama seperti section lain (`sticky top-0`, `w-full border-b-4 border-neu-black`, konten di-center lewat `max-w-7xl mx-auto`) — bukan kartu mengambang. Nav-link & tombol Masuk/Daftar di dalamnya tetap pill individual (`border-2`/`border-4` + `shadow-neu-solid-sm`, hover `-translate-y-1 rotate-1`), sesuai mock Stitch final.
 
 ### Spacing / ritme section
 
