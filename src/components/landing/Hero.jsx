@@ -7,16 +7,16 @@ export function Hero({ transitionTo, scrollTo, portfolioRef }) {
 
   return (
     <section className="relative bg-neu-white overflow-hidden">
-    <div className="relative max-w-7xl mx-auto px-4 lg:px-6 pt-16 lg:pt-24 pb-16 lg:pb-20 flex flex-col items-center">
+    <div className="relative max-w-7xl mx-auto px-4 lg:px-6 pt-10 lg:pt-16 pb-10 lg:pb-14 flex flex-col items-center">
 
       {/* Badge mono-label */}
-      <div className="hero-badge font-mono text-xs sm:text-sm uppercase tracking-widest border-4 border-neu-black px-5 sm:px-6 py-2.5 sm:py-3 bg-neu-primary mb-10 lg:mb-14 font-black rounded-neu-sm shadow-neu-module-sm"
+      <div className="hero-badge font-mono text-xs sm:text-sm uppercase tracking-widest border-4 border-neu-black px-5 sm:px-6 py-2.5 sm:py-3 bg-neu-primary mb-6 lg:mb-8 font-black rounded-neu-sm shadow-neu-module-sm"
            style={{ opacity: 0 }}>
         [ {t('landing.hero.badge').replace('✦ ', '').replace('✦', '')} ]
       </div>
 
       {/* Headline raksasa, breaking grid */}
-      <h1 className="font-display text-[clamp(2.75rem,9vw,7rem)] leading-[0.92] font-black text-center uppercase tracking-tighter w-full max-w-4xl relative z-20 mb-12 lg:mb-16">
+      <h1 className="font-display text-[clamp(2.5rem,7.5vw,5.75rem)] leading-[0.95] font-black text-center uppercase tracking-tighter w-full max-w-4xl relative z-20 mb-8 lg:mb-10">
         <HeroReveal delay={0.1}>
           <span className="block drop-shadow-[4px_4px_0px_rgba(13,13,13,0.15)] text-neu-black">{t('landing.hero.title1')}</span>
         </HeroReveal>
