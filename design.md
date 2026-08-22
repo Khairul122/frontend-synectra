@@ -94,6 +94,8 @@ Full-bleed, dipisah garis, konten di-center manual — bukan card wrapper:
 
 Background halaman (`LandingPage.jsx` root div) pakai `.bg-brutalist-grid` (garis grid 60px, warna `neu-bg`) — praktis tidak terlihat karena section-section full-bleed menutupinya, tapi tetap jadi fallback yang aman.
 
+**Pengecualian: `Navbar`.** Berbeda dari section konten (full-bleed, tanpa radius), `Navbar` mempertahankan tampilan "floating pill card" persis mock Stitch: `sticky top-3 lg:top-4` dengan padding horizontal, isinya bar `border-4 border-neu-black rounded-neu-lg shadow-neu-solid-lg` yang mengambang dengan jarak dari tepi viewport — bukan `border-b-4` full-width seperti section lain. Nav-link & tombol Masuk/Daftar di dalamnya juga pill individual (`border-2 shadow-neu-solid-sm`, hover `-translate-y-1 rotate-1`), bukan link polos.
+
 ### Spacing / ritme section
 
 - Section konten biasa (Navbar, Hero, TechMarquee, Stats, Services, About, Packages, Banners, Software, FeedbackSection): `py-16 lg:py-20`
@@ -159,7 +161,7 @@ Setiap section men-import `useTranslation()` sendiri (bukan menerima `t` sebagai
 ## Responsive
 
 Breakpoint Tailwind default: `sm` 640px, `md` 768px, `lg` 1024px, `xl` 1280px — tidak ada breakpoint custom. Pola yang sudah ada dan wajib dipertahankan:
-- Navbar: nav link `hidden md:flex`, hamburger `sm:hidden`
+- Navbar: nav link `hidden lg:flex`, hamburger `lg:hidden` (naik dari breakpoint `md`/`sm` karena 7 pill nav-link butuh ruang lebih lebar)
 - Slider horizontal drag (Packages/Software/Feedback) sebagai pengganti grid di mobile — bukan `overflow-x-scroll` biasa, pakai pola `onTouchStart/Move/End` yang sudah ada
 - `useIsDesktop()` (`min-width:1024px` + bukan `prefers-reduced-motion`) menentukan kapan Lenis aktif — di bawah itu scroll native, harus tetap begitu
 - Mobile sticky CTA bar (`sm:hidden`, fixed bottom) + back-to-top button — lihat `FloatingCTA.jsx`
