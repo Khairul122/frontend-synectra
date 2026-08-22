@@ -44,12 +44,17 @@ export function BannerDetailModal({ banner, isOpen, onClose, onAction }) {
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
-      <DialogContent className="p-0 border-0 bg-transparent shadow-none max-w-none sm:max-w-none w-auto flex items-center justify-center p-4">
+      <DialogContent
+        data-lenis-prevent="true"
+        onWheel={(e) => e.stopPropagation()}
+        className="p-0 border-0 bg-transparent shadow-none max-w-none sm:max-w-none w-full max-w-[94vw] md:max-w-none md:w-auto flex items-center justify-center p-2 sm:p-4"
+      >
         <DialogTitle className="sr-only">{title}</DialogTitle>
         <DialogDescription className="sr-only">Detail pengumuman promo {title}</DialogDescription>
 
-        {/* ── DESKTOP MODAL (100% matches banner-modal.html skeleton: 400px Collapsed -> 900px Expanded, 600px Height) ── */}
+        {/* ── DESKTOP MODAL (400px Collapsed -> 900px Expanded, 600px Height) ── */}
         <div
+          data-lenis-prevent="true"
           className={`hidden md:flex bg-neu-white border-4 border-neu-black rounded-2xl shadow-[12px_12px_0px_0px_#0D0D0D] flex-row overflow-hidden relative h-[600px] transition-all duration-350 ease-in-out select-none ${
             isExpanded ? 'w-[900px]' : 'w-[400px]'
           }`}
@@ -153,7 +158,11 @@ export function BannerDetailModal({ banner, isOpen, onClose, onAction }) {
             </div>
 
             {/* Scrollable Body Content */}
-            <div className="p-6 md:p-8 overflow-y-auto flex-1 space-y-6">
+            <div
+              data-lenis-prevent="true"
+              onWheel={(e) => e.stopPropagation()}
+              className="p-6 md:p-8 overflow-y-auto overscroll-contain flex-1 space-y-6"
+            >
               {desc ? (
                 <div
                   className="space-y-4 text-on-surface-variant font-body text-sm leading-relaxed prose prose-sm max-w-none text-neu-black"
@@ -169,10 +178,7 @@ export function BannerDetailModal({ banner, isOpen, onClose, onAction }) {
                     <li>Optimasi Performa &amp; Debugging Kode Kompleks</li>
                   </ul>
                   <p className="text-neu-black/90">
-                    Kami menyediakan solusi teknologi terintegrasi yang dirancang khusus untuk kebutuhan bisnis maupun riset akademik Anda. Dengan pendekatan neubrutalist yang berani, kami memastikan setiap baris kode dan setiap komponen sirkuit bekerja dengan presisi maksimal.
-                  </p>
-                  <p className="text-neu-black/90">
-                    Tim ahli kami siap mendampingi Anda dari tahap ideasi, prototyping, hingga deployment final. Jangan biarkan hambatan teknis menghentikan inovasi Anda.
+                    Kami menyediakan solusi teknologi terintegrasi yang dirancang khusus untuk kebutuhan bisnis maupun riset akademik Anda.
                   </p>
                 </div>
               )}
@@ -198,10 +204,13 @@ export function BannerDetailModal({ banner, isOpen, onClose, onAction }) {
           </div>
         </div>
 
-        {/* ── MOBILE MODAL (100% matches banner-modal-mobile.html skeleton) ── */}
-        <div className="flex md:hidden w-full max-w-[390px] bg-surface border-t-4 border-x-4 border-b-4 border-neu-black rounded-t-[1.5rem] shadow-[0px_-8px_0px_0px_rgba(0,0,0,0.1)] flex-col max-h-[90vh] overflow-hidden select-none">
-          {/* Section 1: Top Banner */}
-          <div className="relative w-full h-[200px] shrink-0 border-b-4 border-neu-black overflow-hidden rounded-t-[1.3rem] bg-surface-dim">
+        {/* ── MOBILE MODAL (Responsive, Full-Width Proportion, Clean Neubrutalist) ── */}
+        <div
+          data-lenis-prevent="true"
+          className="flex md:hidden w-full max-w-[420px] bg-neu-white border-4 border-neu-black rounded-2xl shadow-[8px_8px_0px_0px_#0D0D0D] flex-col max-h-[85vh] overflow-hidden select-none"
+        >
+          {/* Section 1: Top Banner Image Poster */}
+          <div className="relative w-full h-52 sm:h-56 shrink-0 border-b-4 border-neu-black overflow-hidden bg-surface-dim">
             {imageUrl ? (
               <img
                 src={imageUrl}
@@ -216,103 +225,65 @@ export function BannerDetailModal({ banner, isOpen, onClose, onAction }) {
               </div>
             )}
 
-            {/* Scrim / Gradient Overlay */}
+            {/* Gradient Scrim Overlay */}
             <div className="absolute inset-0 bg-gradient-to-t from-neu-black/90 via-neu-black/40 to-transparent pointer-events-none" />
 
-            {/* Badge */}
-            <div className="absolute top-4 left-4 bg-secondary-container text-neu-white font-mono text-xs px-3 py-1.5 border-2 border-neu-black shadow-[2px_2px_0px_0px_#0D0D0D] rounded uppercase tracking-wider">
+            {/* Promo Badge */}
+            <div className="absolute top-3.5 left-3.5 bg-secondary-container text-neu-white font-mono text-xs font-bold px-3 py-1 border-2 border-neu-black shadow-[2px_2px_0px_0px_#0D0D0D] rounded uppercase z-20">
               {badgeText}
             </div>
 
-            {/* Banner Text */}
-            <div className="absolute bottom-4 left-4 right-4 text-neu-white">
-              <h2 className="font-display font-black text-xl mb-1 leading-tight line-clamp-1">
+            {/* Close Button */}
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Tutup modal"
+              className="absolute top-3.5 right-3.5 w-9 h-9 flex items-center justify-center bg-neu-white border-2 border-neu-black rounded-full shadow-[2px_2px_0px_0px_#0D0D0D] hover:bg-secondary-container hover:text-neu-white transition-all cursor-pointer z-20"
+            >
+              <span className="material-symbols-outlined text-base font-bold text-neu-black">close</span>
+            </button>
+
+            {/* Banner Text on Poster */}
+            <div className="absolute bottom-3.5 left-3.5 right-3.5 text-neu-white z-10">
+              <h2 className="font-display font-black text-lg sm:text-xl mb-0.5 leading-tight line-clamp-2 drop-shadow-md">
                 {title}
               </h2>
-              <p className="font-body font-bold text-sm opacity-90 line-clamp-1">
-                {desc ? desc.replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').trim() : 'Detail Singkat'}
+            </div>
+          </div>
+
+          {/* Section 2: Scrollable Content Body */}
+          <div
+            data-lenis-prevent="true"
+            onWheel={(e) => e.stopPropagation()}
+            onTouchMove={(e) => e.stopPropagation()}
+            className="flex-1 overflow-y-auto overscroll-contain p-5 space-y-4 bg-neu-white text-neu-black"
+          >
+            {desc ? (
+              <div
+                className="font-body text-sm sm:text-base text-neu-black leading-relaxed prose prose-sm max-w-none"
+                dangerouslySetInnerHTML={{ __html: desc }}
+              />
+            ) : (
+              <p className="font-body text-sm sm:text-base text-neu-black leading-relaxed">
+                Kami menyediakan solusi teknologi terintegrasi yang dirancang khusus untuk kebutuhan bisnis maupun riset akademik Anda dengan standar arsitektur modern.
               </p>
-            </div>
+            )}
           </div>
 
-          {/* Section 2: Content Area */}
-          <div className="flex-1 overflow-y-auto bg-surface">
-            {/* Sticky Header within Content */}
-            <div className="sticky top-0 bg-surface z-10 border-b-2 border-neu-black px-5 py-4 flex justify-between items-center shadow-sm">
-              <div className="flex items-center gap-3 min-w-0">
-                <span className="bg-primary-container text-neu-black font-mono text-xs font-bold px-2 py-1 border-2 border-neu-black rounded uppercase">
-                  INFO
-                </span>
-                <h3 className="font-display font-black text-xl text-neu-black truncate">
-                  {title}
-                </h3>
-              </div>
-              <button
-                type="button"
-                onClick={onClose}
-                className="w-10 h-10 flex items-center justify-center bg-surface-dim border-2 border-neu-black rounded-full shadow-[2px_2px_0px_0px_#0D0D0D] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all hover:bg-secondary-container hover:text-neu-white cursor-pointer shrink-0"
-              >
-                <span className="material-symbols-outlined text-lg font-bold">close</span>
-              </button>
-            </div>
-
-            {/* Scrollable Body */}
-            <div className="p-5 pb-8 space-y-6">
-              {desc ? (
-                <div
-                  className="font-body text-base text-on-surface leading-relaxed prose prose-sm max-w-none text-neu-black"
-                  dangerouslySetInnerHTML={{ __html: desc }}
-                />
-              ) : (
-                <>
-                  <div>
-                    <h4 className="font-display font-bold text-base text-neu-black mb-4 flex items-center gap-2">
-                      <span className="material-symbols-outlined text-lg">work</span>
-                      Fitur Utama &amp; Lingkup Kerja:
-                    </h4>
-                    <ul className="space-y-3 font-body text-sm text-on-surface-variant">
-                      <li className="flex items-start gap-3">
-                        <span className="material-symbols-outlined text-neu-green text-base mt-0.5">check_circle</span>
-                        Konsultasi Arsitektur Sistem
-                      </li>
-                      <li className="flex items-start gap-3">
-                        <span className="material-symbols-outlined text-neu-green text-base mt-0.5">check_circle</span>
-                        Pengembangan Hardware
-                      </li>
-                      <li className="flex items-start gap-3">
-                        <span className="material-symbols-outlined text-neu-green text-base mt-0.5">check_circle</span>
-                        Integrasi Cloud
-                      </li>
-                      <li className="flex items-start gap-3">
-                        <span className="material-symbols-outlined text-neu-green text-base mt-0.5">check_circle</span>
-                        Optimasi Performa
-                      </li>
-                    </ul>
-                  </div>
-                  <div className="p-4 bg-surface-dim border-2 border-neu-black rounded-lg shadow-[2px_2px_0px_0px_#0D0D0D]">
-                    <p className="font-body text-sm text-on-surface leading-[1.6]">
-                      Layanan komprehensif kami dirancang untuk memastikan infrastruktur teknologi Anda beroperasi pada efisiensi puncak. Tim ahli kami siap mendampingi dari tahap perencanaan awal hingga implementasi akhir.
-                    </p>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-
-          {/* Section 3: Sticky Footer */}
-          <div className="sticky bottom-0 bg-surface border-t-4 border-neu-black p-5 pt-4 pb-8 space-y-3 z-20 shadow-[0px_-4px_10px_rgba(0,0,0,0.05)]">
+          {/* Section 3: Action Buttons Footer */}
+          <div className="p-4 sm:p-5 bg-surface-dim border-t-4 border-neu-black flex flex-col gap-2.5 shrink-0">
             <button
               type="button"
               onClick={handleAction}
-              className="w-full bg-primary-container text-neu-black font-display font-black text-sm py-4 border-4 border-neu-black rounded-lg shadow-[4px_4px_0px_0px_#0D0D0D] hover:bg-primary-fixed active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all flex justify-center items-center gap-2 uppercase cursor-pointer"
+              className="w-full bg-primary-container text-neu-black font-display font-black text-sm sm:text-base py-3.5 border-2 border-neu-black rounded-lg shadow-[2px_2px_0px_0px_#0D0D0D] hover:bg-primary-fixed active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all flex justify-center items-center gap-2 uppercase cursor-pointer"
             >
               <span>PELAJARI LEBIH LANJUT</span>
-              <span className="material-symbols-outlined text-lg font-bold">arrow_forward</span>
+              <span className="material-symbols-outlined text-base font-bold">arrow_forward</span>
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="w-full bg-neu-white text-neu-black font-display font-bold text-sm py-4 border-4 border-neu-black rounded-lg shadow-[4px_4px_0px_0px_#0D0D0D] hover:bg-surface-dim active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all uppercase cursor-pointer"
+              className="w-full bg-neu-white text-neu-black font-display font-bold text-xs sm:text-sm py-2.5 border-2 border-neu-black rounded-lg shadow-[2px_2px_0px_0px_#0D0D0D] hover:bg-surface-dim active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all uppercase cursor-pointer"
             >
               TUTUP
             </button>

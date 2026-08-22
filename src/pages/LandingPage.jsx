@@ -224,6 +224,22 @@ export default function LandingPage() {
         }}
       />
 
+      {/* ── Portfolio Detail Modal ── */}
+      <PortfolioModal
+        item={activePortfolio}
+        open={!!activePortfolio}
+        onClose={() => setActivePortfolio(null)}
+        transitionTo={transitionTo}
+      />
+
+      {/* ── Software Detail Modal ── */}
+      <SoftwareDetailModal
+        sw={activeSoftware}
+        open={!!activeSoftware}
+        onClose={() => setActiveSoftware(null)}
+        transitionTo={transitionTo}
+      />
+
       <Navbar activeSection={activeSection} menuOpen={menuOpen} setMenuOpen={setMenuOpen} transitionTo={transitionTo} scaleX={scaleX} />
 
       <main className="preserve-3d relative flex flex-col items-center w-full">

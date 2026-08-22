@@ -1,7 +1,22 @@
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { supaImg } from '../../utils/imageUrl';
 import { useLang } from './hooks';
 import { ErrorState } from './ErrorState';
+
+function stripHtml(html) {
+  if (!html) return '';
+  const withSpaces = html.replace(/<\/(p|div|h[1-6]|li|tr)>/gi, ' ');
+  const clean = withSpaces.replace(/<[^>]*>/g, ' ');
+  const decoded = clean
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&nbsp;/g, ' ');
+  return decoded.replace(/\s+/g, ' ').trim();
+}
 
 const DEFAULT_SOFTWARE = [
   {
@@ -12,6 +27,8 @@ const DEFAULT_SOFTWARE = [
     description: 'Sistem manajemen koperasi berbasis syariah dengan fitur simpan pinjam, pembiayaan, dan bagi hasil otomatis.',
     descriptionEn: 'Sharia-based cooperative management with automated profit sharing features.',
     price: 2500000,
+    icon: 'account_balance',
+    image: null,
   },
   {
     id: 'sw-2',
@@ -21,6 +38,8 @@ const DEFAULT_SOFTWARE = [
     description: 'Sistem manajemen toko pertanian dengan POS kasir, manajemen stok produk, dan laporan harian.',
     descriptionEn: 'Agricultural inventory & cashier POS with integrated daily reporting.',
     price: 1500000,
+    icon: 'agriculture',
+    image: null,
   },
   {
     id: 'sw-3',
@@ -30,6 +49,8 @@ const DEFAULT_SOFTWARE = [
     description: 'Sistem akuntansi lengkap dengan pencatatan transaksi, arus kas, neraca keuangan standar akuntansi.',
     descriptionEn: 'Transaction recording & financial reporting compliant with accounting standards.',
     price: 2000000,
+    icon: 'payments',
+    image: null,
   },
   {
     id: 'sw-4',
@@ -39,6 +60,8 @@ const DEFAULT_SOFTWARE = [
     description: 'Sistem informasi monitoring bencana hierarkis multi-region dengan integrasi data real-time.',
     descriptionEn: 'Hierarchical disaster monitoring system with real-time notifications.',
     price: 3000000,
+    icon: 'monitoring',
+    image: null,
   },
   {
     id: 'sw-5',
@@ -48,6 +71,8 @@ const DEFAULT_SOFTWARE = [
     description: 'Platform toko online modern dengan payment gateway otomatis, ongkir real-time, dan inventory.',
     descriptionEn: 'Modern online store platform with automated payment gateway and real-time shipping calculation.',
     price: 3500000,
+    icon: 'shopping_bag',
+    image: null,
   },
   {
     id: 'sw-6',
@@ -57,6 +82,8 @@ const DEFAULT_SOFTWARE = [
     description: 'Aplikasi absensi karyawan berbasis GPS & Face Detection dengan validasi radius lokasi.',
     descriptionEn: 'GPS and Face Detection based employee attendance mobile application.',
     price: 2800000,
+    icon: 'pin_drop',
+    image: null,
   },
 ];
 
@@ -91,7 +118,6 @@ export function Software({ softwareProducts, isLoading, error, setActiveSoftware
 
   const handleMouseUp = () => {
     setIsDown(false);
-    // Allow small timeout so click events know if it was a drag
     setTimeout(() => setIsDragged(false), 50);
   };
 
@@ -99,11 +125,17 @@ export function Software({ softwareProducts, isLoading, error, setActiveSoftware
     if (!isDown || !sliderRef.current) return;
     e.preventDefault();
     const x = e.pageX - sliderRef.current.offsetLeft;
-    const walk = (x - startX) * 1.6; // Scroll speed multiplier
+    const walk = (x - startX) * 1.6;
     if (Math.abs(walk) > 6) {
       setIsDragged(true);
     }
     sliderRef.current.scrollLeft = scrollLeftState - walk;
+  };
+
+  const handleOpenDetail = (sw) => {
+    if (isDragged) return;
+    if (setActiveSoftware) setActiveSoftware(sw);
+    else navigateProtected('/my-software');
   };
 
   return (
@@ -126,7 +158,7 @@ export function Software({ softwareProducts, isLoading, error, setActiveSoftware
             onMouseLeave={handleMouseLeave}
             onMouseUp={handleMouseUp}
             onMouseMove={handleMouseMove}
-            className={`flex flex-nowrap gap-6 md:gap-8 overflow-x-auto py-4 px-2 no-scrollbar scroll-smooth cursor-grab active:cursor-grabbing ${
+            className={`flex flex-nowrap gap-6 md:gap-8 overflow-x-auto py-4 px-2 no-scrollbar scroll-smooth ${
               isDown ? 'cursor-grabbing' : 'cursor-grab'
             }`}
             style={{
@@ -137,48 +169,87 @@ export function Software({ softwareProducts, isLoading, error, setActiveSoftware
           >
             {displayList.map((sw) => {
               const swName = lang(sw.name, sw.nameEn);
-              const swDesc = lang(sw.description, sw.descriptionEn);
+              const rawDesc = lang(sw.description, sw.descriptionEn);
+              const swDesc = stripHtml(rawDesc);
               const category = sw.category || 'WEB APP';
+              const rawImg = sw.thumbnailUrl || sw.thumbnail || sw.image || (Array.isArray(sw.images) ? sw.images[0] : null);
+              const imageUrl = rawImg ? supaImg(rawImg, { width: 600 }) : null;
 
               return (
                 <div
                   key={sw.id}
-                  className="w-[280px] sm:w-[320px] md:w-[340px] shrink-0 bg-neu-white border-4 border-neu-black p-6 md:p-8 rounded-xl shadow-[8px_8px_0px_0px_#0D0D0D] hover:-translate-y-2 transition-transform flex flex-col justify-between select-none"
+                  className="w-[280px] sm:w-[320px] md:w-[340px] shrink-0 bg-neu-white border-4 border-neu-black p-5 sm:p-6 md:p-7 rounded-xl shadow-[8px_8px_0px_0px_#0D0D0D] hover:-translate-y-2 transition-transform flex flex-col justify-between select-none group"
                 >
                   <div>
-                    <div className="bg-neu-purple text-neu-white border-4 border-neu-black px-3 py-1 rounded-md font-mono font-bold text-xs uppercase mb-6 self-start inline-block shadow-[2px_2px_0px_0px_#0D0D0D]">
+                    {/* Category Badge */}
+                    <div className="bg-neu-purple text-neu-white border-2 border-neu-black px-3 py-1 rounded-md font-mono font-bold text-xs uppercase mb-3.5 self-start inline-block shadow-[2px_2px_0px_0px_#0D0D0D]">
                       {category}
                     </div>
+
+                    {/* Image / Image Placeholder under Category UI */}
+                    <div
+                      onClick={() => handleOpenDetail(sw)}
+                      className="w-full aspect-video mb-4 bg-surface-dim border-2 border-neu-black rounded-lg shadow-[3px_3px_0px_0px_#0D0D0D] overflow-hidden relative flex items-center justify-center cursor-pointer group-hover:scale-[1.02] transition-transform"
+                    >
+                      {imageUrl ? (
+                        <img
+                          src={imageUrl}
+                          alt={swName}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-neu-black/5 flex flex-col items-center justify-center gap-1.5 p-3 text-neu-black/40">
+                          <span className="material-symbols-outlined text-4xl text-neu-black/50">
+                            {sw.icon || 'deployed_code'}
+                          </span>
+                          <span className="font-mono text-[10px] tracking-wider uppercase font-bold text-neu-black/60">
+                            PREVIEW
+                          </span>
+                          <div className="absolute bottom-1.5 right-1.5 px-1.5 py-0.5 bg-neu-black text-neu-white text-[9px] font-mono rounded border border-neu-black">
+                            16:9
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Title */}
                     <h4
+                      onClick={() => handleOpenDetail(sw)}
                       title={swName}
-                      className="font-display text-lg md:text-xl font-black mb-3 md:mb-4 uppercase text-neu-black break-words line-clamp-2"
+                      className="font-display text-lg md:text-xl font-black mb-2 md:mb-3 uppercase text-neu-black break-words line-clamp-2 cursor-pointer hover:underline"
                     >
                       {swName}
                     </h4>
+
+                    {/* Description */}
                     <p
                       title={swDesc}
-                      className="font-body text-sm md:text-base text-neu-black mb-6 flex-1 font-medium leading-relaxed break-words line-clamp-3"
+                      className="font-body text-sm text-neu-black mb-5 font-medium leading-relaxed break-words line-clamp-3"
                     >
                       {swDesc}
                     </p>
                   </div>
 
                   <div>
-                    <div className="text-2xl md:text-3xl font-display font-black text-neu-black mb-6">
+                    {/* Price */}
+                    <div className="text-2xl md:text-3xl font-display font-black text-neu-black mb-5">
                       {fmt(sw.price)}
                     </div>
+
+                    {/* Action Button */}
                     <button
                       onClick={(e) => {
                         if (isDragged) {
                           e.preventDefault();
                           return;
                         }
-                        if (setActiveSoftware) setActiveSoftware(sw);
-                        else navigateProtected('/my-software');
+                        handleOpenDetail(sw);
                       }}
-                      className="w-full bg-primary-container text-neu-black font-display font-black text-sm md:text-base py-3.5 md:py-4 border-4 border-neu-black rounded-lg shadow-[4px_4px_0px_0px_#0D0D0D] btn-press cursor-pointer uppercase text-center"
+                      className="w-full bg-primary-container text-neu-black font-display font-black text-sm md:text-base py-3.5 border-4 border-neu-black rounded-lg shadow-[4px_4px_0px_0px_#0D0D0D] btn-press cursor-pointer uppercase text-center"
                     >
-                      {t('landing.software.demo', 'LIHAT DEMO')}
+                      {t('landing.software.detail', 'DETAIL')}
                     </button>
                   </div>
                 </div>
