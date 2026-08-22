@@ -2,17 +2,28 @@ import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { cn } from '../../utils/cn';
 
-/* ─── Label pill "sticker" — header tiap module-card (mis. "SERVICES // WHAT_WE_DO") ── */
-export function SectionTag({ children, tone = 'black', rotate = '-rotate-1', className = '' }) {
+/* ─── Label pill "sticker" — header tiap section (mis. "SERVICES // WHAT_WE_DO") ──
+   `shadow` menerima warna solid-shadow arbitrary per section, persis mock Stitch
+   (tiap section punya warna shadow pill berbeda — bukan selalu hitam). ── */
+export function SectionTag({ children, tone = 'black', rotate = '-rotate-1', shadow = '#0D0D0D', size = 'lg', className = '' }) {
   const TONES = {
     black: 'bg-neu-black text-neu-white',
     primary: 'bg-neu-primary text-neu-black',
+    white: 'bg-neu-white text-neu-black',
   };
+  const SIZES = {
+    lg: 'text-xl px-8 py-3',
+    sm: 'text-sm px-4 py-2',
+  };
+  const OFFSET = size === 'sm' ? 4 : 8;
   return (
-    <div className={cn(
-      'inline-block font-mono font-bold text-lg px-6 py-2.5 border-4 border-neu-black rounded-neu-sm shadow-neu-module-sm uppercase tracking-wide',
-      TONES[tone], rotate, className,
-    )}>
+    <div
+      className={cn(
+        'inline-block font-mono font-bold border-4 border-neu-black rounded-neu-sm uppercase tracking-wide',
+        SIZES[size], TONES[tone], rotate, className,
+      )}
+      style={{ boxShadow: `${OFFSET}px ${OFFSET}px 0px 0px ${shadow}` }}
+    >
       {children}
     </div>
   );

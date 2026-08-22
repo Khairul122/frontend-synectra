@@ -1,42 +1,52 @@
 import { useTranslation } from 'react-i18next';
-import { motion } from 'framer-motion';
-import { supaImg } from '../../utils/imageUrl';
-import { fadeUp, cardAnim, STAGGER } from './animations';
-import { SectionTag } from './helpers';
 import { useLang } from './hooks';
 
 export function Banners({ banners, setBannerModal, setBannerModalExp }) {
   const { t } = useTranslation();
   const lang = useLang();
 
-  if (banners.length === 0) return null;
+  const activeBanner = (banners && banners.length > 0) ? banners[0] : null;
+
+  const title = activeBanner ? lang(activeBanner.title, activeBanner.titleEn) : 'Jasa Pembuatan Alat IoT & Android';
+  const desc = activeBanner
+    ? (activeBanner.description ? activeBanner.description.replace(/<[^>]*>/g, ' ') : 'Solusi hardware & software terintegrasi untuk otomasi industri dan personal.')
+    : 'Solusi hardware & software terintegrasi untuk otomasi industri dan personal.';
 
   return (
-    <section className="border-b-4 border-neu-black bg-neu-white py-16 lg:py-20">
-      <div className="max-w-7xl mx-auto px-4 lg:px-6">
-      <motion.div {...fadeUp()} className="flex justify-center mb-8">
-        <SectionTag rotate="rotate-1">{t('landing.banner.title')} // RECENT_UPDATES</SectionTag>
-      </motion.div>
-      <div className="flex gap-5 overflow-x-auto pb-2 snap-x -mx-4 px-4 lg:mx-0 lg:px-0">
-        {banners.map((b, bi) => (
-          <motion.div key={b.id} {...cardAnim(Math.min(bi * STAGGER, 0.42))}
-            onClick={() => { setBannerModal(b); setBannerModalExp(false); }}
-            className="flex-shrink-0 w-72 snap-start border-4 border-neu-black rounded-neu-lg shadow-neu-solid-lg bg-neu-white overflow-hidden cursor-pointer group hover:-translate-y-1.5 transition-transform duration-150">
-            {b.image && (
-              <div className="relative border-b-4 border-neu-black overflow-hidden">
-                <img src={supaImg(b.image, { width: 576 })} alt={b.title} width="288" height="144" className="w-full h-36 object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" decoding="async" />
-                <div className="absolute inset-0 bg-neu-black/0 group-hover:bg-neu-black/20 transition-all duration-200 flex items-center justify-center">
-                  <span className="opacity-0 group-hover:opacity-100 transition-opacity font-mono text-xs text-neu-white bg-neu-black/70 px-3 py-1.5">{t('landing.portfolio.clickView')}</span>
-                </div>
-              </div>
-            )}
-            <div className="p-4">
-              <p className="font-display font-bold text-sm text-neu-black">{lang(b.title, b.titleEn)}</p>
-              {b.description && <p className="font-body text-xs text-neu-black/60 mt-1 line-clamp-2" dangerouslySetInnerHTML={{ __html: lang(b.description, b.descriptionEn)?.replace(/<[^>]*>/g,' ') }} />}
+    <section className="w-full bg-neu-white overflow-hidden border-b-4 border-neu-black">
+      <div className="flex transition-transform duration-500 ease-in-out">
+        <div className="w-full max-w-7xl mx-auto shrink-0 bg-primary-container p-8 md:p-12 relative flex flex-col md:flex-row items-center gap-8 md:gap-12 md:border-x-4 border-neu-black">
+          <div className="w-24 h-24 md:w-32 md:h-32 bg-neu-white border-4 border-neu-black rounded-full flex items-center justify-center shadow-[6px_6px_0px_0px_#0D0D0D] shrink-0">
+            <span className="material-symbols-outlined text-4xl md:text-6xl text-neu-black font-black">
+              memory
+            </span>
+          </div>
+          <div className="flex-1 text-center md:text-left">
+            <div className="bg-neu-black text-neu-white font-mono text-xs md:text-sm font-bold px-4 py-2 border-4 border-neu-black rounded-lg shadow-[4px_4px_0px_0px_#FAFAFA] inline-block mb-4 uppercase">
+              {t('landing.banner.title', 'ANNOUNCEMENTS')} // RECENT_UPDATES
             </div>
-          </motion.div>
-        ))}
-      </div>
+            <h3 className="font-display text-2xl sm:text-3xl md:text-4xl font-black uppercase tracking-tighter mb-4 text-neu-black">
+              {title}
+            </h3>
+            <p className="font-body font-bold text-neu-black mb-6 md:mb-8 text-base md:text-xl leading-relaxed">
+              {desc}
+            </p>
+            <button
+              onClick={() => {
+                if (activeBanner) {
+                  setBannerModal(activeBanner);
+                  setBannerModalExp(false);
+                } else {
+                  const contactEl = document.getElementById('kontak');
+                  if (contactEl) contactEl.scrollIntoView({ behavior: 'smooth' });
+                }
+              }}
+              className="bg-neu-black text-primary-container font-display font-black text-base md:text-lg px-8 md:px-10 py-4 md:py-5 border-4 border-neu-black shadow-[6px_6px_0px_0px_#FAFAFA] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all uppercase rounded-lg btn-press cursor-pointer"
+            >
+              {t('landing.banner.consultNow', 'Konsultasi Sekarang')}
+            </button>
+          </div>
+        </div>
       </div>
     </section>
   );

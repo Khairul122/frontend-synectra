@@ -32,6 +32,23 @@
   --color-neu-cream: #FDFBF7;
   --color-neu-gold:  #FFCC00;
 
+  /* Aliases and containers from index.html */
+  --color-primary-container: #FFD000;
+  --color-secondary-container: #FE5B5B;
+  --color-surface-dim: #E2D9C7;
+  --color-surface-bright: #FFF8F0;
+  --color-surface-variant: #EBE2CF;
+  --color-on-surface: #1F1B10;
+  --color-outline-variant: #D1C6AB;
+
+  --font-display-hero: "Space Grotesk", sans-serif;
+  --font-headline-md: "Space Grotesk", sans-serif;
+  --font-headline-lg: "Space Grotesk", sans-serif;
+  --font-label-caps: "Space Grotesk", sans-serif;
+  --font-mono-label: "JetBrains Mono", monospace;
+  --font-body-md: "DM Sans", sans-serif;
+  --font-body-lg: "DM Sans", sans-serif;
+
   --shadow-neu-solid-sm: 2px 2px 0px #0D0D0D;
   --shadow-neu-solid:    4px 4px 0px #0D0D0D;
   --shadow-neu-solid-lg: 6px 6px 0px #0D0D0D;
@@ -39,6 +56,57 @@
 
   /* ── Shadow keras untuk pill/badge landing page (SectionTag, Hero badge) ── */
   --shadow-neu-module-sm: 6px 6px 0px #0D0D0D;
+}
+
+/* ── 3D & Neubrutalism Utilities from index.html ── */
+.perspective-container {
+  perspective: 1000px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.deep-shadow {
+  box-shadow: 12px 12px 0px 0px rgba(13, 13, 13, 1);
+}
+
+.deep-shadow-sm {
+  box-shadow: 6px 6px 0px 0px rgba(13, 13, 13, 1);
+}
+
+.btn-press:active {
+  transform: translate3d(6px, 6px, 0px) !important;
+  box-shadow: 0px 0px 0px 0px rgba(13, 13, 13, 1) !important;
+}
+
+.floating-3d {
+  animation: float3d 8s ease-in-out infinite alternate;
+}
+
+@keyframes float3d {
+  0% { transform: translateZ(0px) rotateX(0deg) rotateY(0deg) translateY(0px); }
+  50% { transform: translateZ(50px) rotateX(10deg) rotateY(15deg) translateY(-20px); }
+  100% { transform: translateZ(-20px) rotateX(-5deg) rotateY(-10deg) translateY(10px); }
+}
+
+.floating-fast {
+  animation: floatFast 4s ease-in-out infinite alternate;
+}
+
+@keyframes floatFast {
+  0% { transform: translateY(0px) rotate(0deg); }
+  100% { transform: translateY(-30px) rotate(15deg); }
+}
+
+.marquee-container {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.marquee-content {
+  display: inline-block;
+  animation: marquee 20s linear infinite;
 }
 
 :root {

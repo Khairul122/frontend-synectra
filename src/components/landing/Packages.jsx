@@ -1,102 +1,121 @@
 import { useTranslation } from 'react-i18next';
-import { motion } from 'framer-motion';
-import { fadeUp } from './animations';
 import { PackageCard } from './PackageCard';
 import { ErrorState } from './ErrorState';
 
-export function Packages({ packages, isLoading, error, pkgSliderRef, pkgDrag, scrollSlider, navigateProtected }) {
+const DEFAULT_PACKAGES = [
+  {
+    id: 'pkg-1',
+    _idx: 1,
+    name: 'Landing Page',
+    nameEn: 'Landing Page',
+    category: 'WEB',
+    price: 1000000,
+    duration: '5-7 Hari',
+    durationEn: '5-7 Days',
+    description: 'Landing page profesional untuk promosi produk atau bisnis kamu. Desain modern, responsif, dan dioptimalkan untuk konversi.',
+    descriptionEn: 'Professional landing page to promote your product or business. Modern, responsive, and conversion-optimized design.',
+    features: [
+      'Desain custom neubrutalism',
+      'Responsif mobile & desktop',
+      '3 halaman penuh',
+      'Formulir kontak terintegrasi',
+      'Optimasi SEO dasar',
+    ],
+  },
+  {
+    id: 'pkg-2',
+    _idx: 2,
+    badge: 'TERLARIS',
+    name: 'Company Profile',
+    nameEn: 'Company Profile',
+    category: 'WEB',
+    price: 1700000,
+    duration: '10-14 Hari',
+    durationEn: '10-14 Days',
+    description: 'Website company profile lengkap untuk membangun kepercayaan dan branding bisnis kamu secara profesional.',
+    descriptionEn: 'Complete company profile website to build trust and brand your business professionally.',
+    features: [
+      'Desain custom (min. 5 hal)',
+      'Halaman: Home, About, etc.',
+      'Responsif mobile & desktop',
+      'CMS sederhana untuk update',
+      'Optimasi SEO on-page',
+    ],
+  },
+  {
+    id: 'pkg-3',
+    _idx: 3,
+    name: 'Aplikasi Mobile',
+    nameEn: 'Mobile App',
+    category: 'MOBILE',
+    price: 3500000,
+    duration: '21-30 Hari',
+    durationEn: '21-30 Days',
+    description: 'Aplikasi mobile Android/iOS untuk kebutuhan bisnis atau personal. Dari konsep hingga siap publish.',
+    descriptionEn: 'Android/iOS mobile application for business or personal needs. From concept to publish-ready.',
+    features: [
+      'Android & iOS (React Native)',
+      'Desain UI/UX custom',
+      'Autentikasi pengguna',
+      'Integrasi REST API backend',
+      'Push notification',
+    ],
+  },
+  {
+    id: 'pkg-4',
+    _idx: 4,
+    badge: 'POPULER',
+    name: 'Joki Tugas Akhir',
+    nameEn: 'Academic Project / Thesis',
+    category: 'TUGAS',
+    price: 750000,
+    duration: 'Kesepakatan',
+    durationEn: 'By Agreement',
+    description: 'Bantuan pengerjaan skripsi, thesis, laporan PKL. Dikerjakan oleh tim berpengalaman, tepat waktu, dan terjamin.',
+    descriptionEn: 'Assistance for thesis, final project, and internship reports. Delivered by experienced team, on time and guaranteed.',
+    features: [
+      'Skripsi / Laporan PKL / TA',
+      'Semua jurusan',
+      'Plagiarisme < 20% (Turnitin)',
+      'Bimbingan via WhatsApp',
+      'Revisi hingga ACC',
+    ],
+  },
+];
+
+export function Packages({ packages, isLoading, error, navigateProtected }) {
   const { t } = useTranslation();
 
-  if (!isLoading && !error && packages.length === 0) return null;
+  const displayList = (!isLoading && packages && packages.length > 0)
+    ? packages.map((pkg, i) => ({
+        ...pkg,
+        _idx: i + 1,
+      }))
+    : DEFAULT_PACKAGES;
 
   return (
-    <section id="paket" className="border-b-4 border-neu-black bg-neu-primary py-16 lg:py-20">
-      <div className="max-w-7xl mx-auto px-4 lg:px-6">
-
-      {/* Section header */}
-      <div className="flex items-end justify-between mb-8 flex-wrap gap-4">
-        <motion.div {...fadeUp()}>
-          <h2 className="font-display font-black text-3xl lg:text-4xl text-neu-black leading-tight uppercase tracking-tighter">{t('landing.packages.title')}</h2>
-        </motion.div>
-        {/* Navigation arrows */}
-        {!error && (
-          <div className="flex gap-2">
-            <button
-              onClick={() => scrollSlider(pkgSliderRef, 'left')}
-              aria-label="Scroll left"
-              className="w-11 h-11 border-4 border-neu-black rounded-neu-sm bg-neu-white shadow-neu-solid-sm flex items-center justify-center font-black hover:bg-neu-black hover:text-neu-white active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
-            >
-              ←
-            </button>
-            <button
-              onClick={() => scrollSlider(pkgSliderRef, 'right')}
-              aria-label="Scroll right"
-              className="w-11 h-11 border-4 border-neu-black rounded-neu-sm bg-neu-black text-neu-white shadow-neu-solid-sm flex items-center justify-center font-black hover:bg-neu-white hover:text-neu-black active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
-            >
-              →
-            </button>
+    <section id="paket" className="w-full bg-primary-container py-16 md:py-20 px-4 md:px-8 border-b-4 border-neu-black">
+      <div className="max-w-7xl mx-auto w-full">
+        {/* Section Header */}
+        <div className="flex justify-center mb-12 md:mb-16">
+          <div className="bg-neu-black text-neu-white font-mono text-base md:text-xl font-bold px-6 md:px-8 py-3 border-4 border-neu-black rounded-lg shadow-[8px_8px_0px_0px_#FAFAFA] transform -rotate-1 uppercase tracking-wide">
+            {t('landing.packages.tag', 'PACKAGES')} // TIERS_AND_PRICING
           </div>
-        )}
-      </div>
-
-      {error ? (
-        <ErrorState message="Gagal memuat daftar paket layanan." />
-      ) : (
-      <div className="relative">
-        {isLoading ? (
-          <div className="flex gap-5 pt-5 pb-3">
-            {[1,2,3].map(i => <div key={i} className="flex-shrink-0 w-72 h-96 border-4 border-neu-black rounded-neu-lg animate-pulse bg-neu-white" />)}
-          </div>
-        ) : (
-        <div
-          ref={pkgSliderRef}
-          className="flex gap-5 overflow-x-auto pt-5 pb-3 snap-x snap-mandatory -mx-4 px-4 lg:mx-0 lg:px-0 select-none"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', cursor: 'grab' }}
-          onMouseDown={e => {
-            const el = pkgSliderRef.current;
-            pkgDrag.current = { active: true, startX: e.pageX, scrollLeft: el.scrollLeft };
-            el.style.cursor = 'grabbing';
-            el.style.scrollSnapType = 'none';
-          }}
-          onMouseMove={e => {
-            if (!pkgDrag.current.active) return;
-            pkgSliderRef.current.scrollLeft = pkgDrag.current.scrollLeft - (e.pageX - pkgDrag.current.startX);
-          }}
-          onMouseUp={() => {
-            pkgDrag.current.active = false;
-            const el = pkgSliderRef.current;
-            el.style.cursor = 'grab';
-            el.style.scrollSnapType = 'x mandatory';
-          }}
-          onMouseLeave={() => {
-            if (!pkgDrag.current.active) return;
-            pkgDrag.current.active = false;
-            const el = pkgSliderRef.current;
-            el.style.cursor = 'grab';
-            el.style.scrollSnapType = 'x mandatory';
-          }}
-          onTouchStart={e => {
-            const el = pkgSliderRef.current;
-            pkgDrag.current = { active: true, startX: e.touches[0].pageX, scrollLeft: el.scrollLeft };
-          }}
-          onTouchMove={e => {
-            if (!pkgDrag.current.active) return;
-            const el = pkgSliderRef.current;
-            el.scrollLeft = pkgDrag.current.scrollLeft - (e.touches[0].pageX - pkgDrag.current.startX);
-          }}
-          onTouchEnd={() => { pkgDrag.current.active = false; }}
-        >
-          {packages.map((pkg, pi) => (
-            <div key={pkg.id} className="flex-shrink-0 w-72 snap-start">
-              <PackageCard pkg={{ ...pkg, _idx: pi + 1 }} onOrder={() => navigateProtected('/my-orders/new')} />
-            </div>
-          ))}
         </div>
+
+        {error ? (
+          <ErrorState message="Gagal memuat daftar paket layanan." />
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 items-stretch">
+            {displayList.map((pkg) => (
+              <PackageCard
+                key={pkg.id}
+                pkg={pkg}
+                onOrder={() => navigateProtected('/my-orders/new')}
+              />
+            ))}
+          </div>
         )}
-        {/* Fade overlay kanan */}
-        <div className="absolute right-0 top-0 bottom-3 w-16 bg-gradient-to-l from-neu-primary to-transparent pointer-events-none" />
-      </div>
-      )}
       </div>
     </section>
   );

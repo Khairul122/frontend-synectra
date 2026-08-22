@@ -1,198 +1,222 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { motion } from 'framer-motion';
 import axios from 'axios';
-import { cn } from '../../utils/cn';
 import { API_BASE_URL } from '../../constants/api';
-import { fadeLeft } from './animations';
-import { SectionTag } from './helpers';
 
 const BASE = API_BASE_URL || '';
 
-function StarDisplay({ rating, size = 'sm' }) {
-  const sz = size === 'lg' ? 'w-5 h-5' : 'w-3.5 h-3.5';
-  return (
-    <div className="flex gap-0.5">
-      {[1,2,3,4,5].map(s => (
-        <svg key={s} className={cn(sz, s <= rating ? 'text-neu-primary' : 'text-neu-black/20')} fill="currentColor" viewBox="0 0 20 20">
-          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-        </svg>
-      ))}
-    </div>
-  );
-}
+const DEFAULT_TESTIMONIALS = [
+  {
+    id: 'testi-1',
+    name: 'Budi Santoso',
+    role: 'Ketua Koperasi',
+    avatarBg: 'bg-neu-green',
+    rating: 5,
+    message: 'Pengerjaan sangat cepat dan hasilnya sesuai ekspektasi. Website koperasi kami kini berjalan lancar.',
+  },
+  {
+    id: 'testi-2',
+    name: 'Sarah Wijaya',
+    role: 'Product Manager',
+    avatarBg: 'bg-neu-purple',
+    rating: 5,
+    message: 'UI/UX nya juara! Aplikasi mobile kami jadi jauh lebih intuitif dan user-friendly.',
+  },
+  {
+    id: 'testi-3',
+    name: 'Andi Pratama',
+    role: 'Mahasiswa IT',
+    avatarBg: 'bg-secondary-container',
+    rating: 5,
+    message: 'Bantuan skripsi yang sangat membantu. Kode bersih dan bimbingan jelas. Terima kasih tim!',
+  },
+];
 
-/* ─── Feedback Section ───────────────────────────────────────────────── */
 export function FeedbackSection({ feedbacks, onSubmitted }) {
   const { t } = useTranslation();
-  const [form, setForm]         = useState({ name: '', email: '', rating: 0, message: '' });
-  const [hovered, setHovered]   = useState(0);
+  const [form, setForm] = useState({ name: '', email: '', rating: 5, message: '' });
+  const [hovered, setHovered] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitted, setSubmitted]       = useState(false);
-  const [error, setError]               = useState('');
-  const [formErrors, setFormErrors]     = useState({ name: '', email: '', rating: '' });
-  const sliderRef = useRef(null);
-  const drag      = useRef({ active: false, startX: 0, scrollLeft: 0 });
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState('');
 
-  const avg = feedbacks.length
-    ? (feedbacks.reduce((s, f) => s + f.rating, 0) / feedbacks.length).toFixed(1)
-    : null;
-
-  const validate = () => {
-    const errs = { name: '', email: '', rating: '' };
-    if (!form.name.trim()) errs.name = 'Nama wajib diisi';
-    if (!form.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) errs.email = 'Email tidak valid';
-    if (!form.rating) errs.rating = 'Pilih rating terlebih dahulu';
-    setFormErrors(errs);
-    return !Object.values(errs).some(Boolean);
-  };
+  const displayList = (feedbacks && feedbacks.length > 0)
+    ? feedbacks.map((fb, i) => ({
+        id: fb.id,
+        name: fb.name,
+        role: fb.role || 'Klien Synectra',
+        avatarBg: ['bg-neu-green', 'bg-neu-purple', 'bg-secondary-container', 'bg-primary-container'][i % 4],
+        rating: fb.rating || 5,
+        message: fb.message,
+      }))
+    : DEFAULT_TESTIMONIALS;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validate()) return;
+    if (!form.name.trim() || !form.email.trim()) return;
     setError('');
     setIsSubmitting(true);
     try {
       const res = await axios.post(`${BASE}/api/feedbacks`, {
-        name: form.name.trim(), email: form.email.trim(),
-        rating: form.rating, message: form.message.trim() || undefined,
+        name: form.name.trim(),
+        email: form.email.trim(),
+        rating: form.rating,
+        message: form.message.trim() || undefined,
       });
-      onSubmitted(res.data?.data ?? res.data);
+      if (onSubmitted) onSubmitted(res.data?.data ?? res.data);
       setSubmitted(true);
-      setForm({ name: '', email: '', rating: 0, message: '' });
+      setForm({ name: '', email: '', rating: 5, message: '' });
     } catch {
-      setError('Gagal mengirim. Coba lagi.');
-    } finally { setIsSubmitting(false); }
+      setError('Gagal mengirim testimoni. Silakan coba lagi.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <section id="ulasan" className="border-b-4 border-neu-black bg-neu-black py-16 lg:py-20">
-      <div className="max-w-7xl mx-auto px-4 lg:px-6">
-
-      {/* Header */}
-      <motion.div {...fadeLeft()} className="flex justify-center mb-10">
-        <SectionTag tone="primary" rotate="-rotate-1">{t('landing.feedback.sectionTitle')}</SectionTag>
-      </motion.div>
-      {avg && (
-        <div className="flex items-center justify-center gap-2 mb-10 -mt-4">
-          <StarDisplay rating={Math.round(Number(avg))} size="lg" />
-          <span className="font-mono text-sm text-neu-white/60">{avg} — {t('landing.feedback.avgRating', { count: feedbacks.length })}</span>
+    <section id="ulasan" className="w-full bg-neu-black py-16 md:py-20 px-4 md:px-8 border-b-4 border-neu-black">
+      <div className="max-w-7xl mx-auto w-full">
+        {/* Header Tag */}
+        <div className="flex justify-center mb-10 md:mb-12">
+          <div className="bg-neu-white text-neu-black font-mono text-base md:text-xl font-bold px-6 md:px-8 py-3 border-4 border-neu-black rounded-lg shadow-[8px_8px_0px_0px_#FFD000] transform -rotate-1 uppercase tracking-wide">
+            TESTIMONIALS // {t('landing.feedback.title', 'APA KATA MEREKA')}
+          </div>
         </div>
-      )}
 
-      {/* Review cards — drag slider */}
-      {feedbacks.length === 0 ? (
-        <p className="font-body text-sm text-neu-white/40 mb-10 border-4 border-dashed border-neu-white/20 rounded-neu-lg px-6 py-8 text-center">{t('landing.feedback.noReviews')}</p>
-      ) : (
-        <div className="relative mb-10">
-        <div
-          ref={sliderRef}
-          className="flex gap-5 overflow-x-auto pb-3 -mx-4 px-4 lg:mx-0 lg:px-0 select-none"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', cursor: 'grab' }}
-          onMouseDown={e => { const el = sliderRef.current; drag.current = { active: true, startX: e.pageX, scrollLeft: el.scrollLeft }; el.style.cursor = 'grabbing'; }}
-          onMouseMove={e => { if (!drag.current.active) return; sliderRef.current.scrollLeft = drag.current.scrollLeft - (e.pageX - drag.current.startX); }}
-          onMouseUp={() => { drag.current.active = false; sliderRef.current.style.cursor = 'grab'; }}
-          onMouseLeave={() => { if (drag.current.active) { drag.current.active = false; sliderRef.current.style.cursor = 'grab'; } }}
-          onTouchStart={e => { const el = sliderRef.current; drag.current = { active: true, startX: e.touches[0].pageX, scrollLeft: el.scrollLeft }; }}
-          onTouchMove={e => { if (!drag.current.active) return; const el = sliderRef.current; el.scrollLeft = drag.current.scrollLeft - (e.touches[0].pageX - drag.current.startX); }}
-          onTouchEnd={() => { drag.current.active = false; }}
-        >
-          {feedbacks.map(fb => (
-            <div key={fb.id} className="flex-shrink-0 w-64 border-4 border-neu-black rounded-neu-lg bg-neu-bg p-5 shadow-neu-solid-lg flex flex-col gap-3">
-              <StarDisplay rating={fb.rating} />
-              {fb.message && <p className="font-body text-sm text-neu-black/80 leading-relaxed line-clamp-4 italic">"{fb.message}"</p>}
-              <div className="mt-auto pt-2 border-t-2 border-neu-black/10">
-                <p className="font-display font-bold text-xs text-neu-black">{fb.name}</p>
-                <p className="font-mono text-[10px] text-neu-black/40">{new Date(fb.createdAt).toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' })}</p>
+        {/* Testimonials 3 Grid Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mb-12 md:mb-16">
+          {displayList.slice(0, 6).map((item) => (
+            <div
+              key={item.id}
+              className="bg-surface-dim border-4 border-neu-black p-6 md:p-8 rounded-xl shadow-[8px_8px_0px_0px_#FFD000] flex flex-col justify-between"
+            >
+              <div>
+                <div className="flex gap-1 mb-4 md:mb-6 text-primary-container">
+                  {Array.from({ length: item.rating }).map((_, rIdx) => (
+                    <span key={rIdx} className="material-symbols-outlined font-black text-2xl md:text-3xl">
+                      star
+                    </span>
+                  ))}
+                </div>
+                <p className="font-body font-bold mb-6 md:mb-8 italic text-base md:text-lg leading-relaxed text-neu-black">
+                  "{item.message}"
+                </p>
+              </div>
+              <div className="flex items-center gap-4 pt-4 border-t-2 border-neu-black/10">
+                <div className={`w-12 h-12 md:w-16 md:h-16 ${item.avatarBg} border-4 border-neu-black rounded-xl flex items-center justify-center shrink-0`}>
+                  <span className="material-symbols-outlined text-neu-black text-2xl font-bold">
+                    person
+                  </span>
+                </div>
+                <div>
+                  <h5 className="font-display text-base md:text-lg font-black uppercase text-neu-black">
+                    {item.name}
+                  </h5>
+                  <p className="font-mono text-xs md:text-sm font-bold text-neu-black/70">
+                    {item.role}
+                  </p>
+                </div>
               </div>
             </div>
           ))}
         </div>
-        {/* Fade overlay kanan — menandakan ada konten lebih */}
-        <div className="absolute right-0 top-0 bottom-3 w-16 bg-gradient-to-l from-neu-black to-transparent pointer-events-none" />
+
+        {/* Feedback submission toggle / card */}
+        <div className="max-w-2xl mx-auto bg-neu-white border-4 border-neu-black rounded-xl p-6 md:p-8 shadow-[8px_8px_0px_0px_#FAFAFA]">
+          <h4 className="font-display font-black text-xl md:text-2xl uppercase tracking-tight text-neu-black mb-2 text-center">
+            {t('landing.feedback.formTitle', 'BERIKAN ULASAN ANDA')}
+          </h4>
+          <p className="font-body text-sm text-neu-black/70 text-center mb-6 font-medium">
+            Pengalaman Anda sangat berharga bagi kami untuk terus berkembang.
+          </p>
+
+          {submitted ? (
+            <div className="bg-neu-green/20 border-4 border-neu-green p-6 rounded-lg text-center">
+              <span className="material-symbols-outlined text-neu-green text-4xl font-bold mb-2">
+                check_circle
+              </span>
+              <p className="font-display font-black text-lg text-neu-black">
+                {t('landing.feedback.success', 'Terima kasih atas ulasan Anda!')}
+              </p>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="font-display font-black text-xs uppercase text-neu-black mb-1 block">
+                    Nama <span className="text-secondary-container">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    placeholder="Nama Anda"
+                    className="w-full bg-surface-dim border-2 border-neu-black rounded-lg px-4 py-2.5 font-bold text-neu-black text-sm outline-none focus:bg-neu-white"
+                  />
+                </div>
+                <div>
+                  <label className="font-display font-black text-xs uppercase text-neu-black mb-1 block">
+                    Email <span className="text-secondary-container">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    value={form.email}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    placeholder="email@anda.com"
+                    className="w-full bg-surface-dim border-2 border-neu-black rounded-lg px-4 py-2.5 font-bold text-neu-black text-sm outline-none focus:bg-neu-white"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="font-display font-black text-xs uppercase text-neu-black mb-1 block">
+                  Rating Bintang
+                </label>
+                <div className="flex gap-1 text-primary-container">
+                  {[1, 2, 3, 4, 5].map((s) => (
+                    <button
+                      key={s}
+                      type="button"
+                      onMouseEnter={() => setHovered(s)}
+                      onMouseLeave={() => setHovered(0)}
+                      onClick={() => setForm({ ...form, rating: s })}
+                      className="cursor-pointer"
+                    >
+                      <span className="material-symbols-outlined text-3xl font-black">
+                        {(hovered || form.rating) >= s ? 'star' : 'star_border'}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="font-display font-black text-xs uppercase text-neu-black mb-1 block">
+                  Pesan Ulasan
+                </label>
+                <textarea
+                  rows={3}
+                  value={form.message}
+                  onChange={(e) => setForm({ ...form, message: e.target.value })}
+                  placeholder="Ceritakan pengalaman Anda bekerja sama dengan Synectra..."
+                  className="w-full bg-surface-dim border-2 border-neu-black rounded-lg p-4 font-bold text-neu-black text-sm outline-none focus:bg-neu-white resize-none"
+                />
+              </div>
+
+              {error && <p className="text-secondary-container font-bold text-xs">{error}</p>}
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full bg-primary-container text-neu-black font-display font-black text-base py-3.5 border-4 border-neu-black rounded-lg shadow-[4px_4px_0px_0px_#0D0D0D] btn-press uppercase cursor-pointer"
+              >
+                {isSubmitting ? 'MENGIRIM...' : 'KIRIM ULASAN'}
+              </button>
+            </form>
+          )}
         </div>
-      )}
-
-      {/* Divider */}
-      <div className="flex items-center gap-4 mb-8">
-        <div className="flex-1 h-px bg-neu-white/15" />
-        <span className="font-mono text-xs text-neu-white/40 uppercase tracking-widest">{t('landing.feedback.formTitle')}</span>
-        <div className="flex-1 h-px bg-neu-white/15" />
-      </div>
-
-      {/* Form */}
-      {submitted ? (
-        <div className="max-w-lg mx-auto text-center border-4 border-neu-green rounded-neu-lg bg-neu-green/10 px-6 py-8">
-          <svg className="w-10 h-10 text-neu-green mx-auto mb-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <p className="font-display font-bold text-lg text-neu-white">{t('landing.feedback.success')}</p>
-          <button onClick={() => setSubmitted(false)} className="mt-4 font-mono text-xs text-neu-white/50 hover:text-neu-white underline">
-            {t('landing.feedback.submit')} →
-          </button>
-        </div>
-      ) : (
-        <form onSubmit={handleSubmit} className="max-w-lg mx-auto space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="flex flex-col gap-1.5">
-              <label className="font-display font-bold text-xs text-neu-white uppercase tracking-wide">
-                {t('landing.feedback.nameLabel')} <span className="text-neu-accent">*</span>
-              </label>
-              <input type="text" value={form.name} onChange={e => { setForm(p => ({...p, name: e.target.value})); setFormErrors(p => ({...p, name: ''})); }}
-                placeholder="Nama Anda"
-                required aria-required="true"
-                className={cn('w-full px-4 py-2.5 bg-neu-white border-4 rounded-neu-sm shadow-neu-solid-sm font-body text-sm text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu-solid transition-all duration-150', formErrors.name ? 'border-neu-accent' : 'border-neu-black')} />
-              {formErrors.name && <span className="font-body text-xs text-neu-accent">{formErrors.name}</span>}
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <label className="font-display font-bold text-xs text-neu-white uppercase tracking-wide">
-                {t('landing.feedback.emailLabel')} <span className="text-neu-accent">*</span>
-              </label>
-              <input type="email" value={form.email} onChange={e => { setForm(p => ({...p, email: e.target.value})); setFormErrors(p => ({...p, email: ''})); }}
-                placeholder="email@contoh.com"
-                required aria-required="true"
-                className={cn('w-full px-4 py-2.5 bg-neu-white border-4 rounded-neu-sm shadow-neu-solid-sm font-body text-sm text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu-solid transition-all duration-150', formErrors.email ? 'border-neu-accent' : 'border-neu-black')} />
-              {formErrors.email && <span className="font-body text-xs text-neu-accent">{formErrors.email}</span>}
-            </div>
-          </div>
-
-          {/* Star selector */}
-          <div className="flex flex-col gap-1.5">
-            <label className="font-display font-bold text-xs text-neu-white uppercase tracking-wide">
-              {t('landing.feedback.ratingLabel')} <span className="text-neu-accent">*</span>
-            </label>
-            <div className="flex gap-1 items-center">
-              {[1,2,3,4,5].map(s => (
-                <button key={s} type="button"
-                  aria-label={`${s} bintang`}
-                  onMouseEnter={() => setHovered(s)} onMouseLeave={() => setHovered(0)}
-                  onClick={() => { setForm(p => ({...p, rating: s})); setFormErrors(p => ({...p, rating: ''})); }}
-                  className="w-11 h-11 flex items-center justify-center transition-transform duration-100 hover:scale-110 active:scale-95">
-                  <svg className={cn('w-8 h-8 transition-colors duration-100', (hovered || form.rating) >= s ? 'text-neu-primary' : 'text-neu-white/20')} fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                  </svg>
-                </button>
-              ))}
-              {form.rating > 0 && <span className="ml-2 font-mono text-sm text-neu-white/50">{form.rating}/5</span>}
-            </div>
-            {formErrors.rating && <span className="font-body text-xs text-neu-accent">{formErrors.rating}</span>}
-          </div>
-
-          <div className="flex flex-col gap-1.5">
-            <label className="font-display font-bold text-xs text-neu-white uppercase tracking-wide">{t('landing.feedback.messageLabel')}</label>
-            <textarea value={form.message} onChange={e => setForm(p => ({...p, message: e.target.value}))} rows={3}
-              placeholder={t('landing.feedback.messagePlaceholder')}
-              className="w-full px-4 py-2.5 bg-neu-white border-4 border-neu-black rounded-neu-sm shadow-neu-solid-sm font-body text-sm text-neu-black placeholder:text-gray-400 outline-none focus:shadow-neu-solid transition-all duration-150 resize-none" />
-          </div>
-
-          {error && <p className="font-body text-xs text-neu-accent">{error}</p>}
-
-          <button type="submit" disabled={isSubmitting}
-            className={cn('w-full py-3 bg-neu-primary border-4 border-neu-black rounded-neu-sm shadow-neu-solid-lg font-display font-black text-sm uppercase text-neu-black transition-all duration-150 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-solid-sm', isSubmitting && 'opacity-60 cursor-not-allowed')}>
-            {isSubmitting ? t('landing.feedback.submitting') : t('landing.feedback.submit')}
-          </button>
-        </form>
-      )}
       </div>
     </section>
   );

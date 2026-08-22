@@ -1,54 +1,89 @@
 import { useTranslation } from 'react-i18next';
-import { motion } from 'framer-motion';
-import { fadeUp, STAGGER } from './animations';
-import { SectionTag } from './helpers';
 
-const ICON_BG = ['bg-neu-purple text-neu-white', 'bg-neu-green text-neu-black', 'bg-neu-accent text-neu-black', 'bg-neu-primary text-neu-black'];
-const ICONS = [
-  <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>,
-  <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" /></svg>,
-  <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>,
-  <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" /></svg>,
-  <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.5 0-3 1-3 3s1.5 3 3 5c1.5-2 3-3.5 3-5s-1.5-3-3-3z" /><path strokeLinecap="round" d="M12 2v2M12 20v2M2 12h2M20 12h2" /></svg>,
-  <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" /><path strokeLinecap="round" strokeLinejoin="round" d="M12 14l6.16-3.42A12.083 12.083 0 0112 21a12.083 12.083 0 01-6.16-10.42L12 14z" /></svg>,
+const REASONS = [
+  {
+    icon: 'visibility',
+    iconBg: 'bg-neu-purple text-neu-white',
+    title: 'Transparan 100%',
+    titleEn: '100% Transparent',
+    desc: 'Tidak ada biaya tersembunyi. Semua jelas dari awal hingga akhir proyek.',
+    descEn: 'No hidden costs. Everything is transparent from start to finish of the project.',
+  },
+  {
+    icon: 'speed',
+    iconBg: 'bg-neu-green text-neu-black',
+    title: 'Pengerjaan Cepat',
+    titleEn: 'Fast Turnaround',
+    desc: 'Kami menghargai waktu Anda. Proyek selesai sesuai deadline yang disepakati.',
+    descEn: 'We value your time. Projects delivered on or before the agreed deadline.',
+  },
+  {
+    icon: 'verified',
+    iconBg: 'bg-secondary-container text-neu-black',
+    title: 'Garansi Kualitas',
+    titleEn: 'Quality Guarantee',
+    desc: 'Hasil akhir dipastikan bebas bug dan sesuai dengan standar industri terbaik.',
+    descEn: 'Final deliverable is bug-free and complies with top industry engineering standards.',
+  },
+  {
+    icon: 'forum',
+    iconBg: 'bg-primary-container text-neu-black',
+    title: 'Komunikasi Aktif',
+    titleEn: 'Active Communication',
+    desc: 'Update berkala mengenai progress proyek agar Anda selalu mendapatkan informasi terkini.',
+    descEn: 'Continuous real-time progress updates so you always stay fully informed.',
+  },
+  {
+    icon: 'savings',
+    iconBg: 'bg-neu-purple text-neu-white',
+    title: 'Harga Terjangkau',
+    titleEn: 'Affordable Pricing',
+    desc: 'Solusi digital berkualitas premium dengan investasi yang masuk akal.',
+    descEn: 'Premium-grade digital solutions with realistic and reasonable investments.',
+  },
+  {
+    icon: 'history_edu',
+    iconBg: 'bg-neu-green text-neu-black',
+    title: '5+ Tahun Pengalaman',
+    titleEn: '5+ Years Experience',
+    desc: 'Tim ahli yang telah menangani puluhan proyek digital di berbagai industri.',
+    descEn: 'Expert team having delivered dozens of digital projects across diverse industries.',
+  },
 ];
 
 export function WhyChooseUs() {
-  const { t } = useTranslation();
-  const items = t('landing.why.items', { returnObjects: true });
+  const { t, i18n } = useTranslation();
+  const isEn = i18n.language === 'en';
 
   return (
-    <section className="border-b-4 border-neu-black bg-neu-black overflow-hidden">
-      {/* Static value-prop strip */}
-      <div className="bg-neu-primary border-b-4 border-neu-black py-3 px-4 lg:px-6">
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center gap-x-6 gap-y-2">
-          {items.map((w, i) => (
-            <span key={w.title} className="inline-flex items-center gap-6 font-mono font-black text-[11px] uppercase tracking-widest text-neu-black">
-              {i > 0 && <span className="text-neu-black/30">/</span>}
-              {w.title}
-            </span>
-          ))}
+    <section className="w-full bg-neu-black py-16 md:py-20 px-4 md:px-8 border-b-4 border-neu-black">
+      <div className="max-w-7xl mx-auto w-full">
+        {/* Header Tag */}
+        <div className="flex justify-center mb-10 md:mb-12">
+          <div className="bg-primary-container text-neu-black font-mono text-base md:text-xl font-bold px-6 md:px-8 py-3 border-4 border-neu-black rounded-lg shadow-[8px_8px_0px_0px_#FAFAFA] transform rotate-1 uppercase tracking-wide">
+            WHY_CHOOSE_US // {t('landing.why.title', 'MENGAPA MEMILIH SYNECTRA?')}
+          </div>
         </div>
-      </div>
 
-      <div className="max-w-7xl mx-auto px-4 lg:px-6 py-20 lg:py-24">
-        <motion.div className="flex justify-center mb-12" {...fadeUp()}>
-          <SectionTag tone="primary" rotate="rotate-1">{t('landing.why.title')}</SectionTag>
-        </motion.div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {items.map((w, i) => (
-            <motion.div
-              key={w.title}
-              {...fadeUp(Math.min(i * STAGGER, 0.42))}
-              className="bg-neu-white border-4 border-neu-black rounded-neu-lg p-7 shadow-neu-solid-lg hover:-translate-y-2 transition-transform duration-200"
+        {/* 6 Grid Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+          {REASONS.map((r, i) => (
+            <div
+              key={i}
+              className="bg-neu-white border-4 border-neu-black p-6 md:p-8 rounded-xl shadow-[8px_8px_0px_0px_#FFD000] hover:-translate-y-2 transition-transform select-none"
             >
-              <div className={`w-14 h-14 border-4 border-neu-black rounded-neu-lg flex items-center justify-center mb-5 ${ICON_BG[i % ICON_BG.length]}`}>
-                {ICONS[i % ICONS.length]}
+              <div className={`w-14 h-14 md:w-16 md:h-16 ${r.iconBg} border-4 border-neu-black rounded-lg flex items-center justify-center mb-6`}>
+                <span className="material-symbols-outlined text-2xl md:text-3xl font-bold">
+                  {r.icon}
+                </span>
               </div>
-              <h3 className="font-display font-black text-lg text-neu-black mb-2 uppercase">{w.title}</h3>
-              <p className="font-body text-sm text-neu-black/60 leading-relaxed font-medium">{w.desc}</p>
-            </motion.div>
+              <h4 className="font-display text-lg md:text-xl font-black mb-3 md:mb-4 uppercase text-neu-black">
+                {isEn ? r.titleEn : r.title}
+              </h4>
+              <p className="font-body text-sm md:text-base text-neu-black font-medium leading-relaxed">
+                {isEn ? r.descEn : r.desc}
+              </p>
+            </div>
           ))}
         </div>
       </div>

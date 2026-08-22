@@ -118,6 +118,7 @@
       ]
     },
     "packages": {
+      "tag": "Packages",
       "title": "Service Packages",
       "duration": "Duration"
     },

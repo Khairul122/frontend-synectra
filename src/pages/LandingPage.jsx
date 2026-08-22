@@ -166,14 +166,6 @@ export default function LandingPage() {
     return () => document.removeEventListener('keydown', handler);
   }, [menuOpen]);
 
-  // Hero entrance timeline — runs once on mount
-  useEffect(() => {
-    const tl = gsap.timeline({ delay: 0.15 });
-    tl.to('.hero-badge',    { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }, 0)
-      .to('.hero-cta',      { opacity: 1, duration: 0.5, ease: 'power2.out' }, 0.5)
-    return () => tl.kill();
-  }, []);
-
   const scrollTo = (ref) => ref.current?.scrollIntoView({ behavior: 'smooth' });
 
   const avgRating = feedbacks.length > 0
@@ -188,7 +180,7 @@ export default function LandingPage() {
   ];
 
   return (
-    <div ref={pageRef} className="min-h-screen bg-brutalist-grid overflow-x-hidden">
+    <div ref={pageRef} className="min-h-screen bg-brutalist-grid overflow-x-hidden perspective-container">
       <PortfolioModal
         item={activePortfolio}
         open={!!activePortfolio}
@@ -376,7 +368,7 @@ export default function LandingPage() {
 
       <Navbar activeSection={activeSection} menuOpen={menuOpen} setMenuOpen={setMenuOpen} transitionTo={transitionTo} scaleX={scaleX} />
 
-      <main>
+      <main className="preserve-3d relative flex flex-col items-center w-full">
         <Hero transitionTo={transitionTo} scrollTo={scrollTo} portfolioRef={portfolioRef} />
 
         <TechMarquee />

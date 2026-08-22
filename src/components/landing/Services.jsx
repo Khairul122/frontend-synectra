@@ -1,101 +1,96 @@
 import { useTranslation } from 'react-i18next';
-import { motion } from 'framer-motion';
-import { fadeUp, STAGGER } from './animations';
-import { TiltCard } from './TiltCard';
-import { ErrorState } from './ErrorState';
-import { SectionTag } from './helpers';
 import { useLang } from './hooks';
 
-const ICONS = {
-  code: (
-    <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-      <polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" />
-    </svg>
-  ),
-  mobile: (
-    <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-      <rect x="6" y="2" width="12" height="20" rx="2" /><line x1="11" y1="18" x2="13" y2="18" />
-    </svg>
-  ),
-  design: (
-    <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-      <circle cx="12" cy="12" r="10" /><path d="M8 14s1.5 2 4 2 4-2 4-2" /><line x1="9" y1="9" x2="9.01" y2="9" /><line x1="15" y1="9" x2="15.01" y2="9" />
-    </svg>
-  ),
-  api: (
-    <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-      <rect x="3" y="4" width="18" height="6" rx="1" /><rect x="3" y="14" width="18" height="6" rx="1" /><line x1="7" y1="7" x2="7.01" y2="7" /><line x1="7" y1="17" x2="7.01" y2="17" />
-    </svg>
-  ),
-  cloud: (
-    <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-      <path d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z" />
-    </svg>
-  ),
-  chat: (
-    <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
-    </svg>
-  ),
-};
+const DEFAULT_SERVICES = [
+  {
+    id: 'default-web',
+    tag: 'WEB_DEV',
+    tagBg: 'bg-neu-green text-neu-black',
+    icon: 'data_object',
+    title: 'PENGEMBANGAN WEBSITE',
+    titleEn: 'WEB DEVELOPMENT',
+    desc: 'Kami membangun website yang cepat, responsif, dan mudah dikelola dengan teknologi terkini untuk pengalaman pengguna terbaik.',
+    descEn: 'We build fast, responsive, and easy-to-manage websites with the latest technology for the best user experience.',
+  },
+  {
+    id: 'default-mobile',
+    tag: 'MOBILE_DEV',
+    tagBg: 'bg-primary-container text-neu-black',
+    icon: 'smartphone',
+    title: 'APLIKASI MOBILE',
+    titleEn: 'MOBILE APPS',
+    desc: 'Aplikasi native dan cross-platform berkualitas tinggi untuk iOS dan Android yang memberikan performa optimal di genggaman Anda.',
+    descEn: 'High quality native and cross-platform applications for iOS and Android delivering optimal performance.',
+  },
+  {
+    id: 'default-uiux',
+    tag: 'UI_UX',
+    tagBg: 'bg-neu-purple text-neu-white',
+    icon: 'design_services',
+    title: 'DESAIN UI/UX',
+    titleEn: 'UI/UX DESIGN',
+    desc: 'Desain antarmuka yang intuitif dan menarik dengan riset pengguna mendalam untuk meningkatkan konversi dan kepuasan pelanggan.',
+    descEn: 'Intuitive and engaging user interfaces designed with deep user research to boost conversion and satisfaction.',
+  },
+];
 
-const TAGS = {
-  code: ['WEB_DEV', 'bg-neu-green'],
-  mobile: ['MOBILE_DEV', 'bg-neu-primary'],
-  design: ['UI_UX', 'bg-neu-purple text-neu-white'],
-  api: ['BACKEND', 'bg-neu-accent'],
-  cloud: ['CLOUD', 'bg-neu-green'],
-  chat: ['SUPPORT', 'bg-neu-primary'],
+const ICON_MAP = {
+  code: { icon: 'data_object', tag: 'WEB_DEV', tagBg: 'bg-neu-green text-neu-black' },
+  mobile: { icon: 'smartphone', tag: 'MOBILE_DEV', tagBg: 'bg-primary-container text-neu-black' },
+  design: { icon: 'design_services', tag: 'UI_UX', tagBg: 'bg-neu-purple text-neu-white' },
+  api: { icon: 'api', tag: 'BACKEND_API', tagBg: 'bg-secondary-container text-neu-black' },
+  cloud: { icon: 'cloud', tag: 'CLOUD_INFRA', tagBg: 'bg-neu-blue text-neu-white' },
+  chat: { icon: 'support_agent', tag: 'CONSULTATION', tagBg: 'bg-primary-container text-neu-black' },
 };
 
 export function Services({ services, isLoading, error }) {
   const { t } = useTranslation();
   const lang = useLang();
 
+  const displayList = (!isLoading && services && services.length > 0)
+    ? services.map((svc, i) => {
+        const meta = ICON_MAP[svc.iconKey] || DEFAULT_SERVICES[i % DEFAULT_SERVICES.length];
+        return {
+          id: svc.id,
+          tag: meta.tag || 'SERVICES',
+          tagBg: meta.tagBg || 'bg-primary-container text-neu-black',
+          icon: meta.icon || 'terminal',
+          title: lang(svc.title, svc.titleEn),
+          desc: lang(svc.description, svc.descriptionEn),
+        };
+      })
+    : DEFAULT_SERVICES;
+
   return (
-    <section id="layanan" className="border-b-4 border-neu-black bg-neu-bg py-16 lg:py-20">
-      <div className="max-w-7xl mx-auto px-4 lg:px-6">
-      <div className="flex justify-center mb-12">
-        <motion.div {...fadeUp()}><SectionTag>{t('landing.services.tag')} // WHAT_WE_DO</SectionTag></motion.div>
-      </div>
-
-      {error ? (
-        <ErrorState message="Gagal memuat daftar layanan." />
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-          {isLoading
-            ? Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="border-4 border-neu-black rounded-neu-lg bg-neu-white p-8 animate-pulse">
-                  <div className="w-16 h-16 rounded-neu-lg bg-neu-black/10 mb-6" />
-                  <div className="h-5 w-2/3 bg-neu-black/10 rounded-full mb-3" />
-                  <div className="h-3 w-full bg-neu-black/10 rounded-full mb-1.5" />
-                  <div className="h-3 w-4/5 bg-neu-black/10 rounded-full" />
-                </div>
-              ))
-            : services.map((svc, i) => {
-                const [tagLabel, tagColor] = TAGS[svc.iconKey] ?? TAGS.code;
-                return (
-                  <TiltCard key={svc.id} maxTilt={5}>
-                    <motion.div
-                      {...fadeUp(Math.min(i * STAGGER, 0.42))}
-                      className="relative h-full p-8 group border-4 border-neu-black rounded-neu-lg bg-neu-white shadow-neu-solid-lg transition-transform duration-200 hover:-translate-y-2 flex flex-col items-start"
-                    >
-                      <span className={`inline-block ${tagColor} border-4 border-neu-black px-4 py-1.5 rounded-neu-sm font-mono font-bold text-xs mb-6`}>{tagLabel}</span>
-                      <span className="w-14 h-14 border-4 border-neu-black rounded-neu-lg bg-neu-bg text-neu-black flex items-center justify-center mb-4">
-                        {ICONS[svc.iconKey] ?? ICONS.code}
-                      </span>
-                      <h3 className="font-display font-black text-xl text-neu-black mb-3 uppercase">{lang(svc.title, svc.titleEn)}</h3>
-                      <p className="font-body text-sm leading-relaxed text-neu-black/70 font-medium">{lang(svc.description, svc.descriptionEn)}</p>
-                    </motion.div>
-                  </TiltCard>
-                );
-              })}
+    <section id="layanan" className="w-full bg-surface-dim py-16 md:py-20 px-4 md:px-8 border-b-4 border-neu-black">
+      <div className="max-w-7xl mx-auto w-full">
+        <div className="flex justify-center mb-10 md:mb-12">
+          <div className="bg-neu-black text-neu-white font-mono text-base md:text-xl font-bold px-6 md:px-8 py-3 border-4 border-neu-black rounded-lg shadow-[8px_8px_0px_0px_#FFD000] transform rotate-1 uppercase tracking-wide">
+            {t('landing.services.tag', 'SERVICES')} // WHAT_WE_DO
+          </div>
         </div>
-      )}
 
-      {!isLoading && !error && services.length === 0 && (
-        <p className="font-body text-sm text-neu-black/40 text-center py-10">Belum ada layanan yang ditambahkan.</p>
-      )}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+          {displayList.map((item) => (
+            <div
+              key={item.id}
+              className="bg-neu-white border-4 border-neu-black p-6 md:p-8 rounded-xl shadow-[8px_8px_0px_0px_#0D0D0D] hover:-translate-y-2 transition-transform duration-300 flex flex-col items-start"
+            >
+              <div className={`${item.tagBg} border-4 border-neu-black px-4 py-1.5 md:py-2 rounded-lg font-mono font-bold text-xs md:text-sm mb-6 inline-block uppercase`}>
+                {item.tag}
+              </div>
+              <span className="material-symbols-outlined text-4xl md:text-5xl mb-4 text-neu-black font-medium">
+                {item.icon}
+              </span>
+              <h3 className="font-display text-xl md:text-2xl font-black mb-3 md:mb-4 uppercase text-neu-black">
+                {item.title}
+              </h3>
+              <p className="font-body text-sm md:text-base text-neu-black leading-relaxed font-medium">
+                {item.desc}
+              </p>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );

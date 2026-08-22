@@ -1,103 +1,217 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { motion } from 'framer-motion';
 import { getPlatform } from '../../constants/platforms';
-import { fadeUp } from './animations';
 import { useLang } from './hooks';
 
 export function Footer({ socialMedia, services, transitionTo }) {
   const { t } = useTranslation();
   const lang = useLang();
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [newsletterSent, setNewsletterSent] = useState(false);
+
+  const handleSubscribe = (e) => {
+    e.preventDefault();
+    if (!newsletterEmail.trim()) return;
+    setNewsletterSent(true);
+    setNewsletterEmail('');
+  };
+
+  const scrollToSection = (id) => {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+    else window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const defaultServices = [
+    { title: 'Web Development', id: 'layanan' },
+    { title: 'Mobile App', id: 'layanan' },
+    { title: 'UI/UX Design', id: 'layanan' },
+    { title: 'Backend & API', id: 'layanan' },
+    { title: 'Data Science', id: 'layanan' },
+    { title: 'Joki Tugas', id: 'paket' },
+  ];
 
   return (
-    <motion.footer className="bg-neu-black relative overflow-hidden" {...fadeUp()}>
-      {/* Top strip */}
-      <div className="border-b-4 border-neu-white/10">
-        <div className="max-w-7xl mx-auto px-4 lg:px-6 py-12 grid grid-cols-1 lg:grid-cols-4 gap-10">
-
-          {/* Brand col — 2/4 */}
-          <div className="lg:col-span-2">
-            <div className="flex items-center gap-3 mb-5">
-              <picture>
-                <source srcSet="/logo-synectra.webp" type="image/webp" />
-                <img src="/logo-synectra.jpeg" alt="Synectra" width="130" height="36" loading="lazy" decoding="async"
-                  className="h-9 w-auto max-w-[130px] border-2 border-neu-white/30 rounded-neu-sm object-contain brightness-0 invert" />
-              </picture>
+    <footer className="w-full bg-neu-black text-neu-white py-12 md:py-16 px-4 md:px-8 select-none">
+      <div className="max-w-7xl mx-auto w-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12 mb-12">
+          {/* Column 1: Brand */}
+          <div className="flex flex-col gap-6">
+            <div className="font-display text-3xl md:text-4xl font-black text-primary-container tracking-tighter uppercase">
+              Synectra
             </div>
-            <p className="font-body text-sm text-neu-white/50 leading-relaxed mb-6 max-w-sm">
-              {t('landing.footer.desc')}
+            <p className="text-[#D4D4D8] text-sm leading-relaxed font-body font-medium">
+              {t('landing.footer.desc', 'Platform jasa digital terpercaya untuk website, mobile app, UI/UX, dan pengerjaan tugas akademik.')}
             </p>
-            {/* Social icons */}
-            {socialMedia.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {socialMedia.slice(0, 6).map(s => {
+            <div className="inline-flex items-center gap-2 bg-neu-green/10 text-neu-green border-2 border-neu-green px-3 py-1 rounded-full text-xs font-bold w-fit">
+              <span className="w-2 h-2 bg-neu-green rounded-full animate-pulse" />
+              Tersedia untuk Project Baru
+            </div>
+            <div className="flex gap-3">
+              {(socialMedia && socialMedia.length > 0) ? (
+                socialMedia.slice(0, 4).map((s) => {
                   const { Icon } = getPlatform(s.icon ?? s.platformName?.toLowerCase());
                   return (
-                    <a key={s.id} href={s.url} target="_blank" rel="noopener noreferrer"
-                      title={s.platformName}
-                      className="group w-10 h-10 border-2 border-neu-white/20 rounded-neu-sm flex items-center justify-center hover:border-neu-black hover:bg-neu-primary transition-all duration-200">
-                      <Icon style={{ color: '#ffffff70' }} className="w-4 h-4 group-hover:!text-neu-black transition-colors duration-200" />
+                    <a
+                      key={s.id}
+                      href={s.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-11 h-11 border-4 border-neu-white rounded-lg flex items-center justify-center hover:bg-primary-container hover:border-neu-black hover:text-neu-black transition-all group cursor-pointer"
+                    >
+                      <Icon className="w-5 h-5 text-neu-white group-hover:text-neu-black transition-colors" />
                     </a>
                   );
-                })}
+                })
+              ) : (
+                <>
+                  <a
+                    href="https://github.com/synectra"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-11 h-11 border-4 border-neu-white rounded-lg flex items-center justify-center hover:bg-primary-container hover:border-neu-black hover:text-neu-black transition-all cursor-pointer"
+                  >
+                    <span className="material-symbols-outlined text-2xl font-bold">code</span>
+                  </a>
+                  <a
+                    href="#kontak"
+                    className="w-11 h-11 border-4 border-neu-white rounded-lg flex items-center justify-center hover:bg-primary-container hover:border-neu-black hover:text-neu-black transition-all cursor-pointer"
+                  >
+                    <span className="material-symbols-outlined text-2xl font-bold">person</span>
+                  </a>
+                  <a
+                    href="#portofolio"
+                    className="w-11 h-11 border-4 border-neu-white rounded-lg flex items-center justify-center hover:bg-primary-container hover:border-neu-black hover:text-neu-black transition-all cursor-pointer"
+                  >
+                    <span className="material-symbols-outlined text-2xl font-bold">photo_camera</span>
+                  </a>
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Column 2: Layanan */}
+          <div className="flex flex-col gap-5">
+            <h5 className="font-display text-primary-container font-black uppercase tracking-widest text-base md:text-lg">
+              LAYANAN
+            </h5>
+            <nav className="flex flex-col gap-3.5">
+              {(services && services.length > 0) ? (
+                services.slice(0, 6).map((svc) => (
+                  <button
+                    key={svc.id}
+                    onClick={() => scrollToSection('layanan')}
+                    className="text-[#D4D4D8] text-sm font-bold hover:text-primary-container transition-colors text-left cursor-pointer"
+                  >
+                    {lang(svc.title, svc.titleEn)}
+                  </button>
+                ))
+              ) : (
+                defaultServices.map((ds, i) => (
+                  <button
+                    key={i}
+                    onClick={() => scrollToSection(ds.id)}
+                    className="text-[#D4D4D8] text-sm font-bold hover:text-primary-container transition-colors text-left cursor-pointer"
+                  >
+                    {ds.title}
+                  </button>
+                ))
+              )}
+            </nav>
+          </div>
+
+          {/* Column 3: Perusahaan */}
+          <div className="flex flex-col gap-5">
+            <h5 className="font-display text-primary-container font-black uppercase tracking-widest text-base md:text-lg">
+              PERUSAHAAN
+            </h5>
+            <nav className="flex flex-col gap-3.5">
+              <button
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                className="text-[#D4D4D8] text-sm font-bold hover:text-primary-container transition-colors text-left cursor-pointer"
+              >
+                Beranda
+              </button>
+              <button
+                onClick={() => scrollToSection('portofolio')}
+                className="text-[#D4D4D8] text-sm font-bold hover:text-primary-container transition-colors text-left cursor-pointer"
+              >
+                Portofolio
+              </button>
+              <button
+                onClick={() => scrollToSection('cara-kerja')}
+                className="text-[#D4D4D8] text-sm font-bold hover:text-primary-container transition-colors text-left cursor-pointer"
+              >
+                Cara Kerja
+              </button>
+              <button
+                onClick={() => scrollToSection('paket')}
+                className="text-[#D4D4D8] text-sm font-bold hover:text-primary-container transition-colors text-left cursor-pointer"
+              >
+                Harga & Paket
+              </button>
+              <button
+                onClick={() => transitionTo('/login')}
+                className="text-[#D4D4D8] text-sm font-bold hover:text-primary-container transition-colors text-left cursor-pointer"
+              >
+                Masuk
+              </button>
+              <button
+                onClick={() => transitionTo('/register')}
+                className="text-[#D4D4D8] text-sm font-bold hover:text-primary-container transition-colors text-left cursor-pointer"
+              >
+                Daftar Gratis
+              </button>
+            </nav>
+          </div>
+
+          {/* Column 4: Newsletter */}
+          <div className="flex flex-col gap-5">
+            <h5 className="font-display text-primary-container font-black uppercase tracking-widest text-base md:text-lg">
+              NEWSLETTER
+            </h5>
+            <p className="text-[#D4D4D8] text-sm font-bold">
+              Dapatkan update terbaru mengenai promo dan teknologi.
+            </p>
+            {newsletterSent ? (
+              <div className="bg-primary-container text-neu-black p-4 rounded-lg font-display font-black text-sm text-center">
+                Terima kasih telah berlangganan!
               </div>
+            ) : (
+              <form onSubmit={handleSubscribe} className="flex flex-col gap-3">
+                <input
+                  required
+                  value={newsletterEmail}
+                  onChange={(e) => setNewsletterEmail(e.target.value)}
+                  className="bg-neu-white text-neu-black border-4 border-neu-white rounded-lg px-4 py-2.5 font-bold focus:outline-none focus:border-primary-container text-sm"
+                  placeholder="Email Anda"
+                  type="email"
+                />
+                <button
+                  type="submit"
+                  className="bg-primary-container text-neu-black font-display font-black py-3 border-4 border-primary-container rounded-lg shadow-[4px_4px_0px_0px_#FAFAFA] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all uppercase text-sm btn-press cursor-pointer"
+                >
+                  Berlangganan
+                </button>
+              </form>
             )}
           </div>
+        </div>
 
-          {/* Layanan — dari data yang sama dengan section Layanan */}
-          {services.length > 0 && (
-            <div>
-              <p className="font-mono font-black text-[10px] text-neu-primary uppercase tracking-widest mb-5">{t('landing.footer.services')}</p>
-              <ul className="flex flex-col gap-2.5">
-                {services.slice(0, 6).map(svc => (
-                  <li key={svc.id}>
-                    <button onClick={() => transitionTo('/register')}
-                      className="font-body text-sm text-neu-white/50 hover:text-neu-primary transition-colors text-left leading-none">
-                      {lang(svc.title, svc.titleEn)}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {/* Perusahaan */}
-          <div>
-            <p className="font-mono font-black text-[10px] text-neu-primary uppercase tracking-widest mb-5">{t('landing.footer.company')}</p>
-            <ul className="flex flex-col gap-2.5">
-              {[
-                [t('landing.footer.links.home'), '/'],
-                [t('landing.footer.links.portfolio'), '/'],
-                [t('landing.footer.links.howItWorks'), '/'],
-                [t('landing.footer.links.pricing'), '/'],
-                [t('nav.login'), '/login'],
-                [t('nav.register'), '/register'],
-              ].map(([label, href]) => (
-                <li key={label}>
-                  <button onClick={() => transitionTo(href)}
-                    className="font-body text-sm text-neu-white/50 hover:text-neu-primary transition-colors text-left leading-none">
-                    {label}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
+        {/* Bottom copyright & back to top */}
+        <div className="border-t-4 border-neu-white/20 pt-8 flex flex-col md:flex-row justify-between items-center gap-6">
+          <p className="font-mono font-bold text-xs md:text-sm text-[#D4D4D8]">
+            © 2026 Synectra. Semua hak dilindungi.
+          </p>
+          <button
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            aria-label="Kembali ke atas"
+            className="w-11 h-11 md:w-12 md:h-12 bg-primary-container border-4 border-neu-black rounded-lg flex items-center justify-center text-neu-black shadow-[4px_4px_0px_0px_#FAFAFA] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all cursor-pointer"
+          >
+            <span className="material-symbols-outlined font-black text-2xl">arrow_upward</span>
+          </button>
         </div>
       </div>
-
-      {/* Bottom bar */}
-      <div className="max-w-7xl mx-auto px-4 lg:px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <p className="font-mono text-[11px] text-neu-white/25">
-          © {new Date().getFullYear()} Synectra. {t('landing.footer.rights')}
-        </p>
-        <div className="flex items-center gap-4">
-          {[t('landing.footer.privacy'), t('landing.footer.terms')].map(label => (
-            <button key={label}
-              className="font-mono text-[11px] text-neu-white/25 hover:text-neu-white/60 transition-colors">
-              {label}
-            </button>
-          ))}
-        </div>
-      </div>
-    </motion.footer>
+    </footer>
   );
 }

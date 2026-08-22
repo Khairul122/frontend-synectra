@@ -2,92 +2,135 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { cn } from '../../utils/cn';
 import { LanguageSwitcher } from '../ui/LanguageSwitcher';
-import { TactileButton } from './TactileButton';
 
 const NAV_LINKS = [
-  { tKey: 'nav.services',    id: 'layanan'   },
-  { tKey: 'nav.packages',    id: 'paket'     },
-  { tKey: 'nav.software',    id: 'software'  },
-  { tKey: 'nav.portfolio',   id: 'portofolio'},
-  { tKey: 'nav.howItWorks',  id: 'cara-kerja'},
-  { tKey: 'nav.reviews',     id: 'ulasan'    },
-  { tKey: 'nav.contact',     id: 'kontak'    },
+  { tKey: 'nav.services',    id: 'layanan',    label: 'Layanan' },
+  { tKey: 'nav.packages',    id: 'paket',      label: 'Paket' },
+  { tKey: 'nav.software',    id: 'software',   label: 'Software' },
+  { tKey: 'nav.portfolio',   id: 'portofolio', label: 'Portofolio' },
+  { tKey: 'nav.howItWorks',  id: 'cara-kerja', label: 'Cara Kerja' },
+  { tKey: 'nav.reviews',     id: 'ulasan',     label: 'Ulasan' },
+  { tKey: 'nav.contact',     id: 'kontak',     label: 'Kontak' },
 ];
 
 export function Navbar({ activeSection, menuOpen, setMenuOpen, transitionTo, scaleX }) {
   const { t } = useTranslation();
 
+  const handleScroll = (id) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   return (
     <>
       <motion.div
-        className="fixed top-0 left-0 right-0 h-[3.5px] bg-neu-accent z-[99] origin-left"
+        className="fixed top-0 left-0 right-0 h-[3.5px] bg-secondary-container z-[99] origin-left"
         style={{ scaleX }}
       />
-      {/* ── Navbar full-width, konsisten dengan pola border-b-4 section lain (sesuai mock Stitch final) ── */}
-      <nav className="sticky top-0 z-40 w-full bg-neu-white border-b-4 border-neu-black">
-        <div className="max-w-7xl mx-auto px-4 lg:px-6 h-16 lg:h-[4.5rem] flex items-center justify-between gap-3">
-          <div className="flex items-center gap-5 min-w-0">
-            <button
-              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              aria-label="Ke atas"
-              className="shrink-0 transition-transform duration-300 hover:rotate-2">
-              <picture>
-                <source srcSet="/logo-synectra.webp" type="image/webp" />
-                <img src="/logo-synectra.jpeg" alt="Synectra" width="120" height="36"
-                  className="h-9 w-auto max-w-[120px] border-2 border-neu-black rounded-neu-sm object-contain" />
-              </picture>
-            </button>
-            <div className="hidden lg:flex items-center gap-2">
-              {NAV_LINKS.map(({ tKey, id }, i) => (
-                <button key={id}
-                  onClick={() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-                  className={cn(
-                    'font-display font-black text-xs uppercase tracking-wide px-3 py-2 border-2 border-neu-black rounded-neu-sm shadow-neu-solid-sm transition-all duration-150 hover:-translate-y-1.5 active:translate-y-0 active:shadow-none',
-                    i % 2 === 0 ? 'hover:rotate-2' : 'hover:-rotate-2',
-                    activeSection === id
-                      ? 'text-neu-black bg-neu-primary'
-                      : 'text-neu-black/75 bg-neu-white hover:text-neu-black',
-                  )}>
-                  {t(tKey)}
-                </button>
-              ))}
+      <header className="sticky top-0 z-50 w-full bg-neu-white border-b-4 border-neu-black py-4 px-4 md:px-8 transform-gpu">
+        <div className="max-w-7xl mx-auto flex justify-between items-center preserve-3d">
+          {/* Brand */}
+          <a
+            onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+            className="font-headline-md text-2xl md:text-3xl font-black tracking-tighter text-on-surface flex items-center gap-3 group hover:rotate-2 transition-transform cursor-pointer"
+            href="#"
+          >
+            <div className="w-11 h-11 md:w-12 md:h-12 bg-primary-container border-4 border-neu-black rounded-lg flex items-center justify-center deep-shadow-sm group-hover:scale-110 transition-all preserve-3d">
+              <span className="material-symbols-outlined font-bold text-neu-black text-2xl md:text-3xl group-hover:rotate-180 transition-transform duration-500">
+                api
+              </span>
             </div>
-          </div>
-          <div className="hidden lg:flex items-center gap-3 shrink-0">
+            <span className="drop-shadow-[2px_2px_0px_#FFD000] text-neu-black">Synectra</span>
+          </a>
+
+          {/* Navigation Links (Desktop) */}
+          <nav className="hidden md:flex items-center gap-4 lg:gap-6 preserve-3d">
+            {NAV_LINKS.slice(0, 4).map(({ id, tKey, label }, i) => {
+              const isActive = activeSection === id;
+              return (
+                <button
+                  key={id}
+                  onClick={() => handleScroll(id)}
+                  className={cn(
+                    'border-2 border-neu-black px-4 py-2 font-black font-label-caps text-sm uppercase transform hover:-translate-y-2 shadow-[4px_4px_0px_0px_#0D0D0D] transition-all cursor-pointer rounded',
+                    i % 2 === 0 ? 'hover:rotate-2' : 'hover:-rotate-2',
+                    isActive ? 'bg-primary-container text-neu-black' : 'bg-neu-white text-neu-black hover:bg-surface-dim'
+                  )}
+                >
+                  {t(tKey, label)}
+                </button>
+              );
+            })}
+          </nav>
+
+          {/* Actions (Desktop) */}
+          <div className="hidden md:flex items-center gap-3 lg:gap-4 preserve-3d">
             <LanguageSwitcher variant="light" />
-            <TactileButton variant="ghost" className="!px-4 !py-2 !text-xs" onClick={() => transitionTo('/login')}>{t('nav.login')}</TactileButton>
-            <TactileButton variant="gold" className="!px-4 !py-2 !text-xs" onClick={() => transitionTo('/register')}>{t('nav.register')}</TactileButton>
+            <button
+              onClick={() => transitionTo('/login')}
+              className="font-label-caps text-sm uppercase font-bold text-neu-black bg-neu-white px-5 py-2.5 lg:px-6 lg:py-3 border-4 border-neu-black rounded-lg transition-all shadow-[6px_6px_0px_0px_rgba(13,13,13,1)] hover:shadow-[8px_8px_0px_0px_rgba(13,13,13,1)] hover:-translate-y-1 btn-press cursor-pointer"
+            >
+              {t('nav.login', 'Masuk')}
+            </button>
+            <button
+              onClick={() => transitionTo('/register')}
+              className="font-label-caps text-sm uppercase font-black text-neu-black bg-primary-container px-6 py-2.5 lg:px-8 lg:py-3 border-4 border-neu-black rounded-lg transition-all shadow-[6px_6px_0px_0px_rgba(13,13,13,1)] hover:shadow-[8px_8px_0px_0px_rgba(13,13,13,1)] hover:-translate-y-1 btn-press hover:rotate-2 cursor-pointer"
+            >
+              {t('nav.register', 'Daftar Gratis')}
+            </button>
           </div>
+
+          {/* Mobile Menu Toggle */}
           <button
-            onClick={() => setMenuOpen(o => !o)}
+            onClick={() => setMenuOpen(!menuOpen)}
             aria-expanded={menuOpen}
             aria-label={menuOpen ? 'Tutup menu' : 'Buka menu'}
-            className="lg:hidden w-11 h-11 border-4 border-neu-black rounded-neu-sm flex items-center justify-center bg-neu-primary shadow-neu-solid-sm transition-all active:translate-x-0.5 active:translate-y-0.5 active:shadow-none shrink-0">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-              {menuOpen ? <><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></> : <><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></>}
-            </svg>
+            className="md:hidden flex items-center justify-center p-2.5 border-4 border-neu-black bg-primary-container rounded-lg shadow-[4px_4px_0px_0px_rgba(13,13,13,1)] btn-press cursor-pointer"
+          >
+            <span className="material-symbols-outlined text-2xl font-bold">
+              {menuOpen ? 'close' : 'menu'}
+            </span>
           </button>
         </div>
+
+        {/* Mobile Dropdown */}
         {menuOpen && (
-          <div className="lg:hidden border-t-4 border-neu-black px-4 py-3 flex flex-col gap-1">
-            {NAV_LINKS.map(({ tKey, id }) => (
-              <button key={id}
-                onClick={() => { document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); setMenuOpen(false); }}
-                className="font-display font-bold text-sm uppercase text-neu-black text-left py-1.5 border-b border-neu-black/10 last:border-0">
-                {t(tKey)}
+          <div className="md:hidden border-t-4 border-neu-black mt-4 pt-4 flex flex-col gap-2.5 animate-fadeIn">
+            {NAV_LINKS.map(({ id, tKey, label }) => (
+              <button
+                key={id}
+                onClick={() => { handleScroll(id); setMenuOpen(false); }}
+                className={cn(
+                  'w-full text-left font-display font-bold text-sm uppercase px-4 py-2 border-2 border-neu-black rounded-md shadow-[2px_2px_0px_0px_#0D0D0D]',
+                  activeSection === id ? 'bg-primary-container text-neu-black' : 'bg-neu-white text-neu-black'
+                )}
+              >
+                {t(tKey, label)}
               </button>
             ))}
-            <div className="pt-2 flex flex-col gap-2">
-              <button onClick={() => { transitionTo('/login'); setMenuOpen(false); }} className="font-display font-bold text-sm uppercase text-neu-black text-left py-1.5">{t('nav.login')}</button>
-              <button onClick={() => { transitionTo('/register'); setMenuOpen(false); }} className="px-4 py-2 bg-neu-primary border-2 border-neu-black rounded-neu-sm font-display font-bold text-sm uppercase text-neu-black text-center">{t('nav.register')}</button>
-              <div className="flex items-center gap-2 py-1">
-                <span className="font-mono text-xs text-neu-black/40 uppercase">Lang</span>
+            <div className="pt-2 flex flex-col gap-2 border-t-2 border-neu-black/10">
+              <button
+                onClick={() => { transitionTo('/login'); setMenuOpen(false); }}
+                className="w-full py-2.5 bg-neu-white border-2 border-neu-black rounded-md font-display font-bold text-sm uppercase text-neu-black shadow-[2px_2px_0px_0px_#0D0D0D]"
+              >
+                {t('nav.login', 'Masuk')}
+              </button>
+              <button
+                onClick={() => { transitionTo('/register'); setMenuOpen(false); }}
+                className="w-full py-2.5 bg-primary-container border-2 border-neu-black rounded-md font-display font-bold text-sm uppercase text-neu-black shadow-[2px_2px_0px_0px_#0D0D0D]"
+              >
+                {t('nav.register', 'Daftar Gratis')}
+              </button>
+              <div className="flex items-center justify-between px-2 py-1">
+                <span className="font-mono text-xs text-neu-black/60 uppercase font-bold">Bahasa / Lang</span>
                 <LanguageSwitcher variant="light" />
               </div>
             </div>
           </div>
         )}
-      </nav>
+      </header>
     </>
   );
 }
