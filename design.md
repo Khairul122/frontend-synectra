@@ -98,7 +98,7 @@ Background halaman (`LandingPage.jsx` root div) pakai `.bg-brutalist-grid` (gari
 
 - Section konten biasa (Navbar, Hero, TechMarquee, Stats, Services, About, Packages, Banners, Software, FeedbackSection): `py-16 lg:py-20`
 - Section "showcase" (Portfolio, WhyChooseUs, HowItWorks, Contact, CTAFinal): `py-20 lg:py-24`
-- Tidak ada gap/margin antar section — pemisah hanya `border-b-4 border-neu-black`, section terakhir (`Footer`) tanpa border bawah.
+- Tidak ada gap/margin antar section — pemisah hanya `border-b-4 border-neu-black`, kecuali `Hero` dan `Footer` (section terakhir) yang sengaja tanpa border bawah.
 
 ### Urutan & warna latar section (mengikuti mock Stitch)
 
