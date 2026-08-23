@@ -37,10 +37,15 @@ export function Navbar({ activeSection, menuOpen, setMenuOpen, transitionTo, sca
             className="font-headline-md text-2xl md:text-3xl font-black tracking-tighter text-on-surface flex items-center gap-3 group hover:rotate-2 transition-transform cursor-pointer"
             href="#"
           >
-            <div className="w-11 h-11 md:w-12 md:h-12 bg-primary-container border-4 border-neu-black rounded-lg flex items-center justify-center deep-shadow-sm group-hover:scale-110 transition-all preserve-3d">
-              <span className="material-symbols-outlined font-bold text-neu-black text-2xl md:text-3xl group-hover:rotate-180 transition-transform duration-500">
-                api
-              </span>
+            <div className="w-11 h-11 md:w-12 md:h-12 bg-neu-white border-4 border-neu-black rounded-lg flex items-center justify-center deep-shadow-sm group-hover:scale-110 transition-all preserve-3d overflow-hidden flex-shrink-0">
+              <picture className="w-full h-full flex items-center justify-center">
+                <source srcSet="/logo-synectra.webp" type="image/webp" />
+                <img
+                  src="/logo-synectra.jpeg"
+                  alt="Synectra"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                />
+              </picture>
             </div>
             <span className="drop-shadow-[2px_2px_0px_#FFD000] text-neu-black">Synectra</span>
           </a>
