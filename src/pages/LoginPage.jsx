@@ -156,15 +156,7 @@ export default function LoginPage({ initialMode = 'login' }) {
             <AuthVisual3D isDesktop={false} />
           </div>
 
-          {/* Desktop Home Navigation */}
-          <div className="hidden md:flex absolute top-6 left-8 items-center gap-3">
-            <span
-              onClick={() => navigate('/')}
-              className="font-display font-black text-2xl text-neu-black tracking-tighter cursor-pointer hover:-rotate-2 transition-transform"
-            >
-              Synectra
-            </span>
-          </div>
+
 
           {/* Flip Card Container */}
           <div className="w-full max-w-md perspective-1000 min-h-[580px] md:h-[640px] flex flex-col">
@@ -206,20 +198,6 @@ export default function LoginPage({ initialMode = 'login' }) {
                 </div>
 
                 <form onSubmit={handleLoginSubmit} className="flex flex-col gap-4 flex-1">
-                  {/* Forgot Password Inline Banner */}
-                  {showForgotNotice && (
-                    <div className="bg-primary-container border-2 border-neu-black p-3 rounded-md flex items-center justify-between text-xs font-bold text-neu-black shadow-neu-sm">
-                      <span>Silakan hubungi administrator untuk reset password.</span>
-                      <button
-                        type="button"
-                        onClick={() => setShowForgotNotice(false)}
-                        className="font-mono text-base font-black ml-2 hover:opacity-75 cursor-pointer px-1"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  )}
-
                   {/* Email */}
                   <div className="flex flex-col gap-1.5">
                     <label className="font-mono text-xs text-neu-black font-bold uppercase tracking-wider">
@@ -299,7 +277,6 @@ export default function LoginPage({ initialMode = 'login' }) {
                       href="#"
                       onClick={(e) => {
                         e.preventDefault();
-                        setShowForgotNotice(true);
                         alert.info('Silakan hubungi administrator untuk reset password.');
                       }}
                       className="font-mono text-xs text-neu-black font-bold underline decoration-2 underline-offset-4 hover:text-neu-primary transition-colors"

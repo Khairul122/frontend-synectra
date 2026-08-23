@@ -6,7 +6,7 @@ export function AuthVisual3D({ isDesktop = false }) {
   const glCanvasRef = useRef(null);
 
   useEffect(() => {
-    // --- 1. WebGL Shader Canvas ---
+    // --- 1. WebGL Subtle Ambient Grid Shader ---
     const canvas = glCanvasRef.current;
     if (!canvas) return;
 
@@ -39,17 +39,17 @@ export function AuthVisual3D({ isDesktop = false }) {
             vec2 uv = v_texCoord;
             vec2 mouse = u_mouse / u_resolution;
             
-            vec2 pan = vec2(u_time * 0.02, u_time * 0.015);
-            float g = grid(uv + pan, 15.0);
+            vec2 pan = vec2(u_time * 0.015, u_time * 0.01);
+            float g = grid(uv + pan, 16.0);
             
             vec3 bg = vec3(0.96, 0.94, 0.91); 
-            vec3 gridCol = vec3(0.05, 0.05, 0.05);
+            vec3 gridCol = vec3(0.08, 0.08, 0.08);
             
             float dist = distance(uv, mouse);
-            float glow = 1.0 - smoothstep(0.0, 0.8, dist);
+            float glow = 1.0 - smoothstep(0.0, 0.7, dist);
             
-            vec3 finalCol = mix(bg, gridCol, g * 0.05);
-            finalCol += vec3(1.0, 0.82, 0.0) * glow * 0.05;
+            vec3 finalCol = mix(bg, gridCol, g * 0.04);
+            finalCol += vec3(1.0, 0.82, 0.0) * glow * 0.06;
             
             gl_FragColor = vec4(finalCol, 1.0);
         }
@@ -132,65 +132,66 @@ export function AuthVisual3D({ isDesktop = false }) {
   }, []);
 
   useEffect(() => {
-    // --- 2. Three.js Floating 3D Monolith Lock ---
+    // --- 2. Sleek & Professional 3D Floating Geometry (Three.js) ---
     const container = containerRef.current;
     if (!container) return;
 
     const width = container.clientWidth || (isDesktop ? window.innerWidth / 2 : window.innerWidth);
-    const height = container.clientHeight || (isDesktop ? 400 : 180);
+    const height = container.clientHeight || (isDesktop ? 380 : 180);
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-    const threeRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'low-power' });
+    const threeRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
     threeRenderer.setSize(width, height);
     threeRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     container.appendChild(threeRenderer.domElement);
 
-    const colors = {
-      yellow: 0xFFD000,
-      black: 0x0D0D0D,
-    };
-
     const group = new THREE.Group();
     scene.add(group);
 
-    // Stylized 3D Lock/Monolith
-    const geometry = new THREE.BoxGeometry(2, 3, 0.8);
-    const material = new THREE.MeshPhongMaterial({
-      color: colors.yellow,
+    // --- Main Object: Sleek Chamfered Monolith ---
+    const cubeGeom = new THREE.BoxGeometry(2.2, 2.8, 1.2);
+    const cubeMat = new THREE.MeshPhongMaterial({
+      color: 0xFFD000,
+      specular: 0xFFFFFF,
+      shininess: 80,
       flatShading: true,
-      shininess: 100,
     });
-    const monolith = new THREE.Mesh(geometry, material);
+    const cubeMesh = new THREE.Mesh(cubeGeom, cubeMat);
 
-    // Wireframe Edges
-    const edges = new THREE.EdgesGeometry(geometry);
-    const lineMaterial = new THREE.LineBasicMaterial({ color: colors.black, linewidth: 2 });
-    const wireframe = new THREE.LineSegments(edges, lineMaterial);
-    monolith.add(wireframe);
+    // Crisp Neubrutalist Outline
+    const edges = new THREE.EdgesGeometry(cubeGeom);
+    const lineMat = new THREE.LineBasicMaterial({ color: 0x0D0D0D, linewidth: 2.5 });
+    const wireframe = new THREE.LineSegments(edges, lineMat);
+    cubeMesh.add(wireframe);
 
-    group.add(monolith);
+    group.add(cubeMesh);
 
-    // Floating Torus Ring
-    const ringGeom = new THREE.TorusGeometry(2, 0.05, 16, 100);
-    const ringMat = new THREE.MeshBasicMaterial({ color: colors.black });
-    const ring = new THREE.Mesh(ringGeom, ringMat);
-    ring.rotation.x = Math.PI / 2;
-    group.add(ring);
+    // --- Elegant Orbiting Ring ---
+    const ringGeom = new THREE.TorusGeometry(2.5, 0.06, 16, 100);
+    const ringMat = new THREE.MeshPhongMaterial({ color: 0x0D0D0D });
+    const ringMesh = new THREE.Mesh(ringGeom, ringMat);
+    ringMesh.rotation.x = Math.PI / 2.5;
+    ringMesh.rotation.y = Math.PI / 6;
+    group.add(ringMesh);
 
-    // Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    // --- Lighting ---
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
     scene.add(ambientLight);
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-    directionalLight.position.set(5, 5, 5);
-    scene.add(directionalLight);
 
-    camera.position.z = 8;
+    const dirLight1 = new THREE.DirectionalLight(0xffffff, 1.0);
+    dirLight1.position.set(5, 8, 5);
+    scene.add(dirLight1);
 
+    const dirLight2 = new THREE.DirectionalLight(0xFFD000, 0.5);
+    dirLight2.position.set(-5, -5, -2);
+    scene.add(dirLight2);
+
+    camera.position.z = isDesktop ? 8 : 7.5;
+
+    // --- Smooth Mouse Parallax ---
     let mouseX = 0;
     let mouseY = 0;
-    let targetX = 0;
-    let targetY = 0;
 
     const handlePointerMove = (e) => {
       mouseX = (e.clientX / window.innerWidth) - 0.5;
@@ -203,21 +204,28 @@ export function AuthVisual3D({ isDesktop = false }) {
       threeReqId = requestAnimationFrame(animate3D);
       const time = Date.now() * 0.001;
 
-      group.position.y = Math.sin(time) * 0.2;
-      group.rotation.y += 0.005;
+      // Smooth floating oscillation
+      group.position.y = Math.sin(time * 1.2) * 0.18;
+      
+      // Smooth continuous rotation
+      cubeMesh.rotation.y += 0.006;
+      cubeMesh.rotation.x = Math.sin(time * 0.6) * 0.1;
 
-      targetX = mouseX * 0.5;
-      targetY = -mouseY * 0.5;
+      ringMesh.rotation.z += 0.008;
 
-      group.rotation.x += (targetY - group.rotation.x) * 0.1;
-      group.rotation.y += (targetX - group.rotation.y) * 0.1;
+      // Mouse tilt responsiveness
+      const targetX = mouseX * 0.4;
+      const targetY = -mouseY * 0.4;
+
+      group.rotation.y += (targetX - group.rotation.y) * 0.06;
+      group.rotation.x += (targetY - group.rotation.x) * 0.06;
 
       threeRenderer.render(scene, camera);
     };
 
     const handleResize = () => {
       const w = container.clientWidth || (isDesktop ? window.innerWidth / 2 : window.innerWidth);
-      const h = container.clientHeight || (isDesktop ? 400 : 180);
+      const h = container.clientHeight || (isDesktop ? 380 : 180);
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
       threeRenderer.setSize(w, h);
@@ -231,10 +239,11 @@ export function AuthVisual3D({ isDesktop = false }) {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('mousemove', handlePointerMove);
 
-      geometry.dispose();
-      material.dispose();
+      cubeGeom.dispose();
+      cubeMat.dispose();
       edges.dispose();
-      lineMaterial.dispose();
+      lineMat.dispose();
+
       ringGeom.dispose();
       ringMat.dispose();
 
@@ -248,21 +257,27 @@ export function AuthVisual3D({ isDesktop = false }) {
 
   if (isDesktop) {
     return (
-      <div className="w-full h-full relative flex flex-col items-center justify-center overflow-hidden">
+      <div className="w-full h-full relative flex flex-col items-center justify-center overflow-hidden p-6 select-none">
         <canvas ref={glCanvasRef} className="absolute inset-0 w-full h-full z-0" />
-        <div className="absolute inset-0 z-0 bg-gradient-to-b from-transparent to-surface-container-high/40 pointer-events-none" />
-        <div className="relative z-10 text-center flex flex-col items-center w-full">
-          <h1 className="font-display font-black text-4xl lg:text-5xl text-neu-black mb-8 tracking-tighter uppercase drop-shadow-[4px_4px_0px_rgba(255,208,0,1)]">
+        
+        {/* Simple & Clean Header */}
+        <div className="relative z-10 text-center flex flex-col items-center w-full max-w-xl mb-2">
+          <h1 className="font-display font-black text-5xl lg:text-6xl xl:text-7xl text-neu-black tracking-tighter uppercase leading-[1.05] drop-shadow-[6px_6px_0px_rgba(255,208,0,1)]">
             WELCOME TO SYNECTRA
           </h1>
-          <div ref={containerRef} className="relative z-10 w-full h-[400px]" />
+          <p className="font-body text-sm lg:text-base text-on-surface-variant font-medium mt-3">
+            Enter the next generation digital workspace.
+          </p>
         </div>
+
+        {/* Sleek 3D Canvas Area */}
+        <div ref={containerRef} className="relative z-10 w-full h-[380px] max-w-md my-2" />
       </div>
     );
   }
 
   return (
-    <div className="w-full h-[180px] relative flex items-center justify-center shrink-0 border-b-3 border-neu-black overflow-hidden">
+    <div className="w-full h-[180px] relative flex items-center justify-center shrink-0 border-b-3 border-neu-black overflow-hidden select-none">
       <canvas ref={glCanvasRef} className="absolute inset-0 w-full h-full z-0" />
       <div ref={containerRef} className="absolute inset-0 w-full h-full z-10 pointer-events-none" />
     </div>

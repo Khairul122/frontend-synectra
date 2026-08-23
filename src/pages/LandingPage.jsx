@@ -4,7 +4,10 @@ import { useTranslation } from 'react-i18next';
 import { useScroll, useSpring } from 'framer-motion';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from '../components/ui/dialog';
 import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import axios from 'axios';
+
+gsap.registerPlugin(ScrollTrigger);
 import { cn } from '../utils/cn';
 import { API_BASE_URL } from '../constants/api';
 import { useIsDesktop } from '../hooks/useIsDesktop';
@@ -165,6 +168,58 @@ export default function LandingPage() {
     return () => document.removeEventListener('keydown', handler);
   }, [menuOpen]);
 
+  const mainRef = useRef(null);
+
+  // ── GSAP ScrollTrigger Per-Section Reveal Animations ──
+  useEffect(() => {
+    if (isLoading) return;
+
+    const ctx = gsap.context(() => {
+      const sections = gsap.utils.toArray('.gsap-section-reveal');
+
+      sections.forEach((sec) => {
+        gsap.fromTo(
+          sec,
+          { y: 55, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.85,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: sec,
+              start: 'top 88%',
+              toggleActions: 'play none none reverse',
+            },
+          }
+        );
+
+        const staggerItems = sec.querySelectorAll('.gsap-card-stagger');
+        if (staggerItems.length > 0) {
+          gsap.fromTo(
+            staggerItems,
+            { y: 40, opacity: 0, scale: 0.94 },
+            {
+              y: 0,
+              opacity: 1,
+              scale: 1,
+              duration: 0.65,
+              stagger: 0.12,
+              ease: 'back.out(1.4)',
+              scrollTrigger: {
+                trigger: sec,
+                start: 'top 82%',
+                toggleActions: 'play none none reverse',
+              },
+            }
+          );
+        }
+      });
+    }, mainRef);
+
+    return () => ctx.revert();
+  }, [isLoading]);
+
   const scrollTo = (ref) => ref.current?.scrollIntoView({ behavior: 'smooth' });
 
   const avgRating = feedbacks.length > 0
@@ -242,59 +297,86 @@ export default function LandingPage() {
 
       <Navbar activeSection={activeSection} menuOpen={menuOpen} setMenuOpen={setMenuOpen} transitionTo={transitionTo} scaleX={scaleX} />
 
-      <main className="preserve-3d relative flex flex-col items-center w-full">
-        <Hero transitionTo={transitionTo} scrollTo={scrollTo} portfolioRef={portfolioRef} />
+      <main ref={mainRef} className="preserve-3d relative flex flex-col items-center w-full">
+        <div className="gsap-section-reveal w-full">
+          <Hero transitionTo={transitionTo} scrollTo={scrollTo} portfolioRef={portfolioRef} />
+        </div>
 
-        <TechMarquee />
+        <div className="gsap-section-reveal w-full">
+          <TechMarquee />
+        </div>
 
-        <Stats stats={stats} isLoading={isLoading} error={errors.portfolios || errors.feedbacks} />
+        <div className="gsap-section-reveal w-full">
+          <Stats stats={stats} isLoading={isLoading} error={errors.portfolios || errors.feedbacks} />
+        </div>
 
-        <Services services={services} isLoading={isLoading} error={errors.services} />
+        <div className="gsap-section-reveal w-full">
+          <Services services={services} isLoading={isLoading} error={errors.services} />
+        </div>
 
-        <About stats={stats} isLoading={isLoading} />
+        <div className="gsap-section-reveal w-full">
+          <About stats={stats} isLoading={isLoading} />
+        </div>
 
-        <Packages
-          packages={packages}
-          isLoading={isLoading}
-          error={errors.packages}
-          pkgSliderRef={pkgSliderRef}
-          pkgDrag={pkgDrag}
-          scrollSlider={scrollSlider}
-          navigateProtected={navigateProtected}
-        />
+        <div className="gsap-section-reveal w-full">
+          <Packages
+            packages={packages}
+            isLoading={isLoading}
+            error={errors.packages}
+            pkgSliderRef={pkgSliderRef}
+            pkgDrag={pkgDrag}
+            scrollSlider={scrollSlider}
+            navigateProtected={navigateProtected}
+          />
+        </div>
 
-        <Banners banners={banners} onOpenModal={setActiveBannerModal} />
+        <div className="gsap-section-reveal w-full">
+          <Banners banners={banners} onOpenModal={setActiveBannerModal} />
+        </div>
 
-        <Software
-          softwareProducts={softwareProducts}
-          isLoading={isLoading}
-          error={errors.softwareProducts}
-          swSliderRef={swSliderRef}
-          swDrag={swDrag}
-          scrollSlider={scrollSlider}
-          setActiveSoftware={setActiveSoftware}
-          navigateProtected={navigateProtected}
-        />
+        <div className="gsap-section-reveal w-full">
+          <Software
+            softwareProducts={softwareProducts}
+            isLoading={isLoading}
+            error={errors.softwareProducts}
+            swSliderRef={swSliderRef}
+            swDrag={swDrag}
+            scrollSlider={scrollSlider}
+            setActiveSoftware={setActiveSoftware}
+            navigateProtected={navigateProtected}
+          />
+        </div>
 
-        <Portfolio
-          portfolios={portfolios}
-          isLoading={isLoading}
-          error={errors.portfolios}
-          portfolioRef={portfolioRef}
-          setActivePortfolio={setActivePortfolio}
-          transitionTo={transitionTo}
-        />
+        <div className="gsap-section-reveal w-full">
+          <Portfolio
+            portfolios={portfolios}
+            isLoading={isLoading}
+            error={errors.portfolios}
+            portfolioRef={portfolioRef}
+            setActivePortfolio={setActivePortfolio}
+            transitionTo={transitionTo}
+          />
+        </div>
 
-        <WhyChooseUs />
+        <div className="gsap-section-reveal w-full">
+          <WhyChooseUs />
+        </div>
 
-        <HowItWorks />
+        <div className="gsap-section-reveal w-full">
+          <HowItWorks />
+        </div>
 
-        <Contact contacts={contacts} socialMedia={socialMedia} showToast={showToast} />
+        <div className="gsap-section-reveal w-full">
+          <Contact contacts={contacts} socialMedia={socialMedia} showToast={showToast} />
+        </div>
 
-        {/* ── RATING & ULASAN ── */}
-        <FeedbackSection feedbacks={feedbacks} onSubmitted={fb => setFeedbacks(prev => [fb, ...prev])} />
+        <div className="gsap-section-reveal w-full">
+          <FeedbackSection feedbacks={feedbacks} onSubmitted={fb => setFeedbacks(prev => [fb, ...prev])} />
+        </div>
 
-        <CTAFinal transitionTo={transitionTo} />
+        <div className="gsap-section-reveal w-full">
+          <CTAFinal transitionTo={transitionTo} />
+        </div>
 
         <Footer socialMedia={socialMedia} services={services} transitionTo={transitionTo} />
       </main>

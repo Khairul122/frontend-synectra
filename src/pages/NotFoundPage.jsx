@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { ArrowRight } from 'lucide-react';
+import notFoundIllustration from '../assets/not-found-illustration.png';
 
 export default function NotFoundPage() {
   const navigate = useNavigate();
@@ -202,8 +203,8 @@ export default function NotFoundPage() {
           >
             <div className="absolute inset-0 bg-secondary/10 opacity-0 group-hover:opacity-100 transition-opacity z-10 pointer-events-none rounded-lg" />
             <img
-              src="https://lh3.googleusercontent.com/aida/AEtjO1WwbgrpQMzAwXjqf9L-aXuyUoTaz7SzU9K50QZcKglsYC75vJMAmHf_NAyeQP-3CX3zUUPsr3nQdZeM82SVS4oJIRTPYrrIq_1Knoe67ss8yzd37-S7tFk728PQ8W2XybChTNN8rZ96RRmO1k0rbu_HcbHyVNyIuQge86_PKBRbF9W7oz1jfUi9wADSM8L2sqnPXnQZDSaglP7qBQDIlfBYIYOKUhByOSGbqWKjzmwGg-_gdfHQ_t6YEVA"
-              alt="Confused blue creature looking lost on a 404 page"
+              src={notFoundIllustration}
+              alt="Robot 404 Synectra - Kodingan Nyasar"
               className="w-full h-full object-cover rounded-lg border-2 border-neu-black filter contrast-105"
             />
           </div>

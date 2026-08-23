@@ -1,63 +1,60 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { gsap } from 'gsap';
 
 const CONFIG = {
   success: {
-    bgStyle: { backgroundColor: '#00C48C', color: '#FFFFFF' },
+    badgeBg: '#00C48C',
+    badgeText: '#FFFFFF',
     icon: '✓',
     label: 'Berhasil',
   },
   error: {
-    bgStyle: { backgroundColor: '#FF5C5C', color: '#FFFFFF' },
+    badgeBg: '#FF5C5C',
+    badgeText: '#FFFFFF',
     icon: '✕',
     label: 'Error',
   },
   warning: {
-    bgStyle: { backgroundColor: '#FFD000', color: '#0D0D0D' },
+    badgeBg: '#FFD000',
+    badgeText: '#0D0D0D',
     icon: '!',
     label: 'Perhatian',
   },
   info: {
-    bgStyle: { backgroundColor: '#4D61FF', color: '#FFFFFF' },
+    badgeBg: '#4D61FF',
+    badgeText: '#FFFFFF',
     icon: 'ℹ',
     label: 'Info',
   },
 };
 
 function AlertItem({ alert, onDismiss }) {
-  const ref = useRef(null);
+  const [exiting, setExiting] = useState(false);
   const c = CONFIG[alert.type] ?? CONFIG.info;
 
-  useEffect(() => {
-    gsap.from(ref.current, { y: 30, opacity: 0, duration: 0.35, ease: 'power3.out' });
-  }, []);
-
   const handleDismiss = () => {
-    gsap.to(ref.current, {
-      y: 30,
-      opacity: 0,
-      duration: 0.25,
-      ease: 'power2.in',
-      onComplete: () => onDismiss(alert.id),
-    });
+    setExiting(true);
+    setTimeout(() => {
+      onDismiss(alert.id);
+    }, 200);
   };
 
   return (
     <div
-      ref={ref}
       style={{
         backgroundColor: '#FFFFFF',
         color: '#0D0D0D',
         border: '3px solid #0D0D0D',
         boxShadow: '5px 5px 0px 0px #0D0D0D',
-        opacity: 1,
+        opacity: exiting ? 0 : 1,
+        transform: exiting ? 'translateY(-20px)' : 'translateY(0)',
+        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
       }}
-      className="flex items-start gap-3.5 w-80 md:w-96 p-4 rounded-xl select-none"
+      className="flex items-start gap-3.5 w-80 md:w-96 p-4 rounded-xl select-none relative z-[999999]"
     >
       <span
-        style={c.bgStyle}
-        className="flex-shrink-0 w-8 h-8 rounded-lg border-2 border-[#0D0D0D] flex items-center justify-center font-display font-black text-sm shadow-sm"
+        style={{ backgroundColor: c.badgeBg, color: c.badgeText, border: '2px solid #0D0D0D' }}
+        className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center font-display font-black text-sm shadow-sm"
       >
         {c.icon}
       </span>
@@ -82,10 +79,23 @@ function AlertItem({ alert, onDismiss }) {
 }
 
 export function AlertContainer({ alerts, onDismiss }) {
+  if (!alerts || alerts.length === 0) return null;
+
   return createPortal(
-    <div className="fixed bottom-6 right-6 z-[99999] flex flex-col gap-3 pointer-events-none">
+    <div
+      style={{
+        position: 'fixed',
+        top: '24px',
+        right: '24px',
+        zIndex: 999999,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '12px',
+        pointerEvents: 'none',
+      }}
+    >
       {alerts.map((a) => (
-        <div key={a.id} className="pointer-events-auto">
+        <div key={a.id} style={{ pointerEvents: 'auto' }}>
           <AlertItem alert={a} onDismiss={onDismiss} />
         </div>
       ))}

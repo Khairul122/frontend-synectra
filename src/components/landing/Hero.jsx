@@ -56,7 +56,7 @@ export function Hero({ transitionTo, scrollTo, portfolioRef }) {
         {/* Abstract Badges / Stickers 3D */}
         <div className="absolute top-[15%] left-[6%] z-30 transform -rotate-6 translate-z-30 floating-3d cursor-pointer hidden lg:block">
           <div className="bg-neu-purple text-neu-white border-4 border-neu-black px-6 py-4 rounded-xl font-mono text-xl uppercase font-black deep-shadow-sm hover:scale-110 transition-transform">
-            WEB.DEV
+            WEB
           </div>
         </div>
         <div
@@ -64,7 +64,7 @@ export function Hero({ transitionTo, scrollTo, portfolioRef }) {
           style={{ animationDelay: '-3s' }}
         >
           <div className="bg-secondary-container text-neu-black border-4 border-neu-black px-6 py-4 rounded-[20%_80%_80%_20%/20%_20%_80%_80%] font-mono text-xl uppercase font-black deep-shadow-sm hover:rounded-xl transition-all duration-500">
-            * UI/UX *
+            ANDROID
           </div>
         </div>
       </div>

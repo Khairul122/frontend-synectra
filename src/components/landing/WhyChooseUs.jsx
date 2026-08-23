@@ -70,7 +70,7 @@ export function WhyChooseUs() {
           {REASONS.map((r, i) => (
             <div
               key={i}
-              className="bg-neu-white border-4 border-neu-black p-6 md:p-8 rounded-xl shadow-[8px_8px_0px_0px_#FFD000] hover:-translate-y-2 transition-transform select-none"
+              className="gsap-card-stagger bg-neu-white border-4 border-neu-black p-6 md:p-8 rounded-xl shadow-[8px_8px_0px_0px_#FFD000] hover:-translate-y-2 transition-transform select-none"
             >
               <div className={`w-14 h-14 md:w-16 md:h-16 ${r.iconBg} border-4 border-neu-black rounded-lg flex items-center justify-center mb-6`}>
                 <span className="material-symbols-outlined text-2xl md:text-3xl font-bold">

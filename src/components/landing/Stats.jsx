@@ -77,7 +77,7 @@ export function Stats({ stats, isLoading, error }) {
                   <div className="flex items-baseline justify-between mb-2 mt-3 md:mt-4">
                     <span className="text-3xl md:text-4xl font-display font-black text-neu-black drop-shadow-[2px_2px_0px_#FFD000]">
                       {isLoading ? (
-                        '...'
+                        <span className="inline-block h-8 md:h-9 w-16 bg-neu-black/10 rounded-md animate-pulse" />
                       ) : (
                         <AnimatedCounter target={displayVal} suffix={displaySuffix} />
                       )}

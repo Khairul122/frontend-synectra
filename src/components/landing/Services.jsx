@@ -74,7 +74,7 @@ export function Services({ services, isLoading, error }) {
           {displayList.map((item) => (
             <div
               key={item.id}
-              className="bg-neu-white border-4 border-neu-black p-6 md:p-8 rounded-xl shadow-[8px_8px_0px_0px_#0D0D0D] hover:-translate-y-2 transition-transform duration-300 flex flex-col items-start"
+              className="gsap-card-stagger bg-neu-white border-4 border-neu-black p-6 md:p-8 rounded-xl shadow-[8px_8px_0px_0px_#0D0D0D] hover:-translate-y-2 transition-transform duration-300 flex flex-col items-start"
             >
               <div className={`${item.tagBg} border-4 border-neu-black px-4 py-1.5 md:py-2 rounded-lg font-mono font-bold text-xs md:text-sm mb-6 inline-block uppercase`}>
                 {item.tag}
