@@ -58,16 +58,7 @@ export default function TodoPage() {
       .catch(() => navigate('/login'));
   }, []);
 
-  useEffect(() => {
-    if (!user) return;
-    fetchTodos();
-  }, [user, currentDate]);
-
-  useEffect(() => {
-    if (editingId && editInputRef.current) editInputRef.current.focus();
-  }, [editingId]);
-
-  async function fetchTodos() {
+  const fetchTodos = async () => {
     setIsLoading(true);
     try {
       const res = await todoService.getByDate(formatDateKey(currentDate));
@@ -77,7 +68,12 @@ export default function TodoPage() {
     } finally {
       setIsLoading(false);
     }
-  }
+  };
+
+  useEffect(() => {
+    if (!user) return;
+    fetchTodos();
+  }, [user, currentDate]);
 
   function goToPrev() {
     setCurrentDate(d => { const nd = new Date(d); nd.setDate(nd.getDate() - 1); return nd; });

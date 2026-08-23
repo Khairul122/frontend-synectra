@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
@@ -11,14 +11,13 @@ import { useAlert } from '../hooks/useAlert';
 
 /* ─── Icon Preview Modal ─────────────────────────────────────────────────── */
 function IconPreviewModal({ item, onClose }) {
+  const handleClose = onClose;
 
   useEffect(() => {
     const handleKey = (e) => { if (e.key === 'Escape') handleClose(); };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, []);
-
-  const handleClose = onClose;
+  }, [handleClose]);
 
   return createPortal(
     <div

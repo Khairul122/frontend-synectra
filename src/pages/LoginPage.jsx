@@ -1,234 +1,502 @@
-﻿import { useEffect, useRef, useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { gsap } from 'gsap';
+import { Mail, Lock, User, ArrowRight, Link as LinkIcon, X, Eye, EyeOff, Check } from 'lucide-react';
 import { cn } from '../utils/cn';
 import { authService } from '../services/auth.service';
-import { Scene3D } from '../components/3d/Scene3D';
+import { AuthVisual3D } from '../components/3d/AuthVisual3D';
 import { AlertContainer } from '../components/ui/Alert';
 import { useAlert } from '../hooks/useAlert';
 import { LanguageSwitcher } from '../components/ui/LanguageSwitcher';
 
-export default function LoginPage() {
-  const navigate  = useNavigate();
-  const alert     = useAlert();
-  const { t }     = useTranslation();
-  const cardRef   = useRef(null);
-  const titleRef  = useRef(null);
-  const formRef   = useRef(null);
+export default function LoginPage({ initialMode = 'login' }) {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const alert = useAlert();
+  const { t } = useTranslation();
 
-  const [email, setEmail]           = useState('');
-  const [password, setPassword]     = useState('');
-  const [isLoading, setIsLoading]   = useState(false);
-  const [showPass, setShowPass]     = useState(false);
-  const [fieldError, setFieldError] = useState({ email: '', password: '' });
+  const [mode, setMode] = useState(initialMode); // 'login' | 'register'
+  const cardRef = useRef(null);
 
+  // Sync mode with route path
   useEffect(() => {
-    const ctx = gsap.context(() => {
-      const tl = gsap.timeline();
-      tl.from(cardRef.current,  { y: 70, opacity: 0, duration: 0.7, ease: 'power3.out' })
-        .from(titleRef.current, { y: 20, opacity: 0, duration: 0.5, ease: 'power2.out' }, '-=0.4')
-        .from(formRef.current,  { y: 20, opacity: 0, duration: 0.5, ease: 'power2.out' }, '-=0.3');
-    });
-    return () => ctx.revert();
-  }, []);
+    if (location.pathname === '/register') {
+      setMode('register');
+    } else if (location.pathname === '/login') {
+      setMode('login');
+    }
+  }, [location.pathname]);
+
+  // Login Form state
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
+  const [showForgotNotice, setShowForgotNotice] = useState(false);
+  const [loginLoading, setLoginLoading] = useState(false);
+  const [showLoginPass, setShowLoginPass] = useState(false);
+  const [loginError, setLoginError] = useState({ email: '', password: '' });
+
+  // Register Form state
+  const [regForm, setRegForm] = useState({ fullName: '', email: '', password: '', confirm: '' });
+  const [regLoading, setRegLoading] = useState(false);
+  const [showRegPass, setShowRegPass] = useState(false);
+  const [regError, setRegError] = useState({});
 
   const shakeCard = () => {
-    gsap.fromTo(cardRef.current, { x: -10 }, { x: 0, duration: 0.5, ease: 'elastic.out(1, 0.3)' });
+    if (cardRef.current) {
+      gsap.fromTo(cardRef.current, { x: -10 }, { x: 0, duration: 0.5, ease: 'elastic.out(1, 0.3)' });
+    }
   };
 
-  const validate = () => {
-    const errs = { email: '', password: '' };
-    if (!email)                              errs.email    = t('login.validation.emailRequired');
-    else if (!/\S+@\S+\.\S+/.test(email))   errs.email    = t('login.validation.emailInvalid');
-    if (!password)                           errs.password = t('login.validation.passwordRequired');
-    setFieldError(errs);
-    return !errs.email && !errs.password;
+  const handleTabSwitch = (newMode) => {
+    setMode(newMode);
+    const targetPath = newMode === 'register' ? '/register' : '/login';
+    if (window.location.pathname !== targetPath) {
+      window.history.replaceState(null, '', targetPath);
+    }
   };
 
-  const handleSubmit = async (e) => {
+  // Handle Login
+  const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    if (!validate()) { shakeCard(); return; }
+    const errs = { email: '', password: '' };
+    if (!loginEmail) errs.email = t('login.validation.emailRequired', 'Email wajib diisi');
+    else if (!/\S+@\S+\.\S+/.test(loginEmail)) errs.email = t('login.validation.emailInvalid', 'Format email tidak valid');
+    if (!loginPassword) errs.password = t('login.validation.passwordRequired', 'Password wajib diisi');
 
-    setIsLoading(true);
+    setLoginError(errs);
+    if (errs.email || errs.password) {
+      shakeCard();
+      return;
+    }
+
+    setLoginLoading(true);
     try {
-      await authService.login(email, password);
-      alert.success(t('login.success'));
+      await authService.login(loginEmail, loginPassword);
+      alert.success(t('login.success', 'Login berhasil! Selamat datang kembali.'));
       setTimeout(() => navigate('/dashboard'), 800);
     } catch (err) {
-      const message = err?.response?.data?.message || t('login.failed');
-      alert.error(message);
+      const message = err?.response?.data?.message || t('login.failed', 'Gagal login. Periksa email dan password.');
+      alert.error(Array.isArray(message) ? message.join(', ') : message);
       shakeCard();
     } finally {
-      setIsLoading(false);
+      setLoginLoading(false);
+    }
+  };
+
+  // Handle Register
+  const handleRegisterSubmit = async (e) => {
+    e.preventDefault();
+    const errs = {};
+    if (!regForm.fullName.trim()) errs.fullName = t('register.validation.nameRequired', 'Nama lengkap wajib diisi');
+    if (!regForm.email) errs.email = t('register.validation.emailRequired', 'Email wajib diisi');
+    else if (!/\S+@\S+\.\S+/.test(regForm.email)) errs.email = t('register.validation.emailInvalid', 'Format email tidak valid');
+    if (!regForm.password) errs.password = t('register.validation.passwordRequired', 'Password wajib diisi');
+    else if (regForm.password.length < 8) errs.password = t('register.validation.passwordMinLength', 'Password minimal 8 karakter');
+
+    setRegError(errs);
+    if (Object.keys(errs).length > 0) {
+      shakeCard();
+      return;
+    }
+
+    setRegLoading(true);
+    try {
+      await authService.register(regForm.email, regForm.fullName, regForm.password);
+      alert.success(t('register.success', 'Registrasi berhasil! Silakan login.'));
+      setMode('login');
+      navigate('/login', { replace: true });
+    } catch (err) {
+      const message = err?.response?.data?.message || t('register.failed', 'Gagal registrasi.');
+      alert.error(Array.isArray(message) ? message.join(', ') : message);
+      shakeCard();
+    } finally {
+      setRegLoading(false);
     }
   };
 
   return (
-    <>
+    <div className="min-h-screen bg-neu-bg flex flex-col font-body text-neu-black overflow-hidden relative selection:bg-primary-container selection:text-neu-black">
       <AlertContainer alerts={alert.alerts} onDismiss={alert.dismiss} />
-      <Scene3D />
 
-      {/* Language switcher */}
-      <div className="absolute top-4 right-4 z-20">
+      {/* Language Switcher */}
+      <div className="absolute top-4 right-4 md:right-8 z-30">
         <LanguageSwitcher variant="light" />
       </div>
 
-      <div className="min-h-screen flex items-center justify-center p-4 pointer-events-none relative z-10">
-        <div ref={cardRef} className="w-full max-w-md bg-neu-white border-2 border-neu-black shadow-neu-xl p-8 pointer-events-auto">
+      {/* Top Header - Mobile view */}
+      <header className="w-full flex justify-between items-center px-4 py-4 z-40 bg-neu-bg border-b-2 border-neu-black absolute top-0 left-0 md:hidden">
+        <div
+          className="font-display font-black text-2xl text-neu-primary tracking-tighter cursor-pointer"
+          onClick={() => navigate('/')}
+        >
+          Synectra
+        </div>
+        <button
+          onClick={() => navigate('/')}
+          className="w-10 h-10 bg-neu-white border-2 border-neu-black rounded-lg shadow-neu-sm flex items-center justify-center transition-transform active:translate-x-0.5 active:translate-y-0.5"
+          aria-label="Tutup"
+        >
+          <X className="w-5 h-5 text-neu-black" />
+        </button>
+      </header>
 
-          {/* Header */}
-          <div ref={titleRef} className="mb-8">
-            <div className="inline-block bg-neu-primary border-2 border-neu-black px-3 py-1 mb-4 shadow-neu-sm">
-              <span className="font-mono font-semibold text-xs text-neu-black uppercase tracking-widest">
-                Synectra
-              </span>
-            </div>
-            <h1 className="font-display font-bold text-4xl text-neu-black leading-tight">
-              {t('login.welcome').split('\n').map((line, i) => (
-                <span key={i}>{line}{i === 0 && <br />}</span>
-              ))}
-            </h1>
-            <p className="font-body text-sm text-neu-black/60 mt-2">
-              {t('login.subtitle')}
-            </p>
+      {/* Main Container: Split-Screen on Desktop (auth.html), Top Visual + Overlay Card on Mobile (auth-mobile.html) */}
+      <main className="flex-1 flex flex-col md:flex-row w-full h-screen">
+        {/* Left Side: Desktop 3D Visual & Branding */}
+        <section className="hidden md:flex flex-col md:w-1/2 relative border-r-3 border-neu-black bg-surface-container-high overflow-hidden items-center justify-center">
+          <AuthVisual3D isDesktop={true} />
+        </section>
+
+        {/* Right Side / Mobile Layout: Interactive 3D Flip Card */}
+        <section className="w-full md:w-1/2 flex flex-col items-center justify-center p-4 md:p-8 relative bg-neu-bg overflow-y-auto pt-20 md:pt-8">
+          {/* Mobile Top Visual Canvas */}
+          <div className="w-full md:hidden mb-4 rounded-xl overflow-hidden shadow-neu-md">
+            <AuthVisual3D isDesktop={false} />
           </div>
 
-          {/* Google OAuth */}
-          <button
-            type="button"
-            onClick={() => authService.loginWithGoogle()}
-            className={cn(
-              'w-full py-3 mb-6 font-display font-bold text-sm uppercase tracking-wide',
-              'bg-neu-white text-neu-black',
-              'border-2 border-neu-black shadow-neu',
-              'flex items-center justify-center gap-3',
-              'transition-all duration-150',
-              'hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm',
-              'active:translate-x-1 active:translate-y-1 active:shadow-none',
-            )}
-          >
-            <svg className="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24">
-              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-            </svg>
-            {t('login.withGoogle')}
-          </button>
-
-          {/* Divider */}
-          <div className="flex items-center gap-3 mb-6">
-            <div className="flex-1 h-0.5 bg-neu-black" />
-            <span className="font-mono text-xs text-neu-black/50 uppercase">{t('login.orManual')}</span>
-            <div className="flex-1 h-0.5 bg-neu-black" />
+          {/* Desktop Home Navigation */}
+          <div className="hidden md:flex absolute top-6 left-8 items-center gap-3">
+            <span
+              onClick={() => navigate('/')}
+              className="font-display font-black text-2xl text-neu-black tracking-tighter cursor-pointer hover:-rotate-2 transition-transform"
+            >
+              Synectra
+            </span>
           </div>
 
-          {/* Form */}
-          <form ref={formRef} onSubmit={handleSubmit} noValidate>
-            {/* Email */}
-            <div className="flex flex-col gap-1.5 mb-4">
-              <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wider">
-                {t('login.emailLabel')}
-              </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => { setEmail(e.target.value); setFieldError((p) => ({ ...p, email: '' })); }}
-                placeholder={t('login.emailPlaceholder')}
-                autoComplete="email"
-                className={cn(
-                  'w-full px-4 py-3 bg-neu-white',
-                  'border-2 border-neu-black shadow-neu-sm',
-                  'font-body text-neu-black placeholder:text-neu-black/30',
-                  'outline-none focus:shadow-neu focus:-translate-x-0.5 focus:-translate-y-0.5',
-                  'transition-all duration-150',
-                  fieldError.email && 'border-neu-accent shadow-[4px_4px_0px_#FF5C5C]',
-                )}
-              />
-              {fieldError.email && (
-                <span className="font-body font-semibold text-xs text-neu-accent">{fieldError.email}</span>
-              )}
-            </div>
-
-            {/* Password */}
-            <div className="flex flex-col gap-1.5 mb-6">
-              <label className="font-display font-bold text-xs text-neu-black uppercase tracking-wider">
-                {t('login.passwordLabel')}
-              </label>
-              <div className="relative">
-                <input
-                  type={showPass ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => { setPassword(e.target.value); setFieldError((p) => ({ ...p, password: '' })); }}
-                  placeholder="••••••••"
-                  autoComplete="current-password"
-                  className={cn(
-                    'w-full px-4 py-3 pr-12 bg-neu-white',
-                    'border-2 border-neu-black shadow-neu-sm',
-                    'font-body text-neu-black placeholder:text-neu-black/30',
-                    'outline-none focus:shadow-neu focus:-translate-x-0.5 focus:-translate-y-0.5',
-                    'transition-all duration-150',
-                    fieldError.password && 'border-neu-accent shadow-[4px_4px_0px_#FF5C5C]',
-                  )}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPass((p) => !p)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-neu-black/50 hover:text-neu-black transition-colors"
-                  aria-label={showPass ? t('login.hidePassword') : t('login.showPassword')}
-                >
-                  {showPass ? (
-                    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
-                      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
-                      <line x1="1" y1="1" x2="23" y2="23" />
-                    </svg>
-                  ) : (
-                    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                      <circle cx="12" cy="12" r="3" />
-                    </svg>
-                  )}
-                </button>
-              </div>
-              {fieldError.password && (
-                <span className="font-body font-semibold text-xs text-neu-accent">{fieldError.password}</span>
-              )}
-            </div>
-
-            {/* Submit */}
-            <button
-              type="submit"
-              disabled={isLoading}
+          {/* Flip Card Container */}
+          <div className="w-full max-w-md perspective-1000 min-h-[580px] md:h-[640px] flex flex-col">
+            <div
+              ref={cardRef}
+              style={{ transition: 'transform 2s cubic-bezier(0.4, 0, 0.2, 1)' }}
               className={cn(
-                'w-full py-3 font-display font-bold text-sm uppercase tracking-wide',
-                'bg-neu-primary text-neu-black',
-                'border-2 border-neu-black shadow-neu',
-                'transition-all duration-150',
-                'hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-neu-sm',
-                'active:translate-x-1 active:translate-y-1 active:shadow-none',
-                isLoading && 'opacity-60 cursor-not-allowed',
+                'relative w-full flex-1 transform-style-3d flip-card-inner',
+                mode === 'register' && 'flip-active'
               )}
             >
-              {isLoading ? (
-                <span className="inline-flex items-center gap-2 justify-center">
-                  <span className="animate-spin inline-block">⟳</span>
-                  {t('login.processing')}
-                </span>
-              ) : t('login.submit')}
-            </button>
-          </form>
+              {/* FRONT: LOGIN FORM */}
+              <div className="absolute w-full h-full backface-hidden bg-neu-white border-3 border-neu-black rounded-xl shadow-neu-lg p-6 md:p-8 flex flex-col">
+                {/* Segmented Control Tabs */}
+                <div className="flex mb-6 gap-2 bg-neu-black/5 p-1 rounded-lg border-2 border-neu-black">
+                  <button
+                    type="button"
+                    onClick={() => handleTabSwitch('login')}
+                    className="flex-1 py-2 font-display text-xs md:text-sm font-bold bg-neu-primary text-neu-black border-2 border-neu-black rounded-md shadow-neu-sm transition-all"
+                  >
+                    LOGIN
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleTabSwitch('register')}
+                    className="flex-1 py-2 font-display text-xs md:text-sm font-bold bg-white/20 text-neu-black/60 border-2 border-transparent rounded-md hover:bg-white/40 transition-all"
+                  >
+                    REGISTER
+                  </button>
+                </div>
 
-          {/* Footer */}
-          <p className="mt-6 text-center font-body text-sm text-neu-black/60">
-            {t('login.noAccount')}{' '}
-            <Link to="/register" className="font-semibold text-neu-black underline hover:text-neu-blue transition-colors">
-              {t('login.registerLink')}
-            </Link>
-          </p>
-        </div>
-      </div>
-    </>
+                <div className="mb-5">
+                  <h2 className="font-display text-3xl md:text-4xl font-bold text-neu-black leading-tight">
+                    Welcome<br />Back.
+                  </h2>
+                  <p className="font-body text-xs md:text-sm text-on-surface-variant mt-1">
+                    Enter your details to access Synectra.
+                  </p>
+                </div>
+
+                <form onSubmit={handleLoginSubmit} className="flex flex-col gap-4 flex-1">
+                  {/* Forgot Password Inline Banner */}
+                  {showForgotNotice && (
+                    <div className="bg-primary-container border-2 border-neu-black p-3 rounded-md flex items-center justify-between text-xs font-bold text-neu-black shadow-neu-sm">
+                      <span>Silakan hubungi administrator untuk reset password.</span>
+                      <button
+                        type="button"
+                        onClick={() => setShowForgotNotice(false)}
+                        className="font-mono text-base font-black ml-2 hover:opacity-75 cursor-pointer px-1"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Email */}
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-mono text-xs text-neu-black font-bold uppercase tracking-wider">
+                      Email Address
+                    </label>
+                    <div className="relative w-full">
+                      <Mail className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant z-10" />
+                      <input
+                        type="email"
+                        value={loginEmail}
+                        onChange={(e) => {
+                          setLoginEmail(e.target.value);
+                          setLoginError((p) => ({ ...p, email: '' }));
+                        }}
+                        placeholder="john@example.com"
+                        className={cn(
+                          'w-full h-[48px] pl-10 pr-4 bg-neu-white border-2 border-neu-black rounded-md font-body text-sm text-neu-black',
+                          'outline-none focus:border-neu-primary focus:shadow-neu-solid transition-all',
+                          loginError.email && 'border-neu-accent shadow-[3px_3px_0px_#FF5C5C]'
+                        )}
+                      />
+                    </div>
+                    {loginError.email && (
+                      <span className="font-body text-xs font-semibold text-neu-accent">{loginError.email}</span>
+                    )}
+                  </div>
+
+                  {/* Password */}
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-mono text-xs text-neu-black font-bold uppercase tracking-wider">
+                      Password
+                    </label>
+                    <div className="relative w-full">
+                      <Lock className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant z-10" />
+                      <input
+                        type={showLoginPass ? 'text' : 'password'}
+                        value={loginPassword}
+                        onChange={(e) => {
+                          setLoginPassword(e.target.value);
+                          setLoginError((p) => ({ ...p, password: '' }));
+                        }}
+                        placeholder="••••••••"
+                        className={cn(
+                          'w-full h-[48px] pl-10 pr-10 bg-neu-white border-2 border-neu-black rounded-md font-body text-sm text-neu-black',
+                          'outline-none focus:border-neu-primary focus:shadow-neu-solid transition-all',
+                          loginError.password && 'border-neu-accent shadow-[3px_3px_0px_#FF5C5C]'
+                        )}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowLoginPass((p) => !p)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-neu-black"
+                      >
+                        {showLoginPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                    {loginError.password && (
+                      <span className="font-body text-xs font-semibold text-neu-accent">{loginError.password}</span>
+                    )}
+                  </div>
+
+                  {/* Remember me & Forgot Password */}
+                  <div className="flex items-center justify-between mt-1">
+                    <label className="flex items-center gap-2 cursor-pointer group">
+                      <div className="relative flex items-center justify-center">
+                        <input
+                          type="checkbox"
+                          checked={rememberMe}
+                          onChange={(e) => setRememberMe(e.target.checked)}
+                          className="peer appearance-none w-4 h-4 border-2 border-neu-black rounded bg-neu-white checked:bg-neu-primary focus:outline-none transition-all"
+                        />
+                        <Check className="w-3 h-3 absolute text-neu-black opacity-0 peer-checked:opacity-100 pointer-events-none stroke-[3]" />
+                      </div>
+                      <span className="font-mono text-xs text-neu-black font-bold">Remember me</span>
+                    </label>
+                    <a
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setShowForgotNotice(true);
+                        alert.info('Silakan hubungi administrator untuk reset password.');
+                      }}
+                      className="font-mono text-xs text-neu-black font-bold underline decoration-2 underline-offset-4 hover:text-neu-primary transition-colors"
+                    >
+                      Forgot Password?
+                    </a>
+                  </div>
+
+                  {/* Initiate Sequence / Submit Button */}
+                  <button
+                    type="submit"
+                    disabled={loginLoading}
+                    className="w-full h-[52px] bg-neu-primary border-3 border-neu-black rounded-md shadow-neu-md font-display text-lg font-bold text-neu-black uppercase tracking-wider hover:bg-inverse-primary active:translate-y-1 active:shadow-neu-sm transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                  >
+                    {loginLoading ? (
+                      <span className="inline-flex items-center gap-2">
+                        <span className="animate-spin">⟳</span> Initiating...
+                      </span>
+                    ) : (
+                      <>
+                      LOGIN
+                        <ArrowRight className="w-5 h-5" />
+                      </>
+                    )}
+                  </button>
+
+                  {/* Google OAuth Login Button */}
+                  <div className="mt-2 pt-2 border-t-2 border-neu-black/10">
+                    <button
+                      type="button"
+                      onClick={() => authService.loginWithGoogle()}
+                      className="w-full h-[46px] bg-neu-white border-2 border-neu-black rounded-md shadow-[2px_2px_0px_0px_rgba(13,13,13,1)] font-display text-xs md:text-sm font-bold text-neu-black flex items-center justify-center gap-2.5 hover:translate-x-0.5 hover:translate-y-0.5 active:translate-x-1 active:translate-y-1 transition-all cursor-pointer"
+                    >
+                      <div className="w-5 h-5 rounded-full border border-neu-black flex items-center justify-center bg-secondary-container">
+                        <span className="text-[10px] font-bold text-neu-white">G</span>
+                      </div>
+                      {t('login.withGoogle', 'Continue with Google')}
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              {/* BACK: REGISTER FORM */}
+              <div className="absolute w-full h-full backface-hidden bg-neu-white border-3 border-neu-black rounded-xl shadow-neu-lg p-6 md:p-8 flex flex-col rotate-y-180">
+                {/* Segmented Control Tabs */}
+                <div className="flex mb-6 gap-2 bg-neu-black/5 p-1 rounded-lg border-2 border-neu-black">
+                  <button
+                    type="button"
+                    onClick={() => handleTabSwitch('login')}
+                    className="flex-1 py-2 font-display text-xs md:text-sm font-bold bg-white/20 text-neu-black/60 border-2 border-transparent rounded-md hover:bg-white/40 transition-all"
+                  >
+                    LOGIN
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleTabSwitch('register')}
+                    className="flex-1 py-2 font-display text-xs md:text-sm font-bold bg-neu-primary text-neu-black border-2 border-neu-black rounded-md shadow-neu-sm transition-all"
+                  >
+                    REGISTER
+                  </button>
+                </div>
+
+                <div className="mb-4">
+                  <h2 className="font-display text-3xl md:text-4xl font-bold text-neu-black leading-tight">
+                    Join<br />Network.
+                  </h2>
+                  <p className="font-body text-xs md:text-sm text-on-surface-variant mt-1">
+                    Create your account to start building.
+                  </p>
+                </div>
+
+                <form onSubmit={handleRegisterSubmit} className="flex flex-col gap-3 flex-1">
+                  {/* Full Name */}
+                  <div className="flex flex-col gap-1">
+                    <label className="font-mono text-xs text-neu-black font-bold uppercase tracking-wider">
+                      Full Name
+                    </label>
+                    <div className="relative w-full">
+                      <User className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant z-10" />
+                      <input
+                        type="text"
+                        value={regForm.fullName}
+                        onChange={(e) => {
+                          setRegForm((p) => ({ ...p, fullName: e.target.value }));
+                          setRegError((p) => ({ ...p, fullName: '' }));
+                        }}
+                        placeholder="John Doe"
+                        className={cn(
+                          'w-full h-[44px] pl-10 pr-4 bg-neu-white border-2 border-neu-black rounded-md font-body text-sm text-neu-black',
+                          'outline-none focus:border-neu-primary focus:shadow-neu-solid transition-all',
+                          regError.fullName && 'border-neu-accent shadow-[3px_3px_0px_#FF5C5C]'
+                        )}
+                      />
+                    </div>
+                    {regError.fullName && (
+                      <span className="font-body text-xs font-semibold text-neu-accent">{regError.fullName}</span>
+                    )}
+                  </div>
+
+                  {/* Email */}
+                  <div className="flex flex-col gap-1">
+                    <label className="font-mono text-xs text-neu-black font-bold uppercase tracking-wider">
+                      Email Address
+                    </label>
+                    <div className="relative w-full">
+                      <Mail className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant z-10" />
+                      <input
+                        type="email"
+                        value={regForm.email}
+                        onChange={(e) => {
+                          setRegForm((p) => ({ ...p, email: e.target.value }));
+                          setRegError((p) => ({ ...p, email: '' }));
+                        }}
+                        placeholder="john@example.com"
+                        className={cn(
+                          'w-full h-[44px] pl-10 pr-4 bg-neu-white border-2 border-neu-black rounded-md font-body text-sm text-neu-black',
+                          'outline-none focus:border-neu-primary focus:shadow-neu-solid transition-all',
+                          regError.email && 'border-neu-accent shadow-[3px_3px_0px_#FF5C5C]'
+                        )}
+                      />
+                    </div>
+                    {regError.email && (
+                      <span className="font-body text-xs font-semibold text-neu-accent">{regError.email}</span>
+                    )}
+                  </div>
+
+                  {/* Password */}
+                  <div className="flex flex-col gap-1">
+                    <label className="font-mono text-xs text-neu-black font-bold uppercase tracking-wider">
+                      Password
+                    </label>
+                    <div className="relative w-full">
+                      <Lock className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant z-10" />
+                      <input
+                        type={showRegPass ? 'text' : 'password'}
+                        value={regForm.password}
+                        onChange={(e) => {
+                          setRegForm((p) => ({ ...p, password: e.target.value }));
+                          setRegError((p) => ({ ...p, password: '' }));
+                        }}
+                        placeholder="••••••••"
+                        className={cn(
+                          'w-full h-[44px] pl-10 pr-10 bg-neu-white border-2 border-neu-black rounded-md font-body text-sm text-neu-black',
+                          'outline-none focus:border-neu-primary focus:shadow-neu-solid transition-all',
+                          regError.password && 'border-neu-accent shadow-[3px_3px_0px_#FF5C5C]'
+                        )}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowRegPass((p) => !p)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-neu-black"
+                      >
+                        {showRegPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                    {regError.password && (
+                      <span className="font-body text-xs font-semibold text-neu-accent">{regError.password}</span>
+                    )}
+                  </div>
+
+                  {/* Establish Link / Submit Button */}
+                  <button
+                    type="submit"
+                    disabled={regLoading}
+                    className="w-full h-[50px] bg-neu-black border-3 border-neu-black rounded-md shadow-neu-md font-display text-lg font-bold text-neu-white uppercase tracking-wider hover:bg-neu-black/90 active:translate-y-1 active:shadow-neu-sm transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 mt-1"
+                  >
+                    {regLoading ? (
+                      <span className="inline-flex items-center gap-2">
+                        <span className="animate-spin">⟳</span> Establishing...
+                      </span>
+                    ) : (
+                      <>
+                     REGISTER
+                        <LinkIcon className="w-5 h-5 text-neu-primary" />
+                      </>
+                    )}
+                  </button>
+
+                  {/* Google OAuth Register Button */}
+                  <div className="pt-1">
+                    <button
+                      type="button"
+                      onClick={() => authService.loginWithGoogle()}
+                      className="w-full h-[44px] bg-neu-white border-2 border-neu-black rounded-md shadow-[2px_2px_0px_0px_rgba(13,13,13,1)] font-display text-xs md:text-sm font-bold text-neu-black flex items-center justify-center gap-2.5 hover:translate-x-0.5 hover:translate-y-0.5 active:translate-x-1 active:translate-y-1 transition-all cursor-pointer"
+                    >
+                      <div className="w-5 h-5 rounded-full border border-neu-black flex items-center justify-center bg-secondary-container">
+                        <span className="text-[10px] font-bold text-neu-white">G</span>
+                      </div>
+                      {t('register.withGoogle', 'Continue with Google')}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
   );
 }

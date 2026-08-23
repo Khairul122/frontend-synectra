@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { cn } from '../utils/cn';
@@ -121,6 +121,7 @@ export default function SocialMediaFormPage() {
   const navigate   = useNavigate();
   const { id }     = useParams();
   const alert      = useAlert();
+  const { t }      = useTranslation();
   const isEditMode = Boolean(id);
 
   const [user,      setUser]      = useState(null);

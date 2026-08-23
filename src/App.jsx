@@ -92,7 +92,7 @@ function App() {
         {/* ── Public routes ── */}
         <Route path="/"        element={<LandingPage />} />
         <Route path="/login"   element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/register" element={<LoginPage />} />
         <Route path="/500"     element={<ServerErrorPage />} />
         <Route path="*"        element={<NotFoundPage />} />
 
