@@ -150,18 +150,6 @@ export function Footer({ socialMedia, services, transitionTo }) {
               >
                 Harga & Paket
               </button>
-              <button
-                onClick={() => transitionTo('/login')}
-                className="text-[#D4D4D8] text-sm font-bold hover:text-primary-container transition-colors text-left cursor-pointer"
-              >
-                Masuk
-              </button>
-              <button
-                onClick={() => transitionTo('/register')}
-                className="text-[#D4D4D8] text-sm font-bold hover:text-primary-container transition-colors text-left cursor-pointer"
-              >
-                Daftar Gratis
-              </button>
             </nav>
           </div>
 
@@ -198,18 +186,11 @@ export function Footer({ socialMedia, services, transitionTo }) {
           </div>
         </div>
 
-        {/* Bottom copyright & back to top */}
-        <div className="border-t-4 border-neu-white/20 pt-8 flex flex-col md:flex-row justify-between items-center gap-6">
-          <p className="font-mono font-bold text-xs md:text-sm text-[#D4D4D8]">
+        {/* Bottom copyright */}
+        <div className="border-t-4 border-neu-white/20 pt-8 flex justify-center items-center">
+          <p className="font-mono font-bold text-xs md:text-sm text-[#D4D4D8] text-center">
             © 2026 Synectra. Semua hak dilindungi.
           </p>
-          <button
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            aria-label="Kembali ke atas"
-            className="w-11 h-11 md:w-12 md:h-12 bg-primary-container border-4 border-neu-black rounded-lg flex items-center justify-center text-neu-black shadow-[4px_4px_0px_0px_#FAFAFA] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all cursor-pointer"
-          >
-            <span className="material-symbols-outlined font-black text-2xl">arrow_upward</span>
-          </button>
         </div>
       </div>
     </footer>
