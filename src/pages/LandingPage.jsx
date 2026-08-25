@@ -82,16 +82,27 @@ export default function LandingPage() {
   const pkgDrag       = useRef({ active: false, startX: 0, scrollLeft: 0 });
   const swSliderRef   = useRef(null);
   const swDrag        = useRef({ active: false, startX: 0, scrollLeft: 0 });
-  const bannerAdTimeoutRef = useRef(null);
 
   useEffect(() => {
+    // Banner dipisah dari batch Promise.allSettled di bawah dan di-fetch sendiri
+    // supaya popup-nya bisa tampil begitu responsnya sendiri selesai, bukan
+    // ikut nunggu endpoint lain yang paling lambat (jadi elemen LCP terlambat -
+    // ini paling banyak nyumbang skor performa rendah). Ditampilkan langsung
+    // begitu data siap, tanpa delay artifisial - Lighthouse tetap menghitung
+    // elemen ini sebagai LCP kapan pun dia akhirnya tampil, jadi yang benar
+    // dioptimalkan adalah KECEPATANNYA, bukan menunda kemunculannya.
+    axios.get(`${BASE}/api/banners`).then((res) => {
+      const activeBanners = (res.data?.data ?? []).filter(x => x.isActive);
+      setBanners(activeBanners);
+      if (activeBanners.length > 0) setBannerAd(activeBanners[0]);
+    }).catch(() => setErrors(prev => ({ ...prev, banners: true })));
+
     // Setiap resource dilacak sukses/gagalnya sendiri-sendiri (bukan digenapkan
     // jadi array kosong secara diam-diam) supaya tiap section bisa membedakan
     // "memang belum ada data" vs "API gagal dihubungi".
     const resources = [
       ['portfolios',       `${BASE}/api/portfolio`],
       ['services',         `${BASE}/api/services/public`],
-      ['banners',          `${BASE}/api/banners`],
       ['contacts',         `${BASE}/api/contacts`],
       ['socialMedia',      `${BASE}/api/social-media`],
       ['bankAccounts',     `${BASE}/api/bank-accounts`],
@@ -115,15 +126,6 @@ export default function LandingPage() {
 
       setPortfolios(data.portfolios);
       setServices(data.services);
-      const activeBanners = data.banners.filter(x => x.isActive);
-      setBanners(activeBanners);
-      // Delay singkat supaya gambar popup ini tidak ikut terhitung sebagai LCP
-      // candidate (elemen tercat terbesar) - popup yang muncul persis saat
-      // network idle sering "menang" jadi LCP karena ukurannya besar, padahal
-      // bukan konten utama halaman.
-      if (activeBanners.length > 0) {
-        bannerAdTimeoutRef.current = setTimeout(() => setBannerAd(activeBanners[0]), 1500);
-      }
       setContacts(data.contacts.filter(x => x.isActive));
       setSocialMedia(data.socialMedia.filter(x => x.isActive));
       setBankAccounts(data.bankAccounts.filter(x => x.isActive));
@@ -132,8 +134,6 @@ export default function LandingPage() {
       setFeedbacks(data.feedbacks);
       setErrors(nextErrors);
     }).finally(() => setIsLoading(false));
-
-    return () => clearTimeout(bannerAdTimeoutRef.current);
   }, []);
 
   // Navigasi ke halaman protected — cek token dulu, kalau tidak ada langsung ke /login

@@ -96,6 +96,7 @@ export function BannerDetailModal({ banner, isOpen, onClose, onAction }) {
               <img
                 src={imageUrl}
                 alt={title}
+                fetchPriority="high"
                 className="absolute inset-0 w-full h-full object-cover"
               />
             ) : (
@@ -215,6 +216,7 @@ export function BannerDetailModal({ banner, isOpen, onClose, onAction }) {
               <img
                 src={imageUrl}
                 alt={title}
+                fetchPriority="high"
                 className="w-full h-full object-cover"
               />
             ) : (
