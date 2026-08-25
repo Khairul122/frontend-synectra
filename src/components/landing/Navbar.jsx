@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next';
-import { motion } from 'framer-motion';
 import { cn } from '../../utils/cn';
 import { LanguageSwitcher } from '../ui/LanguageSwitcher';
 
@@ -13,7 +12,7 @@ const NAV_LINKS = [
   { tKey: 'nav.contact',     id: 'kontak',     label: 'Kontak' },
 ];
 
-export function Navbar({ activeSection, menuOpen, setMenuOpen, transitionTo, scaleX }) {
+export function Navbar({ activeSection, menuOpen, setMenuOpen, transitionTo, progressBarRef }) {
   const { t } = useTranslation();
 
   const handleScroll = (id) => {
@@ -25,9 +24,10 @@ export function Navbar({ activeSection, menuOpen, setMenuOpen, transitionTo, sca
 
   return (
     <>
-      <motion.div
+      <div
+        ref={progressBarRef}
         className="fixed top-0 left-0 right-0 h-[3.5px] bg-secondary-container z-[99] origin-left"
-        style={{ scaleX }}
+        style={{ transform: 'scaleX(0)' }}
       />
       <header className="sticky top-0 z-50 w-full bg-neu-white border-b-4 border-neu-black py-4 px-4 md:px-8 transform-gpu">
         <div className="max-w-7xl mx-auto flex justify-between items-center preserve-3d">
@@ -39,10 +39,12 @@ export function Navbar({ activeSection, menuOpen, setMenuOpen, transitionTo, sca
           >
             <div className="w-11 h-11 md:w-12 md:h-12 bg-neu-white border-4 border-neu-black rounded-lg flex items-center justify-center deep-shadow-sm group-hover:scale-110 transition-all preserve-3d overflow-hidden flex-shrink-0">
               <picture className="w-full h-full flex items-center justify-center">
-                <source srcSet="/logo-synectra.webp" type="image/webp" />
+                <source srcSet="/logo-synectra-sm.webp" type="image/webp" />
                 <img
-                  src="/logo-synectra.jpeg"
+                  src="/logo-synectra-sm.jpeg"
                   alt="Synectra"
+                  width={48}
+                  height={48}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 />
               </picture>
