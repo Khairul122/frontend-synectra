@@ -22,4 +22,4 @@ Allow: /login
 Allow: /register
 
 # Sitemap
-Sitemap: https://synectra-pi.vercel.app/sitemap.xml
+Sitemap: https://synectra-omega.vercel.app/sitemap.xml

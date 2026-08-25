@@ -2,22 +2,22 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
   <url>
-    <loc>https://synectra-pi.vercel.app/</loc>
-    <lastmod>2025-05-12</lastmod>
+    <loc>https://synectra-omega.vercel.app/</loc>
+    <lastmod>2026-08-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
 
   <url>
-    <loc>https://synectra-pi.vercel.app/login</loc>
-    <lastmod>2025-05-12</lastmod>
+    <loc>https://synectra-omega.vercel.app/login</loc>
+    <lastmod>2026-08-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://synectra-pi.vercel.app/register</loc>
-    <lastmod>2025-05-12</lastmod>
+    <loc>https://synectra-omega.vercel.app/register</loc>
+    <lastmod>2026-08-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
