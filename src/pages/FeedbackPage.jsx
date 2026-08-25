@@ -102,9 +102,11 @@ export default function FeedbackPage() {
   const [feedbacks,    setFeedbacks]    = useState([]);
   const [isLoading,    setIsLoading]    = useState(true);
   const [filterRating, setFilterRating] = useState(0);
+  const [filterStatus, setFilterStatus] = useState('all');
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [isDeleting,   setIsDeleting]   = useState(false);
   const [editTarget,   setEditTarget]   = useState(null);
+  const [togglingId,   setTogglingId]   = useState(null);
 
 
   const loadData = async () => {
@@ -137,7 +139,20 @@ export default function FeedbackPage() {
     finally { setIsDeleting(false); }
   };
 
-  const filtered = filterRating ? feedbacks.filter(f => f.rating === filterRating) : feedbacks;
+  const handleToggleApprove = async (fb) => {
+    setTogglingId(fb.id);
+    try {
+      const next = !fb.isApproved;
+      await feedbackService.update(fb.id, { isApproved: next });
+      setFeedbacks(prev => prev.map(f => f.id === fb.id ? { ...f, isApproved: next } : f));
+      alert.success(next ? 'Feedback ditampilkan di landing page.' : 'Feedback disembunyikan dari landing page.');
+    } catch { alert.error('Gagal mengubah status feedback.'); }
+    finally { setTogglingId(null); }
+  };
+
+  const filtered = feedbacks
+    .filter(f => !filterRating || f.rating === filterRating)
+    .filter(f => filterStatus === 'all' || (filterStatus === 'pending' ? !f.isApproved : f.isApproved));
 
   const avg = feedbacks.length
     ? (feedbacks.reduce((s, f) => s + f.rating, 0) / feedbacks.length).toFixed(1)
@@ -171,6 +186,19 @@ export default function FeedbackPage() {
             </button>
           ))}
         </div>
+        <div className="w-px h-5 bg-neu-black/20" />
+        <div className="flex gap-2 flex-wrap">
+          {[['all', 'Semua Status'], ['pending', 'Pending'], ['approved', 'Tayang']].map(([key, label]) => (
+            <button key={key} onClick={() => setFilterStatus(key)}
+              className={cn('px-3 py-1.5 border-2 border-neu-black font-display font-bold text-xs uppercase',
+                filterStatus === key ? 'bg-neu-primary text-neu-black' : 'bg-neu-white text-neu-black hover:bg-neu-bg')}>
+              {label}
+              {key === 'pending' && feedbacks.some(f => !f.isApproved) && (
+                <span className="ml-1.5 inline-block w-1.5 h-1.5 rounded-full bg-neu-accent align-middle" />
+              )}
+            </button>
+          ))}
+        </div>
         <span className="font-mono text-xs text-neu-black/50 ml-auto">
           <strong className="text-neu-black">{filtered.length}</strong> feedback · Avg: <strong className="text-neu-black">{avg}★</strong>
         </span>
@@ -187,8 +215,8 @@ export default function FeedbackPage() {
             <table className="w-full border-collapse">
               <thead>
                 <tr className="bg-neu-black text-neu-white">
-                  {['No', 'Nama', 'Email', 'Rating', 'Komentar', 'Tanggal', 'Aksi'].map((h, i) => (
-                    <th key={h} className={cn('px-4 py-3 font-display font-bold text-xs uppercase tracking-wide text-left', i < 6 && 'border-r-2 border-neu-white/20')}>
+                  {['No', 'Nama', 'Email', 'Rating', 'Komentar', 'Tanggal', 'Status', 'Aksi'].map((h, i) => (
+                    <th key={h} className={cn('px-4 py-3 font-display font-bold text-xs uppercase tracking-wide text-left', i < 7 && 'border-r-2 border-neu-white/20')}>
                       {h}
                     </th>
                   ))}
@@ -207,8 +235,20 @@ export default function FeedbackPage() {
                         : <span className="font-mono text-xs text-neu-black/30">—</span>}
                     </td>
                     <td className="px-4 py-3 border-r-2 border-neu-black font-mono text-xs text-neu-black/50 whitespace-nowrap">{fmtDate(fb.createdAt)}</td>
+                    <td className="px-4 py-3 border-r-2 border-neu-black">
+                      <span className={cn('px-2 py-0.5 border-2 border-neu-black font-display font-bold text-[10px] uppercase whitespace-nowrap',
+                        fb.isApproved ? 'bg-[#00C48C] text-neu-white' : 'bg-neu-bg text-neu-black/60')}>
+                        {fb.isApproved ? 'Tayang' : 'Pending'}
+                      </span>
+                    </td>
                     <td className="px-4 py-3">
                       <div className="flex gap-2">
+                        <button onClick={() => handleToggleApprove(fb)} disabled={togglingId === fb.id}
+                          className={cn('px-2.5 py-1 border-2 border-neu-black font-display font-bold text-[10px] uppercase shadow-neu-sm hover:shadow-none',
+                            fb.isApproved ? 'bg-neu-white text-neu-black' : 'bg-[#00C48C] text-neu-white',
+                            togglingId === fb.id && 'opacity-50 cursor-not-allowed')}>
+                          {fb.isApproved ? 'Sembunyikan' : 'Tayangkan'}
+                        </button>
                         <button onClick={() => setEditTarget(fb)}
                           className="px-2.5 py-1 bg-neu-primary border-2 border-neu-black font-display font-bold text-[10px] uppercase text-neu-black shadow-neu-sm hover:shadow-none">
                           Edit
