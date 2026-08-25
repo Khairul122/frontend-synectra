@@ -14,8 +14,25 @@ import App from './App.jsx'
 
 const _warn = console.warn.bind(console)
 console.warn = (...args) => {
-  if (typeof args[0] === 'string' && args[0].includes('THREE.Clock')) return
+  if (
+    typeof args[0] === 'string' &&
+    (args[0].includes('THREE.Clock') ||
+     args[0].includes('ObjectMultiplex') ||
+     args[0].includes('app-init-liveness') ||
+     args[0].includes('background-liveness'))
+  ) return
   _warn(...args)
+}
+
+const _error = console.error.bind(console)
+console.error = (...args) => {
+  if (
+    typeof args[0] === 'string' &&
+    (args[0].includes('ObjectMultiplex') ||
+     args[0].includes('app-init-liveness') ||
+     args[0].includes('background-liveness'))
+  ) return
+  _error(...args)
 }
 
 createRoot(document.getElementById('root')).render(

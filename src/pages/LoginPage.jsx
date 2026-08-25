@@ -28,6 +28,23 @@ export default function LoginPage({ initialMode = 'login' }) {
     }
   }, [location.pathname]);
 
+  // Safely handle Web3 / browser extension postMessage streams (app-init-liveness & background-liveness)
+  useEffect(() => {
+    const handleExtensionStreamMessage = (e) => {
+      if (
+        e?.data?.stream === 'app-init-liveness' ||
+        e?.data?.stream === 'background-liveness' ||
+        (typeof e?.data === 'string' &&
+          (e.data.includes('app-init-liveness') || e.data.includes('background-liveness')))
+      ) {
+        // Silently consume extension liveness pings to prevent ObjectMultiplex orphaned data warnings
+        return;
+      }
+    };
+    window.addEventListener('message', handleExtensionStreamMessage);
+    return () => window.removeEventListener('message', handleExtensionStreamMessage);
+  }, []);
+
   // Login Form state
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
@@ -206,7 +223,10 @@ export default function LoginPage({ initialMode = 'login' }) {
                     <div className="relative w-full">
                       <Mail className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant z-10" />
                       <input
+                        id="login-email"
+                        name="email"
                         type="email"
+                        autoComplete="username"
                         value={loginEmail}
                         onChange={(e) => {
                           setLoginEmail(e.target.value);
@@ -233,7 +253,10 @@ export default function LoginPage({ initialMode = 'login' }) {
                     <div className="relative w-full">
                       <Lock className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant z-10" />
                       <input
+                        id="login-password"
+                        name="password"
                         type={showLoginPass ? 'text' : 'password'}
+                        autoComplete="current-password"
                         value={loginPassword}
                         onChange={(e) => {
                           setLoginPassword(e.target.value);
@@ -357,7 +380,10 @@ export default function LoginPage({ initialMode = 'login' }) {
                     <div className="relative w-full">
                       <User className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant z-10" />
                       <input
+                        id="reg-fullName"
+                        name="fullName"
                         type="text"
+                        autoComplete="name"
                         value={regForm.fullName}
                         onChange={(e) => {
                           setRegForm((p) => ({ ...p, fullName: e.target.value }));
@@ -384,7 +410,10 @@ export default function LoginPage({ initialMode = 'login' }) {
                     <div className="relative w-full">
                       <Mail className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant z-10" />
                       <input
+                        id="reg-email"
+                        name="email"
                         type="email"
+                        autoComplete="email"
                         value={regForm.email}
                         onChange={(e) => {
                           setRegForm((p) => ({ ...p, email: e.target.value }));
@@ -411,7 +440,10 @@ export default function LoginPage({ initialMode = 'login' }) {
                     <div className="relative w-full">
                       <Lock className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant z-10" />
                       <input
+                        id="reg-password"
+                        name="password"
                         type={showRegPass ? 'text' : 'password'}
+                        autoComplete="new-password"
                         value={regForm.password}
                         onChange={(e) => {
                           setRegForm((p) => ({ ...p, password: e.target.value }));
