@@ -312,8 +312,8 @@ export function Sidebar({ user, isOpen, onClose }) {
         <div className="px-5 py-5 border-b-2 border-neu-black flex items-center justify-between">
           <div className="flex items-center gap-3">
             <picture>
-              <source srcSet="/logo-synectra.webp" type="image/webp" />
-              <img src="/logo-synectra.jpeg" alt="Synectra" width="110" height="40"
+              <source srcSet="/logo-synectra-sm.webp" type="image/webp" />
+              <img src="/logo-synectra-sm.jpeg" alt="Synectra" width="110" height="40"
                 className="h-10 w-auto max-w-[110px] border-2 border-neu-black object-contain shadow-neu-sm flex-shrink-0" />
             </picture>
             <h2 className="font-display font-bold text-sm text-neu-black/60 uppercase tracking-widest leading-tight">{t('admin.panel')}</h2>

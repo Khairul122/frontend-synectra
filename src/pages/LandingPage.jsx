@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { useScroll, useSpring } from 'framer-motion';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from '../components/ui/dialog';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -42,10 +41,6 @@ export default function LandingPage() {
   useLenis(isDesktop);
   const { t } = useTranslation();
 
-  // Smooth scroll progress hook
-  const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
-
   // Slider programmatic scroller
   const scrollSlider = (ref, direction) => {
     if (ref.current) {
@@ -81,6 +76,7 @@ export default function LandingPage() {
   };
   const [bannerAd,          setBannerAd]          = useState(null);  // banner popup iklan awal
   const [activeBannerModal, setActiveBannerModal] = useState(null);  // banner detail modal
+  const progressBarRef = useRef(null);
   const portfolioRef  = useRef(null);
   const pkgSliderRef  = useRef(null);
   const pkgDrag       = useRef({ active: false, startX: 0, scrollLeft: 0 });
@@ -154,6 +150,25 @@ export default function LandingPage() {
   }, []);
 
   // Show/hide scroll-to-top button
+  useEffect(() => {
+    // Update langsung lewat ref (bukan state) supaya scroll bar tidak trigger
+    // re-render React di setiap event scroll.
+    const onProgress = () => {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = max > 0 ? window.scrollY / max : 0;
+      if (progressBarRef.current) {
+        progressBarRef.current.style.transform = `scaleX(${progress})`;
+      }
+    };
+    onProgress();
+    window.addEventListener('scroll', onProgress, { passive: true });
+    window.addEventListener('resize', onProgress);
+    return () => {
+      window.removeEventListener('scroll', onProgress);
+      window.removeEventListener('resize', onProgress);
+    };
+  }, []);
+
   useEffect(() => {
     const onScroll = () => setShowScrollTop(window.scrollY > 300);
     window.addEventListener('scroll', onScroll, { passive: true });
@@ -295,7 +310,7 @@ export default function LandingPage() {
         transitionTo={transitionTo}
       />
 
-      <Navbar activeSection={activeSection} menuOpen={menuOpen} setMenuOpen={setMenuOpen} transitionTo={transitionTo} scaleX={scaleX} />
+      <Navbar activeSection={activeSection} menuOpen={menuOpen} setMenuOpen={setMenuOpen} transitionTo={transitionTo} progressBarRef={progressBarRef} />
 
       <main ref={mainRef} className="preserve-3d relative flex flex-col items-center w-full">
         <div className="gsap-section-reveal w-full">

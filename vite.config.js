@@ -29,9 +29,6 @@ export default defineConfig({
           if (id.includes('node_modules/@splinetool')) {
             return 'vendor-spline';
           }
-          if (id.includes('node_modules/framer-motion')) {
-            return 'vendor-framer';
-          }
         },
       },
     },
