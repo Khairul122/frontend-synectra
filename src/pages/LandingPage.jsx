@@ -82,6 +82,7 @@ export default function LandingPage() {
   const pkgDrag       = useRef({ active: false, startX: 0, scrollLeft: 0 });
   const swSliderRef   = useRef(null);
   const swDrag        = useRef({ active: false, startX: 0, scrollLeft: 0 });
+  const bannerAdTimeoutRef = useRef(null);
 
   useEffect(() => {
     // Setiap resource dilacak sukses/gagalnya sendiri-sendiri (bukan digenapkan
@@ -116,7 +117,13 @@ export default function LandingPage() {
       setServices(data.services);
       const activeBanners = data.banners.filter(x => x.isActive);
       setBanners(activeBanners);
-      if (activeBanners.length > 0) setBannerAd(activeBanners[0]); // tampilkan banner pertama sebagai popup
+      // Delay singkat supaya gambar popup ini tidak ikut terhitung sebagai LCP
+      // candidate (elemen tercat terbesar) - popup yang muncul persis saat
+      // network idle sering "menang" jadi LCP karena ukurannya besar, padahal
+      // bukan konten utama halaman.
+      if (activeBanners.length > 0) {
+        bannerAdTimeoutRef.current = setTimeout(() => setBannerAd(activeBanners[0]), 1500);
+      }
       setContacts(data.contacts.filter(x => x.isActive));
       setSocialMedia(data.socialMedia.filter(x => x.isActive));
       setBankAccounts(data.bankAccounts.filter(x => x.isActive));
@@ -125,6 +132,8 @@ export default function LandingPage() {
       setFeedbacks(data.feedbacks);
       setErrors(nextErrors);
     }).finally(() => setIsLoading(false));
+
+    return () => clearTimeout(bannerAdTimeoutRef.current);
   }, []);
 
   // Navigasi ke halaman protected — cek token dulu, kalau tidak ada langsung ke /login
