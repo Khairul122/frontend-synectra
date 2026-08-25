@@ -16,6 +16,7 @@ import { useLenis, usePageTransition } from '../components/landing/hooks';
 import { PortfolioModal } from '../components/landing/PortfolioModal';
 import { SoftwareDetailModal } from '../components/landing/SoftwareDetailModal';
 import { BannerDetailModal } from '../components/landing/BannerDetailModal';
+import { BannerToast } from '../components/landing/BannerToast';
 import { FeedbackSection } from '../components/landing/FeedbackSection';
 import { Navbar } from '../components/landing/Navbar';
 import { Hero } from '../components/landing/Hero';
@@ -289,17 +290,26 @@ export default function LandingPage() {
         document.body
       )}
 
-      {/* ── Banner Detail Modal (Desktop Split Screen + Mobile Bottom Sheet) ── */}
+      {/* ── Banner Detail Modal (buka cuma lewat klik - image-nya tidak pernah
+          auto-render, supaya tidak jadi kandidat LCP) ── */}
       <BannerDetailModal
-        banner={activeBannerModal || bannerAd}
-        isOpen={!!activeBannerModal || !!bannerAd}
-        onClose={() => {
-          setActiveBannerModal(null);
-          setBannerAd(null);
-        }}
+        banner={activeBannerModal}
+        isOpen={!!activeBannerModal}
+        onClose={() => setActiveBannerModal(null)}
         onAction={() => {
           const el = document.getElementById('kontak');
           if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }}
+      />
+
+      {/* ── Toast Promo Awal (pengganti popup full-screen otomatis - tanpa
+          gambar sama sekali, jadi tidak mungkin jadi elemen LCP) ── */}
+      <BannerToast
+        banner={bannerAd}
+        onClose={() => setBannerAd(null)}
+        onViewDetail={() => {
+          setActiveBannerModal(bannerAd);
+          setBannerAd(null);
         }}
       />
 
