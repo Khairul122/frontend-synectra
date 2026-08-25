@@ -59,6 +59,7 @@ export function PortfolioModal({ item, open, onClose, transitionTo }) {
     'Ekspor laporan analitik dan manajemen multi-user',
   ]);
   const category = item.category ? item.category.replace(/_/g, ' ') : 'WEB APP';
+  const link = item.link || item.demoUrl || item.previewUrl || item.url;
 
   const handleOrder = () => {
     onClose();
@@ -67,14 +68,6 @@ export function PortfolioModal({ item, open, onClose, transitionTo }) {
     } else {
       const el = document.getElementById('kontak');
       if (el) el.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  const handleDemo = () => {
-    if (item.demoUrl || item.previewUrl || item.link || item.url) {
-      window.open(item.demoUrl || item.previewUrl || item.link || item.url, '_blank');
-    } else {
-      handleOrder();
     }
   };
 
@@ -190,13 +183,16 @@ export function PortfolioModal({ item, open, onClose, transitionTo }) {
 
           {/* Action Buttons Footer */}
           <div className="p-4 sm:p-5 bg-neu-bg border-t-2 border-neu-black flex flex-row gap-3 mt-auto select-none shrink-0">
-            <button
-              type="button"
-              onClick={handleDemo}
-              className="flex-1 py-3 px-4 bg-neu-white border-2 border-neu-black rounded shadow-[2px_2px_0px_0px_#0D0D0D] font-display font-bold text-xs sm:text-sm text-neu-black hover:translate-y-[1px] hover:translate-x-[1px] hover:shadow-none transition-all cursor-pointer uppercase text-center"
-            >
-              DETAIL
-            </button>
+            {link && (
+              <a
+                href={link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 py-3 px-4 bg-neu-white border-2 border-neu-black rounded shadow-[2px_2px_0px_0px_#0D0D0D] font-display font-bold text-xs sm:text-sm text-neu-black hover:translate-y-[1px] hover:translate-x-[1px] hover:shadow-none transition-all cursor-pointer uppercase text-center"
+              >
+                LIHAT LIVE
+              </a>
+            )}
             <button
               type="button"
               onClick={handleOrder}
