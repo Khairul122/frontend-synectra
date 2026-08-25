@@ -11,7 +11,7 @@ import { RichTextEditor } from '../components/ui/RichTextEditor';
 import { useAlert } from '../hooks/useAlert';
 
 const CATEGORIES = ['Web App', 'Mobile', 'Design', 'Backend'];
-const EMPTY      = { title: '', description: '', images: [], category: '' };
+const EMPTY      = { title: '', description: '', images: [], category: '', link: '' };
 
 /* ─── Multi-image uploader ─────────────────────────────────────────────── */
 function MultiImageUploader({ values, onChange }) {
@@ -170,6 +170,7 @@ export default function PortfolioFormPage() {
             description: p.description ?? '',
             images:      p.images?.length ? p.images : (p.image ? [p.image] : []),
             category:    p.category    ?? '',
+            link:        p.link        ?? '',
           });
         } catch {
           alert.error('Portfolio tidak ditemukan.');
@@ -205,6 +206,7 @@ export default function PortfolioFormPage() {
         image:       form.images[0]   || undefined,
         images:      form.images,
         category:    form.category    || undefined,
+        link:        form.link.trim() || undefined,
       };
       if (isEdit) {
         await portfolioService.update(id, payload);
@@ -271,6 +273,17 @@ export default function PortfolioFormPage() {
                 onChange={e => set('category', e.target.value)}
                 placeholder="Atau ketik kategori lain..."
                 className={cn(inputCls('category'), 'text-xs')} />
+            </div>
+
+            {/* Link demo/preview (opsional) */}
+            <div className="flex flex-col gap-1.5">
+              <label className="font-display font-bold text-xs uppercase tracking-wider text-neu-black">
+                Link Demo <span className="text-neu-black/40 normal-case font-body">(opsional)</span>
+              </label>
+              <input type="url" value={form.link}
+                onChange={e => set('link', e.target.value)}
+                placeholder="https://project-demo.vercel.app" className={inputCls('link')} />
+              {errors.link && <span className="font-body text-xs text-neu-accent font-semibold">{errors.link}</span>}
             </div>
 
             {/* Gambar */}
