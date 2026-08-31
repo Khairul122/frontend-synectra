@@ -34,6 +34,7 @@ import { Contact } from '../components/landing/Contact';
 import { CTAFinal } from '../components/landing/CTAFinal';
 import { Footer } from '../components/landing/Footer';
 import { FloatingCTA } from '../components/landing/FloatingCTA';
+import { LazySection } from '../components/landing/LazySection';
 
 const BASE = API_BASE_URL || '';
 
@@ -344,15 +345,15 @@ export default function LandingPage() {
           <Stats stats={stats} isLoading={isLoading} error={errors.portfolios || errors.feedbacks} />
         </div>
 
-        <div className="gsap-section-reveal w-full">
+        <LazySection id="layanan" minHeight="400px" className="gsap-section-reveal w-full">
           <Services services={services} isLoading={isLoading} error={errors.services} />
-        </div>
+        </LazySection>
 
-        <div className="gsap-section-reveal w-full">
+        <LazySection minHeight="400px" className="gsap-section-reveal w-full">
           <About stats={stats} isLoading={isLoading} />
-        </div>
+        </LazySection>
 
-        <div className="gsap-section-reveal w-full">
+        <LazySection id="paket" minHeight="500px" className="gsap-section-reveal w-full">
           <Packages
             packages={packages}
             isLoading={isLoading}
@@ -362,13 +363,13 @@ export default function LandingPage() {
             scrollSlider={scrollSlider}
             navigateProtected={navigateProtected}
           />
-        </div>
+        </LazySection>
 
-        <div className="gsap-section-reveal w-full">
+        <LazySection minHeight="300px" className="gsap-section-reveal w-full">
           <Banners banners={banners} onOpenModal={setActiveBannerModal} />
-        </div>
+        </LazySection>
 
-        <div className="gsap-section-reveal w-full">
+        <LazySection id="software" minHeight="500px" className="gsap-section-reveal w-full">
           <Software
             softwareProducts={softwareProducts}
             isLoading={isLoading}
@@ -379,9 +380,9 @@ export default function LandingPage() {
             setActiveSoftware={setActiveSoftware}
             navigateProtected={navigateProtected}
           />
-        </div>
+        </LazySection>
 
-        <div className="gsap-section-reveal w-full">
+        <LazySection id="portofolio" minHeight="600px" className="gsap-section-reveal w-full">
           <Portfolio
             portfolios={portfolios}
             isLoading={isLoading}
@@ -390,29 +391,31 @@ export default function LandingPage() {
             setActivePortfolio={setActivePortfolio}
             transitionTo={transitionTo}
           />
-        </div>
+        </LazySection>
 
-        <div className="gsap-section-reveal w-full">
+        <LazySection minHeight="400px" className="gsap-section-reveal w-full">
           <WhyChooseUs />
-        </div>
+        </LazySection>
 
-        <div className="gsap-section-reveal w-full">
+        <LazySection id="cara-kerja" minHeight="400px" className="gsap-section-reveal w-full">
           <HowItWorks />
-        </div>
+        </LazySection>
 
-        <div className="gsap-section-reveal w-full">
+        <LazySection id="kontak" minHeight="500px" className="gsap-section-reveal w-full">
           <Contact contacts={contacts} socialMedia={socialMedia} showToast={showToast} />
-        </div>
+        </LazySection>
 
-        <div className="gsap-section-reveal w-full">
+        <LazySection id="ulasan" minHeight="450px" className="gsap-section-reveal w-full">
           <FeedbackSection feedbacks={feedbacks} onSubmitted={fb => setFeedbacks(prev => [fb, ...prev])} />
-        </div>
+        </LazySection>
 
-        <div className="gsap-section-reveal w-full">
+        <LazySection minHeight="350px" className="gsap-section-reveal w-full">
           <CTAFinal transitionTo={transitionTo} />
-        </div>
+        </LazySection>
 
-        <Footer socialMedia={socialMedia} services={services} transitionTo={transitionTo} />
+        <LazySection minHeight="300px" className="w-full">
+          <Footer socialMedia={socialMedia} services={services} transitionTo={transitionTo} />
+        </LazySection>
       </main>
 
       <FloatingCTA showScrollTop={showScrollTop} transitionTo={transitionTo} />
