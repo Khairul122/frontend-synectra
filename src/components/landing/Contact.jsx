@@ -72,6 +72,7 @@ export function Contact({ contacts, socialMedia, showToast }) {
               href={item.url}
               target={item.url.startsWith('mailto:') || item.url.startsWith('tel:') ? '_self' : '_blank'}
               rel="noopener noreferrer"
+              aria-label={`Hubungi via ${item.title}: ${item.info}`}
               onClick={(e) => {
                 if (item.url.startsWith('mailto:')) {
                   const addr = item.url.replace('mailto:', '');
