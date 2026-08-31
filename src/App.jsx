@@ -1,8 +1,8 @@
 import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, lazy, Suspense } from 'react';
 import { tokenStorage } from './services/auth.service';
+import LandingPage from './pages/LandingPage';
 
-const LandingPage        = lazy(() => import('./pages/LandingPage'));
 const LoginPage          = lazy(() => import('./pages/LoginPage'));
 const RegisterPage       = lazy(() => import('./pages/RegisterPage'));
 const DashboardPage      = lazy(() => import('./pages/DashboardPage'));
