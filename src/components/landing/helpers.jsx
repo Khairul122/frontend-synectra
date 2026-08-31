@@ -33,15 +33,19 @@ export function SectionTag({ children, tone = 'black', rotate = '-rotate-1', sha
 export function HeroReveal({ children, delay = 0, className = '' }) {
   const innerRef = useRef(null);
   useEffect(() => {
-    gsap.fromTo(
-      innerRef.current,
-      { y: '110%' },
-      { y: '0%', duration: 1.0, delay, ease: 'power3.out' },
-    );
+    if (!innerRef.current) return;
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        innerRef.current,
+        { y: '110%' },
+        { y: '0%', duration: 1.0, delay, ease: 'power3.out' },
+      );
+    }, innerRef);
+    return () => ctx.revert();
   }, [delay]);
   return (
     <div className={`overflow-hidden pb-4 -mb-4 ${className}`}>
-      <div ref={innerRef} style={{ transform: 'translateY(110%)' }}>
+      <div ref={innerRef} className="will-change-transform" style={{ transform: 'translateY(110%)' }}>
         {children}
       </div>
     </div>
@@ -60,8 +64,13 @@ export function AnimatedCounter({ target, suffix = '' }) {
         triggered.current = true;
         import('animejs').then(({ animate }) => {
           const obj = { val: 0 };
-          animate(obj, { val: target, duration: 2000, ease: 'outExpo',
-            onUpdate: () => { if (el) el.textContent = Math.round(obj.val).toLocaleString('id-ID') + suffix; },
+          animate(obj, {
+            val: target,
+            duration: 2000,
+            ease: 'outExpo',
+            onUpdate: () => {
+              if (el) el.textContent = Math.round(obj.val).toLocaleString('id-ID') + suffix;
+            },
           });
         });
       }
@@ -79,15 +88,28 @@ export function LetterReveal({ text, className, delay = 0 }) {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    el.innerHTML = text.split('').map(c =>
-      `<span style="display:inline-block;opacity:0">${c === ' ' ? '&nbsp;' : c}</span>`
+    const markup = text.split('').map(c =>
+      `<span style="display:inline-block;opacity:0;will-change:transform,opacity">${c === ' ' ? '&nbsp;' : c}</span>`
     ).join('');
+
+    requestAnimationFrame(() => {
+      if (el) el.innerHTML = markup;
+    });
+
     const observer = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting && !triggered.current) {
         triggered.current = true;
         import('animejs').then(({ animate, stagger }) => {
-          animate(el.querySelectorAll('span'), { opacity: [0, 1], translateY: [30, 0],
-            delay: stagger(40, { start: delay }), duration: 500, ease: 'outExpo' });
+          const spans = el.querySelectorAll('span');
+          if (spans && spans.length > 0) {
+            animate(spans, {
+              opacity: [0, 1],
+              translateY: [30, 0],
+              delay: stagger(40, { start: delay }),
+              duration: 500,
+              ease: 'outExpo',
+            });
+          }
         });
       }
     }, { threshold: 0.3 });

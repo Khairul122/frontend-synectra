@@ -51,12 +51,14 @@ export function Footer({ socialMedia, services, transitionTo }) {
               {(socialMedia && socialMedia.length > 0) ? (
                 socialMedia.slice(0, 4).map((s) => {
                   const { Icon } = getPlatform(s.icon ?? s.platformName?.toLowerCase());
+                  const platformName = s.platformName || s.nama || 'Social Media';
                   return (
                     <a
                       key={s.id}
                       href={s.url}
                       target="_blank"
                       rel="noopener noreferrer"
+                      aria-label={`Kunjungi ${platformName}`}
                       className="w-11 h-11 border-4 border-neu-white rounded-lg flex items-center justify-center hover:bg-primary-container hover:border-neu-black hover:text-neu-black transition-all group cursor-pointer"
                     >
                       <Icon className="w-5 h-5 text-neu-white group-hover:text-neu-black transition-colors" />
@@ -69,18 +71,21 @@ export function Footer({ socialMedia, services, transitionTo }) {
                     href="https://github.com/synectra"
                     target="_blank"
                     rel="noopener noreferrer"
+                    aria-label="GitHub Synectra"
                     className="w-11 h-11 border-4 border-neu-white rounded-lg flex items-center justify-center hover:bg-primary-container hover:border-neu-black hover:text-neu-black transition-all cursor-pointer"
                   >
                     <span className="material-symbols-outlined text-2xl font-bold">code</span>
                   </a>
                   <a
                     href="#kontak"
+                    aria-label="Hubungi Kontak Synectra"
                     className="w-11 h-11 border-4 border-neu-white rounded-lg flex items-center justify-center hover:bg-primary-container hover:border-neu-black hover:text-neu-black transition-all cursor-pointer"
                   >
                     <span className="material-symbols-outlined text-2xl font-bold">person</span>
                   </a>
                   <a
                     href="#portofolio"
+                    aria-label="Lihat Portofolio Synectra"
                     className="w-11 h-11 border-4 border-neu-white rounded-lg flex items-center justify-center hover:bg-primary-container hover:border-neu-black hover:text-neu-black transition-all cursor-pointer"
                   >
                     <span className="material-symbols-outlined text-2xl font-bold">photo_camera</span>
