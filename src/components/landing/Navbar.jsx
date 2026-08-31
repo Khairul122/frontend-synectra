@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { Menu, X } from 'lucide-react';
 import { cn } from '../../utils/cn';
 import { LanguageSwitcher } from '../ui/LanguageSwitcher';
 
@@ -96,9 +97,7 @@ export function Navbar({ activeSection, menuOpen, setMenuOpen, transitionTo, pro
             aria-label={menuOpen ? 'Tutup menu' : 'Buka menu'}
             className="md:hidden flex items-center justify-center p-2.5 border-4 border-neu-black bg-primary-container rounded-lg shadow-[4px_4px_0px_0px_rgba(13,13,13,1)] btn-press cursor-pointer"
           >
-            <span className="material-symbols-outlined text-2xl font-bold">
-              {menuOpen ? 'close' : 'menu'}
-            </span>
+            {menuOpen ? <X className="w-6 h-6 stroke-[3] text-neu-black" /> : <Menu className="w-6 h-6 stroke-[3] text-neu-black" />}
           </button>
         </div>
 

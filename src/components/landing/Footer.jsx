@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Code, User, Camera } from 'lucide-react';
 import { getPlatform } from '../../constants/platforms';
 import { useLang } from './hooks';
 
@@ -72,23 +73,23 @@ export function Footer({ socialMedia, services, transitionTo }) {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="GitHub Synectra"
-                    className="w-11 h-11 border-4 border-neu-white rounded-lg flex items-center justify-center hover:bg-primary-container hover:border-neu-black hover:text-neu-black transition-all cursor-pointer"
+                    className="w-11 h-11 border-4 border-neu-white rounded-lg flex items-center justify-center hover:bg-primary-container hover:border-neu-black hover:text-neu-black transition-all cursor-pointer text-neu-white group"
                   >
-                    <span className="material-symbols-outlined text-2xl font-bold">code</span>
+                    <Code className="w-5 h-5 text-neu-white group-hover:text-neu-black" />
                   </a>
                   <a
                     href="#kontak"
                     aria-label="Hubungi Kontak Synectra"
-                    className="w-11 h-11 border-4 border-neu-white rounded-lg flex items-center justify-center hover:bg-primary-container hover:border-neu-black hover:text-neu-black transition-all cursor-pointer"
+                    className="w-11 h-11 border-4 border-neu-white rounded-lg flex items-center justify-center hover:bg-primary-container hover:border-neu-black hover:text-neu-black transition-all cursor-pointer text-neu-white group"
                   >
-                    <span className="material-symbols-outlined text-2xl font-bold">person</span>
+                    <User className="w-5 h-5 text-neu-white group-hover:text-neu-black" />
                   </a>
                   <a
                     href="#portofolio"
                     aria-label="Lihat Portofolio Synectra"
-                    className="w-11 h-11 border-4 border-neu-white rounded-lg flex items-center justify-center hover:bg-primary-container hover:border-neu-black hover:text-neu-black transition-all cursor-pointer"
+                    className="w-11 h-11 border-4 border-neu-white rounded-lg flex items-center justify-center hover:bg-primary-container hover:border-neu-black hover:text-neu-black transition-all cursor-pointer text-neu-white group"
                   >
-                    <span className="material-symbols-outlined text-2xl font-bold">photo_camera</span>
+                    <Camera className="w-5 h-5 text-neu-white group-hover:text-neu-black" />
                   </a>
                 </>
               )}

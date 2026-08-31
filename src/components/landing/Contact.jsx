@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { Mail, MessageSquare, Code2 } from 'lucide-react';
 import { fixContactUrl } from './hooks';
 
 const DEFAULT_CONTACT_ITEMS = [
@@ -85,9 +86,13 @@ export function Contact({ contacts, socialMedia, showToast }) {
               className={`bg-surface-dim border-4 border-neu-black p-5 md:p-6 rounded-xl shadow-[8px_8px_0px_0px_#0D0D0D] flex items-center gap-4 md:gap-6 hover:-translate-y-2 ${item.hoverBg} transition-all select-none group text-neu-black`}
             >
               <div className="w-14 h-14 md:w-16 md:h-16 bg-neu-black text-neu-white border-4 border-neu-black rounded-lg flex items-center justify-center shrink-0">
-                <span className="material-symbols-outlined text-3xl md:text-4xl">
-                  {item.icon}
-                </span>
+                {item.icon === 'email' ? (
+                  <Mail className="w-7 h-7 md:w-8 md:h-8 text-neu-white stroke-[2.5]" />
+                ) : item.icon === 'chat' ? (
+                  <MessageSquare className="w-7 h-7 md:w-8 md:h-8 text-neu-white stroke-[2.5]" />
+                ) : (
+                  <Code2 className="w-7 h-7 md:w-8 md:h-8 text-neu-white stroke-[2.5]" />
+                )}
               </div>
               <div className="min-w-0">
                 <h4 className="font-display text-xl md:text-2xl font-black uppercase text-neu-black group-hover:text-inherit">

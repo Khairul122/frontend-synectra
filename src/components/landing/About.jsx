@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { Zap, Layers, Activity } from 'lucide-react';
 
 export function About() {
   const { t } = useTranslation();
@@ -23,21 +24,21 @@ export function About() {
         <div className="flex-1 flex flex-col gap-4 md:gap-6 w-full">
           <div className="flex items-center gap-4 md:gap-6 bg-primary-container border-4 border-neu-black rounded-xl p-4 md:p-6 shadow-[6px_6px_0px_0px_#0D0D0D] transform hover:translate-x-2 transition-transform">
             <div className="w-14 h-14 md:w-16 md:h-16 bg-neu-white border-4 border-neu-black rounded-lg flex items-center justify-center shrink-0">
-              <span className="material-symbols-outlined text-neu-green text-3xl md:text-4xl font-bold">bolt</span>
+              <Zap className="text-neu-green w-8 h-8 md:w-9 md:h-9 stroke-[2.5]" />
             </div>
             <span className="font-mono font-black text-lg md:text-xl uppercase text-neu-black">FAST DELIVERY</span>
           </div>
 
           <div className="flex items-center gap-4 md:gap-6 bg-neu-purple text-neu-white border-4 border-neu-black rounded-xl p-4 md:p-6 shadow-[6px_6px_0px_0px_#0D0D0D] transform hover:translate-x-2 transition-transform">
             <div className="w-14 h-14 md:w-16 md:h-16 bg-neu-white border-4 border-neu-black rounded-lg flex items-center justify-center shrink-0">
-              <span className="material-symbols-outlined text-neu-purple text-3xl md:text-4xl font-bold">layers</span>
+              <Layers className="text-neu-purple w-8 h-8 md:w-9 md:h-9 stroke-[2.5]" />
             </div>
             <span className="font-mono font-black text-lg md:text-xl uppercase">SCALABLE CODE</span>
           </div>
 
           <div className="flex items-center gap-4 md:gap-6 bg-surface-dim border-4 border-neu-black rounded-xl p-4 md:p-6 shadow-[6px_6px_0px_0px_#0D0D0D] transform hover:translate-x-2 transition-transform">
             <div className="w-14 h-14 md:w-16 md:h-16 bg-neu-white border-4 border-neu-black rounded-lg flex items-center justify-center shrink-0">
-              <span className="material-symbols-outlined text-secondary-container text-3xl md:text-4xl font-bold">monitoring</span>
+              <Activity className="text-secondary-container w-8 h-8 md:w-9 md:h-9 stroke-[2.5]" />
             </div>
             <span className="font-mono font-black text-lg md:text-xl uppercase text-neu-black">24/7 MONITORING</span>
           </div>

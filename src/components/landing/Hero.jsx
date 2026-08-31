@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { ArrowRight } from 'lucide-react';
 
 export function Hero({ transitionTo, scrollTo, portfolioRef }) {
   const { t } = useTranslation();
@@ -46,9 +47,7 @@ export function Hero({ transitionTo, scrollTo, portfolioRef }) {
               className="w-full sm:w-auto font-display text-lg md:text-xl uppercase font-black text-neu-black bg-primary-container px-8 md:px-12 py-5 md:py-6 border-4 border-neu-black deep-shadow rounded-lg btn-press flex items-center justify-center gap-4 group cursor-pointer"
             >
               {t('landing.hero.cta', 'MULAI PROYEK')}
-              <span className="material-symbols-outlined text-3xl md:text-4xl font-black group-hover:translate-x-3 transition-transform">
-                arrow_forward
-              </span>
+              <ArrowRight className="w-7 h-7 md:w-8 md:h-8 stroke-[3] group-hover:translate-x-2 transition-transform" />
             </button>
           </div>
         </div>
