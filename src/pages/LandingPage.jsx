@@ -12,28 +12,31 @@ import { API_BASE_URL } from '../constants/api';
 import { useIsDesktop } from '../hooks/useIsDesktop';
 import { supaImg } from '../utils/imageUrl';
 
+import { lazy, Suspense } from 'react';
 import { useLenis, usePageTransition } from '../components/landing/hooks';
 import { PortfolioModal } from '../components/landing/PortfolioModal';
 import { SoftwareDetailModal } from '../components/landing/SoftwareDetailModal';
 import { BannerDetailModal } from '../components/landing/BannerDetailModal';
 import { BannerToast } from '../components/landing/BannerToast';
-import { FeedbackSection } from '../components/landing/FeedbackSection';
 import { Navbar } from '../components/landing/Navbar';
 import { Hero } from '../components/landing/Hero';
 import { TechMarquee } from '../components/landing/TechMarquee';
 import { Stats } from '../components/landing/Stats';
 import { Services } from '../components/landing/Services';
-import { About } from '../components/landing/About';
-import { Packages } from '../components/landing/Packages';
-import { Banners } from '../components/landing/Banners';
-import { Software } from '../components/landing/Software';
-import { Portfolio } from '../components/landing/Portfolio';
-import { WhyChooseUs } from '../components/landing/WhyChooseUs';
-import { HowItWorks } from '../components/landing/HowItWorks';
-import { Contact } from '../components/landing/Contact';
-import { CTAFinal } from '../components/landing/CTAFinal';
-import { Footer } from '../components/landing/Footer';
 import { FloatingCTA } from '../components/landing/FloatingCTA';
+
+// Below-the-fold sections are lazy loaded to minimize initial JS execution on mobile
+const About           = lazy(() => import('../components/landing/About').then(m => ({ default: m.About })));
+const Packages        = lazy(() => import('../components/landing/Packages').then(m => ({ default: m.Packages })));
+const Banners         = lazy(() => import('../components/landing/Banners').then(m => ({ default: m.Banners })));
+const Software        = lazy(() => import('../components/landing/Software').then(m => ({ default: m.Software })));
+const Portfolio       = lazy(() => import('../components/landing/Portfolio').then(m => ({ default: m.Portfolio })));
+const WhyChooseUs     = lazy(() => import('../components/landing/WhyChooseUs').then(m => ({ default: m.WhyChooseUs })));
+const HowItWorks      = lazy(() => import('../components/landing/HowItWorks').then(m => ({ default: m.HowItWorks })));
+const Contact         = lazy(() => import('../components/landing/Contact').then(m => ({ default: m.Contact })));
+const FeedbackSection = lazy(() => import('../components/landing/FeedbackSection').then(m => ({ default: m.FeedbackSection })));
+const CTAFinal        = lazy(() => import('../components/landing/CTAFinal').then(m => ({ default: m.CTAFinal })));
+const Footer          = lazy(() => import('../components/landing/Footer').then(m => ({ default: m.Footer })));
 
 const BASE = API_BASE_URL || '';
 
@@ -195,9 +198,9 @@ export default function LandingPage() {
 
   const mainRef = useRef(null);
 
-  // ── GSAP ScrollTrigger Per-Section Reveal Animations ──
+  // ── GSAP ScrollTrigger Per-Section Reveal Animations (Desktop Only) ──
   useEffect(() => {
-    if (isLoading) return;
+    if (isLoading || !isDesktop) return;
 
     const ctx = gsap.context(() => {
       const sections = gsap.utils.toArray('.gsap-section-reveal');
@@ -243,7 +246,7 @@ export default function LandingPage() {
     }, mainRef);
 
     return () => ctx.revert();
-  }, [isLoading]);
+  }, [isLoading, isDesktop]);
 
   const scrollTo = (ref) => ref.current?.scrollIntoView({ behavior: 'smooth' });
 
@@ -348,71 +351,73 @@ export default function LandingPage() {
           <Services services={services} isLoading={isLoading} error={errors.services} />
         </div>
 
-        <div className="gsap-section-reveal w-full">
-          <About stats={stats} isLoading={isLoading} />
-        </div>
+        <Suspense fallback={null}>
+          <div className="gsap-section-reveal w-full">
+            <About stats={stats} isLoading={isLoading} />
+          </div>
 
-        <div className="gsap-section-reveal w-full">
-          <Packages
-            packages={packages}
-            isLoading={isLoading}
-            error={errors.packages}
-            pkgSliderRef={pkgSliderRef}
-            pkgDrag={pkgDrag}
-            scrollSlider={scrollSlider}
-            navigateProtected={navigateProtected}
-          />
-        </div>
+          <div className="gsap-section-reveal w-full">
+            <Packages
+              packages={packages}
+              isLoading={isLoading}
+              error={errors.packages}
+              pkgSliderRef={pkgSliderRef}
+              pkgDrag={pkgDrag}
+              scrollSlider={scrollSlider}
+              navigateProtected={navigateProtected}
+            />
+          </div>
 
-        <div className="gsap-section-reveal w-full">
-          <Banners banners={banners} onOpenModal={setActiveBannerModal} />
-        </div>
+          <div className="gsap-section-reveal w-full">
+            <Banners banners={banners} onOpenModal={setActiveBannerModal} />
+          </div>
 
-        <div className="gsap-section-reveal w-full">
-          <Software
-            softwareProducts={softwareProducts}
-            isLoading={isLoading}
-            error={errors.softwareProducts}
-            swSliderRef={swSliderRef}
-            swDrag={swDrag}
-            scrollSlider={scrollSlider}
-            setActiveSoftware={setActiveSoftware}
-            navigateProtected={navigateProtected}
-          />
-        </div>
+          <div className="gsap-section-reveal w-full">
+            <Software
+              softwareProducts={softwareProducts}
+              isLoading={isLoading}
+              error={errors.softwareProducts}
+              swSliderRef={swSliderRef}
+              swDrag={swDrag}
+              scrollSlider={scrollSlider}
+              setActiveSoftware={setActiveSoftware}
+              navigateProtected={navigateProtected}
+            />
+          </div>
 
-        <div className="gsap-section-reveal w-full">
-          <Portfolio
-            portfolios={portfolios}
-            isLoading={isLoading}
-            error={errors.portfolios}
-            portfolioRef={portfolioRef}
-            setActivePortfolio={setActivePortfolio}
-            transitionTo={transitionTo}
-          />
-        </div>
+          <div className="gsap-section-reveal w-full">
+            <Portfolio
+              portfolios={portfolios}
+              isLoading={isLoading}
+              error={errors.portfolios}
+              portfolioRef={portfolioRef}
+              setActivePortfolio={setActivePortfolio}
+              transitionTo={transitionTo}
+            />
+          </div>
 
-        <div className="gsap-section-reveal w-full">
-          <WhyChooseUs />
-        </div>
+          <div className="gsap-section-reveal w-full">
+            <WhyChooseUs />
+          </div>
 
-        <div className="gsap-section-reveal w-full">
-          <HowItWorks />
-        </div>
+          <div className="gsap-section-reveal w-full">
+            <HowItWorks />
+          </div>
 
-        <div className="gsap-section-reveal w-full">
-          <Contact contacts={contacts} socialMedia={socialMedia} showToast={showToast} />
-        </div>
+          <div className="gsap-section-reveal w-full">
+            <Contact contacts={contacts} socialMedia={socialMedia} showToast={showToast} />
+          </div>
 
-        <div className="gsap-section-reveal w-full">
-          <FeedbackSection feedbacks={feedbacks} onSubmitted={fb => setFeedbacks(prev => [fb, ...prev])} />
-        </div>
+          <div className="gsap-section-reveal w-full">
+            <FeedbackSection feedbacks={feedbacks} onSubmitted={fb => setFeedbacks(prev => [fb, ...prev])} />
+          </div>
 
-        <div className="gsap-section-reveal w-full">
-          <CTAFinal transitionTo={transitionTo} />
-        </div>
+          <div className="gsap-section-reveal w-full">
+            <CTAFinal transitionTo={transitionTo} />
+          </div>
 
-        <Footer socialMedia={socialMedia} services={services} transitionTo={transitionTo} />
+          <Footer socialMedia={socialMedia} services={services} transitionTo={transitionTo} />
+        </Suspense>
       </main>
 
       <FloatingCTA showScrollTop={showScrollTop} transitionTo={transitionTo} />
