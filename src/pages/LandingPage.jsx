@@ -1,23 +1,20 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, lazy, Suspense } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from '../components/ui/dialog';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import axios from 'axios';
 
-gsap.registerPlugin(ScrollTrigger);
 import { cn } from '../utils/cn';
 import { API_BASE_URL } from '../constants/api';
 import { useIsDesktop } from '../hooks/useIsDesktop';
 import { supaImg } from '../utils/imageUrl';
 
 import { useLenis, usePageTransition } from '../components/landing/hooks';
-import { PortfolioModal } from '../components/landing/PortfolioModal';
-import { SoftwareDetailModal } from '../components/landing/SoftwareDetailModal';
-import { BannerDetailModal } from '../components/landing/BannerDetailModal';
 import { BannerToast } from '../components/landing/BannerToast';
 import { FeedbackSection } from '../components/landing/FeedbackSection';
+
+const PortfolioModal = lazy(() => import('../components/landing/PortfolioModal').then(m => ({ default: m.PortfolioModal })));
+const SoftwareDetailModal = lazy(() => import('../components/landing/SoftwareDetailModal').then(m => ({ default: m.SoftwareDetailModal })));
+const BannerDetailModal = lazy(() => import('../components/landing/BannerDetailModal').then(m => ({ default: m.BannerDetailModal })));
 import { Navbar } from '../components/landing/Navbar';
 import { Hero } from '../components/landing/Hero';
 import { TechMarquee } from '../components/landing/TechMarquee';
@@ -196,54 +193,61 @@ export default function LandingPage() {
 
   const mainRef = useRef(null);
 
-  // ── GSAP ScrollTrigger Per-Section Reveal Animations (Desktop Only) ──
+  // ── GSAP ScrollTrigger Per-Section Reveal Animations (Desktop Only, Dynamic Import) ──
   useEffect(() => {
     if (isLoading || !isDesktop) return;
 
-    const ctx = gsap.context(() => {
-      const sections = gsap.utils.toArray('.gsap-section-reveal');
+    let ctx;
+    Promise.all([
+      import('gsap'),
+      import('gsap/ScrollTrigger'),
+    ]).then(([{ gsap }, { ScrollTrigger }]) => {
+      gsap.registerPlugin(ScrollTrigger);
+      ctx = gsap.context(() => {
+        const sections = gsap.utils.toArray('.gsap-section-reveal');
 
-      sections.forEach((sec) => {
-        gsap.fromTo(
-          sec,
-          { y: 55, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.85,
-            ease: 'power3.out',
-            scrollTrigger: {
-              trigger: sec,
-              start: 'top 88%',
-              toggleActions: 'play none none reverse',
-            },
-          }
-        );
-
-        const staggerItems = sec.querySelectorAll('.gsap-card-stagger');
-        if (staggerItems.length > 0) {
+        sections.forEach((sec) => {
           gsap.fromTo(
-            staggerItems,
-            { y: 40, opacity: 0, scale: 0.94 },
+            sec,
+            { y: 55, opacity: 0 },
             {
               y: 0,
               opacity: 1,
-              scale: 1,
-              duration: 0.65,
-              stagger: 0.12,
-              ease: 'back.out(1.4)',
+              duration: 0.85,
+              ease: 'power3.out',
               scrollTrigger: {
                 trigger: sec,
-                start: 'top 82%',
+                start: 'top 88%',
                 toggleActions: 'play none none reverse',
               },
             }
           );
-        }
-      });
-    }, mainRef);
 
-    return () => ctx.revert();
+          const staggerItems = sec.querySelectorAll('.gsap-card-stagger');
+          if (staggerItems.length > 0) {
+            gsap.fromTo(
+              staggerItems,
+              { y: 40, opacity: 0, scale: 0.94 },
+              {
+                y: 0,
+                opacity: 1,
+                scale: 1,
+                duration: 0.65,
+                stagger: 0.12,
+                ease: 'back.out(1.4)',
+                scrollTrigger: {
+                  trigger: sec,
+                  start: 'top 82%',
+                  toggleActions: 'play none none reverse',
+                },
+              }
+            );
+          }
+        });
+      }, mainRef);
+    });
+
+    return () => ctx?.revert();
   }, [isLoading, isDesktop]);
 
   const scrollTo = (ref) => ref.current?.scrollIntoView({ behavior: 'smooth' });
@@ -291,44 +295,38 @@ export default function LandingPage() {
         document.body
       )}
 
-      {/* ── Banner Detail Modal (buka cuma lewat klik - image-nya tidak pernah
-          auto-render, supaya tidak jadi kandidat LCP) ── */}
-      <BannerDetailModal
-        banner={activeBannerModal}
-        isOpen={!!activeBannerModal}
-        onClose={() => setActiveBannerModal(null)}
-        onAction={() => {
-          const el = document.getElementById('kontak');
-          if (el) el.scrollIntoView({ behavior: 'smooth' });
-        }}
-      />
+      {/* ── Modals loaded lazily on demand ── */}
+      <Suspense fallback={null}>
+        {activeBannerModal && (
+          <BannerDetailModal
+            banner={activeBannerModal}
+            isOpen={!!activeBannerModal}
+            onClose={() => setActiveBannerModal(null)}
+            onAction={() => {
+              const el = document.getElementById('kontak');
+              if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }}
+          />
+        )}
 
-      {/* ── Toast Promo Awal (pengganti popup full-screen otomatis - tanpa
-          gambar sama sekali, jadi tidak mungkin jadi elemen LCP) ── */}
-      <BannerToast
-        banner={bannerAd}
-        onClose={() => setBannerAd(null)}
-        onViewDetail={() => {
-          setActiveBannerModal(bannerAd);
-          setBannerAd(null);
-        }}
-      />
+        {activePortfolio && (
+          <PortfolioModal
+            item={activePortfolio}
+            open={!!activePortfolio}
+            onClose={() => setActivePortfolio(null)}
+            transitionTo={transitionTo}
+          />
+        )}
 
-      {/* ── Portfolio Detail Modal ── */}
-      <PortfolioModal
-        item={activePortfolio}
-        open={!!activePortfolio}
-        onClose={() => setActivePortfolio(null)}
-        transitionTo={transitionTo}
-      />
-
-      {/* ── Software Detail Modal ── */}
-      <SoftwareDetailModal
-        sw={activeSoftware}
-        open={!!activeSoftware}
-        onClose={() => setActiveSoftware(null)}
-        transitionTo={transitionTo}
-      />
+        {activeSoftware && (
+          <SoftwareDetailModal
+            sw={activeSoftware}
+            open={!!activeSoftware}
+            onClose={() => setActiveSoftware(null)}
+            transitionTo={transitionTo}
+          />
+        )}
+      </Suspense>
 
       <Navbar activeSection={activeSection} menuOpen={menuOpen} setMenuOpen={setMenuOpen} transitionTo={transitionTo} progressBarRef={progressBarRef} />
 

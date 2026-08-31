@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { gsap } from 'gsap';
 
 /* ─── Pastikan URL kontak punya prefix yang benar ────────────────────── */
 export function fixContactUrl(linkUrl, iconKey) {
@@ -52,14 +51,18 @@ export function useLenis(enabled) {
   }, [enabled]);
 }
 
-/* ─── Barba-style page transition ─────────────────────────────────────── */
+/* ─── Fast CSS-accelerated page transition ─────────────────────────────── */
 export function usePageTransition() {
   const pageRef = useRef(null);
   const navigate = useNavigate();
-  const transitionTo = async (path) => {
+  const transitionTo = (path) => {
     if (!pageRef.current) { navigate(path); return; }
-    await gsap.to(pageRef.current, { opacity: 0, y: -30, duration: 0.4, ease: 'power2.in' });
-    navigate(path);
+    pageRef.current.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+    pageRef.current.style.opacity = '0';
+    pageRef.current.style.transform = 'translateY(-15px)';
+    setTimeout(() => {
+      navigate(path);
+    }, 200);
   };
   return { pageRef, transitionTo };
 }
