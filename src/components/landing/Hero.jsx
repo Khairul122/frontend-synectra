@@ -27,7 +27,7 @@ export function Hero({ transitionTo, scrollTo, portfolioRef }) {
             </span>
             <span
               className="relative text-transparent bg-clip-text bg-gradient-to-r from-neu-purple to-secondary-container"
-              style={{ WebkitTextStroke: '6px rgb(13, 13, 13)' }}
+              style={{ WebkitTextStroke: 'clamp(2px, 1.2vw, 6px) rgb(13, 13, 13)' }}
             >
               {t('landing.hero.title3', 'REALITA')}
             </span>
